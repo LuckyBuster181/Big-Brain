@@ -30,13 +30,18 @@ def _reload_with_env(test: unittest.TestCase, **env: str) -> None:
     ursprüngliche Zustand nach dem Test wiederhergestellt wird - erst danach,
     nicht schon vor der Prüfung im Testkörper."""
     old_environ = dict(os.environ)
+    # 10.10.2026: Modulinhalt sichern und danach zurücklegen. Ein zweites reload() erzeugte neue Klassen
+    # (z.B. OllamaClient) - Tests anderer Dateien, die von der alten Klasse erben, galten dann nicht mehr
+    # als lokal (isinstance) und schlugen nur im Gesamtlauf fehl.
+    alter_inhalt = dict(vars(llm_provider))
     os.environ.update(env)
     importlib.reload(llm_provider)
 
     def restore() -> None:
         os.environ.clear()
         os.environ.update(old_environ)
-        importlib.reload(llm_provider)
+        vars(llm_provider).clear()
+        vars(llm_provider).update(alter_inhalt)
 
     test.addCleanup(restore)
 

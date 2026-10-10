@@ -85,7 +85,9 @@ class Datenquellen(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.trading = Path(self.tmp.name) / "trading"
         self.ablage = Path(self.tmp.name) / "ablage"
-        self.patch = mock.patch.dict(os.environ, {"TRADING_DATEN_PATH": str(self.trading), "ABLAGE_PATH": str(self.ablage)})
+        # MARKT_DB_PATH eigen: andere Tests (test_kurs) füllen die gemeinsame Test-Datenbank
+        self.patch = mock.patch.dict(os.environ, {"TRADING_DATEN_PATH": str(self.trading), "ABLAGE_PATH": str(self.ablage),
+                                                  "MARKT_DB_PATH": str(Path(self.tmp.name) / "marktdaten.db")})
         self.patch.start()
 
     def tearDown(self):
