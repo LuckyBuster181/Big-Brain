@@ -137,7 +137,8 @@ class RollenSucherSchreiber(unittest.TestCase):
     def setUp(self):
         agenten.leeren()
         self.p = [mock.patch("app.ki_aufruf.chat_service.log_usage"),
-                  mock.patch("app.ki_aufruf._lokal", return_value=False)]
+                  mock.patch("app.ki_aufruf._lokal", return_value=False),
+                  mock.patch.object(agenten, "_vault_material", return_value="VAULT-TREFFER Notiz B")]
         for p in self.p:
             p.start()
 
@@ -193,10 +194,64 @@ class RollenSucherSchreiber(unittest.TestCase):
         wer = {e["agent"] for e in agenten.uebersicht()["verlauf"]}
         self.assertEqual(wer, {"sucher", "schreiber"})
 
+    def test_vault_wird_selbst_durchsucht(self):
+        c = _Client("roh", "Sir, ok.")
+        agenten.sucher_und_schreiber("Was steht zum Vertrag?", client=c)
+        agenten._vault_material.assert_called_once_with("Was steht zum Vertrag?")  # noqa: SLF001
+        self.assertIn("VAULT-TREFFER Notiz B", c.aufrufe[0]["messages"][0]["content"])
+        self.assertNotIn("VAULT-TREFFER", c.aufrufe[1]["messages"][0]["content"])  # Schreiber sucht nicht
+
+    def test_mitgegebenes_vault_material_ersetzt_suche(self):
+        c = _Client("roh", "Sir, ok.")
+        agenten.sucher_und_schreiber("Was steht zum Vertrag?", client=c, vault_material="eigene Treffer")
+        agenten._vault_material.assert_not_called()  # noqa: SLF001
+        self.assertIn("eigene Treffer", c.aufrufe[0]["messages"][0]["content"])
+
     def test_zu_kurze_frage(self):
         from app import ki_aufruf
         with self.assertRaises(ki_aufruf.KiFehler):
             agenten.sucher_und_schreiber("hm", client=_Client("a"))
+
+
+class VaultSucheFehler(unittest.TestCase):
+    def test_fehler_wird_text(self):
+        from app import werkzeuge
+        with mock.patch.object(werkzeuge, "vault_suchen", side_effect=RuntimeError("kein Index")):
+            self.assertIn("kein Index", agenten._vault_material("x"))  # noqa: SLF001
+
+
+class ChatBefehl(unittest.TestCase):
+    """Anschluss an den Chat: Erkennung (app/befehle.py) und Ausführung (app/chat_ablauf.py)."""
+
+    def test_erkennung(self):
+        from app import alltag
+        a = alltag.absicht("Such und schreib: was kostet der neue Vertrag?")
+        self.assertEqual(a, {"art": "sucher_schreiber", "frage": "was kostet der neue Vertrag?", "internet": False})
+        a = alltag.absicht("Auron, such und schreib im Internet: beste Powerbank unter 50 Euro")
+        self.assertEqual(a["art"], "sucher_schreiber")
+        self.assertTrue(a["internet"])
+        self.assertEqual(a["frage"], "beste Powerbank unter 50 Euro")
+        self.assertTrue(alltag.absicht("Sucher und Schreiber: Stand Projekt Garten")["art"] == "sucher_schreiber")
+
+    def test_alte_befehle_unveraendert(self):
+        from app import alltag
+        self.assertEqual(alltag.absicht("Such im Internet nach Mietpreisen in Köln")["art"], "recherche")
+        self.assertIsNone(alltag.absicht("Such und schreib"))   # ohne Doppelpunkt und Frage: normale Nachricht
+
+    def test_ausfuehrung_im_chat(self):
+        from app import chat_ablauf
+        erg = {"text": "Sir, es kostet 5 Euro.", "rohmaterial": "roh", "kosten_usd": 0.0}
+        with mock.patch.object(agenten, "sucher_und_schreiber", return_value=erg) as m:
+            text = chat_ablauf._neue_art({"art": "sucher_schreiber", "frage": "Was kostet das?", "internet": True})  # noqa: SLF001
+        m.assert_called_once_with("Was kostet das?", internet=True)
+        self.assertTrue(text.startswith("Sir, es kostet 5 Euro."))
+        self.assertIn("Vault und Internet", text)
+
+    def test_fehler_im_chat_freundlich(self):
+        from app import chat_ablauf, ki_aufruf
+        with mock.patch.object(agenten, "sucher_und_schreiber", side_effect=ki_aufruf.KiFehler("Rahmen leer")):
+            text = chat_ablauf._neue_art({"art": "sucher_schreiber", "frage": "Was kostet das?"})  # noqa: SLF001
+        self.assertEqual(text, "Das ging nicht, Sir: Rahmen leer")
 
 
 if __name__ == "__main__":

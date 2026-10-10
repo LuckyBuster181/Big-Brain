@@ -9,6 +9,8 @@ welchen Code er ausführt. Grundlage:
   "Nacht-Arbeiter"). Dadurch mussten die einzelnen Arbeits-Module nicht geändert werden.
 
 Nur im Speicher (nach einem Neustart leer), keine KI-Aufrufe, 0 Kosten.
+Ausnahme seit 10.10.2026: die Rollen Sucher und Schreiber (unten, rolle_aufrufen) rufen ein Modell auf.
+Im Chat: "Such und schreib: ..." (nur Vault) oder "Such und schreib im Internet: ..." (app/befehle.py).
 """
 
 from __future__ import annotations
@@ -130,13 +132,29 @@ def rolle_aufrufen(rolle: str, inhalt: str, *, client: Any = None, vault_materia
             websuche=MAX_SUCHEN_SUCHER if (sucher and internet) else 0, client=client)
 
 
-def sucher_und_schreiber(frage: str, *, client: Any = None, vault_material: str = "", internet: bool = False) -> dict:
-    """Erst der Sucher (Rohmaterial), dann der Schreiber (Antwort). Rückgabe: text, rohmaterial, kosten_usd."""
+def _vault_material(frage: str) -> str:
+    """Vault-Treffer als Text für den Sucher (gleiche Suche wie das Werkzeug vault_suche). Fehler -> Hinweistext."""
+    try:
+        from . import werkzeuge  # noqa: PLC0415
+
+        return werkzeuge.vault_suchen({"suchanfrage": frage}, werkzeuge.Kontext())
+    except Exception as exc:  # noqa: BLE001 - ohne Vault arbeitet der Sucher trotzdem weiter
+        return f"Vault-Suche nicht möglich: {exc}"
+
+
+def sucher_und_schreiber(frage: str, *, client: Any = None, vault_material: str | None = None,
+                         internet: bool = False) -> dict:
+    """Erst der Sucher (Rohmaterial), dann der Schreiber (Antwort). Rückgabe: text, rohmaterial, kosten_usd.
+    Ohne vault_material durchsucht der Sucher den Vault selbst. Internet nur mit internet=True (Claude, kostet)."""
     from . import ki_aufruf  # noqa: PLC0415
 
     frage = (frage or "").strip()
     if len(frage) < 4:
         raise ki_aufruf.KiFehler("Was soll ich suchen, Sir?")
+    if client is None:
+        ki_aufruf.rest_pruefen()   # lokal: nichts zu prüfen; Claude: Monatsrahmen
+    if vault_material is None:
+        vault_material = _vault_material(frage)
     roh = rolle_aufrufen("sucher", frage, client=client, vault_material=vault_material, internet=internet)
     ant = rolle_aufrufen("schreiber", frage, client=client, rohmaterial=roh["text"])
     return {"text": ant["text"], "rohmaterial": roh["text"],

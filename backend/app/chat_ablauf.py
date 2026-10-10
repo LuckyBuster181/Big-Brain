@@ -123,12 +123,12 @@ def _absicht_ausfuehren(a: dict) -> Iterator[dict]:
 
 
 NEUE_ARTEN = ("pc", "whatsapp", "schreiben", "recherche", "recherche_speichern", "mindmap", "projekt", "termin", "tagesplan",
-              "umwandeln")
+              "umwandeln", "sucher_schreiber")
 
 
 def _neue_art(a: dict) -> str | tuple[str, list[dict]]:
     """Neue Alltagsfunktionen (27.09.2026). Fehler kommen als freundlicher Satz zurück."""
-    from . import mindmap, planung, projekte, recherche, schreiben, umwandeln, whatsapp
+    from . import agenten, mindmap, planung, projekte, recherche, schreiben, umwandeln, whatsapp
 
     art = a["art"]
     try:
@@ -148,6 +148,11 @@ def _neue_art(a: dict) -> str | tuple[str, list[dict]]:
             e = recherche.recherchieren(a["frage"])
             return (f"{e['text']}\n\n*Websuche ({e['suchen']} Suchen), Kosten ca. {ki_aufruf.cent(e['kosten_usd'])}. "
                     "\"Speicher die Recherche\" legt sie als Notiz an.*")
+        if art == "sucher_schreiber":
+            # 10.10.2026: Sucher (Haiku) sammelt Rohmaterial, Schreiber formuliert (app/agenten.py)
+            e = agenten.sucher_und_schreiber(a["frage"], internet=a.get("internet", False))
+            wo = "Vault und Internet" if a.get("internet") else "Vault"
+            return f"{e['text']}\n\n*Sucher und Schreiber ({wo}), Kosten ca. {ki_aufruf.cent(e['kosten_usd'])}.*"
         if art == "recherche_speichern":
             v = recherche.letzte_speichern()
             return (f'Soll ich die Recherche als Notiz "{v["titel"]}" in "{recherche.ORDNER}" anlegen, Sir? '
