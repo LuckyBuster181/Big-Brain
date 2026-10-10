@@ -405,6 +405,28 @@ class ChatAblauf(MitVault):
         ev = self.lauf(message="Zeig mir den Markt")
         self.assertIn({"typ": "hud", "aktion": "seite", "seite": "markt"}, ev)
 
+    def test_recherche_ohne_schluessel_freundlich(self):
+        # 10.10.2026 (Cloud-Prüfstand): ohne Claude-Schlüssel brach der Stream vorher stumm ab
+        from app import aufgaben_loop, ki_aufruf
+        with mock.patch.object(ki_aufruf, "_lokal", return_value=False), \
+                mock.patch.object(ki_aufruf, "rest_pruefen"), \
+                mock.patch.object(aufgaben_loop, "_anthropic_client",
+                                  side_effect=RuntimeError("ANTHROPIC_API_KEY ist nicht gesetzt")):
+            ev = self.lauf(message="Recherchiere: beste Powerbank")
+        text = "".join(e.get("text", "") for e in ev if e["typ"] == "text")
+        self.assertIn("Sir", text)
+        self.assertIn("Claude ist nicht erreichbar", text)
+        self.assertEqual(ev[-1], {"typ": "fertig"})
+
+    def test_unerwarteter_fehler_wird_gemeldet(self):
+        def kaputt(*a, **kw):
+            yield {"typ": "text", "text": "Anfang"}
+            raise ValueError("kaputt")
+        with mock.patch.object(chat_ablauf, "_inner", kaputt):
+            ev = self.lauf(message="Hallo")
+        self.assertEqual(ev[-1]["typ"], "fehler")
+        self.assertIn("ValueError: kaputt", ev[-1]["text"])
+
     def test_diktat_dann_ja(self):
         ev = self.lauf(message="Merk dir: Bot-Rohfassung liegt im Vault")
         v = next(e["vorschlag"] for e in ev if e["typ"] == "vorschlag")

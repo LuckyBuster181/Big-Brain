@@ -32,6 +32,7 @@ from __future__ import annotations
 import datetime
 import re
 import time
+import traceback
 from typing import Any, Iterator
 
 from . import (agent_service, alltag, chat_service, gespraeche, hauptpc, ki_aufruf, marktdaten, nachtauftraege,
@@ -368,6 +369,18 @@ def kanarienvogel(modus: str | None, antwort: str) -> bool:
     return modus in CLAUDE_MODI and bool((antwort or "").strip()) and not _SIR_RE.search(antwort)
 
 
+def _abgesichert(quelle: Iterator[dict]) -> Iterator[dict]:
+    """10.10.2026 (Befund Cloud-Prüfstand): Ein unerwarteter Fehler beendete den Stream ohne ein Wort - Auron
+    blieb stumm. Jetzt kommt ein "fehler"-Ereignis, das alle Oberflächen anzeigen. Der volle Fehler steht weiter
+    im Protokoll des Backends."""
+    try:
+        yield from quelle
+    except Exception as exc:  # noqa: BLE001
+        print("[Chat] Unerwarteter Fehler:", flush=True)
+        traceback.print_exc()
+        yield {"typ": "fehler", "text": f"Da ist etwas schiefgelaufen, Sir: {exc.__class__.__name__}: {exc}"[:300]}
+
+
 def ereignisse(request: ChatRequest) -> Iterator[dict]:
     """Alle Ereignisse einer Anfrage, inkl. Speichern des Gesprächs."""
     try:
@@ -378,7 +391,7 @@ def ereignisse(request: ChatRequest) -> Iterator[dict]:
     laenge = request.laenge if request.laenge in ("kurz", "ausfuehrlich") else None
 
     antwort, quellen, modus, ki = [], [], None, {}
-    for e in _inner(request, modell, laenge):
+    for e in _abgesichert(_inner(request, modell, laenge)):
         typ = e.get("typ")
         if typ == "_modus":
             modus = e["modus"]

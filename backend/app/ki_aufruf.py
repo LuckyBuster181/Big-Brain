@@ -89,7 +89,10 @@ def aufrufen(system: str, inhalt: str | list[dict], *, modus: str, modell: str |
         else:
             if _lokal():  # Websuche/Bilder gehen nur über Claude: Monatsrahmen prüfen
                 _rest_pruefen_claude()
-            client = aufgaben_loop._anthropic_client()  # noqa: SLF001
+            try:
+                client = aufgaben_loop._anthropic_client()  # noqa: SLF001
+            except Exception as exc:  # noqa: BLE001 - 10.10.2026: z.B. Schlüssel fehlt; vorher brach der Chat stumm ab
+                raise KiFehler(f"Claude ist nicht erreichbar ({exc})") from exc
     nachrichten = [*(verlauf or []), {"role": "user", "content": inhalt}]
     argumente: dict[str, Any] = {"model": modell, "max_tokens": max_tokens,
                                  "system": chat_service.cache_system(system), "messages": nachrichten}
