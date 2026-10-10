@@ -318,9 +318,12 @@ def _seite_pruefen(browser, basis: str, name: str, adresse: str, b: Bericht, bil
     try:
         seite.goto(basis + adresse, wait_until="load", timeout=30000)
         seite.wait_for_timeout(6000)   # Seiten laden Daten nach, 3D braucht Zeit
-        seite.screenshot(path=str(bilder / f"{name}.png"))
     except Exception as exc:  # noqa: BLE001
         funde.append(("Laden", str(exc)[:300]))
+    try:
+        seite.screenshot(path=str(bilder / f"{name}.png"), timeout=60000)
+    except Exception as exc:  # noqa: BLE001 - ohne Grafikkarte (GitHub) ist 3D manchmal zu langsam fürs Foto
+        b.h("Browser", f"{name}: kein Bildschirmfoto ({str(exc).splitlines()[0][:120]})")
     kontext.close()
     echte = 0
     for art, text in dict.fromkeys(funde):   # gleiche Meldung nur einmal
@@ -461,6 +464,8 @@ def main(argv: list[str] | None = None) -> int:
         bericht_schreiben(b, ausgabe, time.time() - beginn, log)
         if not a.behalten:
             shutil.rmtree(arbeit, ignore_errors=True)
+    for f in b.fehler:
+        print(f"[Prüfstand] FEHLER [{f['bereich']}] {f['text']}"[:500], flush=True)
     print(f"[Prüfstand] {'FEHLER' if b.fehler else 'OK'}: {len(b.fehler)} Fehler, {len(b.hinweise)} Hinweise, "
           f"{len(b.ok)} bestanden. Bericht: {ausgabe / 'bericht.md'}", flush=True)
     return 1 if b.fehler else 0
