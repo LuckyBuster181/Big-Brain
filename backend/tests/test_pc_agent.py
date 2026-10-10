@@ -14,6 +14,8 @@ from pathlib import Path
 from unittest import mock
 
 _PFAD = Path(__file__).resolve().parents[2] / "pc_agent_windows" / "jarvis_pc_agent.py"
+if not _PFAD.exists():
+    raise unittest.SkipTest("pc_agent_windows fehlt (nur auf Sirs PC, nicht im Repo)")
 _spec = importlib.util.spec_from_file_location("jarvis_pc_agent", _PFAD)
 agent = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(agent)

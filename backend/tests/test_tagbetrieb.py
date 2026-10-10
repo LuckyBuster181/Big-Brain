@@ -301,7 +301,7 @@ class ChatServiceTest(Grundlage):
         with tempfile.TemporaryDirectory() as t, mock.patch.dict(os.environ, {"GESPRAECHE_PATH": t}), \
                 mock.patch.object(p.requests, "post", return_value=OllamaAntwort(("Bestens, Sir.",))):
             list(chat_ablauf.ereignisse(ChatRequest(message="wie geht's dir")))
-            e = gespraeche.tag_laden(datetime.date.today().isoformat())[-1]
+            e = gespraeche.tag_laden(gespraeche._jetzt().date().isoformat())[-1]  # noqa: SLF001 - gleiche Uhr wie das Modul
         self.assertEqual(e["modell"], "m9")
         self.assertEqual(e["ki_rechner"], "Haupt-PC")
         self.assertEqual(e["antwort"], "Bestens, Sir.")
@@ -312,7 +312,7 @@ class ChatServiceTest(Grundlage):
         with tempfile.TemporaryDirectory() as t, mock.patch.dict(os.environ, {"GESPRAECHE_PATH": t}), \
                 mock.patch.object(p.requests, "post", return_value=OllamaAntwort(("好的好的好的",))):
             list(chat_ablauf.ereignisse(ChatRequest(message="wie geht's dir")))
-            e = gespraeche.tag_laden(datetime.date.today().isoformat())[-1]
+            e = gespraeche.tag_laden(gespraeche._jetzt().date().isoformat())[-1]  # noqa: SLF001 - gleiche Uhr wie das Modul
         self.assertEqual(e["antwort"], "Claude hier, Sir.")
         self.assertIn("fremder Schrift", e["rueckfall_grund"])
         self.assertEqual(e["modell"], "claude-sonnet-5")

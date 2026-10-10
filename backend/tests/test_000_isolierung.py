@@ -54,6 +54,13 @@ UMLEITUNGEN = {
     "SPRACHMEMOS_PATH": _TMP / "sprachmemos",
     # 03.10.2026: Ollama-Rechnerliste
     "KI_LOKAL_PATH": _TMP / "ki_lokal.json",
+    # 10.10.2026: Suchindex, Nachtarbeit-Log, Sicherheitscheck und .env - Tests griffen sonst auf die
+    # echten Dateien zu (Befund Cloud-Prüfstand: data/vector_db wurde beim Testlauf angelegt).
+    "CHROMA_PATH": _TMP / "vector_db",
+    "NACHTARBEIT_LOG_PATH": _TMP / "nachtarbeit_log.jsonl",
+    "SICHERHEITSCHECK_PATH": _TMP / "sicherheitscheck_bericht.txt",
+    "JARVIS_ENV_PATH": _TMP / ".env",
+    "FEHLER_LOG_PATH": _TMP / "fehler_log.jsonl",
 }
 for _name, _pfad in UMLEITUNGEN.items():
     os.environ[_name] = str(_pfad)

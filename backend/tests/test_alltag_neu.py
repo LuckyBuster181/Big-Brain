@@ -338,7 +338,10 @@ class HauptPc(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "pc_agent_windows"))
+        ordner = Path(__file__).resolve().parents[2] / "pc_agent_windows"
+        if not (ordner / "jarvis_pc_agent.py").exists():
+            raise unittest.SkipTest("pc_agent_windows fehlt (nur auf Sirs PC, nicht im Repo)")
+        sys.path.insert(0, str(ordner))
         import jarvis_pc_agent
 
         cls.agent = jarvis_pc_agent

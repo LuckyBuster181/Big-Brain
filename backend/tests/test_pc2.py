@@ -22,6 +22,8 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 AGENT_ORDNER = Path(__file__).resolve().parents[2] / "pc2_agent"
+if not (AGENT_ORDNER / "jarvis_agent.py").exists():
+    raise unittest.SkipTest(f"{AGENT_ORDNER.name} fehlt (nur auf Sirs PC, nicht im Repo)")
 sys.path.insert(0, str(AGENT_ORDNER))
 import jarvis_agent  # noqa: E402
 

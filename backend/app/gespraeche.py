@@ -29,6 +29,9 @@ import uuid
 from pathlib import Path
 from typing import Any
 
+from dateutil import tz
+
+ZEITZONE = tz.gettz("Europe/Berlin") or tz.tzlocal()
 DEFAULT_ORDNER = Path(__file__).resolve().parents[2] / "data" / "gespraeche"
 MAX_ANTWORT_ZEICHEN = 20_000
 MAX_TREFFER = 30
@@ -47,7 +50,9 @@ def aktiv() -> bool:
 
 
 def _jetzt() -> datetime.datetime:
-    return datetime.datetime.now().astimezone()
+    # 10.10.2026: deutsche Zeit wie alltag.jetzt() (Tagesnotiz). Mit der Rechner-Zeitzone landeten Gespräche
+    # nach 22/23 Uhr auf einem Rechner in UTC (z.B. Linux-Mini-PC) beim falschen Tag.
+    return datetime.datetime.now(ZEITZONE)
 
 
 def _datei(tag: str) -> Path:

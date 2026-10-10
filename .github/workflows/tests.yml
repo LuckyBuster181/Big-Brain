@@ -1,0 +1,94 @@
+# Automatische Tests (10.10.2026, Claude Code).
+# Laeuft bei jedem Pull Request und jedem Push auf main. Rot = nicht zu Sir.
+# Gleiche Python-Version wie Sirs PC (run_log.txt: Python 3.14), deutsche Zeitzone wie dort.
+# Keine Schluessel, keine .env, kein Vault: die Tests brauchen nichts davon (test_000_isolierung).
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Neuer Push bricht den alten Lauf desselben Zweigs ab (spart Minuten im kostenlosen Kontingent)
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  unittest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      TZ: Europe/Berlin
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: PDF-Werkzeuge (fuer die Umwandeln-Tests; ohne sie werden 2 Tests uebersprungen)
+        continue-on-error: true
+        run: sudo apt-get update -q && sudo apt-get install -y --no-install-recommends poppler-utils
+
+      - name: Pakete installieren
+        run: pip install -r requirements.txt
+
+      - name: Tests
+        run: python -m unittest discover -s tests -p "test_*.py"
+
+      - name: Echte Daten unberuehrt?
+        # Tests duerfen nie in den echten data-Ordner schreiben (Schutz in tests/test_000_isolierung.py)
+        run: |
+          if [ -d ../data ]; then
+            echo "FEHLER: Tests haben in data/ geschrieben:"; find ../data -type f; exit 1
+          fi
+
+  pruefstand:
+    # Cloud-Pruefstand (backend/cloud_pruefstand): echtes Backend mit Ersatz-KI und Test-Vault,
+    # Auron im Browser durchklicken. Bericht als Download am Lauf ("pruefstand-bericht").
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      TZ: Europe/Berlin
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Pakete und Browser installieren
+        run: |
+          pip install -r requirements.txt playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Pruefstand
+        run: python -m cloud_pruefstand.lauf --ausgabe ../pruefstand-bericht
+
+      - name: Bericht anzeigen
+        if: always()
+        run: cat ../pruefstand-bericht/bericht.md >> "$GITHUB_STEP_SUMMARY" || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pruefstand-bericht
+          path: pruefstand-bericht
+          retention-days: 14
