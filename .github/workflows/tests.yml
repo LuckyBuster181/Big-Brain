@@ -47,3 +47,42 @@ jobs:
           if [ -d ../data ]; then
             echo "FEHLER: Tests haben in data/ geschrieben:"; find ../data -type f; exit 1
           fi
+
+  pruefstand:
+    # Cloud-Pruefstand (backend/cloud_pruefstand): echtes Backend mit Ersatz-KI und Test-Vault,
+    # Auron im Browser durchklicken. Bericht als Download am Lauf ("pruefstand-bericht").
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      TZ: Europe/Berlin
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Pakete und Browser installieren
+        run: |
+          pip install -r requirements.txt playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Pruefstand
+        run: python -m cloud_pruefstand.lauf --ausgabe ../pruefstand-bericht
+
+      - name: Bericht anzeigen
+        if: always()
+        run: cat ../pruefstand-bericht/bericht.md >> "$GITHUB_STEP_SUMMARY" || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pruefstand-bericht
+          path: pruefstand-bericht
+          retention-days: 14
