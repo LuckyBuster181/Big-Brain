@@ -1,13 +1,19 @@
 # Automatische Tests (10.10.2026, Claude Code).
-# Laeuft bei jedem Push und jedem Pull Request. Rot = nicht zu Sir.
+# Laeuft bei jedem Pull Request und jedem Push auf main. Rot = nicht zu Sir.
 # Gleiche Python-Version wie Sirs PC (run_log.txt: Python 3.14), deutsche Zeitzone wie dort.
 # Keine Schluessel, keine .env, kein Vault: die Tests brauchen nichts davon (test_000_isolierung).
 name: Tests
 
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
+
+# Neuer Push bricht den alten Lauf desselben Zweigs ab (spart Minuten im kostenlosen Kontingent)
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
