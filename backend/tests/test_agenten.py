@@ -107,5 +107,97 @@ class Uebersicht(unittest.TestCase):
             self.assertEqual(agenten.melden("start", "x"), {})
 
 
+class _Block:
+    def __init__(self, text):
+        self.type = "text"
+        self.text = text
+        self.citations = None
+
+
+class _Antwort:
+    def __init__(self, text):
+        self.content = [_Block(text)]
+        self.usage = None
+        self.stop_reason = "end_turn"
+
+
+class _Client:
+    """Merkt sich die Aufrufe; antwortet je Aufruf mit dem nächsten Text."""
+    def __init__(self, *texte):
+        self.texte = list(texte)
+        self.aufrufe = []
+        self.messages = self
+
+    def create(self, **kw):
+        self.aufrufe.append(kw)
+        return _Antwort(self.texte.pop(0))
+
+
+class RollenSucherSchreiber(unittest.TestCase):
+    def setUp(self):
+        agenten.leeren()
+        self.p = [mock.patch("app.ki_aufruf.chat_service.log_usage"),
+                  mock.patch("app.ki_aufruf._lokal", return_value=False)]
+        for p in self.p:
+            p.start()
+
+    def tearDown(self):
+        for p in self.p:
+            p.stop()
+
+    def test_rollen_vorhanden(self):
+        ids = [r["id"] for r in agenten.ROLLEN]
+        self.assertIn("sucher", ids)
+        self.assertIn("schreiber", ids)
+        self.assertEqual(len(ids), len(set(ids)))
+        self.assertEqual(set(agenten.ROLLEN_SYSTEM), {"sucher", "schreiber"})
+
+    def test_systemtexte(self):
+        self.assertIn("NUR Rohmaterial", agenten.SUCHER_SYSTEM)
+        self.assertIn("NICHT selbst", agenten.SUCHER_SYSTEM)
+        self.assertIn("Sir", agenten.SCHREIBER_SYSTEM)
+        self.assertIn("Emojis", agenten.SCHREIBER_SYSTEM)
+
+    def test_sucher_guenstiges_modell_ohne_internet(self):
+        from app import ki_aufruf
+        c = _Client("VAULT: x")
+        agenten.rolle_aufrufen("sucher", "Wie war das mit dem Vertrag?", client=c, vault_material="Notiz A: ...")
+        kw = c.aufrufe[0]
+        self.assertEqual(kw["model"], ki_aufruf.HAIKU)
+        self.assertNotIn("tools", kw)
+        self.assertIn("<vault_treffer>", kw["messages"][0]["content"])
+
+    def test_sucher_mit_internet_nutzt_websuche(self):
+        c = _Client("INTERNET: y")
+        agenten.rolle_aufrufen("sucher", "Preis Powerbank", client=c, internet=True)
+        self.assertEqual(c.aufrufe[0]["tools"][0]["name"], "web_search")
+
+    def test_unbekannte_rolle(self):
+        with self.assertRaises(ValueError):
+            agenten.rolle_aufrufen("koch", "x", client=_Client("a"))
+
+    def test_sucher_dann_schreiber(self):
+        from app import ki_aufruf
+        c = _Client("VAULT: Notiz A sagt 5 Euro", "Sir, es kostet 5 Euro.")
+        e = agenten.sucher_und_schreiber("Was kostet das?", client=c)
+        self.assertEqual(e["text"], "Sir, es kostet 5 Euro.")
+        self.assertEqual(e["rohmaterial"], "VAULT: Notiz A sagt 5 Euro")
+        sucher, schreiber = c.aufrufe
+        self.assertEqual(sucher["model"], ki_aufruf.HAIKU)
+        self.assertEqual(schreiber["model"], ki_aufruf.SONNET)
+        self.assertIn("Notiz A sagt 5 Euro", schreiber["messages"][0]["content"])
+        self.assertNotIn("<rohmaterial>", sucher["messages"][0]["content"])
+
+    def test_meldungen_unter_der_rolle(self):
+        agenten.sucher_und_schreiber("Was kostet das?", client=_Client("roh", "Sir, ok."))
+        wer = {e["agent"] for e in agenten.uebersicht()["verlauf"]}
+        self.assertEqual(wer, {"sucher", "schreiber"})
+
+    def test_zu_kurze_frage(self):
+        from app import ki_aufruf
+        with self.assertRaises(ki_aufruf.KiFehler):
+            agenten.sucher_und_schreiber("hm", client=_Client("a"))
+
+
 if __name__ == "__main__":
     unittest.main()
