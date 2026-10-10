@@ -1,0 +1,42 @@
+<section class="page" id="page-alltag">
+    <div class="seiten-kopf">
+      <div><h1 id="alHallo">Alltag</h1><div class="unter" id="alDatum"></div></div>
+      <div class="al-uhr" id="alUhr"></div>
+    </div>
+    <div class="al-gitter">
+      <div class="card al-wetter">
+        <div class="row" style="justify-content: space-between;">
+          <h2 style="margin:0;">Wetter Kevelaer</h2>
+          <div class="chips" id="ortChips"></div>
+        </div>
+        <div id="weatherNow" class="hint" style="margin-top:10px">lädt …</div>
+        <div class="wdays" id="weatherDays"></div>
+        <div class="wdetail" id="weatherDetail"></div>
+        <div class="err" id="weatherErr"></div>
+      </div>
+      <div class="card al-naechst">
+        <h2>Als Nächstes</h2>
+        <div id="calList"></div>
+      </div>
+      <div class="card al-kalender">
+        <div class="row" style="justify-content: space-between;">
+          <h2 style="margin:0;" id="calTitle">Kalender</h2>
+          <div class="chips">
+            <span class="chip active" id="calMonat" title="Monatsübersicht">Monat</span>
+            <span class="chip" id="calWoche" title="Woche mit Uhrzeiten">Woche</span>
+            <span class="chip" id="calPrev">zurück</span><span class="chip" id="calNext">weiter</span>
+            <span class="chip" id="calHeute" title="Zurück zu heute">heute</span>
+            <span class="chip" id="calReload" title="Termine neu laden">neu laden</span>
+          </div>
+        </div>
+        <div class="cal" id="calGrid" style="margin-top:10px;"></div>
+        <div class="woche" id="calWocheGrid" style="margin-top:10px; display:none;"></div>
+        <div class="tagliste" id="calTag" style="display:none"></div>
+        <div class="hint" id="calNote" style="margin-top:8px"></div>
+      </div>
+      <div class="card al-wartet">
+        <h2>Wartet auf Sie</h2>
+        <div id="alWartet" class="hint">lädt …</div>
+      </div>
+    </div>
+  </section>

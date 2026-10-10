@@ -1,0 +1,595 @@
+==== Jarvis Suchtest 22.09.2026 19:40:17,63 ==== 
+ 
+==== 1. Schnelle Tests ==== 
+test_ask_leitet_an_werkzeug_modus_weiter (tests.test_agent.ModusWahlTest.test_ask_leitet_an_werkzeug_modus_weiter) ... ok
+test_klassisch_ohne_treffer_wird_wissensluecke_und_claude_antwortet_trotzdem (tests.test_agent.ModusWahlTest.test_klassisch_ohne_treffer_wird_wissensluecke_und_claude_antwortet_trotzdem) ... [Claude] 100 Tokens rein, 20 raus, 0.0s (claude-sonnet-5, klassisch)
+ok
+test_standard_ist_klassisch (tests.test_agent.ModusWahlTest.test_standard_ist_klassisch) ... ok
+test_agenten_stream_trennt_sucher_und_antworter (tests.test_agent.WerkzeugModusTest.test_agenten_stream_trennt_sucher_und_antworter) ... [Werkzeug/Sucher] Suche 1: 'Backtesting' -> 1 Treffer
+[Claude] 700 Tokens rein, 110 raus, 0.0s (claude-sonnet-5, werkzeug+agenten, 3 Aufrufe, 1 Suchen)
+ok
+test_begruessung_ohne_suche (tests.test_agent.WerkzeugModusTest.test_begruessung_ohne_suche) ... [Claude] 300 Tokens rein, 50 raus, 0.0s (claude-sonnet-5, werkzeug, 1 Aufrufe, 0 Suchen)
+ok
+test_hoechstens_drei_suchen (tests.test_agent.WerkzeugModusTest.test_hoechstens_drei_suchen) ... [Werkzeug] Suche 1: 'Suche 0' -> 0 Treffer
+[Werkzeug] Suche 2: 'Suche 1' -> 0 Treffer
+[Werkzeug] Suche 3: 'Suche 2' -> 0 Treffer
+[Claude] 600 Tokens rein, 80 raus, 0.0s (claude-sonnet-5, werkzeug, 4 Aufrufe, 3 Suchen)
+ok
+test_keine_treffer_wird_wissensluecke (tests.test_agent.WerkzeugModusTest.test_keine_treffer_wird_wissensluecke) ... [Werkzeug] Suche 1: 'Käsekuchen' -> 0 Treffer
+[Claude] 400 Tokens rein, 60 raus, 0.0s (claude-sonnet-5, werkzeug, 2 Aufrufe, 1 Suchen)
+ok
+test_notiz_kann_datenblock_nicht_verlassen (tests.test_agent.WerkzeugModusTest.test_notiz_kann_datenblock_nicht_verlassen) ... [Werkzeug] Suche 1: 'x' -> 1 Treffer
+[Claude] 400 Tokens rein, 60 raus, 0.0s (claude-sonnet-5, werkzeug, 2 Aufrufe, 1 Suchen)
+ok
+test_schwache_treffer_werden_wissensluecke (tests.test_agent.WerkzeugModusTest.test_schwache_treffer_werden_wissensluecke) ... [Werkzeug] Suche 1: 'Quark' -> 1 Treffer
+[Claude] 400 Tokens rein, 60 raus, 0.0s (claude-sonnet-5, werkzeug, 2 Aufrufe, 1 Suchen)
+ok
+test_token_protokoll_summiert_alle_aufrufe (tests.test_agent.WerkzeugModusTest.test_token_protokoll_summiert_alle_aufrufe) ... [Werkzeug] Suche 1: 'x' -> 1 Treffer
+[Claude] 400 Tokens rein, 60 raus, 0.0s (claude-sonnet-5, werkzeug, 2 Aufrufe, 1 Suchen)
+ok
+test_werkzeug_prompt_verlangt_sir_anrede (tests.test_agent.WerkzeugModusTest.test_werkzeug_prompt_verlangt_sir_anrede) ... ok
+test_zwei_themen_zwei_suchen_durchgehende_nummern (tests.test_agent.WerkzeugModusTest.test_zwei_themen_zwei_suchen_durchgehende_nummern) ... [Werkzeug] Suche 1: 'Backtesting' -> 2 Treffer
+[Werkzeug] Suche 2: 'Risiko pro Trade' -> 2 Treffer
+[Claude] 500 Tokens rein, 70 raus, 0.0s (claude-sonnet-5, werkzeug, 3 Aufrufe, 2 Suchen)
+ok
+test_abschaltbar (tests.test_agent.WissenslueckenTest.test_abschaltbar) ... ok
+test_neueste_zuerst_und_kaputte_zeilen_ignorieren (tests.test_agent.WissenslueckenTest.test_neueste_zuerst_und_kaputte_zeilen_ignorieren) ... ok
+test_leere_modellantwort_wird_als_fehler_sichtbar (tests.test_briefing.Erzeugen.test_leere_modellantwort_wird_als_fehler_sichtbar) ... ok
+test_abend_nimmt_heute_und_morgen (tests.test_briefing.Modus.test_abend_nimmt_heute_und_morgen) ... ok
+test_angaben_enthalten_die_bausteine (tests.test_briefing.Modus.test_angaben_enthalten_die_bausteine) ... ok
+test_modus_nach_uhrzeit (tests.test_briefing.Modus.test_modus_nach_uhrzeit) ... ok
+test_fehlende_notiz_gibt_leeren_text (tests.test_briefing.Tagesnotiz.test_fehlende_notiz_gibt_leeren_text) ... ok
+test_lange_notiz_wird_gekuerzt (tests.test_briefing.Tagesnotiz.test_lange_notiz_wird_gekuerzt) ... ok
+test_ohne_vault_pfad_kein_absturz (tests.test_briefing.Tagesnotiz.test_ohne_vault_pfad_kein_absturz) ... ok
+test_vorhandene_notiz_wird_gelesen (tests.test_briefing.Tagesnotiz.test_vorhandene_notiz_wird_gelesen) ... ok
+test_ganztaegiger_termin (tests.test_briefing.TermineText.test_ganztaegiger_termin) ... ok
+test_leere_liste (tests.test_briefing.TermineText.test_leere_liste) ... ok
+test_uhrzeit_und_ort (tests.test_briefing.TermineText.test_uhrzeit_und_ort) ... ok
+test_fehlende_datei_gibt_nullen (tests.test_briefing.Verbrauch.test_fehlende_datei_gibt_nullen) ... ok
+test_kaputte_zeile_wird_uebersprungen (tests.test_briefing.Verbrauch.test_kaputte_zeile_wird_uebersprungen) ... ok
+test_nur_der_gewuenschte_tag_zaehlt (tests.test_briefing.Verbrauch.test_nur_der_gewuenschte_tag_zaehlt) ... ok
+test_anfrage_an_claude_und_token_protokoll (tests.test_chat.AskTest.test_anfrage_an_claude_und_token_protokoll) ... [Claude] 1234 Tokens rein, 56 raus, 0.0s (claude-sonnet-5, klassisch)
+ok
+test_ausschnitte_stehen_im_datenblock (tests.test_chat.ContextTest.test_ausschnitte_stehen_im_datenblock) ... ok
+test_normale_spitze_klammern_bleiben (tests.test_chat.ContextTest.test_normale_spitze_klammern_bleiben) ... ok
+test_notiz_kann_den_datenblock_nicht_verlassen (tests.test_chat.ContextTest.test_notiz_kann_den_datenblock_nicht_verlassen) ... ok
+test_ohne_treffer_fragt_jarvis_trotzdem_claude (tests.test_chat.ContextTest.test_ohne_treffer_fragt_jarvis_trotzdem_claude) ... ok
+test_status_vertrauen_und_datum (tests.test_chat.ContextTest.test_status_vertrauen_und_datum) ... ok
+test_systemprompt_erlaubt_allgemeinwissen_und_nennt_die_herkunft (tests.test_chat.ContextTest.test_systemprompt_erlaubt_allgemeinwissen_und_nennt_die_herkunft) ... ok
+test_systemprompt_nennt_die_schutzregel (tests.test_chat.ContextTest.test_systemprompt_nennt_die_schutzregel) ... ok
+test_lange_antworten_werden_gekuerzt (tests.test_chat.HistoryTest.test_lange_antworten_werden_gekuerzt) ... ok
+test_verlauf_beginnt_mit_frage_und_endet_mit_antwort (tests.test_chat.HistoryTest.test_verlauf_beginnt_mit_frage_und_endet_mit_antwort) ... ok
+test_aktueller_stand_zeigt_umgebung_ohne_schluessel (tests.test_einstellungen.EinstellungenTest.test_aktueller_stand_zeigt_umgebung_ohne_schluessel) ... ok
+test_modus_wird_geprueft (tests.test_einstellungen.EinstellungenTest.test_modus_wird_geprueft) ... ok
+test_ohne_datei_leer (tests.test_einstellungen.EinstellungenTest.test_ohne_datei_leer) ... ok
+test_ordner_muss_existieren (tests.test_einstellungen.EinstellungenTest.test_ordner_muss_existieren) ... ok
+test_speichern_und_anwenden (tests.test_einstellungen.EinstellungenTest.test_speichern_und_anwenden) ... ok
+test_unbekannte_einstellung_wird_abgelehnt (tests.test_einstellungen.EinstellungenTest.test_unbekannte_einstellung_wird_abgelehnt) ... ok
+test_abschaltbar (tests.test_kalender.Feiertage.test_abschaltbar) ... ok
+test_standardadresse_ist_gesetzt (tests.test_kalender.Feiertage.test_standardadresse_ist_gesetzt) ... ok
+test_termine_tragen_eine_kategorie (tests.test_kalender.Feiertage.test_termine_tragen_eine_kategorie) ... ok
+test_einzeltermin_mit_ort (tests.test_kalender.IcsZerlegen.test_einzeltermin_mit_ort) ... ok
+test_ganztaegiger_termin (tests.test_kalender.IcsZerlegen.test_ganztaegiger_termin) ... ok
+test_gefaltete_zeile_wird_zusammengesetzt (tests.test_kalender.IcsZerlegen.test_gefaltete_zeile_wird_zusammengesetzt) ... ok
+test_utc_wird_nach_berlin_umgerechnet (tests.test_kalender.IcsZerlegen.test_utc_wird_nach_berlin_umgerechnet) ... ok
+test_vtimezone_block_wird_uebersprungen (tests.test_kalender.IcsZerlegen.test_vtimezone_block_wird_uebersprungen) ... ok
+test_adresse_taucht_in_keiner_meldung_auf (tests.test_kalender.Konfiguration.test_adresse_taucht_in_keiner_meldung_auf) ... ok
+test_ohne_adresse_klare_meldung (tests.test_kalender.Konfiguration.test_ohne_adresse_klare_meldung) ... ok
+test_abgesagter_termin_faellt_weg (tests.test_kalender.Wiederholungen.test_abgesagter_termin_faellt_weg) ... ok
+test_einzeln_geaenderter_termin_steht_nicht_doppelt (tests.test_kalender.Wiederholungen.test_einzeln_geaenderter_termin_steht_nicht_doppelt) ... ok
+test_exdate_faellt_weg (tests.test_kalender.Wiederholungen.test_exdate_faellt_weg) ... ok
+test_kaputte_regel_kippt_den_rest_nicht (tests.test_kalender.Wiederholungen.test_kaputte_regel_kippt_den_rest_nicht) ... ok
+test_woechentliche_serie_wird_ausgerollt (tests.test_kalender.Wiederholungen.test_woechentliche_serie_wird_ausgerollt) ... ok
+test_sortierung_nach_startzeit (tests.test_kalender.Zeitfenster.test_sortierung_nach_startzeit) ... ok
+test_weit_entfernte_termine_fallen_weg (tests.test_kalender.Zeitfenster.test_weit_entfernte_termine_fallen_weg) ... ok
+test_gute_folgefrage_bleibt_zuversichtlich (tests.test_kostenhebel_und_folgefragen.FolgefragenFixTest.test_gute_folgefrage_bleibt_zuversichtlich)
+Gegenprobe: eine Folgefrage, die inhaltlich wirklich zum Thema ... [Claude] 10 Tokens rein, 5 raus, 0.0s (claude-sonnet-5, klassisch)
+ok
+test_ohne_verlauf_nur_eine_suche (tests.test_kostenhebel_und_folgefragen.FolgefragenFixTest.test_ohne_verlauf_nur_eine_suche)
+Ohne vorherige Frage gibt es nichts zu kombinieren - keine ... [Claude] 1 Tokens rein, 1 raus, 0.0s (claude-sonnet-5, klassisch)
+ok
+test_wissensluecke_wird_trotz_kombinierter_treffer_erkannt (tests.test_kostenhebel_und_folgefragen.FolgefragenFixTest.test_wissensluecke_wird_trotz_kombinierter_treffer_erkannt) ... [Claude] 10 Tokens rein, 5 raus, 0.0s (claude-sonnet-5, klassisch)
+ok
+test_ask_nutzt_max_answer_tokens_und_caching (tests.test_kostenhebel_und_folgefragen.KostenhebelTest.test_ask_nutzt_max_answer_tokens_und_caching) ... [Claude] 10 Tokens rein, 5 raus, 0.0s (claude-sonnet-5, klassisch)
+ok
+test_cache_system_abschaltbar (tests.test_kostenhebel_und_folgefragen.KostenhebelTest.test_cache_system_abschaltbar) ... ok
+test_cache_system_wrapt_standardmaessig (tests.test_kostenhebel_und_folgefragen.KostenhebelTest.test_cache_system_wrapt_standardmaessig) ... ok
+test_laengenregel_im_systemprompt (tests.test_kostenhebel_und_folgefragen.KostenhebelTest.test_laengenregel_im_systemprompt) ... ok
+test_standardwerte (tests.test_kostenhebel_und_folgefragen.KostenhebelTest.test_standardwerte) ... ok
+test_flatten_content_liste_mit_textbloecken (tests.test_llm_provider.TestNachrichtenAufbereitung.test_flatten_content_liste_mit_textbloecken) ... ok
+test_flatten_system_ignoriert_cache_control (tests.test_llm_provider.TestNachrichtenAufbereitung.test_flatten_system_ignoriert_cache_control) ... ok
+test_flatten_system_string_bleibt_string (tests.test_llm_provider.TestNachrichtenAufbereitung.test_flatten_system_string_bleibt_string) ... ok
+test_erfolgreiche_antwort (tests.test_llm_provider.TestOllamaCreate.test_erfolgreiche_antwort) ... ok
+test_verbindungsfehler_wird_zu_klarer_deutscher_meldung (tests.test_llm_provider.TestOllamaCreate.test_verbindungsfehler_wird_zu_klarer_deutscher_meldung) ... ok
+test_stream_liefert_stuecke_und_am_ende_die_gesamtantwort (tests.test_llm_provider.TestOllamaStream.test_stream_liefert_stuecke_und_am_ende_die_gesamtantwort) ... ok
+test_current_model_label_claude_unveraendert (tests.test_llm_provider.TestProviderAuswahl.test_current_model_label_claude_unveraendert) ... ok
+test_current_model_label_ollama_zeigt_lokales_modell (tests.test_llm_provider.TestProviderAuswahl.test_current_model_label_ollama_zeigt_lokales_modell) ... ok
+test_get_client_claude_ruft_anthropic_mit_dem_schluessel_auf (tests.test_llm_provider.TestProviderAuswahl.test_get_client_claude_ruft_anthropic_mit_dem_schluessel_auf) ... ok
+test_get_client_ollama_braucht_kein_anthropic (tests.test_llm_provider.TestProviderAuswahl.test_get_client_ollama_braucht_kein_anthropic) ... ok
+test_llm_provider_ollama_schaltet_um (tests.test_llm_provider.TestProviderAuswahl.test_llm_provider_ollama_schaltet_um) ... ok
+test_standard_ist_claude_ohne_env (tests.test_llm_provider.TestProviderAuswahl.test_standard_ist_claude_ohne_env) ... ok
+test_lautstaerke_absolut (tests.test_spotify.TestAusfuehren.test_lautstaerke_absolut) ... ok
+test_leiser_senkt_um_schritt (tests.test_spotify.TestAusfuehren.test_leiser_senkt_um_schritt) ... ok
+test_pause_ruft_pause (tests.test_spotify.TestAusfuehren.test_pause_ruft_pause) ... ok
+test_spielen_gibt_titel_zurueck (tests.test_spotify.TestAusfuehren.test_spielen_gibt_titel_zurueck) ... ok
+test_unbekannte_aktion_wirft (tests.test_spotify.TestAusfuehren.test_unbekannte_aktion_wirft) ... ok
+test_was_laeuft_ohne_musik (tests.test_spotify.TestAusfuehren.test_was_laeuft_ohne_musik) ... ok
+test_login_url_enthaelt_rechte (tests.test_spotify.TestEinrichtung.test_login_url_enthaelt_rechte) ... ok
+test_login_url_ohne_id_wirft (tests.test_spotify.TestEinrichtung.test_login_url_ohne_id_wirft) ... ok
+test_nicht_eingerichtet_ohne_env (tests.test_spotify.TestEinrichtung.test_nicht_eingerichtet_ohne_env) ... ok
+test_kein_befehl (tests.test_spotify.TestErkennung.test_kein_befehl) ... ok
+test_lautstaerke_absolut (tests.test_spotify.TestErkennung.test_lautstaerke_absolut) ... ok
+test_lautstaerke_relativ (tests.test_spotify.TestErkennung.test_lautstaerke_relativ) ... ok
+test_spiel_weiter_ist_kein_suchbegriff (tests.test_spotify.TestErkennung.test_spiel_weiter_ist_kein_suchbegriff)
+Gefahr: 'spiel weiter' darf nicht als Suche nach 'weiter' enden. ... ok
+test_spielen_mit_suchbegriff (tests.test_spotify.TestErkennung.test_spielen_mit_suchbegriff) ... ok
+test_transport (tests.test_spotify.TestErkennung.test_transport) ... ok
+test_was_laeuft (tests.test_spotify.TestErkennung.test_was_laeuft) ... ok
+test_zufall (tests.test_spotify.TestErkennung.test_zufall) ... ok
+test_absolut_nutzt_box_direkt (tests.test_spotify.TestLautstaerkeUeberSonos.test_absolut_nutzt_box_direkt) ... ok
+test_geraetename_faellt_auf_liste_zurueck (tests.test_spotify.TestLautstaerkeUeberSonos.test_geraetename_faellt_auf_liste_zurueck) ... ok
+test_geraetename_nimmt_player_zuerst (tests.test_spotify.TestLautstaerkeUeberSonos.test_geraetename_nimmt_player_zuerst)
+Anzeige und Steuerung müssen dasselbe Gerät meinen. ... ok
+test_leiser_regelt_beide_boxen (tests.test_spotify.TestLautstaerkeUeberSonos.test_leiser_regelt_beide_boxen)
+Stereopaar: ein Befehl darf nicht nur eine Box treffen. ... ok
+test_name_wird_zwischengespeichert (tests.test_spotify.TestLautstaerkeUeberSonos.test_name_wird_zwischengespeichert)
+Ohne Zwischenspeicher löst jeder Reglerschritt eine Spotify-Anfrage aus. ... ok
+test_ohne_box_bleibt_der_fehler (tests.test_spotify.TestLautstaerkeUeberSonos.test_ohne_box_bleibt_der_fehler) ... ok
+test_schneller_weg_geht_direkt_an_die_box (tests.test_spotify.TestLautstaerkeUeberSonos.test_schneller_weg_geht_direkt_an_die_box)
+Der Regler darf nicht über Spotify laufen. ... ok
+test_skip_faellt_auf_spotify_zurueck (tests.test_spotify.TestLautstaerkeUeberSonos.test_skip_faellt_auf_spotify_zurueck)
+Ohne Sonos-Box (Handy, PC) muss der alte Weg bleiben. ... ok
+test_skip_geht_lokal_an_die_box (tests.test_spotify.TestLautstaerkeUeberSonos.test_skip_geht_lokal_an_die_box)
+Weiter/Zurück dürfen nicht über Spotify laufen - dort kommt 403. ... ok
+test_feste_ips_aus_env (tests.test_spotify.TestSonos.test_feste_ips_aus_env) ... ok
+test_findet_exakten_namen (tests.test_spotify.TestSonos.test_findet_exakten_namen) ... ok
+test_findet_gruppe (tests.test_spotify.TestSonos.test_findet_gruppe)
+Spotify nennt Gruppen oft 'Schlafzimmer + 1'. ... ok
+test_unbekanntes_geraet (tests.test_spotify.TestSonos.test_unbekanntes_geraet) ... ok
+test_aufbereiten_entfernt_quellenmarken_und_kuerzt (tests.test_sprache.SpracheTest.test_aufbereiten_entfernt_quellenmarken_und_kuerzt) ... ok
+test_falscher_schluessel_gibt_klare_meldung (tests.test_sprache.SpracheTest.test_falscher_schluessel_gibt_klare_meldung) ... C:\Users\maxi1\AppData\Local\Python\pythoncore-3.14-64\Lib\tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 401: 'Unauthorized'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+ok
+test_kein_netz_gibt_klare_meldung (tests.test_sprache.SpracheTest.test_kein_netz_gibt_klare_meldung) ... ok
+test_leere_antwort_gibt_fehler (tests.test_sprache.SpracheTest.test_leere_antwort_gibt_fehler) ... ok
+test_leerer_text_wird_abgelehnt (tests.test_sprache.SpracheTest.test_leerer_text_wird_abgelehnt) ... ok
+test_nutzlast_nur_mit_gesetzten_werten (tests.test_sprache.SpracheTest.test_nutzlast_nur_mit_gesetzten_werten) ... ok
+test_ohne_schluessel_nicht_verfuegbar (tests.test_sprache.SpracheTest.test_ohne_schluessel_nicht_verfuegbar) ... ok
+test_sprich_schickt_schluessel_und_modell (tests.test_sprache.SpracheTest.test_sprich_schickt_schluessel_und_modell) ... ok
+test_stand_zeigt_den_schluessel_nicht (tests.test_sprache.SpracheTest.test_stand_zeigt_den_schluessel_nicht) ... ok
+test_standardmodell_ist_das_kostenlose (tests.test_sprache.SpracheTest.test_standardmodell_ist_das_kostenlose) ... ok
+test_tempo_bleibt_im_erlaubten_bereich (tests.test_sprache.SpracheTest.test_tempo_bleibt_im_erlaubten_bereich) ... ok
+test_abkuerzungen_in_grossschrift_zaehlen (tests.test_suche.KeywordsTest.test_abkuerzungen_in_grossschrift_zaehlen) ... ok
+test_fuellwoerter_fallen_weg (tests.test_suche.KeywordsTest.test_fuellwoerter_fallen_weg) ... ok
+test_leerer_text (tests.test_suche.KeywordsTest.test_leerer_text) ... ok
+test_haeufigkeiten_werden_zwischengespeichert (tests.test_suche.RetrieverTest.test_haeufigkeiten_werden_zwischengespeichert) ... ok
+test_leere_anfrage (tests.test_suche.RetrieverTest.test_leere_anfrage) ... ok
+test_seltene_woerter_zaehlen_mehr (tests.test_suche.RetrieverTest.test_seltene_woerter_zaehlen_mehr) ... ok
+test_stichwort_entscheidet_bei_gleicher_semantik (tests.test_suche.RetrieverTest.test_stichwort_entscheidet_bei_gleicher_semantik) ... ok
+test_beugungsformen_passen_zusammen (tests.test_suche.StemmerTest.test_beugungsformen_passen_zusammen) ... ok
+test_snowball_beispiele (tests.test_suche.StemmerTest.test_snowball_beispiele) ... ok
+test_chunks_nach_ueberschriften (tests.test_suche.VaultLoaderTest.test_chunks_nach_ueberschriften) ... ok
+test_jarvis_ignorieren_nimmt_notiz_aus_der_suche (tests.test_suche.VaultLoaderTest.test_jarvis_ignorieren_nimmt_notiz_aus_der_suche) ... ok
+test_cpu_erster_aufruf_none_dann_zahl (tests.test_system_info.SystemInfoTest.test_cpu_erster_aufruf_none_dann_zahl) ... ok
+test_snapshot_hat_alle_felder (tests.test_system_info.SystemInfoTest.test_snapshot_hat_alle_felder) ... ok
+test_speicher_und_festplatte_plausibel (tests.test_system_info.SystemInfoTest.test_speicher_und_festplatte_plausibel) ... ok
+test_ignorierte_notiz_ist_markiert_archiv_fehlt (tests.test_vault_list.VaultListTest.test_ignorierte_notiz_ist_markiert_archiv_fehlt) ... ok
+test_links_werden_aufgeloest_code_bleibt_aussen_vor (tests.test_vault_list.VaultListTest.test_links_werden_aufgeloest_code_bleibt_aussen_vor) ... ok
+test_ohne_frontmatter_zaehlt_der_dateiname (tests.test_vault_list.VaultListTest.test_ohne_frontmatter_zaehlt_der_dateiname) ... ok
+test_ohne_vault_pfad_leere_liste (tests.test_vault_list.VaultListTest.test_ohne_vault_pfad_leere_liste) ... ok
+test_titel_status_und_niveau (tests.test_vault_list.VaultListTest.test_titel_status_und_niveau) ... ok
+test_uebersprungene_ordner_fehlen (tests.test_vault_list.VaultListTest.test_uebersprungene_ordner_fehlen) ... ok
+test_codeblock_bleibt_im_richtigen_chunk_am_stueck (tests.test_vault_loader_codeblocks.CodeblockHeadingTest.test_codeblock_bleibt_im_richtigen_chunk_am_stueck) ... ok
+test_echte_ueberschriften_bleiben_unveraendert (tests.test_vault_loader_codeblocks.CodeblockHeadingTest.test_echte_ueberschriften_bleiben_unveraendert) ... ok
+test_notiz_ohne_codeblock_unveraendert (tests.test_vault_loader_codeblocks.CodeblockHeadingTest.test_notiz_ohne_codeblock_unveraendert) ... ok
+test_raute_in_python_codeblock_wird_ignoriert (tests.test_vault_loader_codeblocks.CodeblockHeadingTest.test_raute_in_python_codeblock_wird_ignoriert) ... ok
+test_raute_in_tilde_codeblock_wird_ignoriert (tests.test_vault_loader_codeblocks.CodeblockHeadingTest.test_raute_in_tilde_codeblock_wird_ignoriert) ... ok
+test_alle_ausgenommen (tests.test_vault_pflege.PlatzhalterTest.test_alle_ausgenommen) ... ok
+test_keine_ausgenommen (tests.test_vault_pflege.PlatzhalterTest.test_keine_ausgenommen) ... ok
+test_teilweise_ausgenommen (tests.test_vault_pflege.PlatzhalterTest.test_teilweise_ausgenommen) ... ok
+test_bericht_wird_erzeugt (tests.test_vault_pflege.VaultPflegeTest.test_bericht_wird_erzeugt) ... ok
+test_code_und_beispiele_sind_kein_fehler (tests.test_vault_pflege.VaultPflegeTest.test_code_und_beispiele_sind_kein_fehler) ... ok
+test_dubletten_metadaten_leere_ordner (tests.test_vault_pflege.VaultPflegeTest.test_dubletten_metadaten_leere_ordner) ... ok
+test_fehlender_abschnitt (tests.test_vault_pflege.VaultPflegeTest.test_fehlender_abschnitt) ... ok
+test_links_ins_leere_und_verschobener_ordner (tests.test_vault_pflege.VaultPflegeTest.test_links_ins_leere_und_verschobener_ordner) ... ok
+test_waisen_und_archiv (tests.test_vault_pflege.VaultPflegeTest.test_waisen_und_archiv) ... ok
+test_einlesen_erst_nach_ruhezeit (tests.test_watcher.WatcherTest.test_einlesen_erst_nach_ruhezeit) ... [Watcher] 1 Notiz(en) geändert - lese Vault neu ein ...
+ok
+test_neue_und_geloeschte_notiz (tests.test_watcher.WatcherTest.test_neue_und_geloeschte_notiz) ... [Watcher] 1 Notiz(en) geändert - lese Vault neu ein ...
+[Watcher] 1 Notiz(en) geändert - lese Vault neu ein ...
+ok
+test_ohne_aenderung_passiert_nichts (tests.test_watcher.WatcherTest.test_ohne_aenderung_passiert_nichts) ... ok
+test_rueckgaengig_gemachte_aenderung (tests.test_watcher.WatcherTest.test_rueckgaengig_gemachte_aenderung) ... ok
+test_uebersprungene_ordner_loesen_nichts_aus (tests.test_watcher.WatcherTest.test_uebersprungene_ordner_loesen_nichts_aus) ... ok
+test_wartet_wenn_schon_ein_lauf_aktiv_ist (tests.test_watcher.WatcherTest.test_wartet_wenn_schon_ein_lauf_aktiv_ist) ... [Watcher] 1 Notiz(en) geändert - lese Vault neu ein ...
+ok
+test_weiteres_tippen_verschiebt_das_einlesen (tests.test_watcher.WatcherTest.test_weiteres_tippen_verschiebt_das_einlesen) ... [Watcher] 1 Notiz(en) geändert - lese Vault neu ein ...
+ok
+
+----------------------------------------------------------------------
+Ran 163 tests in 0.739s
+
+OK
+ 
+==== 2. Suchqualitaet und Schwelle ==== 
+Modell: e5-base, aktuelle Schwelle 'unsicher': 0.807, Threads: 2 (Standard)
+[Embedding] Lade Modell e5-base (multilingual-e5-base, int8-quantisiert (~280 MB)) ...
+[Embedding] Modell bereit nach 0.9s (2 CPU-Threads)
+Modell geladen in 1.0s
+
+==== Stichwort-Logik: alt ====
+  [OK] Wie viel Geld darf ich pro Trade maximal riskieren?
+        cos=0.881 kw=1.00 score=0.721  Wissen/04 - Trading und Big Brain/06 - Risiko und Positionsgröße.md | 06 - Risiko und Positionsgröße > Risiko pro Trade
+        cos=0.864 kw=0.22 score=0.450  Wissen/Bots/OpenAI_Trading-Bots_Dokumentation.md | OpenAI_Trading-Bots_Dokumentation > 7. David V2 – Risikomana
+        cos=0.860 kw=0.22 score=0.440  Wissen/04 - Trading und Big Brain/06 - Risiko und Positionsgröße.md | 06 - Risiko und Positionsgröße > Big-Brain-Regeln
+  [OK] Was passiert, wenn man nach einem Verlust zu aggressiv weiterhandelt?
+        cos=0.886 kw=0.33 score=0.534  Wissen/04 - Trading und Big Brain/07 - Trading Psychologie.md | 07 - Trading Psychologie > Revenge Trading
+        cos=0.834 kw=0.33 score=0.413  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Emotionen und Gefühle.md | Emotionen und Gefühle > Bezug zum eigenen Handeln
+        cos=0.819 kw=0.33 score=0.378  Wissen/Bots/Claude_Trading-Bots_Wissen.md | Claude_Trading-Bots_Wissen > Teil 5 – Konzepte: Methodik > O
+  [OK] Wie prüfe ich eine Handelsstrategie mit alten Kursdaten?
+        cos=0.908 kw=1.00 score=0.785  Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Wie prüfe ich eine Handelsstrategie mit a
+        cos=0.906 kw=1.00 score=0.781  Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Wie prüfe ich eine Handelsstrategie mit a
+        cos=0.847 kw=1.00 score=0.644  Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Wie prüfe ich eine Handelsstrategie mit a
+  [OK] Welche Tech-Stack-Entscheidungen habe ich für Jarvis getroffen?
+        cos=0.840 kw=1.00 score=0.628  Wissen/02 - Grundlagen/Tages Notizen/2026-09-19.md | Tagesnotizen — 2026-09-19 > ⚠️ Zwei Probleme gefunden > 1. D
+        cos=0.843 kw=0.33 score=0.435  Wissen/03 - KI und Technik/05 - Jarvis Projekt Anweisung und Funktionsumfang.md | Jarvis Anweisung > Anweisungs-Prompt (Copy-Paste-Block)
+        cos=0.838 kw=0.33 score=0.422  01 - Persönliches/03 - Wie ich arbeite.md | 03 - Wie ich arbeite > Prioritäten für Jarvis
+  [OK] Welche erneuerbaren Energiequellen gibt es für Strom?
+        cos=0.839 kw=0.33 score=0.425  Wissen/02 - Grundlagen/03 - Technik und Materialien/Energie und Stromerzeugung.md | Energie und Stromerzeugung > Solarenergie (Photovoltaik)
+        cos=0.850 kw=0.17 score=0.400  Wissen/02 - Grundlagen/03 - Technik und Materialien/Energie und Stromerzeugung.md | Energie und Stromerzeugung > Kernenergie
+        cos=0.844 kw=0.17 score=0.387  Wissen/02 - Grundlagen/03 - Technik und Materialien/Energie und Stromerzeugung.md | Energie und Stromerzeugung > Kohle
+  [OK] Wie werden Erbinformationen in Zellen gespeichert?
+        cos=0.857 kw=1.00 score=0.666  Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/Genetik und DNA.md | Genetik und DNA > Wie werden Erbinformationen in Zellen gesp
+        cos=0.808 kw=0.60 score=0.432  Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/Zellbiologie.md | Zellbiologie > Wie sich Zellen teilen
+        cos=0.800 kw=0.40 score=0.354  Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/Zellbiologie.md | Zellbiologie > Wie Zellen Energie gewinnen
+  [OK] Was ist der Unterschied zwischen Steuervermeidung und Steuerhinterziehung?
+        cos=0.845 kw=0.62 score=0.526  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Steuern und Finanzwesen.md | Steuern und Finanzwesen > Steuervermeidung und Steuerhinterz
+        cos=0.828 kw=0.50 score=0.448  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Steuern und Finanzwesen.md | Steuern und Finanzwesen > Was sind Steuern?
+        cos=0.811 kw=0.50 score=0.410  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Steuern und Finanzwesen.md | Steuern und Finanzwesen > Arten von Steuern
+  [OK] Warum arbeitet Holz, wenn sich die Luftfeuchtigkeit ändert?
+        cos=0.845 kw=0.50 score=0.488  Wissen/02 - Grundlagen/03 - Technik und Materialien/Holz.md | Holz > Biologische Struktur von Holz
+        cos=0.831 kw=0.50 score=0.456  Wissen/02 - Grundlagen/03 - Technik und Materialien/Holz.md | Holz > Verwendungen von Holz
+        cos=0.824 kw=0.38 score=0.402  Wissen/02 - Grundlagen/03 - Technik und Materialien/Holz.md | Holz > Mechanische Eigenschaften
+  [OK] Was bedeutet es, wenn eine Strategie zu stark an vergangene Daten angepasst wurde?
+        cos=0.857 kw=0.30 score=0.455  Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Gefahren > Overfitting
+        cos=0.820 kw=0.30 score=0.370  Wissen/Bots/Claude_Trading-Bots_Wissen.md | Claude_Trading-Bots_Wissen > Teil 5 – Konzepte: Methodik > O
+        cos=0.831 kw=0.20 score=0.366  Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Wie prüfe ich eine Handelsstrategie mit a
+  [OK] Wie funktioniert ein Stop-Loss?
+        cos=0.838 kw=0.60 score=0.502  Wissen/04 - Trading und Big Brain/02 - Märkte und Ordertypen.md | 02 - Märkte und Ordertypen > Stop-Loss
+        cos=0.833 kw=0.60 score=0.490  Wissen/Bots/OpenAI_Trading-Bots_Dokumentation.md | OpenAI_Trading-Bots_Dokumentation > 2. Haupt-Bot > Zweck > L
+        cos=0.831 kw=0.60 score=0.485  Wissen/04 - Trading und Big Brain/06 - Risiko und Positionsgröße.md | 06 - Risiko und Positionsgröße > Positionsgröße
+  [OK] Was zeigt mir der RSI an?
+        cos=0.904 kw=1.00 score=0.776  Wissen/04 - Trading und Big Brain/04 - Technische Analyse.md | 04 - Technische Analyse > RSI > Was zeigt mir der RSI an?
+        cos=0.841 kw=0.60 score=0.510  Wissen/Bots/OpenAI_Trading-Bots_Dokumentation.md | OpenAI_Trading-Bots_Dokumentation > 30. M1-RSI-Filter – aktu
+        cos=0.865 kw=0.40 score=0.505  Wissen/04 - Trading und Big Brain/04 - Technische Analyse.md | 04 - Technische Analyse > RSI > Grenzen
+  [OK] Wie geben Nervenzellen Signale aneinander weiter?
+        cos=0.852 kw=0.17 score=0.404  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Gehirn und Neurobiologie.md | Gehirn und Neurobiologie > Neuronen und Synapsen
+        cos=0.813 kw=0.33 score=0.363  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Gehirn und Neurobiologie.md | Gehirn und Neurobiologie > Grundstruktur des Gehirns
+        cos=0.810 kw=0.17 score=0.307  Wissen/03 - KI und Technik/04 - Künstliche Intelligenz Vertiefung.md | 04 - Künstliche Intelligenz Vertiefung > Deep Learning und N
+  [OK] Wie wehrt sich der Körper gegen Krankheitserreger?
+        cos=0.840 kw=0.43 score=0.455  Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/Mikrobiologie und Infektionen.md | Mikrobiologie und Infektionen > Infektionsprozess
+        cos=0.829 kw=0.43 score=0.430  Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/Mikrobiologie und Infektionen.md | Mikrobiologie und Infektionen > Was sind Mikroorganismen?
+        cos=0.843 kw=0.14 score=0.377  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Körper und Physiologie.md | Körper und Physiologie > Die Organsysteme im Überblick
+  [OK] Wie bleiben Brücken und Hochhäuser bei Erdbeben stehen?
+        cos=0.853 kw=0.50 score=0.506  Wissen/02 - Grundlagen/03 - Technik und Materialien/Strukturen und Tragwerke.md | Strukturen und Tragwerke > Naturkatastrophen und Struktur-Ve
+        cos=0.828 kw=0.50 score=0.449  Wissen/02 - Grundlagen/03 - Technik und Materialien/Strukturen und Tragwerke.md | Strukturen und Tragwerke > Grundlagen von Strukturen
+        cos=0.817 kw=0.50 score=0.423  Wissen/02 - Grundlagen/03 - Technik und Materialien/Strukturen und Tragwerke.md | Strukturen und Tragwerke > Materialien und ihre Eigenschafte
+  [OK] Wie tauschen Computer im Internet Daten aus?
+        cos=0.816 kw=0.83 score=0.520  Wissen/02 - Grundlagen/03 - Technik und Materialien/Internet und Netzwerke.md | Internet und Netzwerke > Grundlagen von Netzwerken
+        cos=0.808 kw=0.50 score=0.401  Wissen/02 - Grundlagen/03 - Technik und Materialien/Internet und Netzwerke.md | Internet und Netzwerke > Cybersecurity
+        cos=0.803 kw=0.50 score=0.391  Wissen/02 - Grundlagen/03 - Technik und Materialien/Internet und Netzwerke.md | Internet und Netzwerke > Protokolle und Standards
+  [OK] Was unterscheidet kurzfristiges Handeln vom langfristigen Anlegen?
+        cos=0.799 kw=0.14 score=0.273  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Emotionen und Gefühle.md | Emotionen und Gefühle > Bezug zum eigenen Handeln
+        cos=0.798 kw=0.14 score=0.272  Wissen/04 - Trading und Big Brain/01 - Trading Grundlagen.md | 01 - Trading Grundlagen > Was ist Trading?
+        cos=0.810 kw=0.00 score=0.256  Wissen/04 - Trading und Big Brain/05 - Trading Strategien.md | 05 - Trading Strategien > Scalping
+  [OK] Wie richte ich die Bots für MetaTrader 5 ein?
+        cos=0.876 kw=0.62 score=0.598  Wissen/Bots/ANLEITUNG.md | ANLEITUNG > 4) Wie man einen Bot startet
+        cos=0.882 kw=0.50 score=0.574  Wissen/Bots/ANLEITUNG.md | ANLEITUNG > 3) Installation — Schritt für Schritt
+        cos=0.862 kw=0.62 score=0.565  Wissen/Bots/OpenAI_Trading-Bots_Dokumentation.md | OpenAI_Trading-Bots_Dokumentation > 1. Was ist das Gesamtpro
+  [OK] In welchem Ton soll mir die KI antworten?
+        cos=0.858 kw=0.33 score=0.469  01 - Persönliches/02 - Schreibstil und KI-Antworten.md | 02 - Schreibstil und KI-Antworten > Sprache und Ton
+        cos=0.846 kw=0.33 score=0.440  01 - Persönliches/02 - Schreibstil und KI-Antworten.md | 02 - Schreibstil und KI-Antworten > Arbeitsauftrag für die K
+        cos=0.860 kw=0.17 score=0.422  Wissen/03 - KI und Technik/00 - Künstliche Intelligenz Grundlagen.md | KI > Offene Frage
+  [OK] In welchen Stufen soll Big Brain ausgebaut werden?
+        cos=0.899 kw=1.00 score=0.764  Wissen/03 - KI und Technik/03 - Big Brain Ziele und Entwicklungsplan.md | Big Brain Projektplan > Entwicklungsphasen > In welchen Stuf
+        cos=0.850 kw=0.57 score=0.520  Wissen/03 - KI und Technik/03 - Big Brain Ziele und Entwicklungsplan.md | Big Brain Projektplan > Hauptziel
+        cos=0.845 kw=0.57 score=0.510  Wissen/03 - KI und Technik/03 - Big Brain Ziele und Entwicklungsplan.md | Big Brain Projektplan > Entwicklungsphasen > Phase 3 – Sprac
+  [OK] Wie sortiere ich Notizen nach Projekten, Bereichen und Archiv?
+        cos=0.852 kw=1.00 score=0.655  Wissen/06 - Quellen und Pflege/Obsidian Notizmanagement - Entwurf.md | Obsidian Notizmanagement - Entwurf > Wie sortiere ich Notize
+        cos=0.852 kw=0.22 score=0.421  Wissen/06 - Quellen und Pflege/Obsidian Notizmanagement - Entwurf.md | Obsidian Notizmanagement - Entwurf > Pflegerhythmus
+        cos=0.848 kw=0.22 score=0.412  Wissen/03 - KI und Technik/02-obsidian-markdown.md | Obsidian Flavored Markdown: Das Backbone des Wissensmanageme
+  [OK] Wie steuern Notenbanken die Geldmenge?
+        cos=0.795 kw=0.60 score=0.401  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Währungen und Länder.md | Währungen und Länder > Was ist Geld und Währung?
+        cos=0.792 kw=0.60 score=0.395  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Steuern und Finanzwesen.md | Steuern und Finanzwesen > Arten von Steuern
+        cos=0.812 kw=0.40 score=0.382  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Steuern und Finanzwesen.md | Steuern und Finanzwesen > Geldpolitik und Zentralbanken
+  [OK] Warum suchen Menschen bevorzugt nach Bestätigung ihrer Meinung?
+        cos=0.818 kw=0.38 score=0.387  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Psychologie und Verhalten.md | Psychologie und Verhalten > Kognitive Biases und heuristisch
+        cos=0.806 kw=0.25 score=0.322  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Anthropologie und Kultur.md | Anthropologie und Kultur > Warum Gruppen zusammenhalten
+        cos=0.809 kw=0.12 score=0.293  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Psychologie und Verhalten.md | Psychologie und Verhalten > Sozialpsychologie - Wie andere b
+  [OK] Wie zerlegt ein Sprachmodell Text in kleine Einheiten?
+        cos=0.859 kw=0.57 score=0.543  Wissen/02 - Grundlagen/01 - Mensch und Alltag/03 - Allgemeines Welt- und Funktionswissen.md | Weltwissen > 13 --- Large Language Models
+        cos=0.831 kw=0.57 score=0.477  Wissen/03 - KI und Technik/04 - Künstliche Intelligenz Vertiefung.md | 04 - Künstliche Intelligenz Vertiefung > Transformer und Lar
+        cos=0.820 kw=0.57 score=0.451  Wissen/03 - KI und Technik/02 - Token, Kontext und RAG.md | Token und Kontext > 13. Chunking
+  [OK] Wie verknüpfe ich zwei Notizen in Obsidian?
+        cos=0.894 kw=1.00 score=0.752  Wissen/03 - KI und Technik/00 - Obsidian Grundlagen.md | 00 - Obsidian Grundlagen > Wissen verknüpfen > Wie verknüpfe
+        cos=0.885 kw=0.50 score=0.581  Wissen/02 - Grundlagen/03 - Technik und Materialien/Vault-Update Obsidian Skills - 2026-09-17.md | Vault-Update Obsidian Skills - 2026-09-17 > Was heute neu is
+        cos=0.877 kw=0.33 score=0.512  Wissen/03 - KI und Technik/00 - Obsidian Grundlagen.md | 00 - Obsidian Grundlagen > Kurz erklärt
+  [OK] Wie viel Gewinn sollte ein Trade im Verhältnis zum möglichen Verlust bringen?
+        cos=0.876 kw=0.45 score=0.548  Wissen/04 - Trading und Big Brain/06 - Risiko und Positionsgröße.md | 06 - Risiko und Positionsgröße > Risk/Reward
+        cos=0.863 kw=0.45 score=0.516  Wissen/04 - Trading und Big Brain/06 - Risiko und Positionsgröße.md | 06 - Risiko und Positionsgröße > Risiko pro Trade
+        cos=0.841 kw=0.45 score=0.465  Wissen/Bots/Claude_Trading-Bots_Wissen.md | Claude_Trading-Bots_Wissen > Teil 5 – Konzepte: Methodik > P
+  [OK] Wie entstehen neue Arten im Laufe der Zeit?
+        cos=0.894 kw=1.00 score=0.752  Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/Evolution und Ursprung.md | Evolution und Ursprung > Wie entstehen neue Arten im Laufe d
+        cos=0.832 kw=0.29 score=0.395  Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/Evolution und Ursprung.md | Evolution und Ursprung > Die Mechanismen der Evolution
+        cos=0.818 kw=0.29 score=0.362  Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/Evolution und Ursprung.md | Evolution und Ursprung > Belege
+  [OK] Sind Kryptowährungen richtiges Geld?
+        cos=0.845 kw=0.75 score=0.564  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Währungen und Länder.md | Währungen und Länder > Kryptowährungen und digitales Geld
+        cos=0.812 kw=0.50 score=0.412  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Währungen und Länder.md | Währungen und Länder > Was ist Geld und Währung?
+        cos=0.808 kw=0.50 score=0.403  Wissen/Bots/ANLEITUNG.md | ANLEITUNG > ⚠️ WICHTIGER SICHERHEITSHINWEIS — BITTE ZUERST L
+  [OK] Was muss das System prüfen, bevor es einen simulierten Trade ausführt?
+        cos=0.891 kw=1.00 score=0.745  Wissen/04 - Trading und Big Brain/10 - Big Brain Trading Architektur.md | 10 - Big Brain Trading Architektur > Risk Engine > Was muss 
+        cos=0.842 kw=0.30 score=0.420  Wissen/Bots/OpenAI_Trading-Bots_Dokumentation.md | OpenAI_Trading-Bots_Dokumentation > 7. Dashboard und Analyse
+        cos=0.841 kw=0.30 score=0.419  Wissen/Bots/Claude_Trading-Bots_Wissen.md | Claude_Trading-Bots_Wissen > Teil 6 – Programmierung > Siche
+  => alt: Platz 1: 26/28, Top 3: 28/28
+  (25 ms pro Suche)
+
+==== Stichwort-Logik: neu ohne IDF ====
+  [OK] Wie viel Geld darf ich pro Trade maximal riskieren?
+        cos=0.881 kw=1.00 score=0.721  Wissen/04 - Trading und Big Brain/06 - Risiko und Positionsgröße.md | 06 - Risiko und Positionsgröße > Risiko pro Trade
+        cos=0.860 kw=0.60 score=0.553  Wissen/04 - Trading und Big Brain/06 - Risiko und Positionsgröße.md | 06 - Risiko und Positionsgröße > Big-Brain-Regeln
+        cos=0.864 kw=0.40 score=0.504  Wissen/Bots/OpenAI_Trading-Bots_Dokumentation.md | OpenAI_Trading-Bots_Dokumentation > 7. David V2 – Risikomana
+  [OK] Was passiert, wenn man nach einem Verlust zu aggressiv weiterhandelt?
+        cos=0.886 kw=0.50 score=0.584  Wissen/04 - Trading und Big Brain/07 - Trading Psychologie.md | 07 - Trading Psychologie > Revenge Trading
+        cos=0.834 kw=0.25 score=0.388  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Emotionen und Gefühle.md | Emotionen und Gefühle > Bezug zum eigenen Handeln
+        cos=0.819 kw=0.25 score=0.353  Wissen/Bots/Claude_Trading-Bots_Wissen.md | Claude_Trading-Bots_Wissen > Teil 5 – Konzepte: Methodik > O
+  [OK] Wie prüfe ich eine Handelsstrategie mit alten Kursdaten?
+        cos=0.908 kw=1.00 score=0.785  Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Wie prüfe ich eine Handelsstrategie mit a
+        cos=0.906 kw=1.00 score=0.781  Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Wie prüfe ich eine Handelsstrategie mit a
+        cos=0.847 kw=1.00 score=0.644  Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Wie prüfe ich eine Handelsstrategie mit a
+  [OK] Welche Tech-Stack-Entscheidungen habe ich für Jarvis getroffen?
+        cos=0.840 kw=1.00 score=0.628  Wissen/02 - Grundlagen/Tages Notizen/2026-09-19.md | Tagesnotizen — 2026-09-19 > ⚠️ Zwei Probleme gefunden > 1. D
+        cos=0.843 kw=0.40 score=0.455  Wissen/03 - KI und Technik/05 - Jarvis Projekt Anweisung und Funktionsumfang.md | Jarvis Anweisung > Anweisungs-Prompt (Copy-Paste-Block)
+        cos=0.838 kw=0.40 score=0.442  01 - Persönliches/03 - Wie ich arbeite.md | 03 - Wie ich arbeite > Prioritäten für Jarvis
+  [OK] Welche erneuerbaren Energiequellen gibt es für Strom?
+        cos=0.839 kw=1.00 score=0.625  Wissen/02 - Grundlagen/03 - Technik und Materialien/Energie und Stromerzeugung.md | Energie und Stromerzeugung > Solarenergie (Photovoltaik)
+        cos=0.844 kw=0.67 score=0.537  Wissen/02 - Grundlagen/03 - Technik und Materialien/Energie und Stromerzeugung.md | Energie und Stromerzeugung > Kohle
+        cos=0.838 kw=0.67 score=0.522  Wissen/02 - Grundlagen/03 - Technik und Materialien/Energie und Stromerzeugung.md | Energie und Stromerzeugung > Geothermische Energie
+  [OK] Wie werden Erbinformationen in Zellen gespeichert?
+        cos=0.857 kw=1.00 score=0.666  Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/Genetik und DNA.md | Genetik und DNA > Wie werden Erbinformationen in Zellen gesp
+        cos=0.825 kw=0.33 score=0.392  Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/Zellbiologie.md | Zellbiologie > Aufbau einer tierischen Zelle
+        cos=0.825 kw=0.33 score=0.391  01 - Persönliches/01 - Familie.md | 01 - Familie > Familienwissen
+  [OK] Was ist der Unterschied zwischen Steuervermeidung und Steuerhinterziehung?
+        cos=0.845 kw=0.67 score=0.538  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Steuern und Finanzwesen.md | Steuern und Finanzwesen > Steuervermeidung und Steuerhinterz
+        cos=0.811 kw=0.33 score=0.360  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Steuern und Finanzwesen.md | Steuern und Finanzwesen > Arten von Steuern
+        cos=0.807 kw=0.33 score=0.350  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Steuern und Finanzwesen.md | Steuern und Finanzwesen > Steuersysteme
+  [OK] Warum arbeitet Holz, wenn sich die Luftfeuchtigkeit ändert?
+        cos=0.845 kw=0.75 score=0.563  Wissen/02 - Grundlagen/03 - Technik und Materialien/Holz.md | Holz > Biologische Struktur von Holz
+        cos=0.831 kw=0.25 score=0.381  Wissen/02 - Grundlagen/03 - Technik und Materialien/Holz.md | Holz > Verwendungen von Holz
+        cos=0.826 kw=0.25 score=0.369  Wissen/02 - Grundlagen/03 - Technik und Materialien/Holz.md | Holz > Behandlung und Verarbeitung
+  [OK] Was bedeutet es, wenn eine Strategie zu stark an vergangene Daten angepasst wurde?
+        cos=0.857 kw=0.50 score=0.515  Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Gefahren > Overfitting
+        cos=0.829 kw=0.33 score=0.401  Wissen/Bots/Claude_Trading-Bots_Wissen.md | Claude_Trading-Bots_Wissen > Teil 7 – Eigenes System und Ler
+        cos=0.831 kw=0.17 score=0.356  Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Wie prüfe ich eine Handelsstrategie mit a
+  [OK] Wie funktioniert ein Stop-Loss?
+        cos=0.838 kw=0.67 score=0.522  Wissen/04 - Trading und Big Brain/02 - Märkte und Ordertypen.md | 02 - Märkte und Ordertypen > Stop-Loss
+        cos=0.833 kw=0.67 score=0.510  Wissen/Bots/OpenAI_Trading-Bots_Dokumentation.md | OpenAI_Trading-Bots_Dokumentation > 2. Haupt-Bot > Zweck > L
+        cos=0.831 kw=0.67 score=0.505  Wissen/04 - Trading und Big Brain/06 - Risiko und Positionsgröße.md | 06 - Risiko und Positionsgröße > Positionsgröße
+  [OK] Was zeigt mir der RSI an?
+        cos=0.904 kw=1.00 score=0.776  Wissen/04 - Trading und Big Brain/04 - Technische Analyse.md | 04 - Technische Analyse > RSI > Was zeigt mir der RSI an?
+        cos=0.841 kw=1.00 score=0.630  Wissen/Bots/OpenAI_Trading-Bots_Dokumentation.md | OpenAI_Trading-Bots_Dokumentation > 30. M1-RSI-Filter – aktu
+        cos=0.865 kw=0.50 score=0.535  Wissen/04 - Trading und Big Brain/04 - Technische Analyse.md | 04 - Technische Analyse > RSI > Grenzen
+  [OK] Wie geben Nervenzellen Signale aneinander weiter?
+        cos=0.852 kw=0.50 score=0.504  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Gehirn und Neurobiologie.md | Gehirn und Neurobiologie > Neuronen und Synapsen
+        cos=0.813 kw=0.25 score=0.338  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Gehirn und Neurobiologie.md | Gehirn und Neurobiologie > Grundstruktur des Gehirns
+        cos=0.830 kw=0.00 score=0.303  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Körper und Physiologie.md | Körper und Physiologie > Die Organsysteme im Überblick
+  [OK] Wie wehrt sich der Körper gegen Krankheitserreger?
+        cos=0.843 kw=0.33 score=0.434  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Körper und Physiologie.md | Körper und Physiologie > Die Organsysteme im Überblick
+        cos=0.840 kw=0.33 score=0.427  Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/Mikrobiologie und Infektionen.md | Mikrobiologie und Infektionen > Infektionsprozess
+        cos=0.830 kw=0.33 score=0.403  Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/Mikrobiologie und Infektionen.md | Mikrobiologie und Infektionen > Einordnung und Verbindungen
+  [OK] Wie bleiben Brücken und Hochhäuser bei Erdbeben stehen?
+        cos=0.828 kw=0.60 score=0.479  Wissen/02 - Grundlagen/03 - Technik und Materialien/Strukturen und Tragwerke.md | Strukturen und Tragwerke > Grundlagen von Strukturen
+        cos=0.853 kw=0.40 score=0.476  Wissen/02 - Grundlagen/03 - Technik und Materialien/Strukturen und Tragwerke.md | Strukturen und Tragwerke > Naturkatastrophen und Struktur-Ve
+        cos=0.817 kw=0.40 score=0.393  Wissen/02 - Grundlagen/03 - Technik und Materialien/Strukturen und Tragwerke.md | Strukturen und Tragwerke > Materialien und ihre Eigenschafte
+  [OK] Wie tauschen Computer im Internet Daten aus?
+        cos=0.816 kw=0.75 score=0.495  Wissen/02 - Grundlagen/03 - Technik und Materialien/Internet und Netzwerke.md | Internet und Netzwerke > Grundlagen von Netzwerken
+        cos=0.808 kw=0.75 score=0.476  Wissen/02 - Grundlagen/03 - Technik und Materialien/Internet und Netzwerke.md | Internet und Netzwerke > Cybersecurity
+        cos=0.809 kw=0.50 score=0.404  Wissen/02 - Grundlagen/01 - Mensch und Alltag/03 - Allgemeines Welt- und Funktionswissen.md | Weltwissen > 10 --- Netzwerke und Internet > Server
+  [OK] Was unterscheidet kurzfristiges Handeln vom langfristigen Anlegen?
+        cos=0.809 kw=0.20 score=0.315  Wissen/04 - Trading und Big Brain/01 - Trading Grundlagen.md | 01 - Trading Grundlagen > Trading vs. Investieren
+        cos=0.799 kw=0.20 score=0.292  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Alltagswissen.md | Alltagswissen > Finanzielle Intelligenz
+        cos=0.799 kw=0.20 score=0.290  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Emotionen und Gefühle.md | Emotionen und Gefühle > Bezug zum eigenen Handeln
+  [OK] Wie richte ich die Bots für MetaTrader 5 ein?
+        cos=0.888 kw=0.67 score=0.638  Wissen/Bots/OpenAI_Trading-Bots_Dokumentation.md | OpenAI_Trading-Bots_Dokumentation > 35. Voraussetzungen
+        cos=0.882 kw=0.67 score=0.624  Wissen/Bots/ANLEITUNG.md | ANLEITUNG > 3) Installation — Schritt für Schritt
+        cos=0.876 kw=0.67 score=0.610  Wissen/Bots/ANLEITUNG.md | ANLEITUNG > 4) Wie man einen Bot startet
+  [OK] In welchem Ton soll mir die KI antworten?
+        cos=0.858 kw=1.00 score=0.669  01 - Persönliches/02 - Schreibstil und KI-Antworten.md | 02 - Schreibstil und KI-Antworten > Sprache und Ton
+        cos=0.846 kw=0.67 score=0.542  01 - Persönliches/02 - Schreibstil und KI-Antworten.md | 02 - Schreibstil und KI-Antworten > Verbindungen
+        cos=0.846 kw=0.67 score=0.540  01 - Persönliches/02 - Schreibstil und KI-Antworten.md | 02 - Schreibstil und KI-Antworten > Arbeitsauftrag für die K
+  [OK] In welchen Stufen soll Big Brain ausgebaut werden?
+        cos=0.899 kw=1.00 score=0.764  Wissen/03 - KI und Technik/03 - Big Brain Ziele und Entwicklungsplan.md | Big Brain Projektplan > Entwicklungsphasen > In welchen Stuf
+        cos=0.850 kw=0.75 score=0.576  Wissen/Bots/OpenAI_Trading-Bots_Dokumentation.md | OpenAI_Trading-Bots_Dokumentation > 47. Sinnvolle Weiterentw
+        cos=0.854 kw=0.50 score=0.509  Wissen/03 - KI und Technik/02 - Token, Kontext und RAG.md | Token und Kontext > 71. Prioritäten für die Weiterentwicklun
+  [OK] Wie sortiere ich Notizen nach Projekten, Bereichen und Archiv?
+        cos=0.852 kw=1.00 score=0.655  Wissen/06 - Quellen und Pflege/Obsidian Notizmanagement - Entwurf.md | Obsidian Notizmanagement - Entwurf > Wie sortiere ich Notize
+        cos=0.852 kw=0.40 score=0.475  Wissen/06 - Quellen und Pflege/Obsidian Notizmanagement - Entwurf.md | Obsidian Notizmanagement - Entwurf > Pflegerhythmus
+        cos=0.848 kw=0.40 score=0.465  Wissen/03 - KI und Technik/02-obsidian-markdown.md | Obsidian Flavored Markdown: Das Backbone des Wissensmanageme
+  [OK] Wie steuern Notenbanken die Geldmenge?
+        cos=0.812 kw=0.67 score=0.462  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Steuern und Finanzwesen.md | Steuern und Finanzwesen > Geldpolitik und Zentralbanken
+        cos=0.795 kw=0.67 score=0.421  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Währungen und Länder.md | Währungen und Länder > Was ist Geld und Währung?
+        cos=0.806 kw=0.33 score=0.348  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Steuern und Finanzwesen.md | Steuern und Finanzwesen > Einordnung und Verbindungen
+  [OK] Warum suchen Menschen bevorzugt nach Bestätigung ihrer Meinung?
+        cos=0.818 kw=0.60 score=0.454  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Psychologie und Verhalten.md | Psychologie und Verhalten > Kognitive Biases und heuristisch
+        cos=0.825 kw=0.20 score=0.353  Wissen/04 - Trading und Big Brain/07 - Trading Psychologie.md | 07 - Trading Psychologie > Confirmation Bias
+        cos=0.814 kw=0.20 score=0.327  Wissen/02 - Grundlagen/01 - Mensch und Alltag/03 - Allgemeines Welt- und Funktionswissen.md | Weltwissen > 23 --- Mensch
+  [OK] Wie zerlegt ein Sprachmodell Text in kleine Einheiten?
+        cos=0.819 kw=0.80 score=0.518  Wissen/03 - KI und Technik/02 - Token, Kontext und RAG.md | Token und Kontext > 7. BPE -- Grundprinzip
+        cos=0.859 kw=0.40 score=0.492  Wissen/02 - Grundlagen/01 - Mensch und Alltag/03 - Allgemeines Welt- und Funktionswissen.md | Weltwissen > 13 --- Large Language Models
+        cos=0.820 kw=0.60 score=0.460  Wissen/03 - KI und Technik/02 - Token, Kontext und RAG.md | Token und Kontext > 13. Chunking
+  [OK] Wie verknüpfe ich zwei Notizen in Obsidian?
+        cos=0.894 kw=1.00 score=0.752  Wissen/03 - KI und Technik/00 - Obsidian Grundlagen.md | 00 - Obsidian Grundlagen > Wissen verknüpfen > Wie verknüpfe
+        cos=0.885 kw=0.75 score=0.656  Wissen/02 - Grundlagen/03 - Technik und Materialien/Vault-Update Obsidian Skills - 2026-09-17.md | Vault-Update Obsidian Skills - 2026-09-17 > Was heute neu is
+        cos=0.877 kw=0.50 score=0.562  Wissen/03 - KI und Technik/00 - Obsidian Grundlagen.md | 00 - Obsidian Grundlagen > Kurz erklärt
+  [OK] Wie viel Gewinn sollte ein Trade im Verhältnis zum möglichen Verlust bringen?
+        cos=0.876 kw=0.83 score=0.662  Wissen/04 - Trading und Big Brain/06 - Risiko und Positionsgröße.md | 06 - Risiko und Positionsgröße > Risk/Reward
+        cos=0.863 kw=0.50 score=0.530  Wissen/04 - Trading und Big Brain/06 - Risiko und Positionsgröße.md | 06 - Risiko und Positionsgröße > Risiko pro Trade
+        cos=0.841 kw=0.67 score=0.529  Wissen/Bots/Claude_Trading-Bots_Wissen.md | Claude_Trading-Bots_Wissen > Teil 5 – Konzepte: Methodik > P
+  [OK] Wie entstehen neue Arten im Laufe der Zeit?
+        cos=0.894 kw=1.00 score=0.752  Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/Evolution und Ursprung.md | Evolution und Ursprung > Wie entstehen neue Arten im Laufe d
+        cos=0.809 kw=0.40 score=0.375  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Gehirn und Neurobiologie.md | Gehirn und Neurobiologie > Plastizität und Neurogenese
+        cos=0.832 kw=0.20 score=0.369  Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/Evolution und Ursprung.md | Evolution und Ursprung > Die Mechanismen der Evolution
+  [OK] Sind Kryptowährungen richtiges Geld?
+        cos=0.845 kw=0.67 score=0.539  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Währungen und Länder.md | Währungen und Länder > Kryptowährungen und digitales Geld
+        cos=0.814 kw=0.33 score=0.366  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Währungen und Länder.md | Währungen und Länder > Zukünftige Trends
+        cos=0.812 kw=0.33 score=0.362  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Währungen und Länder.md | Währungen und Länder > Was ist Geld und Währung?
+  [OK] Was muss das System prüfen, bevor es einen simulierten Trade ausführt?
+        cos=0.891 kw=1.00 score=0.745  Wissen/04 - Trading und Big Brain/10 - Big Brain Trading Architektur.md | 10 - Big Brain Trading Architektur > Risk Engine > Was muss 
+        cos=0.841 kw=0.50 score=0.479  Wissen/Bots/Claude_Trading-Bots_Wissen.md | Claude_Trading-Bots_Wissen > Teil 6 – Programmierung > Siche
+        cos=0.842 kw=0.33 score=0.430  Wissen/Bots/OpenAI_Trading-Bots_Dokumentation.md | OpenAI_Trading-Bots_Dokumentation > 7. Dashboard und Analyse
+  => neu ohne IDF: Platz 1: 28/28, Top 3: 28/28
+  (21 ms pro Suche)
+
+==== Stichwort-Logik: neu ====
+  [OK] Wie viel Geld darf ich pro Trade maximal riskieren?
+        cos=0.881 kw=1.00 score=0.721  Wissen/04 - Trading und Big Brain/06 - Risiko und Positionsgröße.md | 06 - Risiko und Positionsgröße > Risiko pro Trade
+        cos=0.860 kw=0.48 score=0.517  Wissen/04 - Trading und Big Brain/06 - Risiko und Positionsgröße.md | 06 - Risiko und Positionsgröße > Big-Brain-Regeln
+        cos=0.864 kw=0.26 score=0.461  Wissen/Bots/OpenAI_Trading-Bots_Dokumentation.md | OpenAI_Trading-Bots_Dokumentation > 7. David V2 – Risikomana
+  [OK] Was passiert, wenn man nach einem Verlust zu aggressiv weiterhandelt?
+        cos=0.886 kw=0.45 score=0.570  Wissen/04 - Trading und Big Brain/07 - Trading Psychologie.md | 07 - Trading Psychologie > Revenge Trading
+        cos=0.834 kw=0.17 score=0.363  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Emotionen und Gefühle.md | Emotionen und Gefühle > Bezug zum eigenen Handeln
+        cos=0.819 kw=0.17 score=0.328  Wissen/Bots/Claude_Trading-Bots_Wissen.md | Claude_Trading-Bots_Wissen > Teil 5 – Konzepte: Methodik > O
+  [OK] Wie prüfe ich eine Handelsstrategie mit alten Kursdaten?
+        cos=0.908 kw=1.00 score=0.785  Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Wie prüfe ich eine Handelsstrategie mit a
+        cos=0.906 kw=1.00 score=0.781  Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Wie prüfe ich eine Handelsstrategie mit a
+        cos=0.847 kw=1.00 score=0.644  Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Wie prüfe ich eine Handelsstrategie mit a
+  [OK] Welche Tech-Stack-Entscheidungen habe ich für Jarvis getroffen?
+        cos=0.840 kw=1.00 score=0.628  Wissen/02 - Grundlagen/Tages Notizen/2026-09-19.md | Tagesnotizen — 2026-09-19 > ⚠️ Zwei Probleme gefunden > 1. D
+        cos=0.843 kw=0.25 score=0.409  Wissen/03 - KI und Technik/05 - Jarvis Projekt Anweisung und Funktionsumfang.md | Jarvis Anweisung > Anweisungs-Prompt (Copy-Paste-Block)
+        cos=0.838 kw=0.25 score=0.396  01 - Persönliches/03 - Wie ich arbeite.md | 03 - Wie ich arbeite > Prioritäten für Jarvis
+  [OK] Welche erneuerbaren Energiequellen gibt es für Strom?
+        cos=0.839 kw=1.00 score=0.625  Wissen/02 - Grundlagen/03 - Technik und Materialien/Energie und Stromerzeugung.md | Energie und Stromerzeugung > Solarenergie (Photovoltaik)
+        cos=0.844 kw=0.67 score=0.537  Wissen/02 - Grundlagen/03 - Technik und Materialien/Energie und Stromerzeugung.md | Energie und Stromerzeugung > Kohle
+        cos=0.838 kw=0.67 score=0.522  Wissen/02 - Grundlagen/03 - Technik und Materialien/Energie und Stromerzeugung.md | Energie und Stromerzeugung > Geothermische Energie
+  [OK] Wie werden Erbinformationen in Zellen gespeichert?
+        cos=0.857 kw=1.00 score=0.666  Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/Genetik und DNA.md | Genetik und DNA > Wie werden Erbinformationen in Zellen gesp
+        cos=0.825 kw=0.31 score=0.384  Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/Zellbiologie.md | Zellbiologie > Aufbau einer tierischen Zelle
+        cos=0.825 kw=0.27 score=0.371  01 - Persönliches/01 - Familie.md | 01 - Familie > Familienwissen
+  [OK] Was ist der Unterschied zwischen Steuervermeidung und Steuerhinterziehung?
+        cos=0.845 kw=0.78 score=0.574  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Steuern und Finanzwesen.md | Steuern und Finanzwesen > Steuervermeidung und Steuerhinterz
+        cos=0.811 kw=0.38 score=0.374  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Steuern und Finanzwesen.md | Steuern und Finanzwesen > Arten von Steuern
+        cos=0.807 kw=0.22 score=0.315  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Steuern und Finanzwesen.md | Steuern und Finanzwesen > Steuersysteme
+  [OK] Warum arbeitet Holz, wenn sich die Luftfeuchtigkeit ändert?
+        cos=0.845 kw=0.75 score=0.562  Wissen/02 - Grundlagen/03 - Technik und Materialien/Holz.md | Holz > Biologische Struktur von Holz
+        cos=0.831 kw=0.20 score=0.365  Wissen/02 - Grundlagen/03 - Technik und Materialien/Holz.md | Holz > Verwendungen von Holz
+        cos=0.826 kw=0.20 score=0.352  Wissen/02 - Grundlagen/03 - Technik und Materialien/Holz.md | Holz > Behandlung und Verarbeitung
+  [OK] Was bedeutet es, wenn eine Strategie zu stark an vergangene Daten angepasst wurde?
+        cos=0.857 kw=0.39 score=0.482  Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Gefahren > Overfitting
+        cos=0.829 kw=0.25 score=0.375  Wissen/Bots/Claude_Trading-Bots_Wissen.md | Claude_Trading-Bots_Wissen > Teil 7 – Eigenes System und Ler
+        cos=0.831 kw=0.14 score=0.349  Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Wie prüfe ich eine Handelsstrategie mit a
+  [OK] Wie funktioniert ein Stop-Loss?
+        cos=0.838 kw=0.64 score=0.515  Wissen/04 - Trading und Big Brain/02 - Märkte und Ordertypen.md | 02 - Märkte und Ordertypen > Stop-Loss
+        cos=0.833 kw=0.64 score=0.503  Wissen/Bots/OpenAI_Trading-Bots_Dokumentation.md | OpenAI_Trading-Bots_Dokumentation > 2. Haupt-Bot > Zweck > L
+        cos=0.831 kw=0.64 score=0.499  Wissen/04 - Trading und Big Brain/06 - Risiko und Positionsgröße.md | 06 - Risiko und Positionsgröße > Positionsgröße
+  [OK] Was zeigt mir der RSI an?
+        cos=0.904 kw=1.00 score=0.776  Wissen/04 - Trading und Big Brain/04 - Technische Analyse.md | 04 - Technische Analyse > RSI > Was zeigt mir der RSI an?
+        cos=0.841 kw=1.00 score=0.630  Wissen/Bots/OpenAI_Trading-Bots_Dokumentation.md | OpenAI_Trading-Bots_Dokumentation > 30. M1-RSI-Filter – aktu
+        cos=0.865 kw=0.43 score=0.512  Wissen/04 - Trading und Big Brain/04 - Technische Analyse.md | 04 - Technische Analyse > RSI > Grenzen
+  [OK] Wie geben Nervenzellen Signale aneinander weiter?
+        cos=0.852 kw=0.44 score=0.486  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Gehirn und Neurobiologie.md | Gehirn und Neurobiologie > Neuronen und Synapsen
+        cos=0.813 kw=0.30 score=0.352  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Gehirn und Neurobiologie.md | Gehirn und Neurobiologie > Grundstruktur des Gehirns
+        cos=0.830 kw=0.00 score=0.303  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Körper und Physiologie.md | Körper und Physiologie > Die Organsysteme im Überblick
+  [OK] Wie wehrt sich der Körper gegen Krankheitserreger?
+        cos=0.829 kw=0.38 score=0.414  Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/Mikrobiologie und Infektionen.md | Mikrobiologie und Infektionen > Was sind Mikroorganismen?
+        cos=0.843 kw=0.21 score=0.397  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Körper und Physiologie.md | Körper und Physiologie > Die Organsysteme im Überblick
+        cos=0.840 kw=0.21 score=0.390  Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/Mikrobiologie und Infektionen.md | Mikrobiologie und Infektionen > Infektionsprozess
+  [OK] Wie bleiben Brücken und Hochhäuser bei Erdbeben stehen?
+        cos=0.853 kw=0.42 score=0.481  Wissen/02 - Grundlagen/03 - Technik und Materialien/Strukturen und Tragwerke.md | Strukturen und Tragwerke > Naturkatastrophen und Struktur-Ve
+        cos=0.828 kw=0.57 score=0.471  Wissen/02 - Grundlagen/03 - Technik und Materialien/Strukturen und Tragwerke.md | Strukturen und Tragwerke > Grundlagen von Strukturen
+        cos=0.817 kw=0.44 score=0.405  Wissen/02 - Grundlagen/03 - Technik und Materialien/Strukturen und Tragwerke.md | Strukturen und Tragwerke > Materialien und ihre Eigenschafte
+  [OK] Wie tauschen Computer im Internet Daten aus?
+        cos=0.816 kw=0.64 score=0.462  Wissen/02 - Grundlagen/03 - Technik und Materialien/Internet und Netzwerke.md | Internet und Netzwerke > Grundlagen von Netzwerken
+        cos=0.808 kw=0.64 score=0.443  Wissen/02 - Grundlagen/03 - Technik und Materialien/Internet und Netzwerke.md | Internet und Netzwerke > Cybersecurity
+        cos=0.806 kw=0.50 score=0.395  Wissen/02 - Grundlagen/01 - Mensch und Alltag/03 - Allgemeines Welt- und Funktionswissen.md | Weltwissen > Funktionale Navigation > Information verarbeite
+  [OK] Was unterscheidet kurzfristiges Handeln vom langfristigen Anlegen?
+        cos=0.809 kw=0.18 score=0.308  Wissen/04 - Trading und Big Brain/01 - Trading Grundlagen.md | 01 - Trading Grundlagen > Trading vs. Investieren
+        cos=0.798 kw=0.20 score=0.288  Wissen/04 - Trading und Big Brain/01 - Trading Grundlagen.md | 01 - Trading Grundlagen > Was ist Trading?
+        cos=0.799 kw=0.18 score=0.285  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Alltagswissen.md | Alltagswissen > Finanzielle Intelligenz
+  [OK] Wie richte ich die Bots für MetaTrader 5 ein?
+        cos=0.888 kw=0.46 score=0.575  Wissen/Bots/OpenAI_Trading-Bots_Dokumentation.md | OpenAI_Trading-Bots_Dokumentation > 35. Voraussetzungen
+        cos=0.882 kw=0.46 score=0.561  Wissen/Bots/ANLEITUNG.md | ANLEITUNG > 3) Installation — Schritt für Schritt
+        cos=0.876 kw=0.46 score=0.547  Wissen/Bots/ANLEITUNG.md | ANLEITUNG > 4) Wie man einen Bot startet
+  [OK] In welchem Ton soll mir die KI antworten?
+        cos=0.858 kw=1.00 score=0.669  01 - Persönliches/02 - Schreibstil und KI-Antworten.md | 02 - Schreibstil und KI-Antworten > Sprache und Ton
+        cos=0.846 kw=0.46 score=0.481  01 - Persönliches/02 - Schreibstil und KI-Antworten.md | 02 - Schreibstil und KI-Antworten > Verbindungen
+        cos=0.846 kw=0.46 score=0.479  01 - Persönliches/02 - Schreibstil und KI-Antworten.md | 02 - Schreibstil und KI-Antworten > Arbeitsauftrag für die K
+  [OK] In welchen Stufen soll Big Brain ausgebaut werden?
+        cos=0.899 kw=1.00 score=0.764  Wissen/03 - KI und Technik/03 - Big Brain Ziele und Entwicklungsplan.md | Big Brain Projektplan > Entwicklungsphasen > In welchen Stuf
+        cos=0.850 kw=0.58 score=0.525  Wissen/Bots/OpenAI_Trading-Bots_Dokumentation.md | OpenAI_Trading-Bots_Dokumentation > 47. Sinnvolle Weiterentw
+        cos=0.854 kw=0.27 score=0.440  Wissen/03 - KI und Technik/02 - Token, Kontext und RAG.md | Token und Kontext > 71. Prioritäten für die Weiterentwicklun
+  [OK] Wie sortiere ich Notizen nach Projekten, Bereichen und Archiv?
+        cos=0.852 kw=1.00 score=0.655  Wissen/06 - Quellen und Pflege/Obsidian Notizmanagement - Entwurf.md | Obsidian Notizmanagement - Entwurf > Wie sortiere ich Notize
+        cos=0.852 kw=0.28 score=0.437  Wissen/06 - Quellen und Pflege/Obsidian Notizmanagement - Entwurf.md | Obsidian Notizmanagement - Entwurf > Pflegerhythmus
+        cos=0.848 kw=0.28 score=0.428  Wissen/03 - KI und Technik/02-obsidian-markdown.md | Obsidian Flavored Markdown: Das Backbone des Wissensmanageme
+  [OK] Wie steuern Notenbanken die Geldmenge?
+        cos=0.812 kw=0.57 score=0.434  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Steuern und Finanzwesen.md | Steuern und Finanzwesen > Geldpolitik und Zentralbanken
+        cos=0.795 kw=0.57 score=0.393  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Währungen und Länder.md | Währungen und Länder > Was ist Geld und Währung?
+        cos=0.806 kw=0.21 score=0.311  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Steuern und Finanzwesen.md | Steuern und Finanzwesen > Einordnung und Verbindungen
+  [OK] Warum suchen Menschen bevorzugt nach Bestätigung ihrer Meinung?
+        cos=0.818 kw=0.47 score=0.416  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Psychologie und Verhalten.md | Psychologie und Verhalten > Kognitive Biases und heuristisch
+        cos=0.825 kw=0.22 score=0.358  Wissen/04 - Trading und Big Brain/07 - Trading Psychologie.md | 07 - Trading Psychologie > Confirmation Bias
+        cos=0.813 kw=0.27 score=0.346  01 - Persönliches/02 - Schreibstil und KI-Antworten.md | 02 - Schreibstil und KI-Antworten > Inhalt und Verlässlichke
+  [OK] Wie zerlegt ein Sprachmodell Text in kleine Einheiten?
+        cos=0.819 kw=0.75 score=0.502  Wissen/03 - KI und Technik/02 - Token, Kontext und RAG.md | Token und Kontext > 7. BPE -- Grundprinzip
+        cos=0.859 kw=0.35 score=0.478  Wissen/02 - Grundlagen/01 - Mensch und Alltag/03 - Allgemeines Welt- und Funktionswissen.md | Weltwissen > 13 --- Large Language Models
+        cos=0.820 kw=0.53 score=0.437  Wissen/03 - KI und Technik/02 - Token, Kontext und RAG.md | Token und Kontext > 13. Chunking
+  [OK] Wie verknüpfe ich zwei Notizen in Obsidian?
+        cos=0.894 kw=1.00 score=0.752  Wissen/03 - KI und Technik/00 - Obsidian Grundlagen.md | 00 - Obsidian Grundlagen > Wissen verknüpfen > Wie verknüpfe
+        cos=0.885 kw=0.75 score=0.657  Wissen/02 - Grundlagen/03 - Technik und Materialien/Vault-Update Obsidian Skills - 2026-09-17.md | Vault-Update Obsidian Skills - 2026-09-17 > Was heute neu is
+        cos=0.877 kw=0.34 score=0.514  Wissen/03 - KI und Technik/00 - Obsidian Grundlagen.md | 00 - Obsidian Grundlagen > Kurz erklärt
+  [OK] Wie viel Gewinn sollte ein Trade im Verhältnis zum möglichen Verlust bringen?
+        cos=0.876 kw=0.77 score=0.643  Wissen/04 - Trading und Big Brain/06 - Risiko und Positionsgröße.md | 06 - Risiko und Positionsgröße > Risk/Reward
+        cos=0.841 kw=0.63 score=0.518  Wissen/Bots/Claude_Trading-Bots_Wissen.md | Claude_Trading-Bots_Wissen > Teil 5 – Konzepte: Methodik > P
+        cos=0.863 kw=0.41 score=0.502  Wissen/04 - Trading und Big Brain/06 - Risiko und Positionsgröße.md | 06 - Risiko und Positionsgröße > Risiko pro Trade
+  [OK] Wie entstehen neue Arten im Laufe der Zeit?
+        cos=0.894 kw=1.00 score=0.752  Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/Evolution und Ursprung.md | Evolution und Ursprung > Wie entstehen neue Arten im Laufe d
+        cos=0.818 kw=0.25 score=0.352  Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/Evolution und Ursprung.md | Evolution und Ursprung > Belege
+        cos=0.809 kw=0.31 score=0.349  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Gehirn und Neurobiologie.md | Gehirn und Neurobiologie > Plastizität und Neurogenese
+  [OK] Sind Kryptowährungen richtiges Geld?
+        cos=0.845 kw=0.74 score=0.560  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Währungen und Länder.md | Währungen und Länder > Kryptowährungen und digitales Geld
+        cos=0.814 kw=0.30 score=0.354  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Währungen und Länder.md | Währungen und Länder > Zukünftige Trends
+        cos=0.812 kw=0.30 score=0.350  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Währungen und Länder.md | Währungen und Länder > Was ist Geld und Währung?
+  [OK] Was muss das System prüfen, bevor es einen simulierten Trade ausführt?
+        cos=0.891 kw=1.00 score=0.745  Wissen/04 - Trading und Big Brain/10 - Big Brain Trading Architektur.md | 10 - Big Brain Trading Architektur > Risk Engine > Was muss 
+        cos=0.841 kw=0.44 score=0.460  Wissen/Bots/Claude_Trading-Bots_Wissen.md | Claude_Trading-Bots_Wissen > Teil 6 – Programmierung > Siche
+        cos=0.842 kw=0.22 score=0.395  Wissen/Bots/OpenAI_Trading-Bots_Dokumentation.md | OpenAI_Trading-Bots_Dokumentation > 7. Dashboard und Analyse
+  => neu: Platz 1: 28/28, Top 3: 28/28
+  (29 ms pro Suche)
+
+==== Schwelle für 'Treffer unsicher' ====
+  themenfremd: cos=0.852 kw=0.63  Wie backe ich einen Käsekuchen mit Quark?  -> Wissen/02 - Grundlagen/Tages Notizen/2026-09-20.md
+  themenfremd: cos=0.797 kw=0.19  Wie lange müssen Spaghetti kochen?  -> 01 - Persönliches/01 - Familie.md
+  themenfremd: cos=0.795 kw=0.21  Wie pflege ich eine Orchidee richtig?  -> Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/Mikrobiologie und Infektionen.md
+  themenfremd: cos=0.734 kw=0.00  Wer hat die Fußball-Weltmeisterschaft 2014 gewonnen?  -> Wissen/02 - Grundlagen/01 - Mensch und Alltag/03 - Allgemeines Welt- und Funktionswissen.md
+  themenfremd: cos=0.767 kw=0.00  Welche Vereine steigen dieses Jahr aus der Bundesliga ab?  -> Wissen/02 - Grundlagen/Tages Notizen/2026-09-21.md
+  themenfremd: cos=0.805 kw=0.00  Wie stricke ich einen Schal für Anfänger?  -> 01 - Persönliches/01 - Familie.md
+  themenfremd: cos=0.805 kw=0.00  Was sollte in einer Hochzeitsrede für meinen Bruder stehen?  -> 01 - Persönliches/01 - Familie.md
+  themenfremd: cos=0.803 kw=0.00  Was packe ich für einen Campingurlaub am Gardasee ein?  -> Wissen/03 - KI und Technik/01 - API Grundlagen.md
+  themenfremd: cos=0.806 kw=0.00  Wie bekomme ich Rotweinflecken aus einem Teppich?  -> 01 - Persönliches/01 - Familie.md
+  themenfremd: cos=0.806 kw=0.14  Wie mache ich einen guten Espresso mit der Siebträgermaschine?  -> 01 - Persönliches/01 - Familie.md
+  themenfremd: cos=0.790 kw=0.23  Welche Farbe passt zu einem grauen Sofa?  -> Wissen/03 - KI und Technik/04-json-canvas.md
+  themenfremd: cos=0.821 kw=0.19  Wie trainiere ich für meinen ersten Halbmarathon?  -> Wissen/Bots/Claude_Trading-Bots_Wissen.md
+
+  passende Fragen:   cos min=0.809  median=0.857  max=0.908
+  themenfremd:       cos min=0.734  median=0.804  max=0.852
+  Stichwort-Treffer: passend median=0.76, themenfremd median=0.07
+
+  Vorschlag reine cos-Schwelle: 0.809  (2 Fehler bei 28 passenden + 12 themenfremden Fragen)
+  Aktuelle Schwelle 0.807: 0 passende fälschlich unsicher, 2 themenfremde fälschlich sicher
+  Regel 'cos < 0.807 ODER kein Stichwort-Treffer': 0 passende fälschlich unsicher, 2 themenfremde fälschlich sicher
+  Regel 'cos < 0.809 ODER kein Stichwort-Treffer': 0 passende fälschlich unsicher, 2 themenfremde fälschlich sicher
+
+==== Ergebnis ====
+  alt: Platz 1: 26/28, Top 3: 28/28
+  neu ohne IDF: Platz 1: 28/28, Top 3: 28/28
+  neu: Platz 1: 28/28, Top 3: 28/28
+==== FERTIG 22.09.2026 19:40:26,44 ==== 

@@ -1,0 +1,100 @@
+/* Grundlagen: Reset, Farben, Typografie. Komponenten-Styles stehen in App.css. */
+
+:root {
+  /* Flächen */
+  --bg: #0f1115;
+  --bg-raised: #171a21;
+  --bg-input: #1b1f28;
+  --bg-hover: #222733;
+
+  /* Linien und Text */
+  --border: #272c37;
+  --border-soft: #1f2530;
+  --text: #e6e8ed;
+  --text-muted: #98a1b0;
+  --text-faint: #6b7483;
+
+  /* Akzente */
+  --accent: #6ea8fe;
+  --accent-strong: #4d8bfd;
+  --user-bubble: #223049;
+  --error: #ff7b72;
+  --error-bg: #2a1a1a;
+  --success: #4ade80;
+  --warn: #fbbf24;
+
+  --radius: 12px;
+  --radius-sm: 8px;
+
+  color-scheme: dark;
+
+  font-family: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+  background-color: var(--bg);
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+textarea,
+select,
+input {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+code,
+pre {
+  font-family: 'Cascadia Code', 'Consolas', 'SF Mono', monospace;
+  font-size: 0.88em;
+}
+
+/* Scrollbars im Dunkeln nicht als weiße Balken */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2c323e;
+  border-radius: 6px;
+  border: 2px solid var(--bg);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3a414f;
+}

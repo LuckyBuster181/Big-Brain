@@ -1,0 +1,20 @@
+[
+ {
+  "datei": "Milchstrasse.json",
+  "name": "Milchstrasse",
+  "koerper": 11,
+  "galaxien": 5
+ },
+ {
+  "datei": "My_Simulation.json",
+  "name": "My Simulation",
+  "koerper": 12,
+  "galaxien": 5
+ },
+ {
+  "datei": "Test-Simple.json",
+  "name": "Test-Simple",
+  "koerper": 3,
+  "galaxien": 0
+ }
+]

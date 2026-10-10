@@ -1,0 +1,23 @@
+    <!-- Vollbild-Jarvis (26.09.2026): Schwarzes Loch + Galaxie oder Hologramm-Kopf, hört dauerhaft zu -->
+    <div id="jvVoll" class="jv-voll" aria-label="Jarvis Vollbild">
+      <canvas id="jvCanvas"></canvas>
+      <div class="jv-karten" id="jvKarten"></div>
+      <div class="jv-fehlt" id="jvKeinGL" hidden>3D ist in diesem Browser nicht verfügbar (WebGL aus).<br>Jarvis hört trotzdem zu.</div>
+      <div class="jv-oben">
+        <div><div class="jv-name" id="jvName">JARVIS</div><div class="jv-status" id="jvStatus">Bereit</div></div>
+        <div class="jv-knoepfe">
+          <button class="jv-k" id="jvKoerper" type="button" title="Zwischen Universum und Kopf wechseln">Universum</button>
+          <button class="jv-k" id="jvTon" type="button" title="Weltraum-Ton an oder aus">Ton an</button>
+          <button class="jv-k" id="jvArbeit" type="button" title="Arbeitsmodus: Chat, Quellen, Werkzeuge (Taste A)">Arbeitsmodus</button>
+        </div>
+      </div>
+      <div class="jv-unten">
+        <div class="jv-du" id="jvDu"></div>
+        <div class="jv-antwort" id="jvAntwort"></div>
+        <div class="jv-eingabe">
+          <button class="jv-mikro" id="jvMikro" type="button" title="Jetzt zuhören"><svg viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg></button>
+          <input id="jvText" type="text" autocomplete="off" placeholder="Hier tippen oder einfach sprechen" />
+        </div>
+        <div class="jv-hinweis" id="jvHinweis"></div>
+      </div>
+    </div>

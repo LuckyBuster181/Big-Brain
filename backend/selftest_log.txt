@@ -1,0 +1,187 @@
+==== Jarvis Selbsttest 19.09.2026 19:25:42,14 ==== 
+Vault: ..\..\..\..\Documents\KI\Obsidian\AI Gehrin 1.1\Brain
+Python: 3.14.7, CPU-Kerne: 16
+EMBEDDING_THREADS=2 (Standard), EMBEDDING_PAUSE_MS=100 (Standard)
+
+==== 1. Embedding-Modell ====
+  Aktives Modell: e5-base (multilingual-e5-base, int8-quantisiert (~280 MB))
+[Embedding] Lade Modell e5-base (multilingual-e5-base, int8-quantisiert (~280 MB)) ...
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[Embedding] Modell bereit nach 1.3s
+  [OK] Modell geladen - 1.5s, ? von 16 CPU-Threads
+  Dimension: 768, cos(passend)=0.866, cos(unpassend)=0.749
+  [OK] Passender Text ähnlicher als unpassender
+  cos(DE-Satz, EN-Übersetzung)=0.896, cos(DE-Satz, anderes Thema)=0.778
+  [OK] Mehrsprachig: Übersetzung ähnlicher als anderes Thema
+
+==== 2. Index komplett neu aufbauen, danach Lauf nur mit Änderungen ====
+    ... 1/77 Notizen (01 - Persönliches/00 - Über mich.md)
+    ... 8/77 Notizen (Wissen/02 - Grundlagen/01 - Mensch und Alltag/03 - Allgemeines Welt- und Funktionswissen.md)
+    ... 16/77 Notizen (Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/02 - NASA Grundlagen.md)
+    ... 24/77 Notizen (Wissen/02 - Grundlagen/03 - Technik und Materialien/Holz.md)
+    ... 32/77 Notizen (Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Steuern und Finanzwesen.md)
+    ... 36/77 Notizen (Wissen/02 - Grundlagen/Tages Notizen/2026-09-19 -Jarvis Entwicklungslog.md)
+    ... 43/77 Notizen (Wissen/03 - KI und Technik/01-obsidian-cli.md)
+    ... 45/77 Notizen (Wissen/03 - KI und Technik/02-obsidian-markdown.md)
+    ... 50/77 Notizen (Wissen/03 - KI und Technik/05 - Jarvis Projekt Anweisung und Funktionsumfang.md)
+    ... 59/77 Notizen (Wissen/04 - Trading und Big Brain/06 - Risiko und Positionsgröße.md)
+    ... 68/77 Notizen (Wissen/06 - Quellen und Pflege/Second Brain Methoden und Ressourcen.md)
+    ... 73/77 Notizen (Wissen/Bots/ANLEITUNG.md)
+    ... 75/77 Notizen (Wissen/Bots/Claude_Trading-Bots_Wissen.md)
+    ... 77/77 Notizen (Wissen/Bots/OpenAI_Trading-Bots_Dokumentation.md)
+  Lauf 1: {'model': 'e5-base', 'full': True, 'files_total': 77, 'files_indexed': 77, 'files_new': 77, 'files_changed': 0, 'files_removed': 0, 'files_unchanged': 0, 'files_empty': 0, 'chunks_written': 1260, 'collection_count': 1260, 'duration_s': 82.57}
+  [OK] Index enthält Chunks - 1260 Chunks in 82.57s
+  Lauf 2: {'model': 'e5-base', 'full': False, 'files_total': 77, 'files_indexed': 0, 'files_new': 0, 'files_changed': 0, 'files_removed': 0, 'files_unchanged': 77, 'files_empty': 0, 'chunks_written': 0, 'collection_count': 1260, 'duration_s': 0.07}
+  [OK] Zweiter Lauf ohne Änderungen indexiert nichts neu
+
+==== 3. Inkrementelles Update (Test-Ordner, echter Vault bleibt unberührt) ====
+  [OK] Test-Index aufgebaut - 22 Chunks
+  Nach Änderungen: {'model': 'e5-base', 'full': False, 'files_total': 3, 'files_indexed': 2, 'files_new': 1, 'files_changed': 1, 'files_removed': 1, 'files_unchanged': 1, 'files_empty': 0, 'chunks_written': 8, 'collection_count': 17, 'duration_s': 0.84}
+  [OK] Änderung, Löschung und neue Datei erkannt
+  [OK] Gelöschte Notiz nicht mehr im Index
+  [OK] Neuer Abschnitt im Index
+
+==== 4. Deutsche Testfragen: altes gegen neues Modell ====
+
+  --- minilm (alter Index, 1239 Chunks, Stand erster Indexlauf) ---
+  [OK] Wie viel Geld darf ich pro Trade maximal riskieren?
+        cos=0.612 score=0.495  Wissen/04 - Trading und Big Brain/10 - Big Brain Trading Architektur.md | 10 - Big Brain Trading Architektur > Risk Engine
+        cos=0.539 score=0.444  Wissen/04 - Trading und Big Brain/06 - Risiko und Positionsgröße.md | 06 - Risiko und Positionsgröße > Big-Brain-Regeln
+        cos=0.533 score=0.440  Wissen/Bots/OpenAI_Trading-Bots_Dokumentation.md | OpenAI_Trading-Bots_Dokumentation > 7. David V2 – Risikomanagement
+  [OK] Was passiert, wenn man nach einem Verlust zu aggressiv weiterhandelt?
+        cos=0.469 score=0.428  Wissen/04 - Trading und Big Brain/07 - Trading Psychologie.md | 07 - Trading Psychologie > Revenge Trading
+        cos=0.370 score=0.293  Wissen/02 - Grundlagen/01 - Mensch und Alltag/03 - Allgemeines Welt- und Funktionswissen.md | Weltwissen > 36 --- Verkehr
+        cos=0.400 score=0.280  Wissen/02 - Grundlagen/01 - Mensch und Alltag/03 - Allgemeines Welt- und Funktionswissen.md | Weltwissen > 03 --- Mechanik > Lager
+  [--] Wie prüfe ich eine Handelsstrategie mit alten Kursdaten?
+        cos=0.459 score=0.397  Wissen/03 - KI und Technik/04 - Künstliche Intelligenz Vertiefung.md | 04 - Künstliche Intelligenz Vertiefung > Grenzen und Probleme der KI
+        cos=0.402 score=0.357  Wissen/03 - KI und Technik/04 - Künstliche Intelligenz Vertiefung.md | 04 - Künstliche Intelligenz Vertiefung > Machine Learning - Das Herz m
+        cos=0.453 score=0.354  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Emotionen und Gefühle.md | Emotionen und Gefühle > Herausforderungen und Kontroversen
+  [OK] Welche Tech-Stack-Entscheidungen habe ich für Jarvis getroffen?
+        cos=0.482 score=0.438  Wissen/03 - KI und Technik/05 - Jarvis Projekt Anweisung und Funktionsumfang.md | Jarvis Anweisung > Anweisungs-Prompt (Copy-Paste-Block)
+        cos=0.526 score=0.402  Wissen/03 - KI und Technik/05 - Jarvis Projekt Anweisung und Funktionsumfang.md | Jarvis Anweisung > Offene Punkte
+        cos=0.508 score=0.356  Wissen/04 - Trading und Big Brain/04 - Technische Analyse.md | 04 - Technische Analyse
+  [--] Welche erneuerbaren Energiequellen gibt es für Strom?
+        cos=0.417 score=0.342  Wissen/02 - Grundlagen/01 - Mensch und Alltag/03 - Allgemeines Welt- und Funktionswissen.md | Weltwissen > 31 --- Heizung
+        cos=0.387 score=0.321  Wissen/03 - KI und Technik/02 - Token, Kontext und RAG.md | Token und Kontext > 71. Prioritäten für die Weiterentwicklung > Priori
+        cos=0.373 score=0.311  Wissen/03 - KI und Technik/02 - Token, Kontext und RAG.md | Token und Kontext > 71. Prioritäten für die Weiterentwicklung > Priori
+  [--] Wie werden Erbinformationen in Zellen gespeichert?
+        cos=0.463 score=0.324  Wissen/02 - Grundlagen/01 - Mensch und Alltag/03 - Allgemeines Welt- und Funktionswissen.md | Weltwissen > 06 --- Fahrzeuge > Bremse
+        cos=0.453 score=0.317  Wissen/02 - Grundlagen/01 - Mensch und Alltag/03 - Allgemeines Welt- und Funktionswissen.md | Weltwissen > 01 --- Physik > Grundbegriffe > Wichtige Zusammenhänge
+        cos=0.427 score=0.299  Wissen/02 - Grundlagen/01 - Mensch und Alltag/03 - Allgemeines Welt- und Funktionswissen.md | Weltwissen > 22 --- Biologie > Zelle
+  [OK] Was ist der Unterschied zwischen Steuervermeidung und Steuerhinterziehung?
+        cos=0.656 score=0.647  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Steuern und Finanzwesen.md | Steuern und Finanzwesen > Steuervermeidung und Steuerhinterziehung
+        cos=0.615 score=0.580  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Steuern und Finanzwesen.md | Steuern und Finanzwesen > Was sind Steuern?
+        cos=0.601 score=0.571  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Steuern und Finanzwesen.md | Steuern und Finanzwesen > Arten von Steuern
+  [OK] Warum arbeitet Holz, wenn sich die Luftfeuchtigkeit ändert?
+        cos=0.463 score=0.474  Wissen/02 - Grundlagen/03 - Technik und Materialien/Holz.md | Holz > Verwendungen von Holz
+        cos=0.472 score=0.443  Wissen/02 - Grundlagen/03 - Technik und Materialien/Holz.md | Holz > Mechanische Eigenschaften
+        cos=0.471 score=0.405  Wissen/02 - Grundlagen/03 - Technik und Materialien/Holz.md | Holz > Verwendungen von Holz
+  Themenfremde Frage 'Wie backe ich einen Käsekuchen mit Quark?': bester cos=0.369 (Wissen/Bots/Claude_Trading-Bots_Wissen.md)
+
+  --- e5-base (neu) ---
+  [OK] Wie viel Geld darf ich pro Trade maximal riskieren?
+        cos=0.856 score=0.431  Wissen/Bots/OpenAI_Trading-Bots_Dokumentation.md | OpenAI_Trading-Bots_Dokumentation > 7. David V2 – Risikomanagement
+        cos=0.850 score=0.416  Wissen/04 - Trading und Big Brain/06 - Risiko und Positionsgröße.md | 06 - Risiko und Positionsgröße > Big-Brain-Regeln
+        cos=0.843 score=0.399  Wissen/Bots/Claude_Trading-Bots_Wissen.md | Claude_Trading-Bots_Wissen > Teil 4 – Konzepte: Risiko > Risk-Reward u
+  [OK] Was passiert, wenn man nach einem Verlust zu aggressiv weiterhandelt?
+        cos=0.888 score=0.539  Wissen/04 - Trading und Big Brain/07 - Trading Psychologie.md | 07 - Trading Psychologie > Revenge Trading
+        cos=0.813 score=0.365  Wissen/Bots/Claude_Trading-Bots_Wissen.md | Claude_Trading-Bots_Wissen > Teil 5 – Konzepte: Methodik > Overfitting
+        cos=0.815 score=0.336  Wissen/Bots/Claude_Trading-Bots_Wissen.md | Claude_Trading-Bots_Wissen > Teil 3 – Konzepte: Indikatoren > Multi-Ti
+  [--] Wie prüfe ich eine Handelsstrategie mit alten Kursdaten?
+        cos=0.829 score=0.414  Wissen/Bots/00 - Trading-Bots und Dashboard.md | 00 - Trading-Bots und Dashboard > Prüfstatus und Versionsabgrenzung
+        cos=0.833 score=0.386  Wissen/04 - Trading und Big Brain/05 - Trading Strategien.md | 05 - Trading Strategien > Fachübergreifende Verbindungen
+        cos=0.826 score=0.370  Wissen/Bots/Claude_Trading-Bots_Wissen.md | Claude_Trading-Bots_Wissen > Teil 5 – Konzepte: Methodik > Filter rich
+  [OK] Welche Tech-Stack-Entscheidungen habe ich für Jarvis getroffen?
+        cos=0.829 score=0.601  Wissen/02 - Grundlagen/Tages Notizen/2026-09-19 -Jarvis Entwicklungslog.md | Jarvis Entwicklungslog — 19. September 2026 > ⚠️ Zwei offene Schwachst
+        cos=0.826 score=0.594  Wissen/02 - Grundlagen/Tages Notizen/2026-09-19.md | Tagesnotizen — 2026-09-19 > ⚠️ Zwei Probleme gefunden > 1. Das Suchmod
+        cos=0.851 score=0.553  Wissen/02 - Grundlagen/Tages Notizen/2026-09-19 -Jarvis Entwicklungslog.md | Jarvis Entwicklungslog — 19. September 2026 > Heute abgeschlossen: Pro
+  [OK] Welche erneuerbaren Energiequellen gibt es für Strom?
+        cos=0.835 score=0.415  Wissen/02 - Grundlagen/03 - Technik und Materialien/Energie und Stromerzeugung.md | Energie und Stromerzeugung > Solarenergie (Photovoltaik)
+        cos=0.839 score=0.374  Wissen/02 - Grundlagen/03 - Technik und Materialien/Energie und Stromerzeugung.md | Energie und Stromerzeugung > Kohle
+        cos=0.838 score=0.372  Wissen/02 - Grundlagen/03 - Technik und Materialien/Energie und Stromerzeugung.md | Energie und Stromerzeugung > Kernenergie
+  [OK] Wie werden Erbinformationen in Zellen gespeichert?
+        cos=0.825 score=0.351  01 - Persönliches/01 - Familie.md | 01 - Familie > Familienwissen
+        cos=0.798 score=0.348  Wissen/02 - Grundlagen/01 - Mensch und Alltag/Gehirn und Neurobiologie.md | Gehirn und Neurobiologie > Gedächtnis und Lernen
+        cos=0.820 score=0.339  Wissen/02 - Grundlagen/02 - Natur und Wissenschaft/Zellbiologie.md | Zellbiologie > Einordnung und Verbindungen
+  [OK] Was ist der Unterschied zwischen Steuervermeidung und Steuerhinterziehung?
+        cos=0.836 score=0.505  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Steuern und Finanzwesen.md | Steuern und Finanzwesen > Steuervermeidung und Steuerhinterziehung
+        cos=0.817 score=0.423  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Steuern und Finanzwesen.md | Steuern und Finanzwesen > Arten von Steuern
+        cos=0.801 score=0.348  Wissen/02 - Grundlagen/04 - Gesellschaft und Wirtschaft/Steuern und Finanzwesen.md | Steuern und Finanzwesen > Steuersysteme
+  [OK] Warum arbeitet Holz, wenn sich die Luftfeuchtigkeit ändert?
+        cos=0.845 score=0.488  Wissen/02 - Grundlagen/03 - Technik und Materialien/Holz.md | Holz > Biologische Struktur von Holz
+        cos=0.831 score=0.456  Wissen/02 - Grundlagen/03 - Technik und Materialien/Holz.md | Holz > Verwendungen von Holz
+        cos=0.824 score=0.402  Wissen/02 - Grundlagen/03 - Technik und Materialien/Holz.md | Holz > Mechanische Eigenschaften
+  Themenfremde Frage 'Wie backe ich einen Käsekuchen mit Quark?': bester cos=0.800 (Wissen/02 - Grundlagen/Tages Notizen/2026-09-19 -Jarvis Entwicklungslog.md)
+
+  Zusammenfassung (von 8 Fragen):
+    minilm         richtig auf Platz 1: 4   in Top 3: 5   ~177 ms/Suche   cos(themenfremd)=0.369
+    e5-base        richtig auf Platz 1: 5   in Top 3: 7   ~22 ms/Suche   cos(themenfremd)=0.800
+  [OK] Neues Modell findet mindestens 6 von 8 in Top 3 - 7/8
+  [OK] Neues Modell mindestens so gut wie das alte
+  [FEHLER] Themenfremde Frage liegt unter der Unsicherheits-Schwelle - cos=0.800, Schwelle=0.8
+
+==== 5. API (FastAPI TestClient) ====
+[Reindex] Vault wird im Hintergrund auf Änderungen geprüft ...
+  /api/health: {'status': 'ok', 'vault_indexed': True, 'chunk_count': 1260, 'embedding_model': 'e5-base', 'reindex_running': True}
+  [OK] Health meldet Modell und Index
+  [OK] POST /api/reindex -> 202 - True
+[Reindex] fertig in 0.1s: 0 Notizen neu eingelesen, 0 entfernt, 1260 Chunks im Index
+  Reindex-Status: {'running': False, 'full': False, 'started_at': '2026-09-19T19:27:13+02:00', 'finished_at': '2026-09-19T19:27:13+02:00', 'progress': None, 'last_result': {'model': 'e5-base', 'full': False, 'files_total': 77, 'files_indexed': 0, 'files_new': 0, 'files_changed': 0, 'files_removed': 0, 'files_unchanged': 77, 'files_empty': 0, 'chunks_written': 0, 'collection_count': 1260, 'duration_s': 0.1}, 'error': None}
+  [OK] Reindex fertig ohne Fehler
+  [OK] Reindex liefert Ergebnis
+  [OK] Ungültige Rolle im Verlauf wird abgelehnt (422)
+  [OK] Chat ohne Verlauf - HTTP 200
+  Antwort 1 (5 Quellen): Backtesting prüft eine Handelsstrategie anhand historischer Daten [1].
+
+**Grundablauf** [2]:
+1. Historische Daten laden
+2. Daten zeitlich korrekt teilen
+3. Strategie definieren
+4. Trades simulieren
+5. Gebühren und Slippage berücksichtigen
+6. Kennzahlen berechnen
+7. Ergebnis mit einer einfachen Baseline vergleichen
+
+**Wichtige Einschränkung:** Ein Backtest ist keine Garantie für zukünftige Ergebnis...
+      - Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Definition (0.512)
+      - Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Grundablauf (0.44)
+      - Wissen/Bots/OpenAI_Trading-Bots_Dokumentation.md | OpenAI_Trading-Bots_Dokumentation > 42. Backtest ≠ Zukunft (0.439)
+      - Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Gefahren > Unrealistische Ausführung (0.419)
+      - Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Gefahren > Overfitting (0.414)
+  [OK] Folgefrage mit Verlauf - HTTP 200
+  Antwort 2 (5 Quellen): Beim Backtesting gibt es folgende Gefahren:
+
+1. **Unrealistische Ausführung:** Ein Backtest ohne Berücksichtigung von Gebühren, Spread und Slippage kann deutlich zu optimistisch ausfallen [1].
+
+2. **Overfitting:** Die Strategie passt sich zu stark an historische Daten an und funktioniert außerhalb der Trainingsdaten (also in der Zukunft) schlecht [2].
+
+3. **Survivorship Bias:** Es werden nur Assets betrachtet, die heute noch erfolgreich sind – gescheiterte oder delistete Assets fallen aus der Betrachtung heraus [3].
+
+4. **Look-ahead Bias:** Die Strategie verwendet Informationen, die zum Zeitpu...
+      - Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Gefahren > Unrealistische Ausführung (0.409)
+      - Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Gefahren > Overfitting (0.376)
+      - Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Gefahren > Survivorship Bias (0.358)
+      - Wissen/04 - Trading und Big Brain/08 - Backtesting.md | 08 - Backtesting > Gefahren > Look-ahead Bias (0.355)
+      - Wissen/Bots/OpenAI_Trading-Bots_Dokumentation.md | OpenAI_Trading-Bots_Dokumentation > 42. Backtest ≠ Zukunft (0.326)
+  [OK] Folgefrage findet Backtesting-Notiz
+
+==== ERGEBNIS ====
+  19 von 20 Prüfungen OK
+  FEHLER: Themenfremde Frage liegt unter der Unsicherheits-Schwelle - cos=0.800, Schwelle=0.8
+[0m 
+==== Dashboard: npm run build ==== 
+
+> dashboard@0.0.0 build
+> tsc -b && vite build
+
+[36mvite v8.3.0 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 239 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.45 kB │ gzip:   0.29 kB
+dist/assets/index-CWh8bFu5.css    8.91 kB │ gzip:   2.59 kB
+dist/assets/index-BS8kKOk5.js   398.53 kB │ gzip: 125.91 kB
+
+[32m✓ built in 170ms[39m
+==== FERTIG 19.09.2026 19:27:26,21 ==== 

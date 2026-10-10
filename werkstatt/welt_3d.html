@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jarvis-Welt</title>
+<!--
+  Jarvis-Welt in 3D, Phase 1: Gelände, Wasser, Himmel, Licht, Weltenbaum als Platzhalter (04.10.2026).
+  Plan: Vault "Wissen/11 - Jarvis Werkstatt/04 - Jarvis-Welt Kartenplan (2026-10-04).md".
+  Maßstab: 1 Einheit = 1 Meter. Hauptinsel ca. 8,5 x 6,5 km, Insel Gehirn (NW), Insel Trading (SO).
+  Three.js r147. Bibliothek zuerst lokal aus lib/three/ (THREE_HOLEN.bat), sonst aus dem Internet (jsdelivr).
+  Es wird nichts gespeichert und nichts gesendet. Eigene Gestaltung, keine Inhalte aus Spielen.
+
+  TESTPLAN (Sir):
+   1. Datei per Doppelklick öffnen (Chrome oder Edge). Nach einigen Sekunden: große Insel mit Steilküsten
+      im Norden und Westen, Stränden im Süden, Hügeln, Felsen, Hochplateau in der Mitte mit dem goldenen Weltenbaum.
+   2. "Licht": Morgen, Tag, Sonnenuntergang, Nacht. Nachts leuchtet die Baumkrone.
+   3. Klick auf den Baum, einen der 6 Türme, eine Markierung oder ein Namensschild öffnet das Detailfeld.
+   4. "Rundgang" fliegt alle 13 Orte an. Ziehen dreht, Rechtsklick verschiebt, Mausrad zoomt.
+  PHASE 1 = PLATZHALTER: Türme und Regionen sind einfache Säulen. Echte Bauten folgen in Phase 2 und 3.
+  EHRLICH UNGETESTET: Bildrate auf dem Haupt-PC und auf Handys; Beispieldaten von Hand, nicht live.
+-->
+<style>
+  :root { color-scheme:dark; --bg:#060810; --panel:#121624; --linie:#2a3144; --text:#ece9e1; --leise:#9aa3b5; --gold:#d4af37; }
+  * { box-sizing:border-box; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--text);
+    font-family:system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; overflow:hidden; }
+  body { display:flex; flex-direction:column; height:100%; }
+  header { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; padding:9px 14px;
+    border-bottom:1px solid var(--linie); background:#0b0e18; z-index:3; }
+  header h1 { font-size:17px; margin:0; color:var(--gold); font-weight:600; letter-spacing:.4px; }
+  .steuer { display:flex; flex-wrap:wrap; gap:8px; margin-left:auto; align-items:center; }
+  label.licht { font-size:13px; color:var(--leise); display:flex; align-items:center; gap:6px; }
+  select, button { font:inherit; font-size:14px; color:var(--text); background:var(--panel);
+    border:1px solid var(--linie); border-radius:8px; padding:7px 12px; min-height:38px; }
+  button { cursor:pointer; }
+  button:hover, select:hover { border-color:var(--gold); }
+  button.haupt { background:#2b2410; border-color:var(--gold); color:#f3d98a; }
+  button:disabled { opacity:.4; cursor:default; }
+  button:focus-visible, select:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
+  .zeile { display:flex; flex-wrap:wrap; gap:4px 16px; padding:5px 14px; font-size:13px; color:var(--leise);
+    border-bottom:1px solid var(--linie); background:#0b0e18; z-index:3; }
+  .punkt { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:5px; vertical-align:middle; }
+  .hinweis { color:#ffc43d; }
+  main { position:relative; flex:1; min-height:0; overflow:hidden; }
+  canvas#stadt { width:100%; height:100%; display:block; touch-action:none; }
+  #schilder { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+  .schild { position:absolute; left:0; top:0; transform:translate(-50%,-100%); white-space:nowrap; pointer-events:auto;
+    background:rgba(10,12,20,.74); border:1px solid rgba(255,255,255,.22); color:#f1efe8; border-radius:11px;
+    padding:3px 10px 3px 8px; font-size:12px; font-weight:600; cursor:pointer; backdrop-filter:blur(3px);
+    display:flex; align-items:center; gap:6px; }
+  .schild .punkt { width:8px; height:8px; margin:0; }
+  .schild.aktiv { background:rgba(60,48,14,.95); border-color:#ffdc78; color:#ffe9a8; }
+  .schild.klein { padding:0; width:14px; height:14px; border-radius:50%; justify-content:center; }
+  .schild.klein .text { display:none; }
+  #untertitel { position:absolute; left:50%; top:12px; transform:translateX(-50%); max-width:min(92%,660px);
+    background:rgba(12,15,25,.86); border:1px solid var(--gold); border-radius:10px; padding:10px 16px;
+    font-size:15px; text-align:center; display:none; pointer-events:none; backdrop-filter:blur(4px); z-index:2; }
+  #untertitel.an { display:block; }
+  #detail { position:absolute; right:12px; top:12px; width:330px; max-height:calc(100% - 24px); overflow:auto;
+    background:rgba(18,22,36,.92); border:1px solid var(--linie); border-radius:12px; padding:14px 16px; display:none;
+    backdrop-filter:blur(6px); z-index:2; }
+  #detail.an { display:block; }
+  #detail h2 { margin:0 28px 6px 0; font-size:18px; }
+  #detail .status { font-size:14px; margin-bottom:10px; }
+  #detail dl { margin:0 0 10px; display:grid; grid-template-columns:auto 1fr; gap:4px 12px; font-size:14px; }
+  #detail dt { color:var(--leise); }
+  #detail dd { margin:0; text-align:right; }
+  #detail p { margin:0; font-size:14px; line-height:1.45; color:#cfd3dc; }
+  #schliessen { position:absolute; right:8px; top:8px; min-height:30px; padding:2px 10px; }
+  #laden { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column;
+    gap:10px; background:var(--bg); z-index:4; font-size:15px; color:var(--leise); text-align:center; padding:20px; }
+  #laden b { color:var(--gold); font-weight:600; }
+  .unsichtbar { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+  .unsichtbar button:focus { position:fixed; left:12px; bottom:12px; width:auto; height:auto; clip:auto; z-index:5; }
+  @media (max-width:700px) {
+    header h1 { font-size:15px; }
+    .steuer { width:100%; margin-left:0; }
+    .steuer button { flex:1; }
+    label.licht { width:100%; }
+    label.licht select { flex:1; }
+    #detail { left:8px; right:8px; top:auto; bottom:8px; width:auto; max-height:55%; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Jarvis-Welt</h1>
+  <div class="steuer">
+    <label class="licht">Licht
+      <select id="licht">
+        <option value="auto">Automatisch (Uhrzeit)</option>
+        <option value="7.2">Morgen</option>
+        <option value="12">Tag</option>
+        <option value="18.75">Sonnenuntergang</option>
+        <option value="23">Nacht</option>
+      </select>
+    </label>
+    <button id="knopfRundgang" class="haupt" type="button">Rundgang</button>
+    <button id="knopfStopp" type="button" disabled>Stopp</button>
+    <button id="knopfUebersicht" type="button">Übersicht</button>
+  </div>
+</header>
+<div class="zeile" id="zusammenfassung" aria-live="polite"></div>
+<main>
+  <canvas id="stadt" aria-label="3D-Insel mit dem Weltenbaum Jarvis in der Mitte, 6 Türmen und 6 weiteren Orten"></canvas>
+  <div id="schilder"></div>
+  <div id="untertitel" role="status"></div>
+  <aside id="detail" aria-live="polite">
+    <button id="schliessen" type="button" aria-label="Detailfeld schließen">x</button>
+    <h2 id="detailName"></h2>
+    <div class="status" id="detailStatus"></div>
+    <dl id="detailZahlen"></dl>
+    <p id="detailText"></p>
+  </aside>
+  <div id="laden"><div><b>Jarvis</b> formt die Insel …</div><div id="ladenText"></div></div>
+  <div class="unsichtbar" id="tastaturListe"></div>
+</main>
+
+<script>
+"use strict";
+
+/* =====================================================================================
+   0. BIBLIOTHEK LADEN (lokal zuerst, sonst Internet)
+   ===================================================================================== */
+const THREE_VERSION = "0.147.0";
+const BIBLIOTHEK = [
+  "build/three.min.js",
+  "examples/js/controls/OrbitControls.js",
+  "examples/js/objects/Water.js",
+  "examples/js/objects/Sky.js",
+  "examples/js/shaders/CopyShader.js",
+  "examples/js/shaders/LuminosityHighPassShader.js",
+  "examples/js/postprocessing/EffectComposer.js",
+  "examples/js/postprocessing/RenderPass.js",
+  "examples/js/postprocessing/ShaderPass.js",
+  "examples/js/postprocessing/UnrealBloomPass.js"
+];
+function skriptLaden(src) {
+  return new Promise((ok, fehler) => {
+    const s = document.createElement("script");
+    s.src = src; s.onload = ok; s.onerror = () => { s.remove(); fehler(new Error(src)); };
+    document.head.appendChild(s);
+  });
+}
+async function bibliothekLaden() {
+  let quelle = "lokal";
+  const lokalZuerst = location.protocol !== "https:";
+  for (const p of BIBLIOTHEK) {
+    try { if (!lokalZuerst) throw new Error("online"); await skriptLaden("lib/three/" + p); }
+    catch (e) { quelle = "Internet"; await skriptLaden(`https://cdn.jsdelivr.net/npm/three@${THREE_VERSION}/` + p); }
+  }
+  return quelle;
+}
+
+
+/* =====================================================================================
+   1. DATEN (BEISPIELDATEN, von Hand eingetragen, Stand 04.10.2026, NICHT live, wie in der Insel-Stadt)
+   ===================================================================================== */
+const DATEN_BEISPIEL = {
+  stand: "Beispieldaten von Hand eingetragen (04.10.2026), nicht live",
+  gebaeude: [
+    { id:"jarvis", name:"Jarvis", status:"laeuft",
+      kennzahlen:[["KI-Anbieter","lokal (Ollama)"],["Antwortzeit Notizfragen","2,5 bis 8,5 s"],["Anrede","Sir"]],
+      text:"Die Zentrale: beantwortet Fragen aus dem Vault mit Quellenangabe und steuert alle anderen Bereiche." },
+    { id:"testpc", name:"Test-PC", status:"laeuft",
+      kennzahlen:[["Modell","qwen3.5:9b"],["Tempo","15,4 Token/s"],["Speichertest","bestanden (0 Fehler)"]],
+      text:"Ubuntu-Rechner mit RX 580, bevorzugter Rechner für die Nachtarbeit." },
+    { id:"hauptpc", name:"Haupt-PC", status:"laeuft",
+      kennzahlen:[["Modell","qwen3.5:9b"],["Tempo","49,5 Token/s"],["Grafikkarte","RTX 2070 Super"]],
+      text:"Der schnellste KI-Rechner, antwortet im Chat zuerst." },
+    { id:"minipc", name:"Mini-PC", status:"laeuft",
+      kennzahlen:[["Modell","qwen3.5:4b"],["Tempo","4,6 Token/s"],["Jarvis-Dienst","läuft"]],
+      text:"Das Zuhause von Jarvis: Dienst, Nacht-Timer und Syncthing laufen hier." },
+    { id:"nachtarbeit", name:"Nachtarbeit", status:"wartet",
+      kennzahlen:[["Nächster Lauf","03:00 Uhr"],["Letzte Nacht","1 fertig, 2 Fehler"],["KI","nur lokal (neu)"]],
+      text:"Arbeitet nachts Aufträge ab. Seit dem 04.10. ohne Claude-Anbindung, kostet nichts." },
+    { id:"aufgabenloop", name:"Aufgaben-Loop", status:"wartet",
+      kennzahlen:[["Offener Vorschlag","Wärmepumpe"],["Schreiber","lokal"],["Recherche","Claude (Websuche)"]],
+      text:"Macht aus Wissenslücken Notiz-Entwürfe. Wartet auf Ihre Freigabe im HUD." },
+    { id:"vault", name:"Vault", status:"laeuft",
+      kennzahlen:[["Suchtest","26/28 auf Platz 1"],["Index","aktuell"],["Änderungen","werden überwacht"]],
+      text:"Big Brain: Ihre Notizen in Obsidian, durchsucht von Jarvis." },
+    { id:"briefing", name:"Briefing & Gmail", status:"laeuft",
+      kennzahlen:[["Mails (2 Tage)","15"],["Wichtig","2"],["Quelle","Gmail per IMAP"]],
+      text:"Fasst Mails, Termine und Stand des Vortags zu einem Tagesbriefing zusammen." },
+    { id:"kalender", name:"Kalender", status:"laeuft",
+      kennzahlen:[["Termine heute","0"],["Quelle","Google Kalender (iCal)"],["Schreiben","über Termin-Links"]],
+      text:"Zeigt Ihre Termine und Feiertage im HUD an." },
+    { id:"kosten", name:"Kosten", status:"laeuft",
+      kennzahlen:[["Heute","0,00 €"],["Monat (Schätzung)","ca. 0,30 $"],["Rahmen","10 € im Monat"]],
+      text:"Zählt, was die Claude-API kostet. Lokale KI kostet nichts." },
+    { id:"trading", name:"Trading", status:"aus",
+      kennzahlen:[["Modus","Demokonto"],["Laufende Bots","0"],["Kandidat","Divergenz Gold-Silber"]],
+      text:"Trading-Labor. Aktuell nichts aktiv, der Umbau auf MQL5 steht aus." },
+    { id:"sicherheit", name:"Sicherheit", status:"wartet",
+      kennzahlen:[["Ampel","gelb"],["Rote Funde","0"],["Letzter Check","04.10."]],
+      text:"Prüft nur lesend auf offene Zugangsdaten. Gelb heißt: aufräumen, aber nichts Akutes." },
+    { id:"tiktok", name:"TikTok", status:"wartet",
+      kennzahlen:[["Ausgewertet","178 Videos"],["Fehlgeschlagen","9"],["Nächster Schritt","Bild-Auswertung"]],
+      text:"Wertet gespeicherte Videos aus und legt Notizen im Vault an." }
+  ]
+};
+/** Holt die Daten. Später: const a = await fetch("/api/stadt"); return await a.json(); (gleiches Format). */
+async function datenLaden() { return DATEN_BEISPIEL; }
+
+const STATUS = {
+  laeuft: { text:"läuft",  farbe:[61,220,132] },
+  wartet: { text:"wartet", farbe:[255,196,61] },
+  fehler: { text:"Fehler", farbe:[255,82,82] },
+  aus:    { text:"aus",    farbe:[120,128,140] }
+};
+const REIHENFOLGE = ["testpc","hauptpc","minipc","nachtarbeit","aufgabenloop","vault",
+                     "briefing","kalender","kosten","trading","sicherheit","tiktok"];
+const AGENT_FARBE = { testpc:0x4e74aa, hauptpc:0x5c82be, minipc:0x42628e, nachtarbeit:0x6c56a6, aufgabenloop:0x3a9280,
+  vault:0xb07c48, briefing:0x4692b8, kalender:0x709e4a, kosten:0xa04c60, trading:0xb67238, sicherheit:0x96964c, tiktok:0x8a4aa0 };
+
+/* =====================================================================================
+   2. HILFEN
+   ===================================================================================== */
+function zufallsquelle(start) {
+  let a = start >>> 0;
+  return function () {
+    a = (a + 0x6D2B79F5) >>> 0; let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const zufall = zufallsquelle(20261004);
+const mix = (a, b, t) => a + (b - a) * t;
+const klemme = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const rgbText = c => `rgb(${c[0]|0},${c[1]|0},${c[2]|0})`;
+const glatt = (a, b, v) => { const t = klemme((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const params = new URLSearchParams(location.search);
+const GRAD = Math.PI / 180;
+
+/* =====================================================================================
+   2b. GELÄNDE-FORMEL (1 Einheit = 1 Meter; Norden = -z, Osten = +x)
+   Gleiche Grundform wie die Kartenskizze im Vault (1 Kartenpixel = 10 m).
+   ===================================================================================== */
+function rauschen(seed) {
+  const hash = (i, j) => {
+    let h = (Math.imul(i, 374761393) + Math.imul(j, 668265263) + Math.imul(seed, 1442695041)) | 0;
+    h = Math.imul(h ^ (h >>> 13), 1274126177); h ^= h >>> 16;
+    return (h >>> 0) / 4294967296;
+  };
+  return (x, y) => {
+    const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+    const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+    const a = hash(xi, yi), b = hash(xi + 1, yi), c = hash(xi, yi + 1), d = hash(xi + 1, yi + 1);
+    return (a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v) * 2 - 1;
+  };
+}
+const N1 = rauschen(11), N2 = rauschen(23), N3 = rauschen(37);
+function fbm(n, x, y, okt) { let s = 0, a = 0.5, f = 1; for (let i = 0; i < okt; i++) { s += a * n(x * f, y * f); f *= 2.03; a *= 0.5; } return s; }
+function grat(n, x, y, okt) { let s = 0, a = 0.5, f = 1; for (let i = 0; i < okt; i++) { s += a * (1 - Math.abs(n(x * f, y * f))); f *= 2.1; a *= 0.5; } return s; }
+function stufen(h, s) { const f = h / s, i = Math.floor(f); return (i + glatt(0.3, 0.7, f - i)) * s; }
+
+const SX = 1.22, RB = 3000;                 // Hauptinsel: Grundradius 3 km, in Ost-West-Richtung gestreckt
+const HP = 260;                             // Höhe des Hochplateaus
+function beule(t, mitte, breite, hoehe) { const d = Math.atan2(Math.sin(t - mitte), Math.cos(t - mitte)); return hoehe * Math.exp(-(d / breite) * (d / breite)); }
+function rHaupt(t) {
+  let r = RB * (1 + 0.09 * Math.sin(2 * t + 0.6) + 0.06 * Math.sin(3 * t + 2.1) + 0.05 * Math.sin(5 * t + 0.3) + 0.025 * Math.sin(9 * t + 1.7));
+  r *= 1 + beule(t, 38 * GRAD, 0.16, 0.30);    // Neon-Kap (Nordost)
+  r *= 1 + beule(t, -90 * GRAD, 0.10, -0.13);  // Hafenbucht (Süd)
+  r *= 1 + beule(t, 185 * GRAD, 0.22, 0.14);   // Westhalbinsel
+  r *= 1 + beule(t, -20 * GRAD, 0.08, -0.08);  // kleine Bucht Südost
+  r *= 1 + beule(t, 118 * GRAD, 0.07, -0.07);  // Fjord Nord
+  return r;
+}
+const KLIPPEN = [[70, 215], [-8, 22]];
+const BERGE = [{ x: -2000, z: -2050, rx: 1500, rz: 950, h: 560 }, { x: 1600, z: -2250, rx: 1000, rz: 750, h: 430 }, { x: 3600, z: -800, rx: 700, rz: 600, h: 260 }, { x: -3300, z: 1500, rx: 650, rz: 520, h: 200 }];
+function klippenAnteil(t) {
+  const d = t / GRAD; let k = 0;
+  for (const [a, b] of KLIPPEN) {
+    const m = (a + b) / 2, h = (b - a) / 2, x = ((d - m + 540) % 360) - 180;
+    k = Math.max(k, klemme((h - Math.abs(x)) / 12 + 0.5, 0, 1));
+  }
+  return k;
+}
+function weltPunkt(t, rho) { return { x: rho * Math.cos(t) * SX, z: -rho * Math.sin(t) }; }
+function plateauRadius(a) { return 1280 * (1 + 0.05 * Math.sin(5 * a + 0.7) + 0.03 * Math.sin(8 * a + 2)); }
+
+const GEHIRN = (function () { const t = 142 * GRAD, p = weltPunkt(t, rHaupt(t) + 2150); return { x: p.x, z: p.z, r: 920 }; })();
+const TRADING = (function () { const t = -33 * GRAD, p = weltPunkt(t, rHaupt(t) + 3000); return { x: p.x, z: p.z, r: 360 }; })();
+const INSELCHEN = [[100, 1200, 140], [205, 950, 180], [-120, 900, 110], [60, 600, 90], [250, 1400, 120]].map(([w, d, r]) => {
+  const t = w * GRAD, p = weltPunkt(t, rHaupt(t) + d); return { x: p.x, z: p.z, r };
+});
+
+function hoeheHaupt(x, z) {
+  const xs = x / SX, t = Math.atan2(-z, xs);
+  const rho = Math.hypot(xs, z) + 150 * fbm(N2, x / 1100, z / 1100, 5);
+  const dc = rHaupt(t) - rho;                                       // Abstand zur Küste (innen positiv)
+  const k = klippenAnteil(t) * klemme(0.55 + fbm(N3, x / 650, z / 650, 2) * 1.3, 0, 1);
+  if (dc < 0) return Math.max(-70, -2 + dc * (0.04 + 0.3 * k));
+  let h = 3 * glatt(0, 90, dc) + 0.04 * Math.max(0, dc - 90);
+  h += 85 * glatt(220, 1000, dc) * (0.4 + 0.6 * fbm(N1, x / 1500, z / 1500, 5));
+  h += k * (75 + 55 * fbm(N1, x / 380, z / 380, 3)) * glatt(0, 40, dc);
+  // Bergketten im Norden (zwischen Plateau und Steilküste)
+  for (const B of BERGE) {
+    const m = glatt(1, 0.25, Math.hypot((x - B.x) / B.rx, (z - B.z) / B.rz)) * glatt(60, 260, dc);
+    if (m > 0) h += m * B.h * Math.pow(grat(N1, x / 760 + B.x, z / 760, 5), 1.3);
+  }
+  const fels = glatt(0.6, 0.78, grat(N3, x / 900, z / 900, 3)) * glatt(20, 60, h);
+  h = mix(h, stufen(h, 16), 0.65 * fels);
+  // Hochplateau mit steilem, gestuftem Rand
+  const dp = Math.hypot(x, z), a = Math.atan2(-z, x), RP = plateauRadius(a) + 30 * fbm(N3, x / 300, z / 300, 2);
+  if (dp < RP + 320) {
+    const s = glatt(RP, RP + 300, dp);
+    const rand = mix(HP, h, Math.pow(s, 0.7));
+    h = dp < RP ? HP + 2.5 * fbm(N1, x / 160, z / 160, 2) * glatt(RP - 160, RP, dp) : mix(stufen(rand, 28), rand, glatt(0.75, 1, s));
+  }
+  return h;
+}
+function hoeheNebeninsel(x, z, I, sx, form) {
+  const dx = (x - I.x) / sx, dz = z - I.z, t = Math.atan2(-dz, dx);
+  const R = I.r * (form === "gehirn" ? (1 + 0.12 * Math.sin(3 * t + 1) + 0.06 * Math.sin(5 * t)) : form === "trading" ? (1 + 0.2 * Math.sin(4 * t + 0.4)) : (1 + 0.25 * Math.sin(3 * t + I.r)));
+  const dc = R - (Math.hypot(dx, dz) + I.r * 0.1 * fbm(N2, x / 600, z / 600, 4));
+  if (form === "gehirn") {
+    if (dc < 0) return -2 + dc * 0.07;
+    let h = 3 * glatt(0, 60, dc) + 0.05 * Math.max(0, dc - 60) + 26 * glatt(0, 28, dc) * klemme(fbm(N3, x / 500, z / 500, 2) + 0.35, 0, 1);
+    // zwei runde Hügel mit einer Senke dazwischen (wie zwei Gehirnhälften)
+    const lx = (x - I.x) / 1.15, lz = z - I.z;
+    for (const s of [-1, 1]) {
+      const d = Math.hypot((lx - s * 290) / 270, (lz + 40) / 420);
+      h += 120 * Math.pow(glatt(1, 0, d), 1.4) * (1 + 0.15 * fbm(N1, x / 120, z / 120, 3));
+    }
+    return h;
+  }
+  if (form === "trading") {
+    if (dc < 0) return -2 + dc * 0.25;
+    return Math.min(stufen(4 + dc * 0.5 + 25 * grat(N1, x / 220, z / 220, 3), 12), 115);
+  }
+  if (dc < 0) return -2 + dc * 0.12;
+  return Math.min(2 + dc * 0.3, 32);
+}
+/** Höhe in Metern an jeder Stelle der Welt (Meeresboden negativ). */
+function hoehe(x, z) {
+  let h = hoeheHaupt(x, z);
+  h = Math.max(h, hoeheNebeninsel(x, z, GEHIRN, 1.15, "gehirn"));
+  h = Math.max(h, hoeheNebeninsel(x, z, TRADING, 1, "trading"));
+  for (const I of INSELCHEN) h = Math.max(h, hoeheNebeninsel(x, z, I, 1.1, "klein"));
+  return Math.max(h, -70);
+}
+
+/* =====================================================================================
+   2c. ORTE (13 anklickbare Stellen, Zuordnung laut Kartenplan)
+   ===================================================================================== */
+const TURM_R = 1120;
+const ORTE = {
+  jarvis:       { art: "baum",   ort: "Weltenbaum" },
+  hauptpc:      { art: "turm",   w: 90,  ort: "Glasturm" },
+  minipc:       { art: "turm",   w: 30,  ort: "Funkturm" },
+  nachtarbeit:  { art: "turm",   w: 150, ort: "Sternwarte" },
+  testpc:       { art: "turm",   w: 210, ort: "Werkstattturm" },
+  sicherheit:   { art: "turm",   w: 270, ort: "Torturm" },
+  kosten:       { art: "turm",   w: 330, ort: "Münzturm" },
+  briefing:     { art: "region", w: -90, a: 0.80, ort: "Hafenstadt" },
+  kalender:     { art: "region", w: 2,   a: 0.70, ort: "Sonnenuhr-Tal" },
+  aufgabenloop: { art: "region", w: 184, a: 0.70, ort: "Mühlenebene" },
+  tiktok:       { art: "region", w: 38,  a: 0.86, ort: "Neon-Kap" },
+  vault:        { art: "insel",  x: GEHIRN.x,  z: GEHIRN.z,  ort: "Insel Gehirn" },
+  trading:      { art: "insel",  x: TRADING.x, z: TRADING.z, ort: "Fernklippe" }
+};
+for (const id in ORTE) {
+  const o = ORTE[id];
+  if (o.art === "baum") { o.x = 0; o.z = 0; }
+  else if (o.art === "turm") { o.x = TURM_R * Math.cos(o.w * GRAD); o.z = -TURM_R * Math.sin(o.w * GRAD); }
+  else if (o.art === "region") { const t = o.w * GRAD, p = weltPunkt(t, rHaupt(t) * o.a); o.x = p.x; o.z = p.z; }
+}
+
+/* =====================================================================================
+   3. START
+   ===================================================================================== */
+const ladenText = document.getElementById("ladenText");
+window.__fehler = [];
+window.addEventListener("error", e => { window.__fehler.push(String(e.message)); ladenText.textContent = "Fehler: " + e.message; });
+(async function () {
+  let quelle;
+  try { quelle = await bibliothekLaden(); }
+  catch (e) {
+    ladenText.innerHTML = "Die 3D-Bibliothek (Three.js) fehlt.<br>Bitte <b>werkstatt\\THREE_HOLEN.bat</b> einmal starten oder mit dem Internet verbinden.";
+    console.error("Bibliothek fehlt:", e);
+    return;
+  }
+  try {
+    const daten = await datenLaden().catch(() => DATEN_BEISPIEL);
+    await new Promise(r => setTimeout(r, 30));          // Ladehinweis zuerst zeichnen lassen
+    weltStarten(daten, quelle);
+  } catch (e) {
+    ladenText.textContent = "Fehler beim Aufbau: " + e.message;
+    console.error(e);
+  }
+})();
+
+function weltStarten(startDaten, quelle) {
+const T = THREE;
+if (T.ColorManagement) T.ColorManagement.legacyMode = false;
+const mobil = matchMedia("(pointer: coarse)").matches || innerWidth < 700;
+const stufe = params.get("q") || (mobil ? "niedrig" : "hoch");
+const Q = { hoch: stufe === "hoch", schatten: stufe === "hoch" ? 4096 : 1024, dpr: Math.min(devicePixelRatio || 1, stufe === "hoch" ? 2 : 1.5),
+            raster: stufe === "hoch" ? 20 : 40 };
+const t0 = performance.now();
+
+/* ---------- Renderer, Szene, Kamera ---------- */
+const leinwand = document.getElementById("stadt");
+const renderer = new T.WebGLRenderer({ canvas: leinwand, antialias: true, powerPreference: "high-performance" });
+renderer.setPixelRatio(Q.dpr);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = T.PCFSoftShadowMap;
+renderer.outputEncoding = T.sRGBEncoding;
+renderer.toneMapping = T.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.55;
+const szene = new T.Scene();
+szene.fog = new T.FogExp2(0xbcd4e6, 0.00004);
+const kamera = new T.PerspectiveCamera(40, 1, 5, 250000);
+const steuerung = new T.OrbitControls(kamera, leinwand);
+steuerung.enableDamping = true; steuerung.dampingFactor = 0.08;
+steuerung.maxPolarAngle = 1.48; steuerung.minDistance = 80; steuerung.maxDistance = 32000;
+steuerung.zoomSpeed = 1.2;
+
+/* ---------- Licht, Himmel, Wasser ---------- */
+const sonne = new T.DirectionalLight(0xffffff, 2.5);
+sonne.castShadow = true;
+sonne.shadow.mapSize.set(Q.schatten, Q.schatten);
+Object.assign(sonne.shadow.camera, { left: -2000, right: 2000, top: 2000, bottom: -2000, near: 100, far: 30000 });
+sonne.shadow.bias = -0.0005; sonne.shadow.normalBias = 2;
+szene.add(sonne); szene.add(sonne.target);
+const himmelsLicht = new T.HemisphereLight(0xbfd8ff, 0x6a5a48, 0.6);
+szene.add(himmelsLicht);
+const mondLicht = new T.DirectionalLight(0x9fb4ff, 0);
+mondLicht.position.set(-4000, 5000, 3000);
+szene.add(mondLicht);
+
+const himmel = new T.Sky();
+himmel.scale.setScalar(200000);
+szene.add(himmel);
+const himmelUmgebung = new T.Sky();
+himmelUmgebung.scale.setScalar(200000);
+const umgebungsSzene = new T.Scene();
+umgebungsSzene.add(himmelUmgebung);
+const pmrem = new T.PMREMGenerator(renderer);
+let umgebungsZiel = null;
+
+function wellenNormalen() {
+  const N = 256, c = document.createElement("canvas"); c.width = c.height = N;
+  const x = c.getContext("2d"), bild = x.createImageData(N, N), z = zufallsquelle(3);
+  const wellen = [];
+  // viele Wellen in allen Richtungen und Längen, damit kein Karomuster entsteht
+  for (let i = 0; i < 70; i++) {
+    const w = z() * Math.PI * 2, f = 3 + Math.pow(z(), 1.6) * 34;
+    const kx = Math.round(Math.cos(w) * f), ky = Math.round(Math.sin(w) * f);
+    if (!kx && !ky) continue;
+    wellen.push({ kx, ky, a: (0.6 + z() * 0.4) / Math.pow(Math.hypot(kx, ky), 1.15), p: z() * 6.28 });
+  }
+  const h = (u, v) => { let s = 0; for (const w of wellen) s += w.a * Math.sin(2 * Math.PI * (w.kx * u + w.ky * v) + w.p); return s; };
+  for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+    const u = i / N, v = j / N, e = 1 / N;
+    const dx = (h(u + e, v) - h(u - e, v)) * 22, dy = (h(u, v + e) - h(u, v - e)) * 22;
+    const l = Math.hypot(dx, dy, 1), k = (j * N + i) * 4;
+    bild.data[k] = (-dx / l * 0.5 + 0.5) * 255; bild.data[k + 1] = (-dy / l * 0.5 + 0.5) * 255; bild.data[k + 2] = (1 / l * 0.5 + 0.5) * 255; bild.data[k + 3] = 255;
+  }
+  x.putImageData(bild, 0, 0);
+  const t = new T.CanvasTexture(c); t.wrapS = t.wrapT = T.RepeatWrapping;
+  return t;
+}
+const normalen = wellenNormalen();
+let wasser;
+// Spiegelwasser (Water.js) wirkt auf große Entfernung grau und fleckig; daher Standard-Wasser. Mit ?spiegel=1 testweise an.
+if (params.get("spiegel") === "1") {
+  wasser = new T.Water(new T.PlaneGeometry(400000, 400000), {
+    textureWidth: 1024, textureHeight: 1024, waterNormals: normalen, sunDirection: new T.Vector3(0, 1, 0),
+    sunColor: 0xffffff, waterColor: 0x0f5e78, distortionScale: 1.8, fog: true, alpha: 1.0
+  });
+  wasser.material.uniforms.size.value = 0.8;
+} else {
+  normalen.repeat.set(4000, 4000);
+  wasser = new T.Mesh(new T.PlaneGeometry(400000, 400000), new T.MeshStandardMaterial({ color: 0x0f5e78, roughness: 0.08, metalness: 0.6, normalMap: normalen, normalScale: new T.Vector2(0.35, 0.35) }));
+}
+wasser.rotation.x = -Math.PI / 2;
+szene.add(wasser);
+
+const sterne = (function () {
+  const z = zufallsquelle(7), pos = [];
+  for (let i = 0; i < 2600; i++) {
+    const w = z() * Math.PI * 2, h = 0.04 + z() * 0.96, r = 150000;
+    pos.push(Math.cos(w) * Math.sqrt(1 - h * h) * r, h * r, Math.sin(w) * Math.sqrt(1 - h * h) * r);
+  }
+  const g = new T.BufferGeometry(); g.setAttribute("position", new T.Float32BufferAttribute(pos, 3));
+  const p = new T.Points(g, new T.PointsMaterial({ color: 0xffffff, size: 1.6, sizeAttenuation: false, transparent: true, opacity: 0, fog: false, depthWrite: false }));
+  szene.add(p); return p;
+})();
+function glanzBild(innen, aussen) {
+  const c = document.createElement("canvas"); c.width = c.height = 128;
+  const x = c.getContext("2d"), v = x.createRadialGradient(64, 64, 0, 64, 64, 64);
+  v.addColorStop(0, innen); v.addColorStop(0.25, aussen); v.addColorStop(1, "rgba(255,255,255,0)");
+  x.fillStyle = v; x.fillRect(0, 0, 128, 128);
+  return new T.CanvasTexture(c);
+}
+const glanz = glanzBild("rgba(255,255,255,1)", "rgba(255,255,255,.35)");
+const mond = new T.Sprite(new T.SpriteMaterial({ map: glanzBild("rgba(245,247,255,1)", "rgba(200,210,255,.25)"), transparent: true, opacity: 0, fog: false, depthWrite: false }));
+mond.position.set(-85000, 42000, 70000); mond.scale.setScalar(14000);
+szene.add(mond);
+
+/* =====================================================================================
+   4. GELÄNDE (ein Gitter, Höhe aus der Formel, Farbe nach Höhe, Steilheit und Ort)
+   ===================================================================================== */
+const FELD = { x0: -7400, x1: 7800, z0: -5800, z1: 5200 };
+const lin = c => [Math.pow(c[0] / 255, 2.2), Math.pow(c[1] / 255, 2.2), Math.pow(c[2] / 255, 2.2)];
+const FARBE = {
+  sand: lin([214, 196, 150]), sandNass: lin([168, 150, 110]), meerboden: lin([46, 92, 98]),
+  wiese1: lin([112, 150, 78]), wiese2: lin([88, 128, 62]), wald: lin([52, 88, 44]), oliv: lin([128, 132, 86]),
+  fels: lin([128, 120, 106]), felsDunkel: lin([92, 86, 78]), stein: lin([206, 198, 172]), weg: lin([232, 222, 186]),
+  lavendel: lin([176, 146, 222])
+};
+function mixF(a, b, t, out) { out[0] = mix(a[0], b[0], t); out[1] = mix(a[1], b[1], t); out[2] = mix(a[2], b[2], t); return out; }
+
+const gelaende = (function () {
+  const nx = Math.round((FELD.x1 - FELD.x0) / Q.raster), nz = Math.round((FELD.z1 - FELD.z0) / Q.raster);
+  const geo = new T.PlaneGeometry(FELD.x1 - FELD.x0, FELD.z1 - FELD.z0, nx, nz);
+  geo.rotateX(-Math.PI / 2);
+  geo.translate((FELD.x0 + FELD.x1) / 2, 0, (FELD.z0 + FELD.z1) / 2);
+  const pos = geo.attributes.position, n = pos.count, H = new Float32Array(n);
+  for (let i = 0; i < n; i++) { const h = hoehe(pos.getX(i), pos.getZ(i)); H[i] = h; pos.setY(i, h); }
+  geo.computeVertexNormals();
+  const nor = geo.attributes.normal, farben = new Float32Array(n * 3), c = [0, 0, 0], tmp = [0, 0, 0];
+  for (let i = 0; i < n; i++) {
+    const x = pos.getX(i), z = pos.getZ(i), h = H[i], ny = nor.getY(i);
+    const fl = fbm(N1, x / 260, z / 260, 3), wald = glatt(0.12, 0.32, fbm(N2, x / 700, z / 700, 4));
+    if (h < 0.4) mixF(FARBE.sandNass, FARBE.meerboden, klemme(-h / 18, 0, 1), c);
+    else {
+      mixF(FARBE.wiese1, FARBE.wiese2, fl * 0.5 + 0.5, c);
+      mixF(c, FARBE.oliv, glatt(140, 240, h) * 0.6, c);
+      mixF(c, FARBE.fels, glatt(300, 420, h) * 0.8, c);
+      mixF(c, FARBE.wald, wald * glatt(8, 20, h) * (1 - glatt(230, 300, h)) * 0.85, c);
+      mixF(c, FARBE.sand, 1 - glatt(2.5, 6.5, h + fl * 2), c);
+    }
+    const steil = glatt(0.86, 0.62, ny);
+    mixF(c, mixF(FARBE.fels, FARBE.felsDunkel, glatt(0.55, 0.3, ny), tmp), steil, c);
+    // Plateau: heller Stein, Ringstraße, Wiese um den Baum
+    const dp = Math.hypot(x, z);
+    if (h > HP - 4 && dp < 1500 && ny > 0.9) {
+      // Wiese mit Steinplatz um den Baum, Ringstraße und Plätzen für die Türme
+      mixF(c, FARBE.stein, 1 - glatt(520, 580, dp), c);
+      mixF(c, FARBE.wiese2, 1 - glatt(300, 340, dp), c);
+      mixF(c, FARBE.weg, 1 - glatt(12, 20, Math.abs(dp - 980)), c);
+      mixF(c, FARBE.stein, 1 - glatt(70, 95, Math.hypot(x - TURM_R * Math.cos(Math.round(Math.atan2(-z, x) / GRAD / 60 - 0.5) * 60 * GRAD + 30 * GRAD), z + TURM_R * Math.sin(Math.round(Math.atan2(-z, x) / GRAD / 60 - 0.5) * 60 * GRAD + 30 * GRAD))), c);
+    }
+    const geh = 1 - glatt(0.75, 1.05, Math.hypot((x - GEHIRN.x) / 1.15, z - GEHIRN.z) / GEHIRN.r);
+    if (h > 3) mixF(c, FARBE.lavendel, geh * glatt(40, 110, h) * 0.55 * (1 - steil), c);
+    farben[i * 3] = c[0]; farben[i * 3 + 1] = c[1]; farben[i * 3 + 2] = c[2];
+  }
+  geo.setAttribute("color", new T.BufferAttribute(farben, 3));
+  // feine Körnung, damit der Boden aus der Nähe nicht glatt wirkt
+  const kc = document.createElement("canvas"); kc.width = kc.height = 256;
+  const kx = kc.getContext("2d"), kb = kx.createImageData(256, 256), kz = zufallsquelle(5);
+  for (let i = 0; i < 256 * 256; i++) { const v = 205 + kz() * 50; kb.data[i * 4] = kb.data[i * 4 + 1] = kb.data[i * 4 + 2] = v; kb.data[i * 4 + 3] = 255; }
+  kx.putImageData(kb, 0, 0);
+  const koernung = new T.CanvasTexture(kc); koernung.wrapS = koernung.wrapT = T.RepeatWrapping;
+  koernung.repeat.set((FELD.x1 - FELD.x0) / 60, (FELD.z1 - FELD.z0) / 60); koernung.encoding = T.sRGBEncoding;
+  koernung.anisotropy = 8;
+  const mat = new T.MeshStandardMaterial({ vertexColors: true, map: koernung, roughness: 0.94, metalness: 0 });
+  const m = new T.Mesh(geo, mat);
+  m.receiveShadow = true; m.castShadow = true;
+  szene.add(m);
+  return { mesh: m, H, nx, nz };
+})();
+
+/** Höhe am Boden aus dem Gitter (schnell, für Kamera und Bauten). */
+function bodenHoehe(x, z) {
+  const fx = (x - FELD.x0) / Q.raster, fz = (z - FELD.z0) / Q.raster;
+  if (fx < 0 || fz < 0 || fx >= gelaende.nx || fz >= gelaende.nz) return Math.max(0, hoehe(x, z));
+  const i = Math.floor(fx), j = Math.floor(fz), u = fx - i, v = fz - j, w = gelaende.nx + 1, H = gelaende.H;
+  const a = H[j * w + i], b = H[j * w + i + 1], c = H[(j + 1) * w + i], d = H[(j + 1) * w + i + 1];
+  return mix(mix(a, b, u), mix(c, d, u), v);
+}
+
+/* Flachwasser und Brandung: durchscheinender Streifen über dem Wasser (Farbe aus der Wassertiefe) */
+const flachwasser = (function () {
+  const nx = gelaende.nx, nz = gelaende.nz, w = nx + 1, H = gelaende.H, src = gelaende.mesh.geometry.attributes.position;
+  const pos = new Float32Array(src.count * 3), col = new Float32Array(src.count * 4), tuerkis = lin([64, 196, 196]), weiss = lin([235, 248, 250]);
+  for (let i = 0; i < src.count; i++) {
+    pos[i * 3] = src.getX(i); pos[i * 3 + 1] = 0.6; pos[i * 3 + 2] = src.getZ(i);
+    const h = H[i], gischt = h < 0.4 ? 1 - glatt(0, 2.2, Math.abs(h + 0.6)) : 0;
+    const a = h < 0.4 ? 0.62 * glatt(-24, -1, h) : 0;
+    col[i * 4] = mix(tuerkis[0], weiss[0], gischt); col[i * 4 + 1] = mix(tuerkis[1], weiss[1], gischt); col[i * 4 + 2] = mix(tuerkis[2], weiss[2], gischt);
+    col[i * 4 + 3] = Math.max(a, gischt * 0.85);
+  }
+  const idx = [];
+  for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) {
+    const a = j * w + i, b = a + 1, c = a + w, d = c + 1;
+    if (col[a * 4 + 3] + col[b * 4 + 3] + col[c * 4 + 3] + col[d * 4 + 3] < 0.01) continue;
+    idx.push(a, c, b, b, c, d);
+  }
+  const g = new T.BufferGeometry();
+  g.setAttribute("position", new T.BufferAttribute(pos, 3));
+  g.setAttribute("color", new T.BufferAttribute(col, 4));
+  g.setIndex(idx);
+  const m = new T.Mesh(g, new T.MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
+  m.renderOrder = 1;
+  szene.add(m);
+  return m;
+})();
+
+/* =====================================================================================
+   5. WELTENBAUM (Platzhalter in voller Größe: 1.200 m, Krone leuchtet nachts)
+   ===================================================================================== */
+const baum = new T.Group(); baum.position.set(0, HP, 0); baum.userData.id = "jarvis"; baum.userData.oben = 1300;
+const rinde = new T.MeshStandardMaterial({ color: 0x6e5438, roughness: 0.92 });
+const zb = zufallsquelle(42);
+{
+  // Stamm aus sechs gedrehten Strängen um einen Kern
+  baum.add(new T.Mesh(new T.CylinderGeometry(40, 80, 720, 14).translate(0, 360, 0), rinde));
+  for (let s = 0; s < 6; s++) {
+    const pkt = [];
+    for (let i = 0; i <= 24; i++) {
+      const y = -30 + i * 30, f = y / 690, w = s * Math.PI / 3 + f * 2.4;
+      const r = 66 - 34 * f + 150 * Math.pow(Math.max(0, 1 - f * 5), 2);
+      pkt.push(new T.Vector3(Math.cos(w) * r, y, Math.sin(w) * r));
+    }
+    baum.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(pkt), 80, 28, 10, false), rinde));
+  }
+  // Äste
+  for (let i = 0; i < 11; i++) {
+    const w = i / 11 * Math.PI * 2 + zb() * 0.4, y0 = 540 + zb() * 160, weit = 420 + zb() * 260, hoch = 860 + zb() * 220;
+    const pkt = [new T.Vector3(0, y0, 0), new T.Vector3(Math.cos(w) * weit * 0.35, y0 + 140, Math.sin(w) * weit * 0.35),
+                 new T.Vector3(Math.cos(w) * weit * 0.75, hoch - 40, Math.sin(w) * weit * 0.75), new T.Vector3(Math.cos(w + 0.2) * weit, hoch, Math.sin(w + 0.2) * weit)];
+    baum.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(pkt), 30, 9 + zb() * 6, 8, false), rinde));
+  }
+  // Wurzeln, die über das Plateau laufen
+  for (let i = 0; i < 9; i++) {
+    const w = i / 9 * Math.PI * 2 + 0.2, l = 260 + zb() * 200;
+    const pkt = [new T.Vector3(Math.cos(w) * 60, 40, Math.sin(w) * 60), new T.Vector3(Math.cos(w) * 140, 8, Math.sin(w) * 140),
+                 new T.Vector3(Math.cos(w + 0.15) * l, -6, Math.sin(w + 0.15) * l)];
+    baum.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(pkt), 24, 14, 8, false), rinde));
+  }
+}
+const kroneMat = new T.MeshStandardMaterial({ color: 0xe0b44c, emissive: 0xffbf40, emissiveIntensity: 0.15, roughness: 0.6, metalness: 0.05, flatShading: true });
+const KRONE_N = 150;
+const krone = new T.InstancedMesh(new T.IcosahedronGeometry(1, 1), kroneMat, KRONE_N);
+{
+  const m = new T.Matrix4(), q = new T.Quaternion(), e = new T.Euler(), p = new T.Vector3(), s = new T.Vector3();
+  for (let i = 0; i < KRONE_N; i++) {
+    const w = zb() * Math.PI * 2, rr = 640 * Math.sqrt(zb()), y = 1000 + (zb() - 0.35) * 380 * (1 - rr / 760);
+    const g = 100 + zb() * 130;
+    m.compose(p.set(Math.cos(w) * rr, y, Math.sin(w) * rr), q.setFromEuler(e.set(zb() * 3, zb() * 3, zb() * 3)), s.set(g, g * 0.75, g));
+    krone.setMatrixAt(i, m);
+  }
+  krone.castShadow = true;
+  baum.add(krone);
+}
+const funken = (function () {
+  const n = 2400, pos = new Float32Array(n * 3), z = zufallsquelle(9);
+  for (let i = 0; i < n; i++) { const w = z() * 6.283, r = 760 * Math.sqrt(z()); pos[i * 3] = Math.cos(w) * r; pos[i * 3 + 1] = 500 + z() * 900; pos[i * 3 + 2] = Math.sin(w) * r; }
+  const g = new T.BufferGeometry(); g.setAttribute("position", new T.BufferAttribute(pos, 3));
+  const p = new T.Points(g, new T.PointsMaterial({ map: glanz, color: 0xffd36a, size: 9, transparent: true, opacity: 0.5, blending: T.AdditiveBlending, depthWrite: false }));
+  baum.add(p); return p;
+})();
+const baumGlanz = new T.Sprite(new T.SpriteMaterial({ map: glanz, color: 0xffc860, transparent: true, opacity: 0.2, blending: T.AdditiveBlending, depthWrite: false }));
+baumGlanz.position.set(0, 1000, 0); baumGlanz.scale.setScalar(3400);
+baum.add(baumGlanz);
+baum.traverse(o => { if (o.isMesh && o !== krone) { o.castShadow = true; o.receiveShadow = true; } });
+szene.add(baum);
+
+/* =====================================================================================
+   6. PLATZHALTER FÜR TÜRME, REGIONEN UND INSELN (Phase 2/3 ersetzt sie durch echte Bauten)
+   ===================================================================================== */
+const ortGruppen = { jarvis: baum }, statusMats = {};
+const steinMat = new T.MeshStandardMaterial({ color: 0xe8e2d2, roughness: 0.7 });
+const sockelMat = new T.MeshStandardMaterial({ color: 0xb9b19a, roughness: 0.85 });
+function statusLicht(id, g, y, gross) {
+  const kugel = new T.Mesh(new T.SphereGeometry(gross * 0.35, 16, 12), new T.MeshBasicMaterial({ color: 0x3ddc84 }));
+  kugel.position.y = y; g.add(kugel);
+  const gl = new T.Sprite(new T.SpriteMaterial({ map: glanz, color: 0x3ddc84, transparent: true, blending: T.AdditiveBlending, depthWrite: false }));
+  gl.position.y = y; gl.scale.setScalar(gross * 6); g.add(gl);
+  statusMats[id] = { kugel: kugel.material, glanz: gl, gross };
+}
+for (const id in ORTE) {
+  if (id === "jarvis") continue;
+  const o = ORTE[id], g = new T.Group();
+  const y0 = o.art === "turm" ? HP : Math.max(1, bodenHoehe(o.x, o.z));
+  g.position.set(o.x, y0, o.z); g.userData.id = id;
+  if (o.art === "turm") {
+    g.add(new T.Mesh(new T.BoxGeometry(90, 14, 90).translate(0, 7, 0), sockelMat));
+    const s = new T.Mesh(new T.CylinderGeometry(12, 30, 240, 4).rotateY(Math.PI / 4).translate(0, 254, 0), steinMat);
+    g.add(s);
+    statusLicht(id, g, 386, 26);
+    g.userData.oben = 400;
+  } else {
+    g.add(new T.Mesh(new T.CylinderGeometry(60, 70, 10, 24).translate(0, 5, 0), sockelMat));
+    g.add(new T.Mesh(new T.CylinderGeometry(6, 14, 110, 6).translate(0, 65, 0), steinMat));
+    statusLicht(id, g, 132, 18);
+    g.userData.oben = 150;
+  }
+  g.traverse(m => { if (m.isMesh) { m.castShadow = true; m.receiveShadow = true; } });
+  szene.add(g); ortGruppen[id] = g;
+}
+statusLicht("jarvis", baum, 1330, 40);
+
+/* =====================================================================================
+   7. LICHT NACH UHRZEIT (wie Insel-Stadt; Nebel für die große Fläche dünner)
+   ===================================================================================== */
+const LICHT = [
+  { h: 0,     hoehe: -25, trueb: 2,  rayleigh: 0.5, bel: 0.42, sonneI: 0,   sFarbe: [255,220,180], hemiI: 0.22, hemiH: [70,90,150],  hemiB: [20,20,32], nebel: [10,14,30],    dichte: 0.00012, wasser: [4,16,32],   nacht: 1,   bloomS: 0.95, bloomT: 0.55, mond: 1 },
+  { h: 5.4,   hoehe: -8,  trueb: 4,  rayleigh: 1,   bel: 0.45, sonneI: 0,   sFarbe: [255,200,170], hemiI: 0.28, hemiH: [90,90,150],  hemiB: [30,26,40], nebel: [40,40,70],    dichte: 0.00011, wasser: [10,24,48],  nacht: 1,   bloomS: 0.85, bloomT: 0.6,  mond: 0.6 },
+  { h: 7.2,   hoehe: 6,   trueb: 8,  rayleigh: 2.6, bel: 0.5,  sonneI: 1.6, sFarbe: [255,192,140], hemiI: 0.5,  hemiH: [210,190,180],hemiB: [70,56,44], nebel: [235,196,172], dichte: 0.00011, wasser: [26,80,110], nacht: 0.25,bloomS: 0.35, bloomT: 1.4,  mond: 0 },
+  { h: 10,    hoehe: 44,  trueb: 4,  rayleigh: 1.2, bel: 0.42, sonneI: 2.6, sFarbe: [255,248,236], hemiI: 0.75, hemiH: [186,214,255],hemiB: [90,78,62], nebel: [196,218,236], dichte: 0.00008, wasser: [14,104,134],nacht: 0,   bloomS: 0.12, bloomT: 2.8,  mond: 0 },
+  { h: 16,    hoehe: 30,  trueb: 5,  rayleigh: 1.4, bel: 0.45, sonneI: 2.4, sFarbe: [255,236,212], hemiI: 0.7,  hemiH: [190,210,250],hemiB: [92,78,60], nebel: [204,214,228], dichte: 0.00009, wasser: [18,100,130],nacht: 0.05,bloomS: 0.15, bloomT: 2.5,  mond: 0 },
+  { h: 18.75, hoehe: 2.5, trueb: 10, rayleigh: 3,   bel: 0.6,  sonneI: 1.8, sFarbe: [255,150,88],  hemiI: 0.45, hemiH: [255,170,140],hemiB: [70,40,50], nebel: [250,166,128], dichte: 0.00012, wasser: [36,58,88],  nacht: 0.65,bloomS: 0.5,  bloomT: 1.0,  mond: 0 },
+  { h: 19.8,  hoehe: -3,  trueb: 6,  rayleigh: 2,   bel: 0.5,  sonneI: 0.3, sFarbe: [255,120,90],  hemiI: 0.35, hemiH: [120,90,150],hemiB: [30,24,40], nebel: [80,56,86],    dichte: 0.00011, wasser: [18,28,56],  nacht: 0.95,bloomS: 0.8,  bloomT: 0.7,  mond: 0.3 },
+  { h: 21.2,  hoehe: -18, trueb: 2,  rayleigh: 0.6, bel: 0.42, sonneI: 0,   sFarbe: [255,220,180], hemiI: 0.22, hemiH: [70,90,150],  hemiB: [20,20,32], nebel: [12,16,32],    dichte: 0.00012, wasser: [5,17,34],   nacht: 1,   bloomS: 0.95, bloomT: 0.55, mond: 1 },
+  { h: 24,    hoehe: -25, trueb: 2,  rayleigh: 0.5, bel: 0.42, sonneI: 0,   sFarbe: [255,220,180], hemiI: 0.22, hemiH: [70,90,150],  hemiB: [20,20,32], nebel: [10,14,30],    dichte: 0.00012, wasser: [4,16,32],   nacht: 1,   bloomS: 0.95, bloomT: 0.55, mond: 1 }
+];
+const NEBEL_FAKTOR = 0.3;   // die Welt ist ca. 3x so groß wie die Stadt
+function lichtFuer(st) {
+  let i = 0;
+  while (i < LICHT.length - 2 && LICHT[i + 1].h <= st) i++;
+  const a = LICHT[i], b = LICHT[i + 1], t = klemme((st - a.h) / (b.h - a.h), 0, 1), e = { stunde: st };
+  for (const k in a) if (k !== "h") e[k] = Array.isArray(a[k]) ? a[k].map((v, j) => mix(v, b[k][j], t)) : mix(a[k], b[k], t);
+  e.azimut = 90 + klemme((st - 6) / 13.5, 0, 1) * 180;
+  return e;
+}
+const lichtWahl = document.getElementById("licht");
+function stundeJetzt() {
+  if (lichtWahl.value !== "auto") return parseFloat(lichtWahl.value);
+  const d = new Date(); return d.getHours() + d.getMinutes() / 60;
+}
+let licht = lichtFuer(12), lichtSchluessel = "", infoLicht = "";
+const farbe = (c, f) => new T.Color(c[0] / 255, c[1] / 255, c[2] / 255).convertSRGBToLinear().multiplyScalar(f || 1);
+const sonnenRichtung = new T.Vector3();
+function lichtAktualisieren(erzwingen) {
+  const st = stundeJetzt(), k = st.toFixed(2);
+  if (!erzwingen && k === lichtSchluessel) return;
+  lichtSchluessel = k;
+  licht = lichtFuer(st);
+  const phi = T.MathUtils.degToRad(90 - licht.hoehe), theta = T.MathUtils.degToRad(licht.azimut);
+  sonnenRichtung.setFromSphericalCoords(1, phi, theta);
+  for (const s of [himmel, himmelUmgebung]) {
+    const u = s.material.uniforms;
+    u.turbidity.value = licht.trueb; u.rayleigh.value = licht.rayleigh; u.mieCoefficient.value = 0.005; u.mieDirectionalG.value = 0.8;
+    u.sunPosition.value.copy(sonnenRichtung);
+  }
+  if (umgebungsZiel) umgebungsZiel.dispose();
+  umgebungsZiel = pmrem.fromScene(umgebungsSzene);
+  szene.environment = umgebungsZiel.texture;
+  sonne.intensity = licht.sonneI * klemme(licht.hoehe / 4 + 0.5, 0, 1);
+  sonne.color.copy(farbe(licht.sFarbe));
+  sonne.castShadow = sonne.intensity > 0.05;
+  himmelsLicht.intensity = licht.hemiI; himmelsLicht.color.copy(farbe(licht.hemiH)); himmelsLicht.groundColor.copy(farbe(licht.hemiB));
+  mondLicht.intensity = 0.35 * licht.mond;
+  szene.fog.color.copy(farbe(licht.nebel)); szene.fog.density = licht.dichte * NEBEL_FAKTOR;
+  if (wasser.material.uniforms) {
+    wasser.material.uniforms.sunDirection.value.copy(sonnenRichtung);
+    wasser.material.uniforms.sunColor.value.copy(farbe(licht.sFarbe, licht.sonneI > 0.1 ? 1 : 0.15));
+    wasser.material.uniforms.waterColor.value.copy(farbe(licht.wasser));
+  } else wasser.material.color.copy(farbe(licht.wasser, 1.3));
+  renderer.toneMappingExposure = licht.bel;
+  if (ende) ende.uniforms.belichtung.value = licht.bel;
+  if (bloom) { bloom.strength = licht.bloomS; bloom.threshold = licht.bloomT; }
+  sterne.material.opacity = klemme(-licht.hoehe / 10, 0, 1) * 0.9;
+  mond.material.opacity = licht.mond;
+  const n = licht.nacht;
+  kroneMat.emissiveIntensity = 0.12 + 1.5 * n;
+  baumGlanz.material.opacity = 0.12 + 0.55 * n;
+  funken.material.opacity = 0.25 + 0.6 * n;
+  flachwasser.material.color.copy(farbe([255, 255, 255], 0.08 + 0.92 * Math.pow(klemme(licht.hemiI / 0.75, 0, 1), 1.6)));
+  const hh = Math.floor(st), mm = Math.round((st - hh) * 60) % 60;
+  infoLicht = (lichtWahl.value === "auto" ? "Licht automatisch, " : "Licht fest, ") + String(hh).padStart(2, "0") + ":" + String(mm).padStart(2, "0") + " Uhr";
+  zusammenfassungZeigen();
+}
+
+/* =====================================================================================
+   8. NACHBEARBEITUNG (Leuchten) UND BILDGRÖSSE
+   ===================================================================================== */
+let komposition = null, bloom = null, ende = null;
+if (Q.hoch && T.EffectComposer && T.UnrealBloomPass) {
+  const ziel = new T.WebGLRenderTarget(1, 1, { type: T.HalfFloatType, samples: 4 });
+  komposition = new T.EffectComposer(renderer, ziel);
+  komposition.addPass(new T.RenderPass(szene, kamera));
+  bloom = new T.UnrealBloomPass(new T.Vector2(512, 512), 0.4, 0.55, 1.0);
+  komposition.addPass(bloom);
+  ende = new T.ShaderPass({
+    uniforms: { tDiffuse: { value: null }, belichtung: { value: 0.5 } },
+    vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
+    fragmentShader: `uniform sampler2D tDiffuse; uniform float belichtung; varying vec2 vUv;
+      vec3 jarvisFit(vec3 v){ vec3 a = v * (v + 0.0245786) - 0.000090537; vec3 b = v * (0.983729 * v + 0.4329510) + 0.238081; return a / b; }
+      vec3 jarvisAces(vec3 c){
+        const mat3 ein = mat3(0.59719, 0.07600, 0.02840, 0.35458, 0.90834, 0.13383, 0.04823, 0.01566, 0.83777);
+        const mat3 aus = mat3(1.60475, -0.10208, -0.00327, -0.53108, 1.10813, -0.07276, -0.07367, -0.00605, 1.07602);
+        c *= belichtung / 0.6; c = ein * c; c = jarvisFit(c); c = aus * c; return clamp(c, 0.0, 1.0); }
+      vec3 srgb(vec3 c){ return mix(pow(c, vec3(0.41666)) * 1.055 - vec3(0.055), c * 12.92, vec3(lessThanEqual(c, vec3(0.0031308)))); }
+      void main(){ vec4 t = texture2D(tDiffuse, vUv); gl_FragColor = vec4(srgb(jarvisAces(t.rgb)), 1.0); }`
+  });
+  ende.material.toneMapped = false;   // eigene Tonwertkurve, Three soll keine zweite anhängen
+  komposition.addPass(ende);
+  renderer.toneMapping = T.NoToneMapping;  // Tonwertkurve nur einmal (im letzten Durchgang), sonst wird das Bild doppelt abgedunkelt
+}
+function groesse() {
+  const b = leinwand.clientWidth || 800, h = leinwand.clientHeight || 600;
+  renderer.setSize(b, h, false);
+  kamera.aspect = b / h; kamera.updateProjectionMatrix();
+  if (komposition) { komposition.setPixelRatio(Q.dpr); komposition.setSize(b, h); }
+}
+groesse();
+window.addEventListener("resize", groesse);
+
+/* =====================================================================================
+   9. BEWEGUNG
+   ===================================================================================== */
+const wenigBewegung = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let zeit = 0, daten = null, markiert = null;
+const statusSchluessel = id => { const g = daten.gebaeude.find(x => x.id === id); return g ? g.status : "aus"; };
+function bewegen(dt) {
+  zeit += dt;
+  if (wasser.material.uniforms) wasser.material.uniforms.time.value += dt * 0.6;
+  else wasser.material.normalMap.offset.set(zeit * 0.004, zeit * 0.003);
+  flachwasser.material.opacity = 0.85 + 0.15 * Math.sin(zeit * 0.9);
+  funken.rotation.y = zeit * 0.02;
+  funken.position.y = Math.sin(zeit * 0.4) * 12;
+  for (const id in statusMats) {
+    const sk = statusSchluessel(id), st = STATUS[sk] || STATUS.aus, s = statusMats[id];
+    const puls = sk === "laeuft" ? 0.75 + 0.25 * Math.sin(zeit * 3) : sk === "fehler" ? (Math.sin(zeit * 9) > 0 ? 1 : 0.15) : sk === "wartet" ? 0.6 + 0.2 * Math.sin(zeit * 1.2) : 0.25;
+    s.kugel.color.copy(farbe(st.farbe, 1.5 + 2 * puls));
+    s.glanz.material.color.copy(farbe(st.farbe, puls));
+    s.glanz.scale.setScalar(s.gross * 6 * (0.8 + 0.3 * puls));
+  }
+}
+/** Schattenbereich folgt dem Blickpunkt: nah = scharf, weit weg = großer Bereich. */
+let schattenHalb = 0;
+function schattenNachfuehren() {
+  const d = kamera.position.distanceTo(steuerung.target), h = klemme(d * 0.6, 500, 7000);
+  const c = sonne.shadow.camera;
+  if (Math.abs(h - schattenHalb) > schattenHalb * 0.12) { schattenHalb = h; c.left = -h; c.right = h; c.top = h; c.bottom = -h; c.updateProjectionMatrix(); }
+  sonne.target.position.set(steuerung.target.x, 0, steuerung.target.z);
+  sonne.position.copy(sonne.target.position).addScaledVector(sonnenRichtung, 12000);
+}
+/** Kamera nie unter den Boden; Nahgrenze passend zur Entfernung (gegen Flimmern auf große Distanz). */
+function kameraPruefen() {
+  const boden = Math.max(0, bodenHoehe(kamera.position.x, kamera.position.z)) + 25;
+  if (kamera.position.y < boden) kamera.position.y = boden;
+  const d = kamera.position.distanceTo(steuerung.target), near = klemme(d * 0.004, 2, 40);
+  if (Math.abs(near - kamera.near) > kamera.near * 0.2) { kamera.near = near; kamera.updateProjectionMatrix(); }
+}
+
+/* =====================================================================================
+   10. NAMENSSCHILDER, KLICKEN, RUNDGANG
+   ===================================================================================== */
+const schilderBox = document.getElementById("schilder");
+const schilder = {};
+function schilderBauen() {
+  schilderBox.textContent = "";
+  for (const id of ["jarvis"].concat(REIHENFOLGE)) {
+    const g = daten.gebaeude.find(x => x.id === id); if (!g) continue;
+    const d = document.createElement("div"); d.className = "schild";
+    const p = document.createElement("span"); p.className = "punkt"; p.style.background = rgbText((STATUS[g.status] || STATUS.aus).farbe);
+    const t = document.createElement("span"); t.className = "text"; t.textContent = g.name;
+    d.title = ORTE[id].ort;
+    d.appendChild(p); d.appendChild(t);
+    d.addEventListener("click", e => { e.stopPropagation(); oeffneDetail(id); const z = zielFuer(id); fahre(z.pos, z.ziel, 1100); });
+    schilderBox.appendChild(d); schilder[id] = d;
+  }
+}
+const proj = new T.Vector3();
+function schilderSetzen() {
+  const b = leinwand.clientWidth, h = leinwand.clientHeight, rechtecke = [];
+  const ids = Object.keys(schilder).sort((a, c) => (a === markiert ? -1 : c === markiert ? 1 : a === "jarvis" ? -1 : c === "jarvis" ? 1 : 0));
+  for (const id of ids) {
+    const g = ortGruppen[id], d = schilder[id];
+    proj.set(g.position.x, g.position.y + g.userData.oben + 20, g.position.z).project(kamera);
+    if (proj.z > 1) { d.style.display = "none"; continue; }
+    d.style.display = "";
+    const x = (proj.x * 0.5 + 0.5) * b, y = (-proj.y * 0.5 + 0.5) * h;
+    d.style.transform = `translate(${x}px, ${y}px) translate(-50%, -100%)`;
+    d.classList.toggle("aktiv", id === markiert);
+    const breite = id === markiert ? 160 : (d.dataset.breite || (d.dataset.breite = d.querySelector(".text").textContent.length * 7 + 30));
+    const r = { x: x - breite / 2, y: y - 22, w: +breite, h: 22 };
+    const voll = !rechtecke.some(o => r.x < o.x + o.w && r.x + r.w > o.x && r.y < o.y + o.h && r.y + r.h > o.y);
+    d.classList.toggle("klein", !voll && id !== markiert);
+    if (voll || id === markiert) rechtecke.push(r);
+  }
+}
+const strahl = new T.Raycaster(), maus = new T.Vector2();
+let druck = null;
+function trefferBei(e) {
+  const r = leinwand.getBoundingClientRect();
+  maus.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
+  strahl.setFromCamera(maus, kamera);
+  const t = strahl.intersectObjects(Object.values(ortGruppen), true).find(x => !x.object.isSprite && !x.object.isPoints);
+  if (!t) return null;
+  let o = t.object; while (o && !o.userData.id) o = o.parent;
+  return o ? o.userData.id : null;
+}
+leinwand.addEventListener("pointerdown", e => { druck = { x: e.clientX, y: e.clientY }; });
+leinwand.addEventListener("pointerup", e => {
+  if (!druck || Math.hypot(e.clientX - druck.x, e.clientY - druck.y) > 6) return;
+  const id = trefferBei(e);
+  if (id) { oeffneDetail(id); return; }
+  schliesseDetail();
+});
+leinwand.addEventListener("pointermove", e => { if (e.buttons) return; leinwand.style.cursor = trefferBei(e) ? "pointer" : "grab"; });
+
+let fahrtToken = 0;
+function fahre(pos, ziel, ms) {
+  const mein = ++fahrtToken, p0 = kamera.position.clone(), z0 = steuerung.target.clone();
+  if (wenigBewegung || ms <= 0) { kamera.position.copy(pos); steuerung.target.copy(ziel); return Promise.resolve(); }
+  // Bogen nach oben, damit lange Flüge nicht durch Berge gehen
+  const hub = Math.min(2500, p0.distanceTo(pos) * 0.25);
+  return new Promise(fertig => {
+    const start = performance.now();
+    (function schritt(j) {
+      if (mein !== fahrtToken) { fertig(); return; }
+      const t = Math.min(1, (j - start) / ms), e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      kamera.position.lerpVectors(p0, pos, e); kamera.position.y += Math.sin(Math.PI * e) * hub;
+      steuerung.target.lerpVectors(z0, ziel, e);
+      if (t < 1) requestAnimationFrame(schritt); else fertig();
+    })(start);
+  });
+}
+const UEBERSICHT = { pos: new T.Vector3(1200, 4600, 10400), ziel: new T.Vector3(600, 150, -200) };
+function uebersichtPos() {
+  const a = leinwand.clientWidth / leinwand.clientHeight, f = a < 1 ? 1.6 / Math.max(a, 0.45) * 0.62 : 1;
+  return { pos: UEBERSICHT.pos.clone().multiplyScalar(f), ziel: UEBERSICHT.ziel.clone() };
+}
+function zielFuer(id) {
+  const g = ortGruppen[id], o = g.userData.oben;
+  if (id === "jarvis") return { pos: new T.Vector3(2600, HP + 900, 3000), ziel: new T.Vector3(0, HP + 650, 0) };
+  const aussen = new T.Vector3(g.position.x, 0, g.position.z).normalize();
+  const ziel = new T.Vector3(g.position.x, g.position.y + o * 0.45, g.position.z);
+  const abstand = 420 + o * 1.2;
+  const pos = ziel.clone().add(aussen.multiplyScalar(abstand)).add(new T.Vector3(0, 160 + o * 0.5, 0));
+  pos.y = Math.max(pos.y, bodenHoehe(pos.x, pos.z) + 120);
+  return { pos, ziel };
+}
+steuerung.addEventListener("start", () => { fahrtToken++; if (rundgangLaeuft) stopp(false); });
+
+const detail = document.getElementById("detail"), untertitel = document.getElementById("untertitel");
+const knopfRundgang = document.getElementById("knopfRundgang"), knopfStopp = document.getElementById("knopfStopp");
+function oeffneDetail(id) {
+  const g = daten.gebaeude.find(x => x.id === id); if (!g) return;
+  const st = STATUS[g.status] || STATUS.aus;
+  markiert = id;
+  document.getElementById("detailName").textContent = g.name + " · " + ORTE[id].ort;
+  const s = document.getElementById("detailStatus"); s.textContent = "";
+  const p = document.createElement("span"); p.className = "punkt"; p.style.background = rgbText(st.farbe);
+  s.appendChild(p); s.appendChild(document.createTextNode("Status: " + st.text));
+  const dl = document.getElementById("detailZahlen"); dl.textContent = "";
+  (g.kennzahlen || []).slice(0, 3).forEach(z => {
+    const dt = document.createElement("dt"); dt.textContent = z[0];
+    const dd = document.createElement("dd"); dd.textContent = z[1];
+    dl.appendChild(dt); dl.appendChild(dd);
+  });
+  document.getElementById("detailText").textContent = g.text || "";
+  detail.classList.add("an");
+}
+function schliesseDetail() { detail.classList.remove("an"); if (!rundgangLaeuft) markiert = null; }
+let rundgangToken = 0, rundgangLaeuft = false;
+const warte = ms => new Promise(f => setTimeout(f, ms));
+async function rundgang() {
+  if (rundgangLaeuft) return;
+  rundgangLaeuft = true;
+  const mein = ++rundgangToken;
+  knopfRundgang.disabled = true; knopfStopp.disabled = false;
+  schliesseDetail();
+  for (const id of ["jarvis"].concat(REIHENFOLGE_RUNDGANG)) {
+    if (mein !== rundgangToken) return;
+    const g = daten.gebaeude.find(x => x.id === id); if (!g) continue;
+    markiert = id;
+    untertitel.textContent = g.name + " (" + ORTE[id].ort + ") – " + (STATUS[g.status] || STATUS.aus).text + ". " + (g.text || "");
+    untertitel.classList.add("an");
+    const z = zielFuer(id);
+    await fahre(z.pos, z.ziel, 2200);
+    if (mein !== rundgangToken) return;
+    await warte(1800);
+  }
+  if (mein !== rundgangToken) return;
+  untertitel.classList.remove("an"); markiert = null;
+  const u = uebersichtPos(); await fahre(u.pos, u.ziel, 2200);
+  if (mein === rundgangToken) { rundgangLaeuft = false; knopfRundgang.disabled = false; knopfStopp.disabled = true; }
+}
+// Reihenfolge im Uhrzeigersinn: erst die Türme, dann Regionen und Inseln
+const REIHENFOLGE_RUNDGANG = ["hauptpc", "minipc", "kosten", "sicherheit", "testpc", "nachtarbeit", "vault", "aufgabenloop", "briefing", "trading", "kalender", "tiktok"];
+function stopp(zurueck) {
+  if (!rundgangLaeuft) return;
+  rundgangToken++; rundgangLaeuft = false;
+  untertitel.classList.remove("an"); markiert = null;
+  knopfRundgang.disabled = false; knopfStopp.disabled = true;
+  if (zurueck !== false) { const u = uebersichtPos(); fahre(u.pos, u.ziel, 1400); }
+}
+function zusammenfassungZeigen() {
+  if (!daten) return;
+  const zahl = { laeuft: 0, wartet: 0, fehler: 0, aus: 0 };
+  daten.gebaeude.forEach(g => { if (zahl[g.status] !== undefined) zahl[g.status]++; });
+  const z = document.getElementById("zusammenfassung"); z.textContent = "";
+  Object.keys(STATUS).forEach(k => {
+    const s = document.createElement("span"), p = document.createElement("span");
+    p.className = "punkt"; p.style.background = rgbText(STATUS[k].farbe);
+    s.appendChild(p); s.appendChild(document.createTextNode(zahl[k] + " " + STATUS[k].text)); z.appendChild(s);
+  });
+  const l = document.createElement("span"); l.textContent = infoLicht; z.appendChild(l);
+  const ph = document.createElement("span"); ph.textContent = "Phase 1: Gelände (Türme und Orte sind Platzhalter)"; z.appendChild(ph);
+  const h = document.createElement("span"); h.className = "hinweis"; h.textContent = daten.stand || ""; z.appendChild(h);
+}
+function tastaturListeBauen() {
+  const liste = document.getElementById("tastaturListe"); liste.textContent = "";
+  for (const id of ["jarvis"].concat(REIHENFOLGE_RUNDGANG)) {
+    const g = daten.gebaeude.find(x => x.id === id); if (!g) continue;
+    const b = document.createElement("button"); b.type = "button";
+    b.textContent = g.name + " (" + ORTE[id].ort + "), Status " + (STATUS[g.status] || STATUS.aus).text;
+    b.addEventListener("click", () => { oeffneDetail(id); const z = zielFuer(id); fahre(z.pos, z.ziel, 1100); });
+    liste.appendChild(b);
+  }
+}
+knopfRundgang.addEventListener("click", rundgang);
+knopfStopp.addEventListener("click", () => stopp());
+document.getElementById("knopfUebersicht").addEventListener("click", () => { stopp(false); schliesseDetail(); const u = uebersichtPos(); fahre(u.pos, u.ziel, 1600); });
+document.getElementById("schliessen").addEventListener("click", schliesseDetail);
+lichtWahl.addEventListener("change", () => lichtAktualisieren(true));
+document.addEventListener("keydown", e => { if (e.key === "Escape") { stopp(); schliesseDetail(); } });
+setInterval(() => lichtAktualisieren(false), 60000);
+
+/* =====================================================================================
+   11. LOS
+   ===================================================================================== */
+daten = startDaten;
+schilderBauen();
+tastaturListeBauen();
+lichtAktualisieren(true);
+{ const u = uebersichtPos(); kamera.position.copy(u.pos); steuerung.target.copy(u.ziel); steuerung.update(); }
+document.getElementById("laden").style.display = "none";
+window.__welt = { szene, renderer, kamera, steuerung, licht: () => licht, quelle, stufe, hoehe, bodenHoehe, ORTE, ortGruppen, zielFuer, oeffneDetail,
+  gitter: gelaende.nx + " x " + gelaende.nz, ecken: gelaende.mesh.geometry.attributes.position.count, aufbauMs: Math.round(performance.now() - t0) };
+let letzte = performance.now(), bilder = 0, bildZeit = 0;
+renderer.setAnimationLoop(() => {
+  const jetzt = performance.now(), dt = Math.min(0.1, (jetzt - letzte) / 1000); letzte = jetzt;
+  if (document.hidden) return;
+  if (!wenigBewegung) bewegen(dt); else if (zeit === 0) bewegen(0.016);
+  steuerung.update();
+  kameraPruefen();
+  schattenNachfuehren();
+  if (komposition) komposition.render(); else renderer.render(szene, kamera);
+  schilderSetzen();
+  bilder++; bildZeit += dt; if (bildZeit > 2) { window.__fps = bilder / bildZeit; bilder = 0; bildZeit = 0; }
+});
+}
+</script>
+</body>
+</html>

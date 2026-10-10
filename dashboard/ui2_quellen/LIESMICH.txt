@@ -1,0 +1,5 @@
+Quellen der HUD-Oberfläche 2.0 (26./27.09.2026, Claude)
+Die fertige Oberfläche steckt komplett in dashboard\index.html. Diese Teile braucht Claude nur zum Weiterbauen.
+patchen.py baut index.html aus der alten Fassung (dashboard\index_alt_vor_ui2.html) + diesen Teilen neu.
+Pfade in patchen.py zeigen auf die Cloud (/home/claude/jb/...). Nichts hier muss am PC gestartet werden.
+kopf2.js = KI-Frau (gefällt Sir nicht, vertagt). welt3d.js = ältere Fassung des 3D-Teils, steckt schon in ui2.js.

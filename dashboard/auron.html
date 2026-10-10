@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="de" data-farbe="silber">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Auron</title>
+<meta name="theme-color" content="#07080b">
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
+<!--
+  Auron – neue Oberfläche (04.10.2026, Claude). Aufruf: http://127.0.0.1:8001/auron (altes HUD weiter unter /).
+  Ablauf: 1. Tour durch das Universum zur Auron Station (werkstatt/universum/universum_3d.html?auron=1), bei jedem Start (Knopf "Tour" oben rechts startet sie neu), nur Stationen, die gerade laufen.
+          2. Gespräch (gleiche Schnittstelle wie das alte HUD: /api/chat/stream, /api/sprache).
+          3. "Alle Bereiche" öffnet einen Bereich im Modulfenster (05.10.2026): kleines, zentriertes Fenster in den
+             Auron-Farben mit "Zurück" oben links. Inhalt kommt aus dem alten HUD im Modul-Modus (/?modul=<seite>),
+             also ohne dessen Kopfzeile und Seitenleiste. Ein zweites Modul tauscht nur den Inhalt aus.
+          4. (05.10.2026) "Frühere Gespräche" unten: alte Chats laden und weitermachen. Fehleranzeige oben, wenn der
+             Mini-PC oder die lokale KI nicht erreichbar ist. Beim ersten Öffnen am Tag: Mitteilung zur Nachtarbeit.
+  Name und Farbwelt: NAME unten im Skript, Farbwelt unter "Alle Bereiche" (wird im Browser gespeichert).
+  UNGETESTET AM GERÄT: Bildrate der Tour, Mikrofon, Stimme, altes HUD im Fenster.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600&family=Nunito:wght@400;600;700&display=swap">
+<style>
+/* Farbwelten: "silber" (Standard: Silber, Rot, Schwarz), "graphit", "gold". --metall = Akzent, --glut = warme Zweitfarbe. */
+:root, :root[data-farbe="silber"] {
+  color-scheme: dark;
+  --nacht: #0b0c10; --tiefe: #15171d; --glas: rgba(30, 32, 40, .66); --rand: rgba(200, 206, 216, .18);
+  --text: #e8e9ec; --leise: #9a9ea8; --metall: #d0d5de; --glut: #b8333a; --gruen: #86d3a6; --rot: #e0656a;
+  --dunkel: #15161a; --kugel-licht: #ffffff; --kugel-mitte: #c9ced8; --kugel-rand: #5c1d24;
+}
+:root[data-farbe="graphit"] {
+  --nacht: #0d0e11; --tiefe: #17181c; --glas: rgba(34, 36, 42, .66); --rand: rgba(200, 206, 216, .16);
+  --text: #e6e7ea; --leise: #989ba3; --metall: #c4c9d2; --glut: #6c7383; --dunkel: #15161a;
+  --kugel-licht: #ffffff; --kugel-mitte: #b7bcc6; --kugel-rand: #2a2d35;
+}
+:root[data-farbe="gold"] {
+  --nacht: #0f1222; --tiefe: #171a2e; --glas: rgba(36, 40, 66, .62); --rand: rgba(226, 184, 102, .22);
+  --text: #ece6da; --leise: #a3a6bb; --metall: #e2b866; --glut: #d98d7c; --dunkel: #1d1608;
+  --kugel-licht: #fff3d6; --kugel-mitte: #e2b866; --kugel-rand: #3a2140;
+}
+:root {
+  --display: "Unbounded", "Segoe UI", system-ui, sans-serif;
+  --schrift: "Nunito", "Segoe UI", system-ui, sans-serif;
+  --rund: 22px;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--nacht); color: var(--text); font-family: var(--schrift); font-size: 16px; overflow: hidden; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--metall); outline-offset: 3px; }
+.szene { position: absolute; inset: 0; transition: opacity .9s ease; }
+.szene.weg { opacity: 0; pointer-events: none; }
+/* Universum frei erkunden (Sir 04.10.2026): liegt ueber dem Gespraech, unter den Bereichs-Fenstern (z-index 7) */
+#frei { z-index: 5; background: var(--nacht); }
+#frei iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.frei-zu { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); right: 12px; z-index: 2; background: var(--glas); border: 1px solid var(--rand); border-radius: 21px; padding: 9px 16px; font-size: 14px; font-weight: 600; }
+.frei-zu:hover { border-color: var(--metall); }
+
+/* ---------- Tour ---------- */
+#tour { background: var(--nacht); }
+#tour iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.tour-karte { position: absolute; left: 50%; bottom: calc(28px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+  width: min(620px, calc(100% - 32px)); background: var(--glas); border: 1px solid var(--rand); border-radius: var(--rund);
+  padding: 18px 22px 16px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 18px 50px rgba(5,6,14,.55);
+  display: grid; gap: 8px; }
+.tour-oben { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.station { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--metall); }
+.tour-karte h2 { margin: 0; font-family: var(--display); font-weight: 600; font-size: clamp(20px, 3.2vw, 26px); text-wrap: balance; }
+.tour-karte p { margin: 0; line-height: 1.55; }
+.jetzt { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--leise); }
+.jetzt::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--gruen); box-shadow: 0 0 10px var(--gruen); }
+.tour-unten { display: flex; gap: 10px; align-items: center; margin-top: 4px; flex-wrap: wrap; }
+.tour-unten .rechts { margin-left: auto; }
+.punkte { display: flex; gap: 6px; }
+.punkte i { width: 7px; height: 7px; border-radius: 50%; background: rgba(236,230,218,.22); transition: background .4s, transform .4s; }
+.punkte i.an { background: var(--metall); transform: scale(1.3); }
+.knopf-leise { background: transparent; border: 1px solid var(--rand); border-radius: 999px; padding: 8px 16px; }
+.knopf-leise:hover, .knopf-leise[aria-pressed="true"] { border-color: var(--metall); }
+.tour-karte.blende h2, .tour-karte.blende p, .tour-karte.blende .jetzt { animation: blende .7s ease; }
+@keyframes blende { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Gespräch ---------- */
+#chat { display: grid; grid-template-rows: auto 1fr auto; grid-template-columns: minmax(0, 1fr); padding-inline: 16px;
+  background:
+    radial-gradient(120% 60% at 50% 115%, color-mix(in srgb, var(--glut) 26%, transparent), transparent 60%),
+    radial-gradient(90% 50% at 50% 100%, color-mix(in srgb, var(--metall) 10%, transparent), transparent 70%),
+    var(--nacht); }
+.kopf { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: min(860px, 100%); margin-inline: auto;
+  padding-block: calc(16px + env(safe-area-inset-top, 0px)) 8px; }
+.marke { display: flex; align-items: center; gap: 12px; }
+.marke b { font-family: var(--display); font-weight: 600; letter-spacing: .14em; font-size: 18px; }
+.status { font-size: 13px; color: var(--leise); display: flex; align-items: center; gap: 6px; }
+.status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--leise); }
+.status.ok::before { background: var(--gruen); }
+.status.fehler::before { background: var(--rot); }
+.kopf-knoepfe { display: flex; gap: 8px; }
+.rund-knopf { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--rand); background: var(--glas); display: grid; place-items: center; }
+.rund-knopf:hover, .rund-knopf[aria-pressed="true"] { border-color: var(--metall); }
+.rund-knopf.lauscht { box-shadow: 0 0 0 3px color-mix(in srgb, var(--glut) 35%, transparent); }
+.rund-knopf.mit-text { width: auto; padding: 0 16px 0 13px; border-radius: 21px; display: flex; gap: 8px; align-items: center; color: var(--text); font-size: 14px; font-weight: 600; letter-spacing: .02em; }
+.rund-knopf svg { width: 19px; height: 19px; fill: none; stroke: var(--text); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.kugel { width: 34px; height: 34px; border-radius: 50%; flex: none;
+  background: radial-gradient(circle at 35% 30%, var(--kugel-licht) 0%, var(--kugel-mitte) 34%, var(--glut) 78%, var(--kugel-rand) 100%);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--metall) 45%, transparent), 0 0 60px color-mix(in srgb, var(--glut) 30%, transparent);
+  animation: atmen 5s ease-in-out infinite; }
+.kugel.gross { width: 92px; height: 92px; }
+.kugel.denkt { animation-duration: 1.4s; }
+@keyframes atmen { 50% { box-shadow: 0 0 34px color-mix(in srgb, var(--metall) 70%, transparent), 0 0 90px color-mix(in srgb, var(--glut) 45%, transparent); transform: scale(1.03); } }
+
+.verlauf { overflow-y: auto; min-height: 0; }
+.verlauf-innen { width: min(760px, 100%); margin-inline: auto; display: flex; flex-direction: column; gap: 14px; padding-block: 18px 24px; }
+.begruessung { display: grid; justify-items: center; gap: 14px; text-align: center; padding-block: 6vh 10px; }
+.begruessung h1 { margin: 0; font-family: var(--display); font-weight: 400; font-size: clamp(22px, 4vw, 30px); text-wrap: balance; }
+.begruessung p { margin: 0; color: var(--leise); }
+.nachricht { max-width: 86%; padding: 13px 18px; border-radius: var(--rund); line-height: 1.55; min-width: 0; overflow-wrap: anywhere; }
+.nachricht.ich { align-self: flex-end; background: color-mix(in srgb, var(--glut) 16%, transparent); border: 1px solid color-mix(in srgb, var(--glut) 38%, transparent); border-bottom-right-radius: 8px; white-space: pre-wrap; }
+.nachricht.auron { align-self: flex-start; background: var(--glas); border: 1px solid rgba(236,230,218,.09); border-bottom-left-radius: 8px; }
+.nachricht.auron p { margin: 0 0 .6em; } .nachricht.auron p:last-child { margin-bottom: 0; }
+.nachricht.auron ul { margin: .2em 0 .6em; padding-left: 1.2em; }
+.nachricht.fehler { border-color: color-mix(in srgb, var(--rot) 50%, transparent); }
+.quellen { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.quelle { font-size: 12.5px; color: var(--metall); border: 1px solid var(--rand); border-radius: 999px; padding: 2px 10px; }
+.karte-klein { margin-top: 10px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: rgba(10,11,16,.55); border-radius: 14px; padding: 10px 12px; font-size: 14px; }
+.karte-klein span { color: var(--leise); }
+.karte-klein .rechts { margin-left: auto; display: flex; gap: 6px; }
+.karte-klein button { background: var(--metall); color: var(--dunkel); border: 0; border-radius: 999px; padding: 6px 14px; font-weight: 700; }
+.karte-klein button.zweit { background: transparent; color: var(--text); border: 1px solid var(--rand); font-weight: 600; }
+.tippt::after { content: "…"; animation: blinken 1.2s infinite; }
+@keyframes blinken { 50% { opacity: .2; } }
+
+.unten { width: min(760px, 100%); margin-inline: auto; padding-block: 6px calc(18px + env(safe-area-inset-bottom, 0px)); display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.vorschlaege { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.vorschlaege button { background: transparent; border: 1px solid rgba(236,230,218,.14); border-radius: 999px; padding: 7px 14px; font-size: 14px; color: var(--leise); }
+.vorschlaege button:hover { color: var(--text); border-color: var(--metall); }
+.eingabe { display: flex; align-items: center; gap: 8px; background: var(--tiefe); border: 1px solid var(--rand); border-radius: 999px; padding: 6px 6px 6px 20px; box-shadow: 0 10px 40px rgba(5,6,14,.5); }
+.eingabe input { flex: 1; min-width: 0; width: 0; background: transparent; border: 0; color: var(--text); font: inherit; padding-block: 10px; outline: none; }
+.eingabe input::placeholder { color: var(--leise); }
+.senden { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--rand); background: transparent; display: grid; place-items: center; }
+.senden svg { width: 18px; height: 18px; fill: none; stroke: var(--text); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.mikro { width: 46px; height: 46px; border-radius: 50%; border: 0; display: grid; place-items: center;
+  background: radial-gradient(circle at 35% 30%, var(--kugel-licht), var(--kugel-mitte) 45%, var(--glut)); box-shadow: 0 0 18px color-mix(in srgb, var(--glut) 45%, transparent); }
+.mikro svg { width: 20px; height: 20px; fill: none; stroke: var(--dunkel); stroke-width: 2; stroke-linecap: round; }
+.mikro.hoert { animation: atmen 1.2s ease-in-out infinite; }
+.hinweis { text-align: center; font-size: 13px; color: var(--leise); min-height: 1.2em; margin: 0; }
+
+/* ---------- Bereiche ---------- */
+.schleier { position: absolute; inset: 0; background: rgba(8,9,14,.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: grid; place-items: center; padding: 16px; z-index: 8; }
+.bereiche { width: min(900px, 100%); max-height: 100%; overflow-y: auto; background: var(--tiefe); border: 1px solid var(--rand); border-radius: 28px; padding: 22px; display: grid; gap: 16px; }
+.fenster-kopf { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.fenster-kopf h2 { margin: 0; font-family: var(--display); font-weight: 600; font-size: 20px; }
+.fenster-kopf p { margin: 4px 0 0; color: var(--leise); font-size: 14px; }
+.kacheln { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.kachel { background: var(--glas); border: 1px solid rgba(236,230,218,.08); border-radius: 20px; padding: 14px; display: grid; gap: 8px; align-content: start; }
+.kachel > button { text-align: left; background: none; border: 0; padding: 0; font-family: var(--display); font-weight: 600; font-size: 15px; color: var(--metall); }
+.kachel .unter { display: flex; flex-wrap: wrap; gap: 6px; }
+.kachel .unter button { background: transparent; border: 1px solid rgba(236,230,218,.12); border-radius: 999px; padding: 4px 10px; font-size: 13px; color: var(--leise); }
+.kachel .unter button:hover, .kachel > button:hover { color: var(--text); border-color: var(--metall); }
+.sag-es { font-size: 14px; color: var(--leise); text-align: center; margin: 0; }
+.sag-es q { color: var(--text); }
+.farben { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.farben button { display: inline-flex; align-items: center; gap: 8px; background: transparent; border: 1px solid var(--rand); border-radius: 999px; padding: 6px 14px; font-size: 14px; color: var(--leise); }
+.farben button[aria-pressed="true"] { color: var(--text); border-color: var(--metall); }
+.farben i { width: 14px; height: 14px; border-radius: 50%; }
+.schleier { z-index: 12; }
+
+/* ---------- Modulfenster (05.10.2026): ein Bereich, klein und mittig, oben "Zurück" ---------- */
+.modul-schleier { position: absolute; left: 0; right: 0; bottom: 0; top: var(--modul-oben, 0px); z-index: 9;
+  background: rgba(8, 9, 14, .58); backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px);
+  display: grid; place-items: center; padding: 10px 16px calc(16px + env(safe-area-inset-bottom, 0px)); }
+.modul-fenster { width: min(1180px, 100%); height: min(880px, 100%); min-height: 0; display: grid; grid-template-rows: auto 1fr;
+  background: var(--tiefe); border: 1px solid var(--rand); border-radius: 28px; overflow: hidden;
+  box-shadow: 0 30px 80px rgba(3, 4, 8, .6), 0 0 0 1px color-mix(in srgb, var(--glut) 14%, transparent), 0 0 60px color-mix(in srgb, var(--glut) 12%, transparent);
+  animation: aufgehen .26s ease; }
+@keyframes aufgehen { from { opacity: 0; transform: translateY(10px) scale(.985); } to { opacity: 1; transform: none; } }
+.modul-kopf { display: flex; align-items: center; gap: 14px; padding: 12px 16px 12px 12px; border-bottom: 1px solid var(--rand);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--glut) 12%, transparent), transparent); }
+.zurueck { display: inline-flex; align-items: center; gap: 8px; flex: none; background: var(--metall); color: var(--dunkel); border: 0;
+  border-radius: 999px; padding: 9px 18px 9px 13px; font-weight: 700; font-size: 15px; letter-spacing: .01em;
+  box-shadow: 0 0 18px color-mix(in srgb, var(--metall) 30%, transparent); transition: transform .15s, box-shadow .15s; }
+.zurueck:hover { transform: translateX(-2px); box-shadow: 0 0 26px color-mix(in srgb, var(--metall) 45%, transparent); }
+.zurueck svg { width: 18px; height: 18px; fill: none; stroke: var(--dunkel); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.modul-titel { min-width: 0; }
+.modul-titel h2 { margin: 0; font-family: var(--display); font-weight: 600; font-size: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.modul-titel p { margin: 2px 0 0; color: var(--leise); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.modul-kopf .kugel { margin-left: auto; width: 26px; height: 26px; }
+.modul-inhalt { position: relative; min-height: 0; background: var(--nacht); }
+.modul-inhalt iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--nacht); }
+.modul-laedt { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 14px; color: var(--leise); background: var(--nacht); z-index: 1; }
+.modul-laedt .kugel { width: 46px; height: 46px; animation-duration: 1.4s; }
+@media (max-width: 620px) {
+  .modul-schleier { padding: 0; }
+  .modul-fenster { height: 100%; border-radius: 0; border-inline: 0; }
+  .zurueck { padding: 8px 14px 8px 11px; }
+  .modul-titel p { display: none; }
+}
+
+/* ---------- Fehleranzeige (05.10.2026): sofort sichtbar, über allem ---------- */
+.warnung { position: fixed; top: calc(70px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); z-index: 30;
+  width: min(720px, calc(100% - 24px)); display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: start;
+  padding: 13px 14px 13px 16px; border-radius: 18px; background: color-mix(in srgb, var(--rot) 16%, var(--tiefe));
+  border: 1px solid color-mix(in srgb, var(--rot) 60%, transparent); box-shadow: 0 16px 50px rgba(0,0,0,.5), 0 0 30px color-mix(in srgb, var(--rot) 22%, transparent);
+  animation: aufgehen .25s ease; }
+.warnung.info { background: color-mix(in srgb, var(--metall) 10%, var(--tiefe)); border-color: color-mix(in srgb, var(--metall) 40%, transparent); box-shadow: 0 16px 50px rgba(0,0,0,.5); }
+.warnung.gelb { background: color-mix(in srgb, #e0b25a 14%, var(--tiefe)); border-color: color-mix(in srgb, #e0b25a 55%, transparent); box-shadow: 0 16px 50px rgba(0,0,0,.5); }
+.warnung .zeichen { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 15px;
+  background: var(--rot); color: #15161a; margin-top: 1px; }
+.warnung.info .zeichen { background: var(--metall); }
+.warnung.gelb .zeichen { background: #e0b25a; }
+.warnung b { display: block; font-size: 15px; margin-bottom: 2px; }
+.warnung p { margin: 0; font-size: 14px; line-height: 1.45; color: var(--text); opacity: .92; }
+.warnung ul { margin: 6px 0 0; padding-left: 1.1em; font-size: 13.5px; color: var(--leise); }
+.warnung button { background: transparent; color: var(--text); border: 1px solid var(--rand); border-radius: 999px; padding: 6px 14px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.warnung button:hover { border-color: var(--metall); }
+
+/* ---------- Herkunft jeder Antwort, Knopf "Claude fragen" (05.10.2026) ---------- */
+.herkunft { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 9px; font-size: 12.5px; color: var(--leise); }
+.herkunft::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--gruen); }
+.herkunft.claude::before { background: var(--metall); }
+.herkunft.rueckfall { color: color-mix(in srgb, var(--rot) 75%, var(--text)); }
+.herkunft.rueckfall::before { background: var(--rot); }
+.herkunft button { background: transparent; color: var(--leise); border: 1px solid var(--rand); border-radius: 999px; padding: 2px 10px; font-size: 12px; }
+.herkunft button:hover { color: var(--text); border-color: var(--metall); }
+
+/* ---------- Mitteilung zur Nachtarbeit (05.10.2026) ---------- */
+.nachricht.mitteilung { border-color: color-mix(in srgb, var(--metall) 30%, transparent); background: linear-gradient(160deg, color-mix(in srgb, var(--glut) 10%, var(--glas)), var(--glas)); }
+.mitteilung .kopfzeile { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.mitteilung .kopfzeile b { font-family: var(--display); font-weight: 600; font-size: 15px; letter-spacing: .04em; }
+.mitteilung .kopfzeile span { color: var(--leise); font-size: 13px; }
+
+/* ---------- Links in Antworten (05.10.2026) ---------- */
+.nachricht a.link { display: inline-block; margin: 2px 0; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--rand);
+  color: var(--text); text-decoration: none; font-weight: 600; background: color-mix(in srgb, var(--metall) 10%, transparent); }
+.nachricht a.link:hover { border-color: var(--metall); }
+
+/* ---------- Ladebildschirm (05.10.2026): verbindet alles, ohne Startknopf ---------- */
+#lade { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 16px;
+  background: radial-gradient(70% 55% at 50% 42%, color-mix(in srgb, var(--glut) 16%, transparent), transparent 70%), var(--nacht);
+  transition: opacity .8s ease; }
+#lade.weg { opacity: 0; pointer-events: none; }
+.lade-innen { width: min(440px, 100%); display: grid; justify-items: center; gap: 16px; text-align: center; }
+.lade-mitte { position: relative; width: 150px; height: 150px; display: grid; place-items: center; }
+.lade-mitte svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.lade-mitte circle { fill: none; stroke-width: 2.2; }
+.lade-mitte .grund { stroke: var(--rand); }
+.lade-mitte .fort { stroke: var(--metall); stroke-linecap: round; transition: stroke-dashoffset .5s ease;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--metall) 60%, transparent)); }
+.lade-mitte .bahn { stroke: color-mix(in srgb, var(--glut) 60%, transparent); stroke-dasharray: 2 9; stroke-width: 1.2;
+  transform-origin: 50% 50%; animation: kreisen 9s linear infinite; }
+@keyframes kreisen { to { transform: rotate(360deg); } }
+.lade-mitte .kugel { width: 78px; height: 78px; animation-duration: 2.2s; }
+.lade-name { margin: 0; font-family: var(--display); font-weight: 600; letter-spacing: .32em; font-size: 22px; padding-left: .32em; }
+.lade-schritt { margin: 0; color: var(--leise); font-size: 14px; min-height: 1.3em; }
+.lade-liste { list-style: none; margin: 4px 0 0; padding: 0; width: 100%; display: grid; gap: 7px; text-align: left; }
+.lade-liste li { display: grid; grid-template-columns: 12px 1fr auto; gap: 10px; align-items: center; font-size: 14px; color: var(--leise); }
+.lade-liste li i { width: 8px; height: 8px; border-radius: 50%; background: rgba(236,230,218,.18); justify-self: center; }
+.lade-liste li.laeuft i { background: var(--metall); animation: blinken 1s infinite; }
+.lade-liste li.ok { color: var(--text); } .lade-liste li.ok i { background: var(--gruen); box-shadow: 0 0 8px var(--gruen); }
+.lade-liste li.warn i { background: #e0b25a; box-shadow: 0 0 8px #e0b25a; }
+.lade-liste li.fehler i { background: var(--rot); box-shadow: 0 0 8px var(--rot); }
+.lade-liste li span:last-child { font-size: 12.5px; color: var(--leise); text-align: right; max-width: 52vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .lade-mitte .bahn { animation: none; } }
+
+/* ---------- Frühere Gespräche (05.10.2026) ---------- */
+.unten-knoepfe { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.unten-knoepfe button { display: inline-flex; align-items: center; gap: 8px; background: transparent; border: 1px solid var(--rand); border-radius: 999px;
+  padding: 6px 14px; font-size: 14px; color: var(--leise); }
+.unten-knoepfe button:hover, .unten-knoepfe button[aria-pressed="true"] { color: var(--text); border-color: var(--metall); }
+.unten-knoepfe svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.chats { width: min(720px, 100%); max-height: 100%; display: grid; grid-template-rows: auto auto 1fr; gap: 14px; background: var(--tiefe);
+  border: 1px solid var(--rand); border-radius: 28px; padding: 22px; min-height: 0; }
+.chats-suche { display: flex; gap: 8px; }
+.chats-suche input { flex: 1; min-width: 0; background: var(--nacht); border: 1px solid var(--rand); border-radius: 999px; color: var(--text); font: inherit; padding: 9px 16px; outline: none; }
+.chats-suche input:focus { border-color: var(--metall); }
+.chats-suche button { background: transparent; border: 1px solid var(--rand); border-radius: 999px; padding: 6px 14px; font-size: 14px; color: var(--leise); white-space: nowrap; }
+.chats-suche button:hover { color: var(--text); border-color: var(--metall); }
+.chats-liste { overflow-y: auto; min-height: 120px; display: grid; gap: 6px; align-content: start; padding-right: 4px; }
+.chats-tag { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--metall); margin: 10px 4px 2px; }
+.chats-tag:first-child { margin-top: 0; }
+.chat-eintrag { text-align: left; background: var(--glas); border: 1px solid rgba(236,230,218,.07); border-radius: 16px; padding: 10px 14px; display: grid; gap: 3px; }
+.chat-eintrag:hover, .chat-eintrag:focus-visible { border-color: var(--metall); }
+.chat-eintrag b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-eintrag span { font-size: 13px; color: var(--leise); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chats-leer { color: var(--leise); text-align: center; padding: 24px 0; margin: 0; }
+.trenner { align-self: center; font-size: 12.5px; color: var(--leise); border: 1px solid var(--rand); border-radius: 999px; padding: 4px 14px; }
+
+@media (max-width: 520px) {
+  .tour-karte { padding: 16px; }
+  .nachricht { max-width: 94%; }
+  /* 05.10.2026 (Handy): Kopfzeile passt sonst nicht, "Alle Bereiche" war verdeckt */
+  .kopf { gap: 8px; }
+  .kopf-knoepfe { gap: 5px; }
+  .rund-knopf { width: 38px; height: 38px; }
+  .rund-knopf.mit-text { width: 38px; padding: 0; justify-content: center; border-radius: 50%; }
+  .rund-knopf.mit-text span { display: none; }
+  .marke { gap: 9px; min-width: 0; }
+  .marke > div { min-width: 0; }
+  .kopf-knoepfe { flex: none; }
+  .marke b { font-size: 15px; letter-spacing: .1em; }
+  .status { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 34vw; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kugel, .mikro.hoert, .tour-karte.blende * { animation: none !important; }
+  .szene { transition: none; }
+}
+/* Kamera-Modus (10.10.2026): kleines Live-Bild, Standbild nur bei einer Frage */
+.kamera { position: fixed; right: 18px; bottom: 96px; width: 240px; z-index: 25; border-radius: 16px; overflow: hidden;
+  border: 1px solid var(--rand); background: var(--tiefe); box-shadow: 0 10px 30px rgba(0,0,0,.45); }
+.kamera[hidden] { display: none; }
+.kamera video { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #000; transform: scaleX(-1); }
+.kamera-kopf { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 10px; font-size: 12px; color: var(--leise); }
+.kamera-kopf button { background: transparent; border: 1px solid var(--rand); border-radius: 999px; padding: 3px 12px; color: var(--text); font-size: 12px; }
+.kamera.sieht { border-color: var(--gruen); }
+@media (max-width: 600px) { .kamera { width: 150px; right: 10px; bottom: 120px; } }
+</style>
+</head>
+<body>
+
+<!-- Ladebildschirm (05.10.2026): verbindet beim Start alles und geht von selbst weiter, ohne Startknopf -->
+<section id="lade" aria-label="Auron startet" role="status" aria-live="polite">
+  <div class="lade-innen">
+    <div class="lade-mitte" aria-hidden="true">
+      <svg viewBox="0 0 150 150"><circle class="bahn" cx="75" cy="75" r="71"/><circle class="grund" cx="75" cy="75" r="62"/>
+        <circle class="fort" id="ladeFort" cx="75" cy="75" r="62" stroke-dasharray="389.6" stroke-dashoffset="389.6"/></svg>
+      <div class="kugel"></div>
+    </div>
+    <p class="lade-name">AURON</p>
+    <p class="lade-schritt" id="ladeSchritt">Ich verbinde alles, Sir …</p>
+    <ul class="lade-liste" id="ladeListe"></ul>
+  </div>
+</section>
+
+<!-- Szene 1: Tour -->
+<section class="szene" id="tour" aria-label="Rundfahrt durch das Universum" hidden>
+  <div class="tour-karte" id="tourKarte" role="status" aria-live="polite">
+    <div class="tour-oben"><span class="station" id="tourStation">Einen Moment</span><div class="punkte" id="tourPunkte"></div></div>
+    <h2 id="tourTitel">Ich baue das Universum auf, Sir.</h2>
+    <p id="tourText">Gleich geht es los.</p>
+    <span class="jetzt" id="tourJetzt" hidden></span>
+    <div class="tour-unten">
+      <button class="knopf-leise" id="tourStimme" type="button" aria-pressed="false">Mit Stimme</button>
+      <button class="knopf-leise" id="tourWeiter" type="button">Weiter</button>
+      <button class="knopf-leise rechts" id="tourUeberspringen" type="button">Überspringen</button>
+    </div>
+  </div>
+</section>
+
+<!-- Szene: Universum frei erkunden (Knopf "Universum") -->
+<section class="szene" id="frei" aria-label="Universum erkunden" hidden>
+  <button class="frei-zu" id="freiZu" type="button">Zurück zu Auron</button>
+</section>
+
+<!-- Szene 2: Gespräch -->
+<section class="szene" id="chat" aria-label="Gespräch">
+  <header class="kopf">
+    <div class="marke">
+      <div class="kugel" id="kugelKlein" aria-hidden="true"></div>
+      <div><b id="name">AURON</b><div class="status" id="status">verbinde …</div></div>
+    </div>
+    <div class="kopf-knoepfe">
+      <button class="rund-knopf mit-text" id="knopfUniversum" type="button" title="Universum frei ansehen" aria-label="Universum ansehen">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.4"/><ellipse cx="12" cy="12" rx="9.5" ry="3.8" transform="rotate(-24 12 12)"/></svg><span>Universum</span></button>
+      <button class="rund-knopf mit-text" id="knopfTour" type="button" title="Tour durch das Universum noch einmal starten" aria-label="Tour noch einmal">
+        <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span>Tour</span></button>
+      <button class="rund-knopf" id="knopfWach" type="button" aria-pressed="false" title="Immer ansprechbar: auf &quot;Auron&quot; hören" aria-label="Immer ansprechbar">
+        <svg viewBox="0 0 24 24"><path d="M7 15a5 5 0 0 1 0-6M17 9a5 5 0 0 1 0 6M4 18a9 9 0 0 1 0-12M20 6a9 9 0 0 1 0 12"/><circle cx="12" cy="12" r="1.6"/></svg></button>
+      <button class="rund-knopf" id="knopfStimme" type="button" aria-pressed="false" title="Antworten vorlesen" aria-label="Antworten vorlesen">
+        <svg viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6L8 10H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/></svg></button>
+      <button class="rund-knopf" id="knopfBereiche" type="button" title="Alle Bereiche" aria-label="Alle Bereiche">
+        <svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="3"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="3"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="3"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="3"/></svg></button>
+    </div>
+  </header>
+
+  <div class="verlauf" id="verlauf">
+    <div class="verlauf-innen" id="verlaufInnen">
+      <div class="begruessung" id="begruessung">
+        <div class="kugel gross" id="kugelGross" aria-hidden="true"></div>
+        <h1 id="begruessungTitel">Was darf ich für Sie tun, Sir?</h1>
+        <p>Sagen oder schreiben Sie es einfach. Den Rest erledige ich oder bringe Sie hin.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="unten">
+    <div class="vorschlaege" id="vorschlaege">
+      <button type="button" data-text="Briefing">Briefing</button>
+      <button type="button" data-text="Plan meinen Tag">Plan meinen Tag</button>
+      <button type="button" data-text="Merk dir: " data-nur-einsetzen>Merk dir …</button>
+      <button type="button" data-text="Wie steht Gold?">Wie steht Gold?</button>
+    </div>
+    <form class="eingabe" id="eingabe">
+      <input id="frage" type="text" autocomplete="off" placeholder="Sagen Sie Auron, was Sie möchten …" aria-label="Nachricht an Auron">
+      <button class="senden" id="senden" type="submit" aria-label="Senden" title="Senden">
+        <svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
+      <button class="mikro" id="mikro" type="button" aria-label="Sprechen" title="Sprechen">
+        <svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
+    </form>
+    <div class="unten-knoepfe">
+      <button type="button" id="knopfChats" title="Frühere Gespräche öffnen und weitermachen">
+        <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 8v4l3 2"/></svg>Frühere Gespräche</button>
+    </div>
+    <p class="hinweis" id="hinweis"></p>
+  </div>
+
+  <div class="schleier" id="schleier" hidden>
+    <div class="bereiche" role="dialog" aria-modal="true" aria-labelledby="bereicheTitel">
+      <div class="fenster-kopf">
+        <div><h2 id="bereicheTitel">Alle Bereiche</h2><p>Alles ist noch da, nur nicht mehr überall sichtbar.</p></div>
+        <button class="rund-knopf" id="bereicheZu" type="button" aria-label="Schließen"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      </div>
+      <div class="kacheln" id="kacheln"></div>
+      <p class="sag-es">Schneller geht es mit einem Satz, zum Beispiel <q>Zeig mir den Markt</q>.</p>
+      <div class="farben" id="farben" aria-label="Farbwelt">
+        <button type="button" data-farbe="silber"><i style="background:linear-gradient(135deg,#d0d5de 50%,#b8333a 50%)"></i>Silber und Rot</button>
+        <button type="button" data-farbe="graphit"><i style="background:linear-gradient(135deg,#c4c9d2 50%,#17181c 50%)"></i>Graphit</button>
+        <button type="button" data-farbe="gold"><i style="background:linear-gradient(135deg,#e2b866 50%,#d98d7c 50%)"></i>Gold</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="schleier" id="chatsSchleier" hidden>
+    <div class="chats" role="dialog" aria-modal="true" aria-labelledby="chatsTitel">
+      <div class="fenster-kopf">
+        <div><h2 id="chatsTitel">Frühere Gespräche</h2><p>Antippen lädt das Gespräch, danach einfach weiterschreiben.</p></div>
+        <button class="rund-knopf" id="chatsZu" type="button" aria-label="Schließen"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      </div>
+      <form class="chats-suche" id="chatsSuche">
+        <input id="chatsSuchwort" type="search" placeholder="Suchen, z. B. Universum" aria-label="Gespräche durchsuchen">
+        <button type="button" id="chatsNeu" title="Leeres Gespräch beginnen">Neues Gespräch</button>
+      </form>
+      <div class="chats-liste" id="chatsListe"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Modulfenster (05.10.2026): ein Bereich, mittig, "Zurück" oben links. Ein zweites Modul tauscht nur den Inhalt. -->
+<div class="modul-schleier" id="modul" hidden>
+  <div class="modul-fenster" role="dialog" aria-modal="true" aria-labelledby="modulTitel">
+    <div class="modul-kopf">
+      <button class="zurueck" id="modulZurueck" type="button" title="Zurück zur Startseite (Esc)">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Zurück</button>
+      <div class="modul-titel"><h2 id="modulTitel">Bereich</h2><p id="modulUnter"></p></div>
+      <div class="kugel" aria-hidden="true"></div>
+    </div>
+    <div class="modul-inhalt" id="modulInhalt">
+      <div class="modul-laedt" id="modulLaedt"><div class="kugel" aria-hidden="true"></div><span id="modulLaedtText">Einen Moment, Sir …</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Kamera-Modus (10.10.2026): "Auron, schau zu" / "Kamera aus" -->
+<div class="kamera" id="kamera" hidden role="region" aria-label="Kamera">
+  <video id="kameraBild" autoplay muted playsinline></video>
+  <div class="kamera-kopf"><span id="kameraStatus">Kamera an</span><button type="button" id="kameraZu" title="Kamera ausschalten">Aus</button></div>
+</div>
+
+<!-- Fehleranzeige (05.10.2026): Mini-PC oder lokale KI nicht erreichbar -->
+<div class="warnung" id="warnung" role="alert" hidden>
+  <span class="zeichen" aria-hidden="true">!</span>
+  <div><b id="warnungTitel"></b><p id="warnungText"></p><ul id="warnungListe" hidden></ul></div>
+  <button type="button" id="warnungPruefen">Erneut prüfen</button>
+</div>
+
+<script>
+"use strict";
+const NAME = "Auron";
+const $ = (id) => document.getElementById(id);
+const leiseBewegung = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const speicher = {
+  lesen(k, ersatz) { try { const v = localStorage.getItem("auron-" + k); return v === null ? ersatz : v; } catch (e) { return ersatz; } },
+  schreiben(k, v) { try { localStorage.setItem("auron-" + k, v); } catch (e) {} }
+};
+const warte = (ms) => new Promise((ok) => setTimeout(ok, ms));
+async function holeJson(url, ms = 5000) {
+  const ab = new AbortController(), t = setTimeout(() => ab.abort(), ms);
+  try { const r = await fetch(url, { signal: ab.signal }); if (!r.ok) throw new Error(url + ": " + r.status); return await r.json(); }
+  finally { clearTimeout(t); }
+}
+function heute() { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+function gruss() { const h = new Date().getHours(); return h < 11 ? "Guten Morgen" : h < 18 ? "Guten Tag" : "Guten Abend"; }
+$("name").textContent = NAME.toUpperCase();
+$("frage").placeholder = "Sagen Sie " + NAME + ", was Sie möchten …";
+
+/* =========================== Farbwelt =========================== */
+const TURMFARBE = { silber: 0xd5dae3, graphit: 0xb9bec8, gold: 0xd9b45e };
+function farbeSetzen(f) {
+  if (!TURMFARBE[f]) f = "silber";
+  document.documentElement.dataset.farbe = f;
+  document.querySelectorAll("#farben button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.farbe === f)));
+  speicher.schreiben("farbe", f);
+  stadtSenden({ auron: "farbe", turm: TURMFARBE[f] });
+  if (typeof modul !== "undefined" && modul.rahmen) { try { modul.rahmen.contentWindow.postMessage({ auron: "modul", farbe: f }, location.origin); } catch (e) {} }
+}
+document.querySelectorAll("#farben button").forEach((b) => b.addEventListener("click", () => farbeSetzen(b.dataset.farbe)));
+
+/* =========================== Stimme =========================== */
+/* 05.10.2026 (Sir: "Er muss viel schneller bei Sprache antworten"):
+   - Vorrat: jede Sprachdatei wird nur einmal bei Fish Audio erzeugt und gemerkt (Tour-Sätze schon beim Laden).
+   - Satz für Satz: Antworten im Gespräch werden gesprochen, sobald der erste Satz da ist, nicht erst am Ende.
+   - Sperrt der Browser den Ton ohne Klick, sagt Auron das, statt still zu bleiben. */
+let stimmeAn = speicher.lesen("stimme", "aus") === "an", audio = null, sprechToken = 0, stimmeGesperrt = false;
+const stimmeVorrat = new Map();   // Text -> Promise(Adresse der Sprachdatei oder null)
+function stimmeZeigen() {
+  $("knopfStimme").setAttribute("aria-pressed", String(stimmeAn));
+  $("tourStimme").setAttribute("aria-pressed", String(stimmeAn));
+  $("tourStimme").textContent = stimmeAn ? "Stimme an" : "Mit Stimme";
+}
+function stimmeUmschalten() { stimmeAn = !stimmeAn; speicher.schreiben("stimme", stimmeAn ? "an" : "aus"); stimmeZeigen(); if (!stimmeAn) verstummen(); }
+let spielEnde = null, jetztSpricht = "";   // 10.10.2026: jetztSpricht = Text, der gerade läuft (Unterbrechen)   // 05.10.2026: beendet ein laufendes abspielen(), damit Tour und Gespräch nie hängen bleiben
+function verstummen() {
+  sprechToken++; fluss.teile.length = 0; fluss.aktiv = false;
+  if (audio) { audio.pause(); audio = null; }
+  if (spielEnde) { const f = spielEnde; spielEnde = null; f(); }
+  if (window.speechSynthesis) speechSynthesis.cancel();
+}
+function sprechText(t) {
+  return String(t || "").replace(/\[\d+\]/g, "").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/https?:\/\/\S+/g, "")
+    .replace(/[*#_`>|]/g, "").replace(/\s+/g, " ").trim();
+}
+/* 10.10.2026: Fish braucht je Stück ca. 1 s + 0,035 s je Zeichen (gemessen: 10 Zeichen 1,1 s, 53 Zeichen 2,3 s,
+   169 Zeichen 6,8 s). Deshalb kleine Stücke, höchstens 3 Anfragen gleichzeitig, Gesprächs-Stücke vor dem Tour-Vorrat. */
+const fish = { laufend: 0, vorne: [], hinten: [] };
+function fishPlatz(vorne) { return new Promise((ok) => { if (fish.laufend < 3) { fish.laufend++; ok(); } else (vorne ? fish.vorne : fish.hinten).push(ok); }); }
+function fishFrei() { const n = fish.vorne.shift() || fish.hinten.shift(); if (n) n(); else fish.laufend = Math.max(0, fish.laufend - 1); }
+function stimmeHolen(text, vorne) {
+  const t = sprechText(text);
+  if (!t) return Promise.resolve(null);
+  if (stimmeVorrat.has(t)) return stimmeVorrat.get(t);
+  const p = fishPlatz(vorne).then(() => {
+    const ab = new AbortController(), uhr = setTimeout(() => ab.abort(), 25000);   // hängt Fish Audio, nach 25 s Browser-Stimme
+    return fetch("/api/sprache", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: t, tempo: 1 }), signal: ab.signal })
+      .then((r) => (r.ok ? r.blob() : null)).then((b) => (b ? URL.createObjectURL(b) : null)).catch(() => null)
+      .finally(() => { clearTimeout(uhr); fishFrei(); });
+  });
+  p.then((u) => { if (!u) stimmeVorrat.delete(t); });   // Fehlschlag nicht merken, beim nächsten Mal neu versuchen
+  stimmeVorrat.set(t, p);
+  if (stimmeVorrat.size > 120) {   // ältesten Eintrag freigeben
+    const [k, alt] = stimmeVorrat.entries().next().value; stimmeVorrat.delete(k);
+    alt.then((u) => { if (u) URL.revokeObjectURL(u); });
+  }
+  return p;
+}
+function tonFreigeben() {
+  if (!stimmeGesperrt) return;
+  stimmeGesperrt = false; hinweis("");
+}
+document.addEventListener("pointerdown", tonFreigeben); document.addEventListener("keydown", tonFreigeben);
+/* Eine fertige Sprachdatei abspielen (oder Browser-Stimme, wenn Fish nichts lieferte). Wartet bis zum Ende. */
+function abspielen(url, text, token) {
+  return new Promise((ok) => {
+    if (token !== sprechToken) return ok();
+    let erledigt = false, notbremse = null;
+    const fertig = () => { if (erledigt) return; erledigt = true; clearTimeout(notbremse); if (spielEnde === fertig) { spielEnde = null; jetztSpricht = ""; } ok(); };
+    if (spielEnde) spielEnde();   // ein älteres Abspielen gilt als beendet
+    spielEnde = fertig; jetztSpricht = String(text || "");
+    notbremse = setTimeout(fertig, 20000 + String(text || "").length * 120);   // spätestens dann weiter, egal was der Ton macht
+    if (url) {
+      const a = audio = new Audio(url);
+      a.onended = a.onerror = fertig;
+      a.onloadedmetadata = () => { if (isFinite(a.duration)) { clearTimeout(notbremse); notbremse = setTimeout(fertig, a.duration * 1000 + 3000); } };
+      const p = a.play();
+      if (p) p.catch((e) => {
+        if (e && e.name === "NotAllowedError") { stimmeGesperrt = true; hinweis("Zum Sprechen einmal irgendwo klicken, Sir."); }
+        fertig();
+      });
+      return;
+    }
+    if (!window.speechSynthesis || !text) return fertig();
+    const u = new SpeechSynthesisUtterance(text); u.lang = "de-DE"; u.onend = u.onerror = fertig;
+    speechSynthesis.speak(u);
+  });
+}
+/* Ganzer Text auf einmal (Tour, kurze Sätze). Nutzt den Vorrat. */
+async function sprich(text) {
+  if (!stimmeAn || !sprechText(text)) return;
+  verstummen();
+  const mein = sprechToken;
+  const url = await stimmeHolen(text);
+  await abspielen(url, sprechText(text), mein);
+}
+/* Satz für Satz im Gespräch: flussStart() vor der Antwort, flussText() bei jedem Textstück, flussText(…, true) am Ende. */
+const fluss = { aktiv: false, teile: [], gesendet: 0, laeuft: null, token: 0 };
+function flussStart() {
+  verstummen();
+  if (!stimmeAn) return;
+  Object.assign(fluss, { aktiv: true, teile: [], gesendet: 0, laeuft: null, token: sprechToken });
+}
+function flussText(gesamt, fertig) {
+  if (!fluss.aktiv || fluss.token !== sprechToken) return;
+  for (;;) {
+    const rest = gesamt.slice(fluss.gesendet);
+    let ende = -1;
+    /* 10.10.2026: Das erste Stück endet schon am ersten Komma (ab 15 Zeichen), damit Auron nach ca. 1-2 s
+       loslegt statt erst nach dem ganzen, oft langen ersten Satz. Danach Satz für Satz (kurze Sätze zusammen),
+       sehr lange Sätze am Komma geteilt. Fish rechnet die Stücke parallel, während das erste schon läuft. */
+    const erstes = fluss.gesendet === 0;
+    const mindest = erstes ? 15 : 30;
+    const re = erstes ? /[.!?…:;,–—](?=\s)|\n/g : /[.!?…:;](?=\s)|\n/g; let m;
+    if (erstes && fertig && rest.length <= 80) ende = rest.length;   // kurze ganze Antwort: ein Stück
+    else while ((m = re.exec(rest))) { if (m.index + 1 >= mindest) { ende = m.index + 1; break; } }
+    if (ende < 0 && rest.length > (erstes ? 70 : 170)) {   // noch kein Satzende: am Komma (oder Wortende) teilen
+      const grenze = erstes ? 40 : 90, k = /[,–—](?=\s)/g; let km;
+      while ((km = k.exec(rest))) { if (km.index + 1 >= grenze) { ende = km.index + 1; break; } }
+      if (ende < 0 && erstes) { const leer = rest.indexOf(" ", 45); if (leer > 0) ende = leer; }
+    }
+    if (ende < 0 && fertig && rest.trim()) ende = rest.length;
+    if (ende < 0) return;
+    const stueck = rest.slice(0, ende); fluss.gesendet += ende;
+    if (sprechText(stueck).length > 1) { fluss.teile.push(stimmeHolen(stueck, true).then((url) => ({ url, text: sprechText(stueck) }))); flussAbspielen(); }
+  }
+}
+function flussAbspielen() {
+  if (fluss.laeuft) return fluss.laeuft;
+  const tok = fluss.token;
+  fluss.laeuft = (async () => {
+    while (fluss.teile.length && tok === sprechToken) { const t = await fluss.teile.shift(); await abspielen(t.url, t.text, tok); }
+  })().finally(() => { fluss.laeuft = null; });
+  return fluss.laeuft;
+}
+async function flussEnde() { while (fluss.laeuft || (fluss.teile.length && fluss.token === sprechToken)) await (fluss.laeuft || flussAbspielen()); }
+$("knopfStimme").addEventListener("click", stimmeUmschalten);
+$("tourStimme").addEventListener("click", () => { stimmeUmschalten(); if (stimmeAn && tour.aktuell) sprich(tourSatz(tour.aktuell)); });
+stimmeZeigen();
+
+/* =========================== Tour =========================== */
+/* Nur Stationen, die gerade laufen. Jede Prüfung fragt eine vorhandene Schnittstelle ab und liefert
+   null (auslassen) oder {jetzt: "..."}. Antwortet eine Schnittstelle nicht, fällt die Station weg. */
+// 05.10.2026 (Sir): nicht "Jetzt: heute …" vorlesen, sondern sagen, was gerade läuft - "sagen" ist der gesprochene Satz.
+const geld = (x) => Number(x || 0).toFixed(2).replace(".", ",");
+const STATIONEN = [
+  { id: "jarvis", station: "Die Mitte", titel: NAME, text: "Hier in der Mitte stehe ich. Ihre Fragen kommen hier an, und von hier verteile ich die Arbeit.",
+    pruefen: async (z) => z.health && z.health.status === "ok" ? { jetzt: "bereit", sagen: "Gerade bin ich bereit für Sie." } : null },
+  { id: "minipc", station: "Zuhause", titel: "Mini-PC", text: "Mein Zuhause. Hier laufe ich Tag und Nacht, leise und sparsam.",
+    pruefen: async (z) => z.health ? { jetzt: "läuft", sagen: "Er läuft gerade." } : null },
+  { id: "hauptpc", station: "Rechenkraft", titel: "Haupt-PC", text: "Der schnellste Rechner. Er denkt für mich, wenn es auf Tempo ankommt.",
+    pruefen: async () => { const s = await holeJson("/api/hauptpc/status", 5000); return s && s.eingerichtet ? { jetzt: "erreichbar", sagen: "Gerade ist er erreichbar." } : null; } },
+  { id: "testpc", station: "Rechenkraft", titel: "Test-PC", text: "Der zweite Rechner für meine eigene KI. Er übernimmt, wenn der Haupt-PC schläft.",
+    pruefen: async () => { await holeJson("/api/pc2/status", 5000); return { jetzt: "erreichbar", sagen: "Gerade ist er erreichbar." }; } },
+  { id: "nachtarbeit", station: "Nachts", titel: "Nachtarbeit", text: "Ich arbeite gerade Aufträge ab, nur mit eigener KI und eigener Suche.",
+    pruefen: async () => { const s = await holeJson("/api/nachtarbeit/status"); return s && s.running ? { jetzt: "arbeitet gerade", sagen: "Gerade läuft ein Auftrag." } : null; } },
+  { id: "vault", station: "Gedächtnis", titel: "Vault", text: "Ihre Notizen aus Obsidian. Fragen zu Ihnen beantworte ich nur von hier, mit Quelle.",
+    pruefen: async (z) => { const h = z.health; if (!h || !h.vault_indexed) return null;
+      if (h.reindex_running) return { jetzt: "liest gerade neu ein", sagen: "Gerade lese ich Ihre Notizen neu ein." };
+      const n = h.chunk_count ? h.chunk_count.toLocaleString("de-DE") : "";
+      return { jetzt: n ? n + " Abschnitte im Suchindex" : "eingelesen", sagen: n ? "Gerade kenne ich " + n + " Abschnitte aus Ihren Notizen." : "Alles ist eingelesen." }; } },
+  { id: "kalender", station: "Heute", titel: "Kalender", text: "Ihre Termine für heute.",
+    pruefen: async () => { const k = await holeJson("/api/kalender", 8000), tag = heute();
+      const t = (k.termine || []).filter((x) => x.kategorie !== "feiertag" && String(x.start).startsWith(tag));
+      if (!t.length) return null;
+      const erster = t[0], uhr = erster.start.length > 10 ? erster.start.slice(11, 16) : "";
+      return { jetzt: (t.length === 1 ? "1 Termin: " : t.length + " Termine, zuerst: ") + erster.titel + (uhr ? " um " + uhr : ""),
+        sagen: (t.length === 1 ? "Heute steht ein Termin an: " : "Heute stehen " + t.length + " Termine an, zuerst ") + erster.titel + (uhr ? " um " + uhr + " Uhr" : "") + "." }; } },
+  { id: "trading", station: "Markt", titel: "Übungskonto", text: "Offene Positionen im Übungskonto. Ohne Echtgeld.",
+    pruefen: async () => { const p = await holeJson("/api/paper", 8000), n = (p.positionen || []).length;
+      return n ? { jetzt: n + (n === 1 ? " offene Position" : " offene Positionen"), sagen: n === 1 ? "Gerade läuft eine Position." : "Gerade laufen " + n + " Positionen." } : null; } },
+  { id: "kosten", station: "Kosten", titel: "Kosten", text: "Was Claude heute gekostet hat. Meine eigene KI kostet nichts.",
+    pruefen: async () => { const k = await holeJson("/api/kosten"); if (!(k && k.heute_usd > 0)) return null;
+      return { jetzt: "heute " + geld(k.heute_usd) + " $, Monat " + geld(k.ausgegeben_usd) + " $",
+        sagen: "Heute hat Claude " + geld(k.heute_usd) + " Dollar gekostet, diesen Monat " + geld(k.ausgegeben_usd) + " Dollar." }; } }
+];
+function tourSatz(s) { return s.titel + ". " + s.text + (s.sagen ? " " + s.sagen : ""); }
+
+const frei = { aktiv: false, rahmen: null };
+const tour = { laeuft: false, token: 0, liste: [], aktuell: null, weiterSignal: null, rahmen: null, bereit: null, universum: null };
+let ladeFertig = Promise.resolve();   // Ladebildschirm: die Tour beginnt erst, wenn er fertig ist
+let stadtFenster = null;
+function stadtSenden(n) { if (stadtFenster) { try { stadtFenster.postMessage(n, location.origin); } catch (e) {} } }
+const wartende = {};
+window.addEventListener("message", (e) => {
+  if (e.origin !== location.origin || !e.data || !e.data.auron) return;
+  const d = e.data;
+  if (d.auron === "bereit" && frei.aktiv) freiStatus();
+  if (d.auron === "bereit" && tour.bereit) tour.bereit(true);
+  if (d.auron === "fehler" && tour.bereit) tour.bereit(false);
+  if (d.auron === "angekommen" && wartende[d.id]) { wartende[d.id](); delete wartende[d.id]; }
+  if (d.auron === "oeffne" && /^[a-z0-9]+$/.test(String(d.seite || ""))) bereichOeffnen(d.seite);   // Klick auf ein Modul der Station
+});
+function fahre(id) {
+  return Promise.race([new Promise((ok) => { wartende[id] = ok; stadtSenden({ auron: "fahre", id, ms: 1800 }); }), warte(9000)]);
+}
+
+async function zustandHolen() {
+  const z = {};
+  try { z.health = await holeJson("/api/health", 4000); } catch (e) { z.health = null; }
+  const ergebnisse = await Promise.allSettled(STATIONEN.map((s) => s.pruefen(z)));
+  return STATIONEN.map((s, i) => ergebnisse[i].status === "fulfilled" && ergebnisse[i].value ? { ...s, ...ergebnisse[i].value } : null).filter(Boolean);
+}
+
+function karteZeigen(s, nr, gesamt) {
+  const k = $("tourKarte");
+  k.classList.remove("blende"); void k.offsetWidth; if (!leiseBewegung) k.classList.add("blende");
+  $("tourStation").textContent = nr ? "Station " + nr + " von " + gesamt + " · " + s.station : s.station;
+  $("tourTitel").textContent = s.titel;
+  $("tourText").textContent = s.text;
+  $("tourJetzt").hidden = !s.jetzt;
+  $("tourJetzt").textContent = s.jetzt ? "Läuft gerade: " + s.jetzt : "";
+  [...$("tourPunkte").children].forEach((p, i) => p.classList.toggle("an", i === nr));
+}
+
+async function freiOeffnen() {
+  if (frei.aktiv) return;
+  if (tour.laeuft) { tourEnde(); await warte(1100); }   // Tour beenden, Grafikkarte freigeben, dann erst das freie Universum laden
+  frei.aktiv = true; verstummen();
+  const rahmen = document.createElement("iframe");
+  rahmen.title = "Universum";
+  const stufe = new URLSearchParams(location.search).get("q");
+  rahmen.src = "/werkstatt/universum/universum_3d.html?auron=2&ziel=" + encodeURIComponent("Auron Station") + (stufe ? "&q=" + encodeURIComponent(stufe) : "");
+  $("frei").insertBefore(rahmen, $("freiZu")); frei.rahmen = rahmen;
+  $("frei").classList.remove("weg"); $("frei").hidden = false;
+  stadtFenster = rahmen.contentWindow;
+  rahmen.addEventListener("load", () => { if (frei.aktiv) stadtFenster = rahmen.contentWindow; });
+}
+async function freiStatus() {   // das Universum meldet "bereit": laufende Module leuchten lassen
+  try {
+    const liste = await zustandHolen();
+    if (!frei.aktiv) return;
+    farbeSetzen(speicher.lesen("farbe", "silber"));
+    const an = {}; ["minipc", "hauptpc", "testpc", "nachtarbeit", "vault", "kalender", "trading", "kosten"].forEach((k) => { an[k] = liste.some((x) => x.id === k); });
+    stadtSenden({ auron: "modulStatus", an });
+  } catch (e) {}
+}
+/* 05.10.2026: Ein 3D-Fenster nie hart entfernen. Erst Grafik im Universum freigeben ("beenden"), kurz warten,
+   dann ausblenden und entfernen. Hartes Entfernen hat in Chrome "Seite reagiert nicht" ausgelöst (Universum -> Kalender -> Zurück). */
+function universumAbbauen(rahmen) {
+  if (!rahmen) return;
+  rahmen.style.visibility = "hidden";
+  try { rahmen.contentWindow.postMessage({ auron: "beenden" }, location.origin); } catch (e) {}
+  setTimeout(() => { try { rahmen.src = "about:blank"; } catch (e) {} setTimeout(() => rahmen.remove(), 300); }, 250);
+}
+function freiZuMachen() {
+  if (!frei.aktiv) return;
+  frei.aktiv = false;
+  if (frei.rahmen) { universumAbbauen(frei.rahmen); frei.rahmen = null; }   // Grafikkarte freigeben
+  stadtFenster = null; $("frei").hidden = true;
+  $("frei").classList.remove("weg");
+  $("frage").focus({ preventScroll: true });
+}
+$("knopfUniversum").addEventListener("click", freiOeffnen);
+$("freiZu").addEventListener("click", freiZuMachen);
+
+async function tourStarten() {
+  if (frei.aktiv) freiZuMachen();
+  const mein = ++tour.token; tour.laeuft = true;
+  $("chat").classList.add("weg"); $("tour").hidden = false; $("tour").classList.remove("weg");
+  $("tourPunkte").textContent = "";
+  karteZeigen({ station: "Einen Moment", titel: "Ich baue das Universum auf, Sir.", text: "Gleich geht es los." }, 0, 0);
+  $("tourJetzt").hidden = true;
+
+  // Universum laden (eigenes Fenster im Hintergrund) und gleichzeitig den Stand abfragen
+  const rahmen = document.createElement("iframe");
+  rahmen.title = "Universum";
+  const stufe = new URLSearchParams(location.search).get("q");   // ?q=niedrig für schwächere Rechner
+  rahmen.src = "/werkstatt/universum/universum_3d.html?auron=1" + (stufe ? "&q=" + encodeURIComponent(stufe) : "");
+  $("tour").insertBefore(rahmen, $("tourKarte")); tour.rahmen = rahmen;
+  const bereit = new Promise((ok) => { tour.bereit = ok; setTimeout(() => ok(false), 30000); });
+  tour.universum = bereit;   // der Ladebildschirm zeigt, wann das Universum steht
+  rahmen.addEventListener("load", () => { stadtFenster = rahmen.contentWindow; });
+  const zustand = zustandHolen();
+  zustand.then((liste) => { if (stimmeAn) tourVorrat(liste); });   // Tour-Sätze schon jetzt bei Fish erzeugen
+  const [ok, liste] = await Promise.all([bereit, zustand, ladeFertig]);
+  if (mein !== tour.token) return;
+  stadtFenster = rahmen.contentWindow;
+  if (!ok) { hinweis("Das Universum hat nicht geladen. Die Tour wurde übersprungen."); return tourEnde(); }
+  farbeSetzen(speicher.lesen("farbe", "silber"));
+  { const an = {}; ["minipc", "hauptpc", "testpc", "nachtarbeit", "vault", "kalender", "trading", "kosten"].forEach((k) => { an[k] = liste.some((x) => x.id === k); });
+    stadtSenden({ auron: "modulStatus", an }); }   // laufende Module leuchten auf der Station
+
+  const stationen = tourRahmen(liste);
+  tour.liste = stationen;
+  stationen.forEach(() => $("tourPunkte").appendChild(document.createElement("i")));
+  for (let i = 0; i < stationen.length; i++) {
+    if (mein !== tour.token) return;
+    const s = stationen[i]; tour.aktuell = s;
+    const nr = i === 0 || i === stationen.length - 1 ? 0 : i;
+    await fahre(s.id);
+    if (mein !== tour.token) return;
+    karteZeigen(s, nr, stationen.length - 2);
+    [...$("tourPunkte").children].forEach((p, k) => p.classList.toggle("an", k === i));
+    const mindestens = warte(Math.max(4200, s.text.length * 55));
+    const gesprochen = sprich(tourSatz(s));
+    await Promise.race([Promise.all([mindestens, gesprochen]), new Promise((ok) => { tour.weiterSignal = ok; })]);
+    tour.weiterSignal = null;
+  }
+  if (mein === tour.token) tourEnde();
+}
+function tourRahmen(liste) {
+  return [{ id: "uebersicht", station: "Willkommen", titel: gruss() + ", Sir.", text: "Eine kurze Runde durch Ihr Universum und über die Station. Ich zeige Ihnen nur, was gerade läuft." }]
+    .concat(liste)
+    .concat([{ id: "uebersicht", station: "Fertig", titel: "Das war die Runde, Sir.", text: "Sagen Sie mir einfach, was Sie möchten." }]);
+}
+function tourVorrat(liste) { tourRahmen(liste).forEach((s) => stimmeHolen(tourSatz(s))); }
+function tourEnde() {
+  tour.token++; tour.laeuft = false; tour.aktuell = null; verstummen();
+  speicher.schreiben("tour", heute());
+  $("tour").classList.add("weg"); $("chat").classList.remove("weg");
+  setTimeout(() => {
+    $("tour").hidden = true;
+    if (tour.rahmen) { universumAbbauen(tour.rahmen); tour.rahmen = null; }   // Grafikkarte freigeben
+    stadtFenster = null;
+    $("frage").focus({ preventScroll: true });
+    wachStarten();
+    nachtMitteilung();   // 05.10.2026: einmal am Tag nach der Tour
+  }, 900);
+}
+$("tourWeiter").addEventListener("click", () => { if (tour.weiterSignal) { verstummen(); tour.weiterSignal(); } });
+$("tourUeberspringen").addEventListener("click", tourEnde);
+$("knopfTour").addEventListener("click", tourStarten);
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && tour.laeuft) tourEnde(); });
+
+/* =========================== Bereiche (altes HUD) =========================== */
+const BEREICHE = [
+  { name: "Heute", seite: "alltag", unter: [["Briefing", "Briefing", "frage"], ["Tagesplan", "Plan meinen Tag", "frage"], ["Karte", "karte"]] },
+  { name: NAME, seite: "jarvis", unter: [["Agenten", "agenten"], ["Nachtaufträge", "nacht"], ["Denkblock", "denkblock"]] },
+  { name: "Wissen", seite: "vault", unter: [["TikTok", "tiktok"], ["Labor", "labor"]] },
+  { name: "Markt", seite: "markt", unter: [] },
+  { name: "System", seite: "geraete", unter: [["Geräte", "geraete"], ["Einstellungen", "settings"]] }
+];
+const SEITENNAME = { alltag: "Heute", jarvis: NAME, vault: "Wissen", markt: "Markt", settings: "Einstellungen", nacht: "Nachtaufträge",
+  denkblock: "Denkblock", tiktok: "TikTok", labor: "Labor", karte: "Karte", geraete: "Geräte", pc2: "PC 2", agenten: "Agenten" };
+BEREICHE.forEach((b) => {
+  const k = document.createElement("div"); k.className = "kachel";
+  const h = document.createElement("button"); h.type = "button"; h.textContent = b.name; h.addEventListener("click", () => bereichOeffnen(b.seite)); k.appendChild(h);
+  const u = document.createElement("div"); u.className = "unter";
+  b.unter.forEach(([text, ziel, art]) => {
+    const x = document.createElement("button"); x.type = "button"; x.textContent = text;
+    x.addEventListener("click", () => { if (art === "frage") { $("schleier").hidden = true; senden(ziel); } else bereichOeffnen(ziel); });
+    u.appendChild(x);
+  });
+  k.appendChild(u); $("kacheln").appendChild(k);
+});
+/* Modulfenster (05.10.2026, Wunsch Sir): statt des kompletten alten HUDs ein kleines Fenster in den Auron-Farben,
+   das NUR den Bereich zeigt. Inhalt: altes HUD im Modul-Modus ("/?modul=<seite>", dort ohne Kopfzeile, Seitenleiste,
+   Startbildschirm und Weckwort). Bei offenem Fenster tauscht ein anderes Modul nur den Inhalt (Nachricht an das Fenster,
+   kein Neuladen). "Zurück" schließt alles und führt zur Startseite - ohne Neuladen. */
+const UNTERTITEL = { alltag: "Ihr Tag auf einen Blick", jarvis: "Vorschläge, Verlauf und Werkzeuge", vault: "Was im Vault steht und wie gut ich suche",
+  markt: "Kurse, Übersicht und Trading", settings: "Einstellungen und Kosten", nacht: "Aufträge für die Nacht und Frage des Tages",
+  denkblock: "Gedanken sammeln und ordnen", tiktok: "Gelernte Videos und Ideen", labor: "Sandbox, Übungskonto und Prüfstand",
+  karte: "Wie die Notizen zusammenhängen", geraete: "PCs, Laptop und Handy im Netz", pc2: "Mini-PC: Last und Dienste",
+  agenten: "Wer gerade arbeitet, woran und auf welchem Rechner" };
+/* 10.10.2026: Die Agenten-Station ist eine eigene Seite (werkstatt/agenten), kein Teil des alten HUDs. */
+function modulAdresse(seite, farbe) {
+  return seite === "agenten" ? "/werkstatt/agenten/index.html?farbe=" + encodeURIComponent(farbe)
+    : "/?modul=" + encodeURIComponent(seite) + "&farbe=" + encodeURIComponent(farbe);
+}
+var modul = { rahmen: null, seite: null, uhr: null };   // var: farbeSetzen darf es vorher schon prüfen
+function modulLaedt(an, text) {
+  $("modulLaedt").hidden = !an;
+  if (text) $("modulLaedtText").textContent = text;
+  clearTimeout(modul.uhr);
+  if (an) modul.uhr = setTimeout(() => { $("modulLaedt").hidden = true; }, 9000);   // spätestens dann Inhalt zeigen
+}
+function modulObenSetzen() {
+  // Bei offenem Gespräch bleibt die Kopfzeile von Auron sichtbar (z. B. "Alle Bereiche" für ein anderes Modul).
+  const kopf = document.querySelector("#chat .kopf");
+  let oben = frei.aktiv || $("chat").classList.contains("weg") || !kopf ? 0 : Math.round(kopf.getBoundingClientRect().bottom);
+  if (!$("warnung").hidden) oben = Math.max(oben, Math.round($("warnung").getBoundingClientRect().bottom) + 6);   // Fehleranzeige bleibt frei
+  $("modul").style.setProperty("--modul-oben", oben + "px");
+}
+function bereichOeffnen(seite) {
+  seite = String(seite || "");
+  if (!/^[a-z0-9]+$/.test(seite)) return;
+  $("schleier").hidden = true; $("chatsSchleier").hidden = true;
+  const farbe = speicher.lesen("farbe", "silber");
+  $("modulTitel").textContent = SEITENNAME[seite] || "Bereich";
+  $("modulUnter").textContent = UNTERTITEL[seite] || "";
+  modulObenSetzen();
+  $("modul").hidden = false;
+  stadtSenden({ auron: "pause" });   // Universum dahinter anhalten, solange der Bereich offen ist
+  if (modul.rahmen && modul.seite !== seite) {
+    modulLaedt(true, "Wechsle zu " + (SEITENNAME[seite] || "Bereich") + " …");
+    if (seite === "agenten" || modul.seite === "agenten") modul.rahmen.src = modulAdresse(seite, farbe);   // andere Seite: neu laden
+    else try { modul.rahmen.contentWindow.postMessage({ auron: "modul", seite, farbe }, location.origin); }
+    catch (e) { modul.rahmen.src = modulAdresse(seite, farbe); }
+  } else if (!modul.rahmen) {
+    modulLaedt(true, "Einen Moment, Sir …");
+    const r = document.createElement("iframe");
+    r.title = SEITENNAME[seite] || "Bereich";
+    r.src = modulAdresse(seite, farbe);
+    r.addEventListener("load", () => setTimeout(() => { if (modul.rahmen === r && !$("modulLaedt").hidden) modulLaedt(false); }, 1500));
+    $("modulInhalt").appendChild(r); modul.rahmen = r;
+  }
+  modul.seite = seite;
+  $("modulZurueck").focus({ preventScroll: true });
+}
+function modulSchliessen() {
+  if ($("modul").hidden) return;
+  $("modul").hidden = true; modulLaedt(false);
+  if (modul.rahmen) { const r = modul.rahmen; modul.rahmen = null; r.style.visibility = "hidden"; setTimeout(() => { r.src = "about:blank"; r.remove(); }, 0); }   // ganz zu: keine Abfragen im Hintergrund
+  modul.seite = null;
+  if (frei.aktiv) freiZuMachen();   // zurück zur normalen Startseite (Gespräch)
+  else stadtSenden({ auron: "weiter" });   // Tour-Universum läuft weiter
+  $("frage").focus({ preventScroll: true });
+}
+window.addEventListener("message", (e) => {
+  if (e.origin !== location.origin || !e.data || !modul.rahmen || e.source !== modul.rahmen.contentWindow) return;
+  if (e.data.auron === "modul-bereit") modulLaedt(false);
+  if (e.data.auron === "bereich" && typeof e.data.seite === "string") bereichOeffnen(e.data.seite);   // Agenten-Station: "Bereich öffnen"
+  if (e.data.auron === "modul-fehlt") { modulLaedt(true, "Diesen Bereich gibt es nicht, Sir."); clearTimeout(modul.uhr); }
+});
+window.addEventListener("resize", () => { if (!$("modul").hidden) modulObenSetzen(); });
+$("modulZurueck").addEventListener("click", modulSchliessen);
+$("modul").addEventListener("click", (e) => { if (e.target === $("modul")) modulSchliessen(); });
+$("knopfBereiche").addEventListener("click", () => { $("schleier").hidden = false; });
+$("bereicheZu").addEventListener("click", () => { $("schleier").hidden = true; });
+$("schleier").addEventListener("click", (e) => { if (e.target === $("schleier")) $("schleier").hidden = true; });
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  if (!$("schleier").hidden || !$("chatsSchleier").hidden) { $("schleier").hidden = true; $("chatsSchleier").hidden = true; }
+  else modulSchliessen();
+});
+
+/* =========================== Gespräch =========================== */
+let verlauf = [], beschaeftigt = false;
+function hinweis(t) { $("hinweis").textContent = t || ""; }
+function esc(t) { return String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+/* Kleines, sicheres Markdown: Absätze, Listen, **fett** */
+function formatieren(text) {
+  const bloecke = esc(text).split(/\n{2,}/);
+  return bloecke.map((b) => {
+    const zeilen = b.split("\n");
+    if (zeilen.every((z) => /^\s*([-*•]|\d+\.)\s+/.test(z))) return "<ul>" + zeilen.map((z) => "<li>" + z.replace(/^\s*([-*•]|\d+\.)\s+/, "") + "</li>").join("") + "</ul>";
+    return "<p>" + zeilen.join("<br>") + "</p>";
+  }).join("").replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/^<p>#{1,4}\s*/gm, "<p>")
+    // 05.10.2026: [Text](https://…) als Knopf-Link (z. B. "In Google Kalender eintragen"), nur http(s) und obsidian
+    .replace(/\[([^\]<>]{1,80})\]\(((?:https?|obsidian):\/\/[^\s)<>"]+)\)/g, '<a class="link" href="$2" target="_blank" rel="noopener">$1</a>');
+}
+function nachricht(wer, text) {
+  $("begruessung").hidden = true;
+  const d = document.createElement("div"); d.className = "nachricht " + wer;
+  if (wer === "ich") d.textContent = text; else d.innerHTML = formatieren(text);
+  $("verlaufInnen").appendChild(d); nachUnten(); return d;
+}
+function nachUnten() { $("verlauf").scrollTop = $("verlauf").scrollHeight; }
+function denkt(an) { $("kugelKlein").classList.toggle("denkt", an); $("kugelGross").classList.toggle("denkt", an); }
+function quellenZeigen(blase, quellen) {
+  if (!quellen || !quellen.length) return;
+  const q = document.createElement("div"); q.className = "quellen";
+  const gesehen = new Set();
+  quellen.forEach((x) => {
+    const name = String(x.file_path || "").split(/[\\/]/).pop().replace(/\.md$/i, "");
+    if (!name || gesehen.has(name)) return; gesehen.add(name);
+    const s = document.createElement("span"); s.className = "quelle"; s.textContent = name; s.title = x.heading_path || ""; q.appendChild(s);
+  });
+  blase.appendChild(q);
+}
+function karteKlein(blase, titel, text, knoepfe) {
+  const k = document.createElement("div"); k.className = "karte-klein";
+  const b = document.createElement("b"); b.textContent = titel; k.appendChild(b);
+  if (text) { const s = document.createElement("span"); s.textContent = text; k.appendChild(s); }
+  const r = document.createElement("div"); r.className = "rechts";
+  knoepfe.forEach(([t, fn, zweit]) => { const x = document.createElement("button"); x.type = "button"; x.textContent = t; if (zweit) x.className = "zweit"; x.addEventListener("click", fn); r.appendChild(x); });
+  k.appendChild(r); blase.appendChild(k); nachUnten();
+}
+function hudBefehl(blase, ev) {
+  if (ev.aktion === "seite" && ev.seite) {
+    const seite = ev.seite === "pc2" ? "pc2" : ev.seite;
+    karteKlein(blase, SEITENNAME[seite] || ev.seite, "", [["Öffnen", () => bereichOeffnen(seite)]]);
+    setTimeout(() => bereichOeffnen(seite), 500);
+  } else if (ev.aktion === "stumm") verstummen();
+}
+function vorschlagZeigen(blase, v) {
+  const text = (v && (v.titel || v.text || v.inhalt || v.art)) || "Vorschlag";
+  karteKlein(blase, "Vorschlag", String(text).slice(0, 120), [["Übernehmen", () => senden("ja")], ["Verwerfen", () => senden("nein"), true]]);
+}
+
+/* Herkunft jeder Antwort (05.10.2026): lokal (Rechner, Modell) oder Claude - ein Rückfall ist nie still.
+   Unter lokalen Antworten der Knopf "Claude fragen" (Entscheidung Sir): gleiche Frage noch einmal an Claude. */
+const CLAUDE_MODELL = "claude-sonnet-5";
+function herkunftZeigen(blase, ki, frage, verlaufVorher) {
+  if (!ki || !ki.quelle) return;
+  const h = document.createElement("div");
+  const lokal = ki.quelle === "lokal";
+  h.className = "herkunft" + (lokal ? "" : " claude") + (ki.rueckfall ? " rueckfall" : "");
+  const t = document.createElement("span");
+  if (lokal) t.textContent = "Lokal · " + (ki.rechner || "lokal") + (ki.modell ? " · " + ki.modell : "");
+  else if (ki.rueckfall) t.textContent = "Claude statt lokal · " + (ki.grund || "lokale KI nicht verfügbar") + " · kostet ca. 1–2 Cent";
+  else t.textContent = "Claude" + (ki.grund === "auf Wunsch" ? " auf Wunsch" : "") + " · kostet ca. 1–2 Cent";
+  h.appendChild(t);
+  if (lokal && frage) {
+    const k = document.createElement("button"); k.type = "button"; k.textContent = "Claude fragen";
+    k.title = "Dieselbe Frage noch einmal an Claude (ca. 1–2 Cent)";
+    k.addEventListener("click", () => { k.disabled = true; senden(frage, false, { modell: CLAUDE_MODELL, nachfrage: true, verlaufVorher }); });
+    h.appendChild(k);
+  }
+  blase.appendChild(h);
+  if (ki.rueckfall) kiPruefen(true);   // Rückfall: Fehleranzeige sofort auf den neuesten Stand
+}
+
+/* =========================== Kamera-Modus (10.10.2026) ===========================
+   "Auron, schau zu" / "schau mal hier" / "Kamera an" öffnet die Webcam im Browser und zeigt das Live-Bild klein an.
+   Es läuft KEIN Dauerbild zu Claude: Nur wenn Sir etwas sagt oder fragt, geht ein einzelnes Standbild (JPEG,
+   höchstens 1024 px breit) an /api/kamera/sehen (Claude Haiku, ca. 0,2-0,5 Cent je Frage). Nichts wird gespeichert.
+   Solange die Kamera an ist, gehen alle Sätze mit Bild an diese Funktion. "Kamera aus" beendet es. */
+const kamera = { an: false, strom: null, verlauf: [] };
+const KAMERA_AN = /^\s*(?:(?:auron|jarvis)[,\s]+)?(?:bitte\s+)?(?:(?:schau|guck|sieh|kuck)\w*\s+(?:(?:mal|bitte)\s+)?(?:zu|hier(?:hin|her)?|her|hin|mal)\b(?!\s+(?:im|ins|in|nach)\b)|(?:schalt|mach|start|öffn|oeffn)\w*\s+(?:die\s+|deine\s+)?kamera(?:\s+(?:an|auf|ein))?\b|kamera(?:\s*-?\s*modus)?\s+(?:an|auf|ein|starten)\b)[\s,.:;!?-]*/i;
+const KAMERA_AUS = /\bkamera\s*-?\s*(?:aus\w*|zu\b|stopp?\b|beenden)|(?:schau|guck)\w*\s+(?:jetzt\s+)?weg\b|hör\w*\s+auf\s+(?:zu\s+)?(?:schauen|gucken|zuzuschauen)|schau\w*\s+nicht\s+mehr/i;
+function kameraStatusSetzen(t) { $("kameraStatus").textContent = t; }
+async function kameraAn() {
+  if (kamera.an) return;
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error("Dieser Browser erlaubt hier keine Kamera. Auron muss über localhost oder https geöffnet sein.");
+  try { kamera.strom = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false }); }
+  catch (e) {
+    const n = e && e.name;
+    throw new Error(n === "NotAllowedError" ? "Der Browser hat die Kamera gesperrt. Bitte in der Adressleiste erlauben." :
+      n === "NotFoundError" ? "Ich finde keine Webcam." :
+      n === "NotReadableError" ? "Die Kamera wird gerade von einem anderen Programm benutzt." : "Die Kamera lässt sich nicht öffnen (" + (n || "Fehler") + ").");
+  }
+  const v = $("kameraBild"); v.srcObject = kamera.strom;
+  try { await v.play(); } catch (e) {}
+  for (let i = 0; i < 30 && !v.videoWidth; i++) await warte(100);
+  const spur = kamera.strom.getVideoTracks()[0]; if (spur) spur.onended = () => kameraAus();   // Kabel gezogen
+  kamera.an = true; kamera.verlauf = []; kameraStatusSetzen("Kamera an"); $("kamera").hidden = false;
+}
+function kameraAus() {
+  if (kamera.strom) { kamera.strom.getTracks().forEach((t) => t.stop()); kamera.strom = null; }
+  $("kameraBild").srcObject = null; $("kamera").hidden = true; $("kamera").classList.remove("sieht");
+  kamera.an = false; kamera.verlauf = [];
+}
+function kameraBild() {
+  const v = $("kameraBild"); if (!v.videoWidth) return null;
+  const br = Math.min(1024, v.videoWidth), h = Math.round(v.videoHeight * br / v.videoWidth);
+  const c = document.createElement("canvas"); c.width = br; c.height = h;
+  c.getContext("2d").drawImage(v, 0, 0, br, h);
+  return c.toDataURL("image/jpeg", 0.75);
+}
+/* Gibt true zurück, wenn der Satz hier erledigt wurde (dann geht er nicht an den normalen Chat). */
+async function kameraWeiche(text, warteAufStimme) {
+  const aus = KAMERA_AUS.test(text) && (kamera.an || text.length <= 30);
+  const an = !aus && KAMERA_AN.exec(text);
+  if (!aus && !an && !kamera.an) return false;
+  beschaeftigt = true; $("senden").disabled = true; hinweis(""); denkt(true);
+  if (!warteAufStimme) wachStoppen();
+  verstummen();
+  nachricht("ich", text);
+  const blase = nachricht("auron", ""); blase.textContent = "";
+  const inhalt = document.createElement("div"); inhalt.className = "tippt"; blase.appendChild(inhalt);
+  let sagen = "";
+  try {
+    if (aus) {
+      const war = kamera.an; kameraAus();
+      sagen = war ? "Die Kamera ist aus, Sir." : "Die Kamera war schon aus, Sir.";
+    } else {
+      let frage = text;
+      if (an) { frage = text.slice(an[0].length).trim(); if (frage.replace(/[^\p{L}\p{N}]/gu, "").length < 4) frage = ""; }
+      if (!kamera.an) await kameraAn();
+      const bild = kameraBild();
+      if (!bild) throw new Error("Die Kamera liefert noch kein Bild. Bitte gleich noch einmal versuchen.");
+      kameraStatusSetzen("Auron sieht hin …"); $("kamera").classList.add("sieht");
+      let d;
+      try {
+        const r = await fetch("/api/kamera/sehen", { method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ frage, bild, verlauf: kamera.verlauf }) });
+        d = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(typeof d.detail === "string" ? d.detail : "Das Backend antwortet mit Status " + r.status + ".");
+      } finally { $("kamera").classList.remove("sieht"); if (kamera.an) kameraStatusSetzen("Kamera an"); }
+      sagen = d.text || "Ich sehe nichts Auffälliges, Sir.";
+      kamera.verlauf = kamera.verlauf.concat([{ role: "user", content: frage || "Beschreibe kurz, was du siehst." }, { role: "assistant", content: sagen }]).slice(-6);
+      const h = document.createElement("div"); h.className = "herkunft claude";
+      const t = document.createElement("span");
+      t.textContent = "Kamera · Claude" + (d.ki && d.ki.modell ? " · " + d.ki.modell : "") + " · " + (Math.max(0, d.kosten_usd || 0) * 100).toFixed(1).replace(".", ",") + " Cent";
+      h.appendChild(t); blase.appendChild(h);
+    }
+    inhalt.classList.remove("tippt"); inhalt.innerHTML = formatieren(sagen);
+    flussStart(); flussText(sagen, true);   // 10.10.2026: stückweise, damit Auron sofort loslegt
+    if (warteAufStimme) await flussEnde();
+  } catch (e) {
+    verstummen();
+    inhalt.classList.remove("tippt"); blase.classList.add("fehler");
+    inhalt.innerHTML = formatieren("Das hat nicht geklappt, Sir: " + e.message);
+    if (!kamera.an) kameraAus();
+  } finally { beschaeftigt = false; $("senden").disabled = false; denkt(false); }
+  return true;
+}
+$("kameraZu").addEventListener("click", () => { kameraAus(); hinweis("Die Kamera ist aus."); });
+window.addEventListener("pagehide", kameraAus);
+
+async function senden(text, warteAufStimme, optionen) {
+  text = String(text || "").trim();
+  const opt = optionen || {};
+  if (!text || beschaeftigt) return;
+  if (!opt.nachfrage && (kamera.an || KAMERA_AN.test(text) || (KAMERA_AUS.test(text) && text.length <= 30)) && await kameraWeiche(text, warteAufStimme)) return;   // Kamera-Modus (10.10.2026)
+  beschaeftigt = true; $("senden").disabled = true; hinweis(""); denkt(true); flussStart();   // Satz für Satz sprechen
+  if (!warteAufStimme) wachStoppen();   // getippte Frage: Dauerhören kurz aus, der Wächter startet es danach
+  const verlaufVorher = opt.nachfrage ? (opt.verlaufVorher || []) : verlauf.slice();
+  if (opt.nachfrage) { const tr = document.createElement("div"); tr.className = "trenner"; tr.textContent = "Claude zur selben Frage"; $("verlaufInnen").appendChild(tr); }
+  else nachricht("ich", text);
+  const blase = nachricht("auron", ""); blase.textContent = "";
+  const inhalt = document.createElement("div"); inhalt.className = "tippt"; blase.appendChild(inhalt);   // Text getrennt von Karten (Öffnen, Vorschlag)
+  let antwort = "", quellen = [], ki = null;
+  try {
+    const anfrage = { message: text, top_k: 3, history: verlaufVorher };
+    if (opt.modell) anfrage.modell = opt.modell;
+    const r = await fetch("/api/chat/stream", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(anfrage) });
+    if (!r.ok || !r.body) throw new Error("Das Backend antwortet mit Status " + r.status + ".");
+    const leser = r.body.getReader(), dec = new TextDecoder();
+    let puffer = "";
+    for (;;) {
+      const { done, value } = await leser.read(); if (done) break;
+      puffer += dec.decode(value, { stream: true });
+      const teile = puffer.split("\n\n"); puffer = teile.pop();
+      for (const teil of teile) {
+        const zeile = teil.split("\n").find((l) => l.startsWith("data: ")); if (!zeile) continue;
+        let ev; try { ev = JSON.parse(zeile.slice(6)); } catch (e) { continue; }
+        if (ev.typ === "text") { antwort += ev.text; inhalt.classList.remove("tippt"); inhalt.innerHTML = formatieren(antwort); nachUnten(); flussText(antwort, false); }
+        else if (ev.typ === "ersetzen") {   // lokale Antwort unbrauchbar: verwerfen, Claude antwortet
+          antwort = ""; inhalt.innerHTML = ""; inhalt.classList.add("tippt"); flussStart();
+          hinweis("Die lokale Antwort war unbrauchbar (" + (ev.grund || "unklar") + "). Claude antwortet, Sir.");
+        }
+        else if (ev.typ === "ki") ki = ev;
+        else if (ev.typ === "quellen") quellen = ev.quellen || [];
+        else if (ev.typ === "fehler") throw new Error(ev.text);
+        else if (ev.typ === "hud") hudBefehl(blase, ev);
+        else if (ev.typ === "vorschlag") vorschlagZeigen(blase, ev.vorschlag);
+        else if (ev.typ === "vorschlag_erledigt") hinweis("Erledigt.");
+      }
+    }
+    inhalt.classList.remove("tippt");
+    if (!antwort) inhalt.innerHTML = formatieren("Erledigt, Sir.");
+    quellenZeigen(blase, quellen);
+    herkunftZeigen(blase, ki, text, verlaufVorher);
+    verlauf = verlaufVorher.concat([{ role: "user", content: text }, { role: "assistant", content: antwort }]).slice(-8);
+    flussText(antwort, true);   // Rest sprechen
+    if (warteAufStimme) await flussEnde();
+  } catch (e) {
+    verstummen();
+    inhalt.classList.remove("tippt"); blase.classList.add("fehler");
+    const lokalAus = /lokale[rn]? KI|KI-Rechner|Ollama|Monatsrahmen/i.test(e.message || "");
+    inhalt.innerHTML = formatieren((antwort ? antwort + "\n\n" : "") + "Das hat nicht geklappt, Sir: " + e.message);
+    if (lokalAus) { hinweis(""); kiPruefen(true); }
+    else { hinweis(""); backendPruefen(true); }
+  } finally { beschaeftigt = false; $("senden").disabled = false; denkt(false); }
+}
+$("eingabe").addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (beschaeftigt) { hinweis("Einen Moment, Sir, ich antworte noch."); return; }   // Text bleibt stehen, geht nicht verloren
+  const t = $("frage").value; $("frage").value = ""; senden(t);
+});
+$("vorschlaege").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.hasAttribute("data-nur-einsetzen")) { $("frage").value = b.dataset.text; $("frage").focus(); } else senden(b.dataset.text);
+});
+
+/* Sprechen: Spracherkennung des Browsers (Chrome/Edge). */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let erkennung = null;
+$("mikro").addEventListener("click", () => {
+  if (!SR) { hinweis("Dieser Browser kann keine Sprache erkennen. Chrome oder Edge nutzen."); return; }
+  if (erkennung) { erkennung.stop(); return; }
+  verstummen(); wachStoppen();
+  erkennung = new SR(); erkennung.lang = "de-DE"; erkennung.interimResults = true; erkennung.maxAlternatives = 1;
+  $("mikro").classList.add("hoert"); hinweis("Ich höre zu, Sir …");
+  let endgueltig = "";
+  erkennung.onresult = (e) => {
+    let zwischen = "";
+    for (let i = e.resultIndex; i < e.results.length; i++) { if (e.results[i].isFinal) endgueltig += e.results[i][0].transcript; else zwischen += e.results[i][0].transcript; }
+    $("frage").value = endgueltig + zwischen;
+  };
+  erkennung.onerror = (e) => hinweis(e.error === "not-allowed" ? "Das Mikrofon ist im Browser gesperrt." : "Spracherkennung: " + e.error);
+  erkennung.onend = () => {
+    $("mikro").classList.remove("hoert"); erkennung = null;
+    if (endgueltig.trim()) { hinweis(""); $("frage").value = ""; if (!stimmeAn) { stimmeAn = true; stimmeZeigen(); } senden(endgueltig); }
+    else if (!$("hinweis").textContent.startsWith("Spracherkennung") && !$("hinweis").textContent.startsWith("Das Mikrofon")) hinweis("");
+  };
+  erkennung.start();
+});
+
+/* =========================== Immer ansprechbar (Weckwort) ===========================
+   Nach dem alten HUD (index.html, wachStarten, 23./27.09.2026): Chrome hört dauerhaft zu. Fällt das Wort
+   "Auron" (auch "Jarvis"), wird alles danach gesammelt, bis ca. 1,2 s Stille sind, dann gefragt.
+   Während Auron denkt oder spricht, wird nicht gehört (sonst hört er sich selbst). */
+const STOPP = /(?:^|\s)(stopp?|halt|ruhe|sei still)(?=$|[\s,.!?])/i;   // 10.10.2026: nur während Auron spricht
+const WECKWORT = /(?:^|\s)(auron|auren|aurun|oron|auro|aaron|arron|jarvis|javis|jervis)(?=$|[\s,.:!?-])[\s,.:!?-]*/i;
+const wach = { an: speicher.lesen("wach", "aus") === "an", r: null, laeuft: false, idx: null, text: "", uhr: null, pause: false };
+function wachZeigen(lauscht) {
+  $("knopfWach").setAttribute("aria-pressed", String(wach.an));
+  $("knopfWach").classList.toggle("lauscht", !!lauscht);
+}
+function wachStarten() {
+  wachZeigen(false);
+  // 10.10.2026 (Sir: "unterbrechen wie bei Claude"): hört jetzt auch, während Auron denkt und spricht.
+  // Reagiert wird dann nur auf "Auron ..." (unterbricht und nimmt die neue Frage) oder "Stopp" (nur still).
+  if (!wach.an || !SR || wach.laeuft || wach.pause || erkennung || tour.laeuft) return;
+  const r = new SR(); r.lang = "de-DE"; r.continuous = true; r.interimResults = true;
+  wach.r = r; wach.idx = null; wach.text = "";
+  r.onresult = (e) => {
+    if (wach.idx == null) {
+      const spricht = !!jetztSpricht || beschaeftigt;
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const tr = e.results[i][0].transcript;
+        // Auron hört sich selbst über die Lautsprecher: sagt er gerade selbst "Auron", zählt das nicht
+        if (WECKWORT.test(tr) && !(jetztSpricht && WECKWORT.test(jetztSpricht))) { wach.idx = i; break; }
+        if (spricht && STOPP.test(tr) && !STOPP.test(jetztSpricht)) { verstummen(); hinweis("Angehalten, Sir."); return; }
+      }
+      if (wach.idx == null) return;
+      verstummen(); wachZeigen(true); hinweis("Ich höre, Sir …");
+    }
+    let t = "";
+    for (let i = wach.idx; i < e.results.length; i++) {
+      let teil = e.results[i][0].transcript;
+      if (i === wach.idx) { const m = teil.match(WECKWORT); if (m) teil = teil.slice(m.index + m[0].length); }
+      t += " " + teil;
+    }
+    wach.text = t.replace(/\s+/g, " ").trim();
+    $("frage").value = wach.text;
+    clearTimeout(wach.uhr); wach.uhr = setTimeout(wachFertig, 1200);   // 05.10.2026: 1,2 s statt 2 s Stille
+  };
+  r.onerror = (e) => {
+    if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+      wach.an = false; speicher.schreiben("wach", "aus"); wachZeigen(false);
+      hinweis("Das Mikrofon ist im Browser gesperrt. Immer ansprechbar ist aus.");
+    }
+  };
+  r.onend = () => { wach.laeuft = false; if (wach.idx != null) wachFertig(); else setTimeout(wachStarten, 400); };   // Chrome beendet Dauerhören regelmäßig
+  try { r.start(); wach.laeuft = true; } catch (e) { wach.laeuft = false; }
+}
+function wachStoppen() {
+  if (wach.r && wach.laeuft) { wach.r.onend = () => { wach.laeuft = false; }; try { wach.r.stop(); } catch (e) {} }
+  wach.laeuft = false; wachZeigen(false);
+}
+async function wachFertig() {
+  clearTimeout(wach.uhr);
+  const frage = (wach.text || "").trim();
+  wach.idx = null; wach.text = ""; $("frage").value = ""; hinweis("");
+  wachStoppen();
+  if (!stimmeAn) { stimmeAn = true; speicher.schreiben("stimme", "an"); stimmeZeigen(); }
+  if (STOPP.test(frage) && frage.replace(/[^\p{L}\p{N}]/gu, "").length <= 10) { verstummen(); hinweis("Angehalten, Sir."); setTimeout(wachStarten, 300); return; }
+  verstummen();
+  for (let i = 0; i < 100 && beschaeftigt; i++) await warte(100);   // unterbrochene Antwort erst sauber beenden lassen
+  setTimeout(wachStarten, 300);   // weiter zuhören, damit Sir auch diese Antwort unterbrechen kann
+  if (frage.replace(/[^\p{L}\p{N}]/gu, "").length >= 2) await senden(frage, true);
+  else await sprich("Ja, Sir?");
+}
+$("knopfWach").addEventListener("click", () => {
+  if (!SR) { hinweis("Dieser Browser kann keine Sprache erkennen. Chrome oder Edge nutzen."); return; }
+  wach.an = !wach.an; speicher.schreiben("wach", wach.an ? "an" : "aus");
+  if (wach.an) { hinweis("Ich höre jetzt auf \"" + NAME + "\", Sir."); wachStarten(); } else { wachStoppen(); hinweis(""); }
+});
+// Wächter: hört das Dauerhören unbemerkt auf, wieder starten
+setInterval(() => { if (wach.an && !wach.laeuft && !wach.pause && !erkennung && !tour.laeuft) wachStarten(); }, 5000);
+
+/* =========================== Frühere Gespräche (05.10.2026) ===========================
+   Das Backend speichert jeden Austausch (data/gespraeche/JJJJ-MM-TT.jsonl). Ein "Gespräch" ist hier eine Folge
+   von Austauschen ohne Pause über 30 Minuten. Laden zeigt es im Chat und gibt die letzten Nachrichten als Verlauf
+   mit - Sir kann direkt weitermachen. Kostet nichts. */
+const GESPRAECH_PAUSE_MS = 30 * 60 * 1000, CHAT_TAGE = 14;
+const chats = { liste: [], geladen: false };
+function zeitText(iso) { return String(iso || "").slice(11, 16); }
+function tagText(tag) {
+  const h = heute(), g = new Date(Date.now() - 864e5);
+  const gestern = g.getFullYear() + "-" + String(g.getMonth() + 1).padStart(2, "0") + "-" + String(g.getDate()).padStart(2, "0");
+  if (tag === h) return "Heute";
+  if (tag === gestern) return "Gestern";
+  const [j, m, d] = tag.split("-");
+  return d + "." + m + "." + j;
+}
+function gruppieren(eintraege) {
+  const gruppen = [];
+  eintraege.filter((e) => e && e.frage).sort((x, y) => String(x.zeit).localeCompare(String(y.zeit))).forEach((e) => {
+    const t = Date.parse(e.zeit), letzte = gruppen[gruppen.length - 1];
+    if (letzte && t - Date.parse(letzte.eintraege[letzte.eintraege.length - 1].zeit) < GESPRAECH_PAUSE_MS) letzte.eintraege.push(e);
+    else gruppen.push({ tag: String(e.zeit).slice(0, 10), eintraege: [e] });
+  });
+  return gruppen;
+}
+async function chatsLaden() {
+  const tage = (await holeJson("/api/gespraeche", 6000)).slice(0, CHAT_TAGE);
+  const je = await Promise.all(tage.map((t) => holeJson("/api/gespraeche/tag/" + encodeURIComponent(t.tag), 8000).catch(() => [])));
+  chats.liste = gruppieren(je.flat()).reverse();   // neueste zuerst
+  chats.geladen = true;
+}
+function chatEintrag(g, titelText) {
+  const b = document.createElement("button"); b.type = "button"; b.className = "chat-eintrag";
+  const erste = g.eintraege[0], letzte = g.eintraege[g.eintraege.length - 1];
+  const t = document.createElement("b"); t.textContent = titelText || erste.frage; b.appendChild(t);
+  const u = document.createElement("span");
+  u.textContent = zeitText(erste.zeit) + (letzte !== erste ? "–" + zeitText(letzte.zeit) : "") + " · " + g.eintraege.length +
+    (g.eintraege.length === 1 ? " Frage" : " Fragen") + (letzte.antwort ? " · " + letzte.antwort.replace(/\s+/g, " ").slice(0, 90) : "");
+  b.appendChild(u);
+  b.addEventListener("click", () => gespraechLaden(g));
+  return b;
+}
+function chatsZeigen(liste, leerText) {
+  const ziel = $("chatsListe"); ziel.textContent = "";
+  if (!liste.length) { const p = document.createElement("p"); p.className = "chats-leer"; p.textContent = leerText; ziel.appendChild(p); return; }
+  let tag = "";
+  liste.forEach((g) => {
+    if (g.tag !== tag) { tag = g.tag; const k = document.createElement("div"); k.className = "chats-tag"; k.textContent = tagText(tag); ziel.appendChild(k); }
+    ziel.appendChild(chatEintrag(g, g.titel));
+  });
+}
+async function chatsOeffnen() {
+  $("schleier").hidden = true; $("chatsSchleier").hidden = false; $("chatsSuchwort").value = "";
+  chatsZeigen([], "Lade Gespräche …");
+  try { await chatsLaden(); chatsZeigen(chats.liste, "Noch keine Gespräche gespeichert, Sir."); }
+  catch (e) { chatsZeigen([], "Die Gespräche konnte ich nicht laden, Sir (" + e.message + ")."); }
+  $("chatsSuchwort").focus({ preventScroll: true });
+}
+let suchUhr = null;
+$("chatsSuchwort").addEventListener("input", () => {
+  clearTimeout(suchUhr);
+  const q = $("chatsSuchwort").value.trim();
+  if (q.length < 2) { chatsZeigen(chats.liste, "Noch keine Gespräche gespeichert, Sir."); return; }
+  suchUhr = setTimeout(async () => {
+    try {
+      const treffer = await holeJson("/api/gespraeche/suche?q=" + encodeURIComponent(q), 8000);
+      // Treffer dem ganzen Gespräch zuordnen, damit Laden den Zusammenhang mitbringt
+      const liste = [], gesehen = new Set();
+      treffer.forEach((e) => {
+        const g = chats.liste.find((x) => x.eintraege.some((y) => y.id === e.id)) || { tag: String(e.zeit).slice(0, 10), eintraege: [e] };
+        if (gesehen.has(g)) return; gesehen.add(g);
+        liste.push({ ...g, titel: e.frage });
+      });
+      liste.sort((x, y) => String(y.eintraege[0].zeit).localeCompare(String(x.eintraege[0].zeit)));
+      chatsZeigen(liste, "Nichts gefunden zu „" + q + "“, Sir.");
+    } catch (e) { chatsZeigen([], "Suche ging nicht, Sir (" + e.message + ")."); }
+  }, 300);
+});
+$("chatsSuche").addEventListener("submit", (e) => e.preventDefault());
+function chatLeeren() {
+  verlauf = [];
+  [...$("verlaufInnen").children].forEach((k) => { if (k.id !== "begruessung") k.remove(); });
+  $("begruessung").hidden = false;
+}
+function gespraechLaden(g) {
+  $("chatsSchleier").hidden = true;
+  chatLeeren();
+  $("begruessung").hidden = true;
+  const tr = document.createElement("div"); tr.className = "trenner";
+  tr.textContent = "Gespräch vom " + tagText(g.tag) + ", " + zeitText(g.eintraege[0].zeit) + " Uhr";
+  $("verlaufInnen").appendChild(tr);
+  g.eintraege.forEach((e) => {
+    nachricht("ich", e.frage);
+    const blase = nachricht("auron", e.antwort || "…");
+    quellenZeigen(blase, e.quellen || []);
+    const lokal = /:/.test(String(e.modell || ""));
+    if (e.modell && e.ki_rechner) herkunftZeigen(blase, { quelle: lokal ? "lokal" : "claude", rechner: e.ki_rechner || (lokal ? "lokal" : "Claude"),
+      modell: e.modell, rueckfall: !!e.rueckfall_grund, grund: e.rueckfall_grund || "" }, null, null);
+  });
+  verlauf = g.eintraege.flatMap((e) => [{ role: "user", content: e.frage }, { role: "assistant", content: e.antwort || "" }]).slice(-8);
+  const tr2 = document.createElement("div"); tr2.className = "trenner"; tr2.textContent = "Weiter geht's, Sir";
+  $("verlaufInnen").appendChild(tr2); nachUnten();
+  hinweis("Gespräch geladen. Schreiben Sie einfach weiter, ich kenne den Zusammenhang.");
+  $("frage").focus({ preventScroll: true });
+}
+$("knopfChats").addEventListener("click", chatsOeffnen);
+$("chatsZu").addEventListener("click", () => { $("chatsSchleier").hidden = true; });
+$("chatsSchleier").addEventListener("click", (e) => { if (e.target === $("chatsSchleier")) $("chatsSchleier").hidden = true; });
+$("chatsNeu").addEventListener("click", () => { $("chatsSchleier").hidden = true; chatLeeren(); hinweis("Neues Gespräch, Sir."); $("frage").focus(); });
+
+/* =========================== Fehleranzeige (05.10.2026) ===========================
+   Sofort sichtbar oben, über allem: (1) Mini-PC/Backend antwortet nicht, (2) lokale KI aus - mit Angabe, ob Claude
+   einspringt (kostet) oder gar nichts geht, (3) Backend noch alt (Neustart nötig). Verschwindet von selbst, wenn
+   alles wieder läuft. Prüft /api/health alle 15 s und /api/ki/status (kostet nichts) jede Minute. */
+const zustand = { backend: true, backendFehler: 0, ki: null, kiAlt: false };
+function warnungZeigen(art, titel, text, punkte) {
+  const w = $("warnung");
+  w.className = "warnung" + (art === "info" ? " info" : art === "gelb" ? " gelb" : "");
+  $("warnungTitel").textContent = titel; $("warnungText").textContent = text;
+  const l = $("warnungListe"); l.textContent = ""; l.hidden = !(punkte && punkte.length);
+  (punkte || []).forEach((t) => { const li = document.createElement("li"); li.textContent = t; l.appendChild(li); });
+  w.hidden = false;
+  if (!$("modul").hidden) modulObenSetzen();
+}
+function warnungAktualisieren() {
+  if (!zustand.backend) {
+    warnungZeigen("rot", "Keine Verbindung zum Mini-PC, Sir.",
+      "Auron läuft auf dem Mini-PC und antwortet gerade nicht. Ursachen: Mini-PC aus, Netzwerkkabel, oder die Verbindung (Tunnel) ist zu. " +
+      "Abhilfe: Auron über das Desktop-Symbol neu starten, sonst JARVIS STARTEN.bat.");
+    return;
+  }
+  const k = zustand.ki;
+  if (zustand.kiAlt) {
+    warnungZeigen("info", "Neustart nötig, Sir.", "Das Backend auf dem Mini-PC ist noch die alte Version. Bitte JARVIS STARTEN.bat starten, " +
+      "damit lokale KI mit Claude-Rückfall und diese Fehleranzeige vollständig laufen.");
+    return;
+  }
+  if (k && k.anbieter === "ollama" && !k.lokal_bereit) {
+    const punkte = (k.rechner || []).map((r) => r.name + ": " + (r.erreichbar ? (r.installiert ? "bereit" : r.fehler) : r.fehler || "nicht erreichbar"));
+    if (k.rueckfall === "claude") warnungZeigen("gelb", "Lokale KI nicht erreichbar – Claude springt ein.",
+      "Antworten kommen gerade von Claude und kosten ca. 1–2 Cent pro Frage. Haupt-PC oder Test-PC einschalten, dann antwortet wieder die eigene KI.", punkte);
+    else warnungZeigen("rot", "Lokale KI nicht erreichbar, Sir.",
+      "Kein Rechner mit dem Modell antwortet. Fragen kann ich gerade nicht beantworten. Haupt-PC oder Test-PC einschalten.", punkte);
+    return;
+  }
+  $("warnung").hidden = true;
+  if (!$("modul").hidden) modulObenSetzen();
+}
+function statusZeile() {
+  const st = $("status");
+  if (!zustand.backend) { st.textContent = "Mini-PC antwortet nicht"; st.className = "status fehler"; return; }
+  const k = zustand.ki;
+  if (k && k.anbieter === "ollama") {
+    const bereit = (k.rechner || []).find((r) => r.erreichbar && r.installiert);
+    if (bereit) { st.textContent = "bereit · " + bereit.name + (bereit.geladen ? "" : " (lädt beim ersten Satz)"); st.className = "status ok"; }
+    else if (k.rueckfall === "claude") { st.textContent = "bereit · nur Claude"; st.className = "status fehler"; }
+    else { st.textContent = "lokale KI aus"; st.className = "status fehler"; }
+    return;
+  }
+  st.textContent = k && k.anbieter === "claude" ? "bereit · Claude" : "bereit"; st.className = "status ok";
+}
+async function backendPruefen(sofort) {
+  try {
+    await holeJson("/api/health", 5000);
+    zustand.backend = true; zustand.backendFehler = 0;
+  } catch (e) {
+    zustand.backendFehler++;
+    if (zustand.backendFehler >= 2 || sofort) zustand.backend = false;   // ein einzelner Aussetzer zählt nicht
+    else setTimeout(() => backendPruefen(true), 3000);
+  }
+  statusZeile(); warnungAktualisieren();
+  return zustand.backend;
+}
+async function kiPruefen(neu) {
+  if (!zustand.backend) return;
+  try {
+    const r = await fetch("/api/ki/status" + (neu ? "?neu=true" : ""), { cache: "no-store" });
+    if (r.status === 404) { zustand.kiAlt = true; zustand.ki = null; }
+    else if (r.ok) { zustand.kiAlt = false; zustand.ki = await r.json(); }
+  } catch (e) { /* Backend-Aussetzer: übernimmt backendPruefen */ }
+  statusZeile(); warnungAktualisieren();
+}
+$("warnungPruefen").addEventListener("click", async () => {
+  $("warnungPruefen").disabled = true; $("warnungPruefen").textContent = "Prüfe …";
+  try { if (await backendPruefen(true)) await kiPruefen(true); }
+  finally { $("warnungPruefen").disabled = false; $("warnungPruefen").textContent = "Erneut prüfen"; }
+});
+
+/* =========================== Mitteilung zur Nachtarbeit (05.10.2026) ===========================
+   Beim ersten Öffnen am Tag (nach der Tour) eine kurze Zusammenfassung der letzten Nacht aus /api/nachtarbeit/kurz.
+   Danach erst am nächsten Tag wieder (Browser merkt sich das Datum). Kostet nichts. */
+async function nachtMitteilung() {
+  if (speicher.lesen("nacht-gesehen", "") === heute()) return;
+  let k;
+  try { k = await holeJson("/api/nachtarbeit/kurz", 8000); } catch (e) { return; }   // alter Stand ohne Schnittstelle: still auslassen
+  if (!k || !Array.isArray(k.punkte) || !k.punkte.length) return;
+  speicher.schreiben("nacht-gesehen", heute());
+  $("begruessung").hidden = true;
+  const d = document.createElement("div"); d.className = "nachricht auron mitteilung";
+  const kopf = document.createElement("div"); kopf.className = "kopfzeile";
+  const b = document.createElement("b"); b.textContent = k.gelaufen ? "Heute Nacht, Sir" : "Nachtarbeit, Sir"; kopf.appendChild(b);
+  const sp = document.createElement("span");
+  sp.textContent = k.gelaufen ? (k.kosten_usd ? "Kosten " + Number(k.kosten_usd).toFixed(2).replace(".", ",") + " $" : "0 € (nur eigene KI)") : "nicht gelaufen";
+  kopf.appendChild(sp); d.appendChild(kopf);
+  const ul = document.createElement("ul");
+  k.punkte.forEach((t) => { const li = document.createElement("li"); li.textContent = t; ul.appendChild(li); });
+  d.appendChild(ul);
+  $("verlaufInnen").appendChild(d);
+  karteKlein(d, "", "", [["Nachtaufträge öffnen", () => bereichOeffnen("nacht")], ["Verstanden", () => { d.remove(); if (!$("verlaufInnen").querySelector(".nachricht")) $("begruessung").hidden = false; }, true]]);
+  nachUnten();
+  const erster = k.punkte[0];
+  sprich((k.gelaufen ? "Heute Nacht: " : "") + erster + (k.punkte.length > 1 ? " Dazu " + (k.punkte.length - 1) + " weitere Punkte." : ""));
+}
+
+/* =========================== Eigene KI warm halten (05.10.2026) ===========================
+   Nach einer Pause muss das Modell erst geladen werden (ca. 20 s). Auron wärmt es beim Start vor und hält es warm,
+   solange das Fenster sichtbar ist (alle 40 Min.). Kostet nichts, belegt aber Grafikspeicher auf dem Haupt-PC. */
+const kiWarm = { zuletzt: 0, laeuft: null };
+function kiAufwaermen() {
+  if (kiWarm.laeuft) return kiWarm.laeuft;
+  kiWarm.laeuft = fetch("/api/ki/aufwaermen", { method: "POST" })
+    .then((r) => (r.status === 404 ? { alt: true } : r.ok ? r.json() : null)).catch(() => null)
+    .finally(() => { kiWarm.zuletzt = Date.now(); kiWarm.laeuft = null; kiPruefen(true); });
+  return kiWarm.laeuft;
+}
+setInterval(() => { if (document.visibilityState === "visible" && Date.now() - kiWarm.zuletzt > 40 * 60e3) kiAufwaermen(); }, 60e3);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && Date.now() - kiWarm.zuletzt > 30 * 60e3) kiAufwaermen();
+});
+
+/* =========================== Ladebildschirm (05.10.2026) ===========================
+   Wunsch Sir: beim Start ein Ladebildschirm, der alles verbindet, ohne Startknopf. Prüft der Reihe nach
+   Mini-PC, Gedächtnis, eigene KI (wärmt sie vor), Kalender, Stimme, Nachtarbeit und das Universum der Tour,
+   zeigt jeden Schritt an und geht danach von selbst weiter. Was nicht klappt, wird gelb/rot markiert. */
+function mitZeit(ms, p) { return Promise.race([p, warte(ms).then(() => { throw new Error("zeit"); })]); }
+async function ladeStart(mitTour) {
+  const beginn = Date.now();
+  const SCHRITTE = [["minipc", "Mini-PC"], ["gedaechtnis", "Gedächtnis"], ["ki", "Eigene KI"], ["kalender", "Kalender"],
+    ["stimme", "Stimme"], ["nacht", "Nachtarbeit"]].concat(mitTour ? [["universum", "Universum"]] : []);
+  const zeilen = {};
+  SCHRITTE.forEach(([id, name]) => {
+    const li = document.createElement("li"); li.innerHTML = "<i></i><span></span><span></span>";
+    li.children[1].textContent = name; li.children[2].textContent = "wartet";
+    $("ladeListe").appendChild(li); zeilen[id] = li;
+  });
+  let erledigt = 0;
+  const setze = (id, art, text) => {
+    const li = zeilen[id]; if (!li) return;
+    const war = li.className;
+    li.className = art; li.children[2].textContent = text;
+    if (art !== "laeuft" && (war === "" || war === "laeuft")) {
+      erledigt++;
+      $("ladeFort").setAttribute("stroke-dashoffset", String(389.6 * (1 - erledigt / SCHRITTE.length)));
+    }
+  };
+  const schritt = (t) => { $("ladeSchritt").textContent = t; };
+
+  setze("minipc", "laeuft", "verbinde …"); schritt("Verbinde mit dem Mini-PC …");
+  let h = null;
+  try { h = await holeJson("/api/health", 6000); setze("minipc", "ok", "verbunden"); }
+  catch (e) { setze("minipc", "fehler", "nicht erreichbar"); }
+  zustand.backend = !!h; zustand.backendFehler = h ? 0 : 1; statusZeile();
+  if (!h) {
+    SCHRITTE.slice(1).forEach(([id]) => setze(id, "warn", "übersprungen"));
+    schritt("Der Mini-PC antwortet nicht, Sir.");
+    await warte(2500);
+  } else {
+    schritt("Verbinde Gedächtnis, KI, Kalender und Stimme …");
+    setze("gedaechtnis", h.vault_indexed ? "ok" : "warn",
+      h.reindex_running ? "liest neu ein" : h.chunk_count ? h.chunk_count.toLocaleString("de-DE") + " Abschnitte" : "nicht eingelesen");
+    const aufgaben = [
+      (async () => {
+        setze("ki", "laeuft", "wärme vor …");
+        const warm = kiAufwaermen();
+        try {
+          const r = await mitZeit(8000, warm);
+          if (r && r.alt) setze("ki", "warn", "Neustart nötig");
+          else if (r && r.ok) setze("ki", "ok", r.rechner + (r.schon_geladen ? " bereit" : " geladen (" + String(r.sekunden).replace(".", ",") + " s)"));
+          else setze("ki", "warn", r && r.rechner === "" ? "aus – Claude springt ein" : "nicht bereit");
+        } catch (e) { setze("ki", "ok", "lädt im Hintergrund weiter"); }
+      })(),
+      (async () => {
+        setze("kalender", "laeuft", "lese …");
+        try {
+          const k = await holeJson("/api/kalender", 9000), tag = heute();
+          const n = (k.termine || []).filter((x) => x.kategorie !== "feiertag" && String(x.start).startsWith(tag)).length;
+          setze("kalender", "ok", n ? (n === 1 ? "1 Termin heute" : n + " Termine heute") : "heute frei");
+        } catch (e) { setze("kalender", "warn", "nicht lesbar"); }
+      })(),
+      (async () => {
+        setze("stimme", "laeuft", "prüfe …");
+        try {
+          const st = await holeJson("/api/sprache/status", 5000);
+          setze("stimme", st.verfuegbar ? "ok" : "warn", (st.verfuegbar ? "Fish Audio" : "Browser-Stimme") + (stimmeAn ? "" : " (aus)"));
+        } catch (e) { setze("stimme", "warn", "Browser-Stimme"); }
+      })(),
+      (async () => {
+        setze("nacht", "laeuft", "lese …");
+        try {
+          const k = await holeJson("/api/nachtarbeit/kurz", 8000);
+          setze("nacht", k.gelaufen ? "ok" : "warn", k.gelaufen ? "lief heute Nacht" : "heute Nacht nicht gelaufen");
+        } catch (e) { setze("nacht", "warn", "Neustart nötig"); }
+      })(),
+    ];
+    if (mitTour) aufgaben.push((async () => {
+      setze("universum", "laeuft", "baue auf …");
+      try {
+        const ok = await mitZeit(30000, tour.universum || Promise.resolve(false));
+        setze("universum", ok ? "ok" : "warn", ok ? "bereit" : "ohne Tour weiter");
+      } catch (e) { setze("universum", "warn", "ohne Tour weiter"); }
+    })());
+    await Promise.all(aufgaben);
+    const probleme = Object.values(zeilen).filter((li) => li.className === "warn" || li.className === "fehler").length;
+    schritt(probleme ? "Verbunden, Sir. " + probleme + (probleme === 1 ? " Punkt ist" : " Punkte sind") + " gelb markiert." : "Alles verbunden, Sir.");
+  }
+  await warte(Math.max(700, 2000 - (Date.now() - beginn)));
+  $("lade").classList.add("weg");
+  setTimeout(() => { $("lade").hidden = true; }, 900);
+  kiPruefen(true);
+}
+
+/* =========================== Start =========================== */
+$("begruessungTitel").textContent = gruss() + ", Sir. Was darf ich für Sie tun?";
+farbeSetzen(speicher.lesen("farbe", "silber"));
+setInterval(backendPruefen, 15000);
+setInterval(() => kiPruefen(), 60000);
+// 04.10.2026 (Sir): die Tour kommt bei JEDEM Start von Auron. Nur mit ?tour=aus entfällt sie.
+// 05.10.2026: vorher der Ladebildschirm; die Tour lädt das Universum schon dahinter und beginnt, wenn er fertig ist.
+const mitTour = new URLSearchParams(location.search).get("tour") !== "aus";
+ladeFertig = ladeStart(mitTour);
+if (mitTour) tourStarten();
+else ladeFertig.then(() => { $("frage").focus({ preventScroll: true }); nachtMitteilung(); });
+ladeFertig.then(() => wachStarten());   // tut nichts, solange die Tour läuft oder "Immer ansprechbar" aus ist
+</script>
+</body>
+</html>

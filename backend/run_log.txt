@@ -1,0 +1,593 @@
+==== 19.09.2026 17:24:33,88 ==== 
+--- python --version --- 
+Python 3.14.7
+ 
+--- pip show chromadb (vorher) --- 
+Name: chromadb
+Version: 1.5.9
+Summary: Chroma.
+Home-page: https://github.com/chroma-core/chroma
+Author: 
+Author-email: Jeff Huber <jeff@trychroma.com>, Anton Troynikov <anton@trychroma.com>
+License: 
+Location: C:\Users\maxi1\Documents\KI\Jarvis\backend\venv\Lib\site-packages
+Requires: bcrypt, build, grpcio, httpx, importlib-resources, jsonschema, kubernetes, mmh3, numpy, onnxruntime, opentelemetry-api, opentelemetry-exporter-otlp-proto-grpc, opentelemetry-sdk, orjson, overrides, pybase64, pydantic, pydantic-settings, pypika, pyyaml, rich, tenacity, tokenizers, tqdm, typer, typing-extensions, uvicorn
+Required-by: llama-index-vector-stores-chroma
+ 
+--- pip install --force-reinstall --no-cache-dir chromadb --- 
+Collecting chromadb
+  Downloading chromadb-1.5.9-cp39-abi3-win_amd64.whl.metadata (5.1 kB)
+Collecting build>=1.0.3 (from chromadb)
+  Downloading build-1.6.1-py3-none-any.whl.metadata (5.6 kB)
+Collecting pydantic>=2.0 (from chromadb)
+  Downloading pydantic-2.13.5-py3-none-any.whl.metadata (110 kB)
+Collecting pydantic-settings>=2.0 (from chromadb)
+  Downloading pydantic_settings-2.15.0-py3-none-any.whl.metadata (3.9 kB)
+Collecting pybase64>=1.4.1 (from chromadb)
+  Downloading pybase64-1.5.0-cp314-cp314-win_amd64.whl.metadata (11 kB)
+Collecting uvicorn>=0.18.3 (from uvicorn[standard]>=0.18.3->chromadb)
+  Downloading uvicorn-0.53.0-py3-none-any.whl.metadata (6.6 kB)
+Collecting numpy>=1.22.5 (from chromadb)
+  Downloading numpy-2.5.3-cp314-cp314-win_amd64.whl.metadata (6.6 kB)
+Collecting typing-extensions>=4.5.0 (from chromadb)
+  Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting onnxruntime>=1.14.1 (from chromadb)
+  Downloading onnxruntime-1.30.0-cp314-cp314-win_amd64.whl.metadata (5.9 kB)
+Collecting opentelemetry-api>=1.2.0 (from chromadb)
+  Downloading opentelemetry_api-1.44.0-py3-none-any.whl.metadata (1.4 kB)
+Collecting opentelemetry-exporter-otlp-proto-grpc>=1.2.0 (from chromadb)
+  Downloading opentelemetry_exporter_otlp_proto_grpc-1.44.0-py3-none-any.whl.metadata (2.6 kB)
+Collecting opentelemetry-sdk>=1.2.0 (from chromadb)
+  Downloading opentelemetry_sdk-1.44.0-py3-none-any.whl.metadata (1.6 kB)
+Collecting tokenizers>=0.13.2 (from chromadb)
+  Downloading tokenizers-0.23.2-cp310-abi3-win_amd64.whl.metadata (10 kB)
+Collecting pypika>=0.48.9 (from chromadb)
+  Downloading pypika-0.51.1-py2.py3-none-any.whl.metadata (51 kB)
+Collecting tqdm>=4.65.0 (from chromadb)
+  Downloading tqdm-4.70.1-py3-none-any.whl.metadata (57 kB)
+Collecting overrides>=7.3.1 (from chromadb)
+  Downloading overrides-7.7.0-py3-none-any.whl.metadata (5.8 kB)
+Collecting importlib-resources (from chromadb)
+  Downloading importlib_resources-7.1.0-py3-none-any.whl.metadata (4.0 kB)
+Collecting grpcio>=1.58.0 (from chromadb)
+  Downloading grpcio-1.84.0-cp314-cp314-win_amd64.whl.metadata (3.9 kB)
+Collecting bcrypt>=4.0.1 (from chromadb)
+  Downloading bcrypt-5.0.0-cp39-abi3-win_amd64.whl.metadata (10 kB)
+Collecting typer>=0.9.0 (from chromadb)
+  Downloading typer-0.27.2-py3-none-any.whl.metadata (16 kB)
+Collecting kubernetes>=28.1.0 (from chromadb)
+  Downloading kubernetes-36.0.3-py2.py3-none-any.whl.metadata (1.8 kB)
+Collecting tenacity>=8.2.3 (from chromadb)
+  Downloading tenacity-9.1.4-py3-none-any.whl.metadata (1.2 kB)
+Collecting pyyaml>=6.0.0 (from chromadb)
+  Downloading pyyaml-6.0.3-cp314-cp314-win_amd64.whl.metadata (2.4 kB)
+Collecting mmh3>=4.0.1 (from chromadb)
+  Downloading mmh3-5.3.0-cp314-cp314-win_amd64.whl.metadata (14 kB)
+Collecting orjson>=3.9.12 (from chromadb)
+  Downloading orjson-3.12.0-cp314-cp314-win_amd64.whl.metadata (43 kB)
+Collecting httpx>=0.27.0 (from chromadb)
+  Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+Collecting rich>=10.11.0 (from chromadb)
+  Downloading rich-15.0.0-py3-none-any.whl.metadata (18 kB)
+Collecting jsonschema>=4.19.0 (from chromadb)
+  Downloading jsonschema-4.26.0-py3-none-any.whl.metadata (7.6 kB)
+Collecting packaging>=24.0 (from build>=1.0.3->chromadb)
+  Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+Collecting pyproject_hooks (from build>=1.0.3->chromadb)
+  Downloading pyproject_hooks-1.3.3-py3-none-any.whl.metadata (1.3 kB)
+Collecting colorama (from build>=1.0.3->chromadb)
+  Downloading colorama-0.4.6-py2.py3-none-any.whl.metadata (17 kB)
+Collecting anyio (from httpx>=0.27.0->chromadb)
+  Downloading anyio-4.15.1-py3-none-any.whl.metadata (4.7 kB)
+Collecting certifi (from httpx>=0.27.0->chromadb)
+  Downloading certifi-2026.7.22-py3-none-any.whl.metadata (2.5 kB)
+Collecting httpcore==1.* (from httpx>=0.27.0->chromadb)
+  Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+Collecting idna (from httpx>=0.27.0->chromadb)
+  Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+Collecting h11>=0.16 (from httpcore==1.*->httpx>=0.27.0->chromadb)
+  Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+Collecting attrs>=22.2.0 (from jsonschema>=4.19.0->chromadb)
+  Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+Collecting jsonschema-specifications>=2023.03.6 (from jsonschema>=4.19.0->chromadb)
+  Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl.metadata (2.9 kB)
+Collecting referencing>=0.28.4 (from jsonschema>=4.19.0->chromadb)
+  Downloading referencing-0.37.0-py3-none-any.whl.metadata (2.8 kB)
+Collecting rpds-py>=0.25.0 (from jsonschema>=4.19.0->chromadb)
+  Downloading rpds_py-2026.6.3-cp314-cp314-win_amd64.whl.metadata (4.2 kB)
+Collecting six>=1.9.0 (from kubernetes>=28.1.0->chromadb)
+  Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+Collecting python-dateutil>=2.5.3 (from kubernetes>=28.1.0->chromadb)
+  Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+Collecting websocket-client!=0.40.0,!=0.41.*,!=0.42.*,>=0.32.0 (from kubernetes>=28.1.0->chromadb)
+  Downloading websocket_client-1.9.2-py3-none-any.whl.metadata (8.3 kB)
+Collecting requests (from kubernetes>=28.1.0->chromadb)
+  Downloading requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+Collecting requests-oauthlib (from kubernetes>=28.1.0->chromadb)
+  Downloading requests_oauthlib-2.0.0-py2.py3-none-any.whl.metadata (11 kB)
+Collecting urllib3!=2.6.0,>=1.24.2 (from kubernetes>=28.1.0->chromadb)
+  Downloading urllib3-2.8.0-py3-none-any.whl.metadata (7.4 kB)
+Collecting durationpy>=0.7 (from kubernetes>=28.1.0->chromadb)
+  Downloading durationpy-0.11-py3-none-any.whl.metadata (474 bytes)
+Collecting aiohttp<4.0.0,>=3.13.5 (from kubernetes>=28.1.0->chromadb)
+  Downloading aiohttp-3.14.3-cp314-cp314-win_amd64.whl.metadata (8.5 kB)
+Collecting aiohappyeyeballs>=2.5.0 (from aiohttp<4.0.0,>=3.13.5->kubernetes>=28.1.0->chromadb)
+  Downloading aiohappyeyeballs-2.7.1-py3-none-any.whl.metadata (5.9 kB)
+Collecting aiosignal>=1.4.0 (from aiohttp<4.0.0,>=3.13.5->kubernetes>=28.1.0->chromadb)
+  Downloading aiosignal-1.4.0-py3-none-any.whl.metadata (3.7 kB)
+Collecting frozenlist>=1.1.1 (from aiohttp<4.0.0,>=3.13.5->kubernetes>=28.1.0->chromadb)
+  Downloading frozenlist-1.8.0-cp314-cp314-win_amd64.whl.metadata (21 kB)
+Collecting multidict<7.0,>=4.5 (from aiohttp<4.0.0,>=3.13.5->kubernetes>=28.1.0->chromadb)
+  Downloading multidict-6.9.0-cp314-cp314-win_amd64.whl.metadata (5.4 kB)
+Collecting propcache>=0.2.0 (from aiohttp<4.0.0,>=3.13.5->kubernetes>=28.1.0->chromadb)
+  Downloading propcache-0.5.4-cp314-cp314-win_amd64.whl.metadata (25 kB)
+Collecting yarl<2.0,>=1.17.0 (from aiohttp<4.0.0,>=3.13.5->kubernetes>=28.1.0->chromadb)
+  Downloading yarl-1.25.1-cp314-cp314-win_amd64.whl.metadata (115 kB)
+Collecting flatbuffers (from onnxruntime>=1.14.1->chromadb)
+  Downloading flatbuffers-25.12.19-py2.py3-none-any.whl.metadata (1.0 kB)
+Collecting protobuf>=4.25.8 (from onnxruntime>=1.14.1->chromadb)
+  Downloading protobuf-7.36.2-cp310-abi3-win_amd64.whl.metadata (595 bytes)
+Collecting googleapis-common-protos~=1.57 (from opentelemetry-exporter-otlp-proto-grpc>=1.2.0->chromadb)
+  Downloading googleapis_common_protos-1.75.3-py3-none-any.whl.metadata (8.5 kB)
+Collecting opentelemetry-exporter-otlp-proto-common==1.44.0 (from opentelemetry-exporter-otlp-proto-grpc>=1.2.0->chromadb)
+  Downloading opentelemetry_exporter_otlp_proto_common-1.44.0-py3-none-any.whl.metadata (1.8 kB)
+Collecting opentelemetry-proto==1.44.0 (from opentelemetry-exporter-otlp-proto-grpc>=1.2.0->chromadb)
+  Downloading opentelemetry_proto-1.44.0-py3-none-any.whl.metadata (2.3 kB)
+Collecting opentelemetry-semantic-conventions==0.65b0 (from opentelemetry-sdk>=1.2.0->chromadb)
+  Downloading opentelemetry_semantic_conventions-0.65b0-py3-none-any.whl.metadata (2.4 kB)
+Collecting annotated-types>=0.6.0 (from pydantic>=2.0->chromadb)
+  Downloading annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+Collecting pydantic-core==2.46.5 (from pydantic>=2.0->chromadb)
+  Downloading pydantic_core-2.46.5-cp314-cp314-win_amd64.whl.metadata (6.7 kB)
+Collecting typing-inspection>=0.4.2 (from pydantic>=2.0->chromadb)
+  Downloading typing_inspection-0.4.4-py3-none-any.whl.metadata (2.6 kB)
+Collecting python-dotenv>=0.21.0 (from pydantic-settings>=2.0->chromadb)
+  Downloading python_dotenv-1.2.3-py3-none-any.whl.metadata (29 kB)
+Collecting markdown-it-py>=2.2.0 (from rich>=10.11.0->chromadb)
+  Downloading markdown_it_py-4.2.0-py3-none-any.whl.metadata (7.4 kB)
+Collecting pygments<3.0.0,>=2.13.0 (from rich>=10.11.0->chromadb)
+  Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+Collecting mdurl~=0.1 (from markdown-it-py>=2.2.0->rich>=10.11.0->chromadb)
+  Downloading mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+Collecting huggingface-hub<2.0,>=0.16.4 (from tokenizers>=0.13.2->chromadb)
+  Downloading huggingface_hub-1.32.0-py3-none-any.whl.metadata (16 kB)
+Collecting click<9.0.0,>=8.4.2 (from huggingface-hub<2.0,>=0.16.4->tokenizers>=0.13.2->chromadb)
+  Downloading click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+Collecting filelock>=3.10.0 (from huggingface-hub<2.0,>=0.16.4->tokenizers>=0.13.2->chromadb)
+  Downloading filelock-4.0.1-py3-none-any.whl.metadata (2.0 kB)
+Collecting fsspec>=2023.5.0 (from huggingface-hub<2.0,>=0.16.4->tokenizers>=0.13.2->chromadb)
+  Downloading fsspec-2026.9.0-py3-none-any.whl.metadata (10 kB)
+Collecting hf-xet<2.0.0,>=1.5.2 (from huggingface-hub<2.0,>=0.16.4->tokenizers>=0.13.2->chromadb)
+  Downloading hf_xet-1.6.0-cp38-abi3-win_amd64.whl.metadata (4.9 kB)
+Collecting shellingham>=1.3.0 (from typer>=0.9.0->chromadb)
+  Downloading shellingham-1.5.4-py2.py3-none-any.whl.metadata (3.5 kB)
+Collecting annotated-doc>=0.0.2 (from typer>=0.9.0->chromadb)
+  Downloading annotated_doc-0.0.5-py3-none-any.whl.metadata (6.5 kB)
+Collecting httptools>=0.8.0 (from uvicorn[standard]>=0.18.3->chromadb)
+  Downloading httptools-0.8.0-cp314-cp314-win_amd64.whl.metadata (3.7 kB)
+Collecting watchfiles>=0.20 (from uvicorn[standard]>=0.18.3->chromadb)
+  Downloading watchfiles-1.2.0-cp314-cp314-win_amd64.whl.metadata (5.0 kB)
+Collecting websockets>=13.0 (from uvicorn[standard]>=0.18.3->chromadb)
+  Downloading websockets-17.1-cp314-cp314-win_amd64.whl.metadata (6.5 kB)
+Collecting charset_normalizer<4,>=2 (from requests->kubernetes>=28.1.0->chromadb)
+  Downloading charset_normalizer-3.5.1-cp314-cp314-win_amd64.whl.metadata (46 kB)
+Collecting oauthlib>=3.0.0 (from requests-oauthlib->kubernetes>=28.1.0->chromadb)
+  Downloading oauthlib-3.3.1-py3-none-any.whl.metadata (7.9 kB)
+Downloading chromadb-1.5.9-cp39-abi3-win_amd64.whl (23.5 MB)
+   ---------------------------------------- 23.5/23.5 MB 34.5 MB/s  0:00:00
+Downloading bcrypt-5.0.0-cp39-abi3-win_amd64.whl (150 kB)
+Downloading build-1.6.1-py3-none-any.whl (31 kB)
+Downloading grpcio-1.84.0-cp314-cp314-win_amd64.whl (5.4 MB)
+   ---------------------------------------- 5.4/5.4 MB 42.5 MB/s  0:00:00
+Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+Downloading jsonschema-4.26.0-py3-none-any.whl (90 kB)
+Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl (18 kB)
+Downloading kubernetes-36.0.3-py2.py3-none-any.whl (4.6 MB)
+   ---------------------------------------- 4.6/4.6 MB 35.3 MB/s  0:00:00
+Downloading aiohttp-3.14.3-cp314-cp314-win_amd64.whl (481 kB)
+Downloading multidict-6.9.0-cp314-cp314-win_amd64.whl (55 kB)
+Downloading yarl-1.25.1-cp314-cp314-win_amd64.whl (103 kB)
+Downloading aiohappyeyeballs-2.7.1-py3-none-any.whl (15 kB)
+Downloading aiosignal-1.4.0-py3-none-any.whl (7.5 kB)
+Downloading certifi-2026.7.22-py3-none-any.whl (136 kB)
+Downloading durationpy-0.11-py3-none-any.whl (4.1 kB)
+Downloading frozenlist-1.8.0-cp314-cp314-win_amd64.whl (44 kB)
+Downloading idna-3.20-py3-none-any.whl (69 kB)
+Downloading mmh3-5.3.0-cp314-cp314-win_amd64.whl (42 kB)
+Downloading numpy-2.5.3-cp314-cp314-win_amd64.whl (12.7 MB)
+   ---------------------------------------- 12.7/12.7 MB 42.7 MB/s  0:00:00
+Downloading onnxruntime-1.30.0-cp314-cp314-win_amd64.whl (14.7 MB)
+   ---------------------------------------- 14.7/14.7 MB 36.2 MB/s  0:00:00
+Downloading opentelemetry_api-1.44.0-py3-none-any.whl (60 kB)
+Downloading opentelemetry_exporter_otlp_proto_grpc-1.44.0-py3-none-any.whl (19 kB)
+Downloading opentelemetry_exporter_otlp_proto_common-1.44.0-py3-none-any.whl (17 kB)
+Downloading opentelemetry_proto-1.44.0-py3-none-any.whl (72 kB)
+Downloading googleapis_common_protos-1.75.3-py3-none-any.whl (306 kB)
+Downloading opentelemetry_sdk-1.44.0-py3-none-any.whl (137 kB)
+Downloading opentelemetry_semantic_conventions-0.65b0-py3-none-any.whl (204 kB)
+Downloading protobuf-7.36.2-cp310-abi3-win_amd64.whl (456 kB)
+Downloading orjson-3.12.0-cp314-cp314-win_amd64.whl (121 kB)
+Downloading overrides-7.7.0-py3-none-any.whl (17 kB)
+Downloading packaging-26.3-py3-none-any.whl (129 kB)
+Downloading propcache-0.5.4-cp314-cp314-win_amd64.whl (46 kB)
+Downloading pybase64-1.5.0-cp314-cp314-win_amd64.whl (44 kB)
+Downloading pydantic-2.13.5-py3-none-any.whl (472 kB)
+Downloading pydantic_core-2.46.5-cp314-cp314-win_amd64.whl (2.0 MB)
+   ---------------------------------------- 2.0/2.0 MB 46.7 MB/s  0:00:00
+Downloading annotated_types-0.8.0-py3-none-any.whl (13 kB)
+Downloading pydantic_settings-2.15.0-py3-none-any.whl (69 kB)
+Downloading pypika-0.51.1-py2.py3-none-any.whl (60 kB)
+Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+Downloading python_dotenv-1.2.3-py3-none-any.whl (22 kB)
+Downloading pyyaml-6.0.3-cp314-cp314-win_amd64.whl (156 kB)
+Downloading referencing-0.37.0-py3-none-any.whl (26 kB)
+Downloading rich-15.0.0-py3-none-any.whl (310 kB)
+Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+   ---------------------------------------- 1.3/1.3 MB 50.5 MB/s  0:00:00
+Downloading markdown_it_py-4.2.0-py3-none-any.whl (91 kB)
+Downloading mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+Downloading rpds_py-2026.6.3-cp314-cp314-win_amd64.whl (220 kB)
+Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+Downloading tenacity-9.1.4-py3-none-any.whl (28 kB)
+Downloading tokenizers-0.23.2-cp310-abi3-win_amd64.whl (2.9 MB)
+   ---------------------------------------- 2.9/2.9 MB 47.2 MB/s  0:00:00
+Downloading huggingface_hub-1.32.0-py3-none-any.whl (842 kB)
+   ---------------------------------------- 842.9/842.9 kB 42.2 MB/s  0:00:00
+Downloading click-8.5.0-py3-none-any.whl (125 kB)
+Downloading hf_xet-1.6.0-cp38-abi3-win_amd64.whl (4.0 MB)
+   ---------------------------------------- 4.0/4.0 MB 42.4 MB/s  0:00:00
+Downloading filelock-4.0.1-py3-none-any.whl (106 kB)
+Downloading fsspec-2026.9.0-py3-none-any.whl (221 kB)
+Downloading tqdm-4.70.1-py3-none-any.whl (80 kB)
+Downloading typer-0.27.2-py3-none-any.whl (123 kB)
+Downloading annotated_doc-0.0.5-py3-none-any.whl (5.3 kB)
+Downloading shellingham-1.5.4-py2.py3-none-any.whl (9.8 kB)
+Downloading typing_inspection-0.4.4-py3-none-any.whl (14 kB)
+Downloading urllib3-2.8.0-py3-none-any.whl (135 kB)
+Downloading uvicorn-0.53.0-py3-none-any.whl (87 kB)
+Downloading httptools-0.8.0-cp314-cp314-win_amd64.whl (92 kB)
+Downloading watchfiles-1.2.0-cp314-cp314-win_amd64.whl (288 kB)
+Downloading anyio-4.15.1-py3-none-any.whl (132 kB)
+Downloading websocket_client-1.9.2-py3-none-any.whl (95 kB)
+Downloading websockets-17.1-cp314-cp314-win_amd64.whl (217 kB)
+Downloading colorama-0.4.6-py2.py3-none-any.whl (25 kB)
+Downloading flatbuffers-25.12.19-py2.py3-none-any.whl (26 kB)
+Downloading importlib_resources-7.1.0-py3-none-any.whl (37 kB)
+Downloading pyproject_hooks-1.3.3-py3-none-any.whl (10 kB)
+Downloading requests-2.34.2-py3-none-any.whl (73 kB)
+Downloading charset_normalizer-3.5.1-cp314-cp314-win_amd64.whl (204 kB)
+Downloading requests_oauthlib-2.0.0-py2.py3-none-any.whl (24 kB)
+Downloading oauthlib-3.3.1-py3-none-any.whl (160 kB)
+Installing collected packages: pypika, flatbuffers, durationpy, websockets, websocket-client, urllib3, typing-extensions, tenacity, six, shellingham, rpds-py, pyyaml, python-dotenv, pyproject_hooks, pygments, pybase64, protobuf, propcache, packaging, overrides, orjson, oauthlib, numpy, multidict, mmh3, mdurl, importlib-resources, idna, httptools, hf-xet, h11, fsspec, frozenlist, filelock, colorama, click, charset_normalizer, certifi, bcrypt, attrs, annotated-types, annotated-doc, aiohappyeyeballs, yarl, uvicorn, typing-inspection, tqdm, requests, referencing, python-dateutil, pydantic-core, opentelemetry-proto, opentelemetry-api, onnxruntime, markdown-it-py, httpcore, grpcio, googleapis-common-protos, build, anyio, aiosignal, watchfiles, rich, requests-oauthlib, pydantic, opentelemetry-semantic-conventions, opentelemetry-exporter-otlp-proto-common, jsonschema-specifications, httpx, aiohttp, typer, pydantic-settings, opentelemetry-sdk, kubernetes, jsonschema, huggingface-hub, tokenizers, opentelemetry-exporter-otlp-proto-grpc, chromadb
+  Attempting uninstall: pypika
+    Found existing installation: PyPika 0.51.1
+    Uninstalling PyPika-0.51.1:
+      Successfully uninstalled PyPika-0.51.1
+  Attempting uninstall: flatbuffers
+    Found existing installation: flatbuffers 25.12.19
+    Uninstalling flatbuffers-25.12.19:
+      Successfully uninstalled flatbuffers-25.12.19
+  Attempting uninstall: durationpy
+    Found existing installation: durationpy 0.11
+    Uninstalling durationpy-0.11:
+      Successfully uninstalled durationpy-0.11
+  Attempting uninstall: websockets
+    Found existing installation: websockets 17.1
+    Uninstalling websockets-17.1:
+      Successfully uninstalled websockets-17.1
+  Attempting uninstall: websocket-client
+    Found existing installation: websocket-client 1.9.2
+    Uninstalling websocket-client-1.9.2:
+      Successfully uninstalled websocket-client-1.9.2
+  Attempting uninstall: urllib3
+    Found existing installation: urllib3 2.8.0
+    Uninstalling urllib3-2.8.0:
+      Successfully uninstalled urllib3-2.8.0
+  Attempting uninstall: typing-extensions
+    Found existing installation: typing_extensions 4.16.0
+    Uninstalling typing_extensions-4.16.0:
+      Successfully uninstalled typing_extensions-4.16.0
+  Attempting uninstall: tenacity
+    Found existing installation: tenacity 9.1.4
+    Uninstalling tenacity-9.1.4:
+      Successfully uninstalled tenacity-9.1.4
+  Attempting uninstall: six
+    Found existing installation: six 1.17.0
+    Uninstalling six-1.17.0:
+      Successfully uninstalled six-1.17.0
+  Attempting uninstall: shellingham
+    Found existing installation: shellingham 1.5.4
+    Uninstalling shellingham-1.5.4:
+      Successfully uninstalled shellingham-1.5.4
+  Attempting uninstall: rpds-py
+    Found existing installation: rpds-py 2026.6.3
+    Uninstalling rpds-py-2026.6.3:
+      Successfully uninstalled rpds-py-2026.6.3
+  Attempting uninstall: pyyaml
+    Found existing installation: PyYAML 6.0.3
+    Uninstalling PyYAML-6.0.3:
+      Successfully uninstalled PyYAML-6.0.3
+  Attempting uninstall: python-dotenv
+    Found existing installation: python-dotenv 1.2.3
+    Uninstalling python-dotenv-1.2.3:
+      Successfully uninstalled python-dotenv-1.2.3
+  Attempting uninstall: pyproject_hooks
+    Found existing installation: pyproject_hooks 1.3.3
+    Uninstalling pyproject_hooks-1.3.3:
+      Successfully uninstalled pyproject_hooks-1.3.3
+  Attempting uninstall: pygments
+    Found existing installation: Pygments 2.21.0
+    Uninstalling Pygments-2.21.0:
+      Successfully uninstalled Pygments-2.21.0
+  Attempting uninstall: pybase64
+    Found existing installation: pybase64 1.5.0
+    Uninstalling pybase64-1.5.0:
+      Successfully uninstalled pybase64-1.5.0
+  Attempting uninstall: protobuf
+    Found existing installation: protobuf 7.36.2
+    Uninstalling protobuf-7.36.2:
+      Successfully uninstalled protobuf-7.36.2
+  Attempting uninstall: propcache
+    Found existing installation: propcache 0.5.4
+    Uninstalling propcache-0.5.4:
+      Successfully uninstalled propcache-0.5.4
+  Attempting uninstall: packaging
+    Found existing installation: packaging 26.3
+    Uninstalling packaging-26.3:
+      Successfully uninstalled packaging-26.3
+  Attempting uninstall: overrides
+    Found existing installation: overrides 7.7.0
+    Uninstalling overrides-7.7.0:
+      Successfully uninstalled overrides-7.7.0
+  Attempting uninstall: orjson
+    Found existing installation: orjson 3.12.0
+    Uninstalling orjson-3.12.0:
+      Successfully uninstalled orjson-3.12.0
+  Attempting uninstall: oauthlib
+    Found existing installation: oauthlib 3.3.1
+    Uninstalling oauthlib-3.3.1:
+      Successfully uninstalled oauthlib-3.3.1
+  Attempting uninstall: numpy
+    Found existing installation: numpy 2.5.3
+    Uninstalling numpy-2.5.3:
+      Successfully uninstalled numpy-2.5.3
+  Attempting uninstall: multidict
+    Found existing installation: multidict 6.9.0
+    Uninstalling multidict-6.9.0:
+      Successfully uninstalled multidict-6.9.0
+  Attempting uninstall: mmh3
+    Found existing installation: mmh3 5.3.0
+    Uninstalling mmh3-5.3.0:
+      Successfully uninstalled mmh3-5.3.0
+  Attempting uninstall: mdurl
+    Found existing installation: mdurl 0.1.2
+    Uninstalling mdurl-0.1.2:
+      Successfully uninstalled mdurl-0.1.2
+  Attempting uninstall: importlib-resources
+    Found existing installation: importlib_resources 7.1.0
+    Uninstalling importlib_resources-7.1.0:
+      Successfully uninstalled importlib_resources-7.1.0
+  Attempting uninstall: idna
+    Found existing installation: idna 3.20
+    Uninstalling idna-3.20:
+      Successfully uninstalled idna-3.20
+  Attempting uninstall: httptools
+    Found existing installation: httptools 0.8.0
+    Uninstalling httptools-0.8.0:
+      Successfully uninstalled httptools-0.8.0
+  Attempting uninstall: hf-xet
+    Found existing installation: hf-xet 1.6.0
+    Uninstalling hf-xet-1.6.0:
+      Successfully uninstalled hf-xet-1.6.0
+  Attempting uninstall: h11
+    Found existing installation: h11 0.16.0
+    Uninstalling h11-0.16.0:
+      Successfully uninstalled h11-0.16.0
+  Attempting uninstall: fsspec
+    Found existing installation: fsspec 2026.9.0
+    Uninstalling fsspec-2026.9.0:
+      Successfully uninstalled fsspec-2026.9.0
+  Attempting uninstall: frozenlist
+    Found existing installation: frozenlist 1.8.0
+    Uninstalling frozenlist-1.8.0:
+      Successfully uninstalled frozenlist-1.8.0
+  Attempting uninstall: filelock
+    Found existing installation: filelock 4.0.1
+    Uninstalling filelock-4.0.1:
+      Successfully uninstalled filelock-4.0.1
+  Attempting uninstall: colorama
+    Found existing installation: colorama 0.4.6
+    Uninstalling colorama-0.4.6:
+      Successfully uninstalled colorama-0.4.6
+  Attempting uninstall: click
+    Found existing installation: click 8.5.0
+    Uninstalling click-8.5.0:
+      Successfully uninstalled click-8.5.0
+  Attempting uninstall: charset_normalizer
+    Found existing installation: charset-normalizer 3.5.1
+    Uninstalling charset-normalizer-3.5.1:
+      Successfully uninstalled charset-normalizer-3.5.1
+  Attempting uninstall: certifi
+    Found existing installation: certifi 2026.7.22
+    Uninstalling certifi-2026.7.22:
+      Successfully uninstalled certifi-2026.7.22
+  Attempting uninstall: bcrypt
+    Found existing installation: bcrypt 5.0.0
+    Uninstalling bcrypt-5.0.0:
+      Successfully uninstalled bcrypt-5.0.0
+  Attempting uninstall: attrs
+    Found existing installation: attrs 26.1.0
+    Uninstalling attrs-26.1.0:
+      Successfully uninstalled attrs-26.1.0
+  Attempting uninstall: annotated-types
+    Found existing installation: annotated-types 0.8.0
+    Uninstalling annotated-types-0.8.0:
+      Successfully uninstalled annotated-types-0.8.0
+  Attempting uninstall: annotated-doc
+    Found existing installation: annotated-doc 0.0.5
+    Uninstalling annotated-doc-0.0.5:
+      Successfully uninstalled annotated-doc-0.0.5
+  Attempting uninstall: aiohappyeyeballs
+    Found existing installation: aiohappyeyeballs 2.7.1
+    Uninstalling aiohappyeyeballs-2.7.1:
+      Successfully uninstalled aiohappyeyeballs-2.7.1
+  Attempting uninstall: yarl
+    Found existing installation: yarl 1.25.1
+    Uninstalling yarl-1.25.1:
+      Successfully uninstalled yarl-1.25.1
+  Attempting uninstall: uvicorn
+    Found existing installation: uvicorn 0.53.0
+    Uninstalling uvicorn-0.53.0:
+      Successfully uninstalled uvicorn-0.53.0
+  Attempting uninstall: typing-inspection
+    Found existing installation: typing-inspection 0.4.4
+    Uninstalling typing-inspection-0.4.4:
+      Successfully uninstalled typing-inspection-0.4.4
+  Attempting uninstall: tqdm
+    Found existing installation: tqdm 4.70.1
+    Uninstalling tqdm-4.70.1:
+      Successfully uninstalled tqdm-4.70.1
+  Attempting uninstall: requests
+    Found existing installation: requests 2.34.2
+    Uninstalling requests-2.34.2:
+      Successfully uninstalled requests-2.34.2
+  Attempting uninstall: referencing
+    Found existing installation: referencing 0.37.0
+    Uninstalling referencing-0.37.0:
+      Successfully uninstalled referencing-0.37.0
+  Attempting uninstall: python-dateutil
+    Found existing installation: python-dateutil 2.9.0.post0
+    Uninstalling python-dateutil-2.9.0.post0:
+      Successfully uninstalled python-dateutil-2.9.0.post0
+  Attempting uninstall: pydantic-core
+    Found existing installation: pydantic_core 2.46.5
+    Uninstalling pydantic_core-2.46.5:
+      Successfully uninstalled pydantic_core-2.46.5
+  Attempting uninstall: opentelemetry-proto
+    Found existing installation: opentelemetry-proto 1.44.0
+    Uninstalling opentelemetry-proto-1.44.0:
+      Successfully uninstalled opentelemetry-proto-1.44.0
+  Attempting uninstall: opentelemetry-api
+    Found existing installation: opentelemetry-api 1.44.0
+    Uninstalling opentelemetry-api-1.44.0:
+      Successfully uninstalled opentelemetry-api-1.44.0
+  Attempting uninstall: onnxruntime
+    Found existing installation: onnxruntime 1.30.0
+    Uninstalling onnxruntime-1.30.0:
+      Successfully uninstalled onnxruntime-1.30.0
+  Attempting uninstall: markdown-it-py
+    Found existing installation: markdown-it-py 4.2.0
+    Uninstalling markdown-it-py-4.2.0:
+      Successfully uninstalled markdown-it-py-4.2.0
+  Attempting uninstall: httpcore
+    Found existing installation: httpcore 1.0.9
+    Uninstalling httpcore-1.0.9:
+      Successfully uninstalled httpcore-1.0.9
+  Attempting uninstall: grpcio
+    Found existing installation: grpcio 1.84.0
+    Uninstalling grpcio-1.84.0:
+      Successfully uninstalled grpcio-1.84.0
+  Attempting uninstall: googleapis-common-protos
+    Found existing installation: googleapis-common-protos 1.75.3
+    Uninstalling googleapis-common-protos-1.75.3:
+      Successfully uninstalled googleapis-common-protos-1.75.3
+  Attempting uninstall: build
+    Found existing installation: build 1.6.1
+    Uninstalling build-1.6.1:
+      Successfully uninstalled build-1.6.1
+  Attempting uninstall: anyio
+    Found existing installation: anyio 4.15.1
+    Uninstalling anyio-4.15.1:
+      Successfully uninstalled anyio-4.15.1
+  Attempting uninstall: aiosignal
+    Found existing installation: aiosignal 1.4.0
+    Uninstalling aiosignal-1.4.0:
+      Successfully uninstalled aiosignal-1.4.0
+  Attempting uninstall: watchfiles
+    Found existing installation: watchfiles 1.2.0
+    Uninstalling watchfiles-1.2.0:
+      Successfully uninstalled watchfiles-1.2.0
+  Attempting uninstall: rich
+    Found existing installation: rich 15.0.0
+    Uninstalling rich-15.0.0:
+      Successfully uninstalled rich-15.0.0
+  Attempting uninstall: requests-oauthlib
+    Found existing installation: requests-oauthlib 2.0.0
+    Uninstalling requests-oauthlib-2.0.0:
+      Successfully uninstalled requests-oauthlib-2.0.0
+  Attempting uninstall: pydantic
+    Found existing installation: pydantic 2.13.5
+    Uninstalling pydantic-2.13.5:
+      Successfully uninstalled pydantic-2.13.5
+  Attempting uninstall: opentelemetry-semantic-conventions
+    Found existing installation: opentelemetry-semantic-conventions 0.65b0
+    Uninstalling opentelemetry-semantic-conventions-0.65b0:
+      Successfully uninstalled opentelemetry-semantic-conventions-0.65b0
+  Attempting uninstall: opentelemetry-exporter-otlp-proto-common
+    Found existing installation: opentelemetry-exporter-otlp-proto-common 1.44.0
+    Uninstalling opentelemetry-exporter-otlp-proto-common-1.44.0:
+      Successfully uninstalled opentelemetry-exporter-otlp-proto-common-1.44.0
+  Attempting uninstall: jsonschema-specifications
+    Found existing installation: jsonschema-specifications 2025.9.1
+    Uninstalling jsonschema-specifications-2025.9.1:
+      Successfully uninstalled jsonschema-specifications-2025.9.1
+  Attempting uninstall: httpx
+    Found existing installation: httpx 0.28.1
+    Uninstalling httpx-0.28.1:
+      Successfully uninstalled httpx-0.28.1
+  Attempting uninstall: aiohttp
+    Found existing installation: aiohttp 3.14.3
+    Uninstalling aiohttp-3.14.3:
+      Successfully uninstalled aiohttp-3.14.3
+  Attempting uninstall: typer
+    Found existing installation: typer 0.27.2
+    Uninstalling typer-0.27.2:
+      Successfully uninstalled typer-0.27.2
+  Attempting uninstall: pydantic-settings
+    Found existing installation: pydantic-settings 2.15.0
+    Uninstalling pydantic-settings-2.15.0:
+      Successfully uninstalled pydantic-settings-2.15.0
+  Attempting uninstall: opentelemetry-sdk
+    Found existing installation: opentelemetry-sdk 1.44.0
+    Uninstalling opentelemetry-sdk-1.44.0:
+      Successfully uninstalled opentelemetry-sdk-1.44.0
+  Attempting uninstall: kubernetes
+    Found existing installation: kubernetes 36.0.3
+    Uninstalling kubernetes-36.0.3:
+      Successfully uninstalled kubernetes-36.0.3
+  Attempting uninstall: jsonschema
+    Found existing installation: jsonschema 4.26.0
+    Uninstalling jsonschema-4.26.0:
+      Successfully uninstalled jsonschema-4.26.0
+  Attempting uninstall: huggingface-hub
+    Found existing installation: huggingface_hub 1.32.0
+    Uninstalling huggingface_hub-1.32.0:
+      Successfully uninstalled huggingface_hub-1.32.0
+  Attempting uninstall: tokenizers
+    Found existing installation: tokenizers 0.23.2
+    Uninstalling tokenizers-0.23.2:
+      Successfully uninstalled tokenizers-0.23.2
+  Attempting uninstall: opentelemetry-exporter-otlp-proto-grpc
+    Found existing installation: opentelemetry-exporter-otlp-proto-grpc 1.44.0
+    Uninstalling opentelemetry-exporter-otlp-proto-grpc-1.44.0:
+      Successfully uninstalled opentelemetry-exporter-otlp-proto-grpc-1.44.0
+  Attempting uninstall: chromadb
+    Found existing installation: chromadb 1.5.9
+    Uninstalling chromadb-1.5.9:
+      Successfully uninstalled chromadb-1.5.9
+
+Successfully installed aiohappyeyeballs-2.7.1 aiohttp-3.14.3 aiosignal-1.4.0 annotated-doc-0.0.5 annotated-types-0.8.0 anyio-4.15.1 attrs-26.1.0 bcrypt-5.0.0 build-1.6.1 certifi-2026.7.22 charset_normalizer-3.5.1 chromadb-1.5.9 click-8.5.0 colorama-0.4.6 durationpy-0.11 filelock-4.0.1 flatbuffers-25.12.19 frozenlist-1.8.0 fsspec-2026.9.0 googleapis-common-protos-1.75.3 grpcio-1.84.0 h11-0.16.0 hf-xet-1.6.0 httpcore-1.0.9 httptools-0.8.0 httpx-0.28.1 huggingface-hub-1.32.0 idna-3.20 importlib-resources-7.1.0 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 kubernetes-36.0.3 markdown-it-py-4.2.0 mdurl-0.1.2 mmh3-5.3.0 multidict-6.9.0 numpy-2.5.3 oauthlib-3.3.1 onnxruntime-1.30.0 opentelemetry-api-1.44.0 opentelemetry-exporter-otlp-proto-common-1.44.0 opentelemetry-exporter-otlp-proto-grpc-1.44.0 opentelemetry-proto-1.44.0 opentelemetry-sdk-1.44.0 opentelemetry-semantic-conventions-0.65b0 orjson-3.12.0 overrides-7.7.0 packaging-26.3 propcache-0.5.4 protobuf-7.36.2 pybase64-1.5.0 pydantic-2.13.5 pydantic-core-2.46.5 pydantic-settings-2.15.0 pygments-2.21.0 pypika-0.51.1 pyproject_hooks-1.3.3 python-dateutil-2.9.0.post0 python-dotenv-1.2.3 pyyaml-6.0.3 referencing-0.37.0 requests-2.34.2 requests-oauthlib-2.0.0 rich-15.0.0 rpds-py-2026.6.3 shellingham-1.5.4 six-1.17.0 tenacity-9.1.4 tokenizers-0.23.2 tqdm-4.70.1 typer-0.27.2 typing-extensions-4.16.0 typing-inspection-0.4.4 urllib3-2.8.0 uvicorn-0.53.0 watchfiles-1.2.0 websocket-client-1.9.2 websockets-17.1 yarl-1.25.1
+ 
+--- python -m rag.embeddings --- 
+Lese Vault ein: ..\..\..\..\Documents\KI\Obsidian\AI Gehrin 1.1\Brain
+C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   0%|          | 0.00/79.3M [00:00<?, ?iB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   0%|          | 70.0k/79.3M [00:00<03:23, 408kiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   0%|          | 224k/79.3M [00:00<02:02, 680kiB/s] C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   0%|          | 394k/79.3M [00:00<01:43, 803kiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   1%|          | 581k/79.3M [00:00<01:28, 930kiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   1%|          | 700k/79.3M [00:00<01:23, 990kiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   1%|1         | 904k/79.3M [00:00<01:16, 1.08MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   1%|1         | 1.00M/79.3M [00:01<01:16, 1.07MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   2%|1         | 1.20M/79.3M [00:01<01:10, 1.15MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   2%|1         | 1.31M/79.3M [00:01<01:11, 1.14MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   2%|1         | 1.42M/79.3M [00:01<01:12, 1.13MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   2%|1         | 1.56M/79.3M [00:01<01:15, 1.07MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   2%|2         | 1.67M/79.3M [00:01<01:16, 1.06MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   2%|2         | 1.80M/79.3M [00:01<01:12, 1.12MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   2%|2         | 1.96M/79.3M [00:02<01:14, 1.09MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   3%|2         | 2.11M/79.3M [00:02<01:08, 1.18MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   3%|2         | 2.24M/79.3M [00:02<01:05, 1.24MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   3%|2         | 2.38M/79.3M [00:02<01:10, 1.14MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   3%|3         | 2.51M/79.3M [00:02<01:08, 1.18MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   3%|3         | 2.64M/79.3M [00:02<01:05, 1.24MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   4%|3         | 2.83M/79.3M [00:02<01:04, 1.24MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   4%|3         | 2.96M/79.3M [00:02<01:04, 1.25MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   4%|3         | 3.11M/79.3M [00:02<01:01, 1.30MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   4%|4         | 3.27M/79.3M [00:03<01:02, 1.28MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   4%|4         | 3.42M/79.3M [00:03<01:01, 1.29MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   5%|4         | 3.57M/79.3M [00:03<00:59, 1.34MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   5%|4         | 3.75M/79.3M [00:03<00:58, 1.34MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   5%|4         | 3.89M/79.3M [00:03<01:01, 1.29MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   5%|5         | 4.04M/79.3M [00:03<00:58, 1.35MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   5%|5         | 4.22M/79.3M [00:03<00:58, 1.34MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   6%|5         | 4.37M/79.3M [00:03<00:58, 1.34MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   6%|5         | 4.50M/79.3M [00:04<01:01, 1.27MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   6%|5         | 4.70M/79.3M [00:04<00:55, 1.40MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   6%|6         | 4.85M/79.3M [00:04<00:56, 1.37MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   6%|6         | 5.00M/79.3M [00:04<00:56, 1.38MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   7%|6         | 5.18M/79.3M [00:04<00:55, 1.39MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   7%|6         | 5.33M/79.3M [00:04<00:56, 1.38MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   7%|6         | 5.48M/79.3M [00:04<00:56, 1.37MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   7%|7         | 5.66M/79.3M [00:04<00:55, 1.40MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   7%|7         | 5.81M/79.3M [00:05<00:55, 1.38MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   8%|7         | 5.96M/79.3M [00:05<00:54, 1.42MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   8%|7         | 6.10M/79.3M [00:05<00:54, 1.40MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   8%|7         | 6.26M/79.3M [00:05<00:55, 1.38MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   8%|8         | 6.41M/79.3M [00:05<00:56, 1.36MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   8%|8         | 6.56M/79.3M [00:05<00:54, 1.40MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   8%|8         | 6.70M/79.3M [00:05<00:55, 1.38MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   9%|8         | 6.88M/79.3M [00:05<00:54, 1.40MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   9%|8         | 7.02M/79.3M [00:05<00:54, 1.39MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   9%|9         | 7.17M/79.3M [00:06<00:55, 1.36MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   9%|9         | 7.36M/79.3M [00:06<00:54, 1.39MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:   9%|9         | 7.51M/79.3M [00:06<00:54, 1.38MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  10%|9         | 7.66M/79.3M [00:06<00:55, 1.36MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  10%|9         | 7.84M/79.3M [00:06<00:53, 1.40MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  10%|#         | 8.00M/79.3M [00:06<00:52, 1.42MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  10%|#         | 8.17M/79.3M [00:06<00:52, 1.43MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  11%|#         | 8.35M/79.3M [00:06<00:50, 1.46MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  11%|#         | 8.50M/79.3M [00:07<00:52, 1.40MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  11%|#         | 8.67M/79.3M [00:07<00:51, 1.43MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  11%|#1        | 8.83M/79.3M [00:07<00:49, 1.50MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  11%|#1        | 8.98M/79.3M [00:07<00:50, 1.47MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  12%|#1        | 9.15M/79.3M [00:07<00:50, 1.46MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  12%|#1        | 9.33M/79.3M [00:07<00:49, 1.49MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  12%|#1        | 9.52M/79.3M [00:07<00:48, 1.52MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  12%|#2        | 9.70M/79.3M [00:07<00:47, 1.54MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  12%|#2        | 9.86M/79.3M [00:07<00:48, 1.50MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  13%|#2        | 10.1M/79.3M [00:08<00:46, 1.56MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  13%|#2        | 10.2M/79.3M [00:08<00:47, 1.53MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  13%|#3        | 10.4M/79.3M [00:08<00:44, 1.63MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  13%|#3        | 10.6M/79.3M [00:08<00:45, 1.58MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  14%|#3        | 10.7M/79.3M [00:08<00:45, 1.59MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  14%|#3        | 10.9M/79.3M [00:08<00:45, 1.58MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  14%|#3        | 11.1M/79.3M [00:08<00:45, 1.57MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  14%|#4        | 11.3M/79.3M [00:08<00:43, 1.66MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  14%|#4        | 11.4M/79.3M [00:08<00:43, 1.64MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  15%|#4        | 11.6M/79.3M [00:09<00:42, 1.68MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  15%|#4        | 11.8M/79.3M [00:09<00:41, 1.71MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  15%|#5        | 12.0M/79.3M [00:09<00:40, 1.75MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  15%|#5        | 12.1M/79.3M [00:09<00:41, 1.70MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  16%|#5        | 12.4M/79.3M [00:09<00:39, 1.79MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  16%|#5        | 12.6M/79.3M [00:09<00:37, 1.88MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  16%|#6        | 12.8M/79.3M [00:09<00:38, 1.83MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  16%|#6        | 13.0M/79.3M [00:09<00:36, 1.90MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  17%|#6        | 13.1M/79.3M [00:09<00:38, 1.82MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  17%|#6        | 13.3M/79.3M [00:10<00:38, 1.82MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  17%|#7        | 13.6M/79.3M [00:10<00:33, 2.06MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  17%|#7        | 13.8M/79.3M [00:10<00:35, 1.96MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  18%|#7        | 14.0M/79.3M [00:10<00:34, 1.97MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  18%|#7        | 14.2M/79.3M [00:10<00:35, 1.93MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  18%|#8        | 14.4M/79.3M [00:10<00:36, 1.88MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  18%|#8        | 14.6M/79.3M [00:10<00:31, 2.12MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  19%|#8        | 14.9M/79.3M [00:10<00:33, 2.02MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  19%|#8        | 15.0M/79.3M [00:10<00:37, 1.81MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  19%|#9        | 15.2M/79.3M [00:11<00:35, 1.87MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  20%|#9        | 15.5M/79.3M [00:11<00:33, 1.97MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  20%|#9        | 15.7M/79.3M [00:11<00:34, 1.92MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  20%|##        | 15.9M/79.3M [00:11<00:34, 1.92MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  20%|##        | 16.1M/79.3M [00:11<00:33, 1.95MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  21%|##        | 16.4M/79.3M [00:11<00:30, 2.13MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  21%|##        | 16.6M/79.3M [00:11<00:32, 2.03MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  21%|##1       | 16.8M/79.3M [00:11<00:32, 1.99MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  21%|##1       | 17.0M/79.3M [00:11<00:32, 1.99MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  22%|##1       | 17.1M/79.3M [00:12<00:33, 1.97MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  22%|##1       | 17.3M/79.3M [00:12<00:32, 1.97MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  22%|##2       | 17.6M/79.3M [00:12<00:31, 2.06MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  22%|##2       | 17.8M/79.3M [00:12<00:31, 2.07MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  23%|##2       | 18.0M/79.3M [00:12<00:31, 2.05MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  23%|##2       | 18.2M/79.3M [00:12<00:32, 1.99MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  23%|##3       | 18.4M/79.3M [00:12<00:32, 1.96MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  23%|##3       | 18.6M/79.3M [00:12<00:33, 1.92MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  24%|##3       | 18.8M/79.3M [00:12<00:30, 2.09MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  24%|##3       | 19.0M/79.3M [00:13<00:30, 2.06MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  24%|##4       | 19.2M/79.3M [00:13<00:32, 1.95MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  24%|##4       | 19.4M/79.3M [00:13<00:31, 1.97MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  25%|##4       | 19.6M/79.3M [00:13<00:32, 1.93MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  25%|##5       | 19.8M/79.3M [00:13<00:30, 2.07MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  25%|##5       | 20.1M/79.3M [00:13<00:29, 2.10MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  26%|##5       | 20.3M/79.3M [00:13<00:31, 1.98MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  26%|##5       | 20.5M/79.3M [00:13<00:31, 1.98MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  26%|##6       | 20.7M/79.3M [00:13<00:31, 1.94MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  26%|##6       | 20.9M/79.3M [00:14<00:29, 2.06MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  27%|##6       | 21.1M/79.3M [00:14<00:29, 2.07MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  27%|##6       | 21.3M/79.3M [00:14<00:31, 1.96MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  27%|##7       | 21.5M/79.3M [00:14<00:30, 1.97MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  27%|##7       | 21.7M/79.3M [00:14<00:31, 1.92MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  28%|##7       | 21.9M/79.3M [00:14<00:29, 2.01MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  28%|##7       | 22.1M/79.3M [00:14<00:28, 2.09MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  28%|##8       | 22.4M/79.3M [00:14<00:30, 1.96MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  28%|##8       | 22.6M/79.3M [00:14<00:30, 1.93MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  29%|##8       | 22.8M/79.3M [00:15<00:28, 2.08MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  29%|##9       | 23.0M/79.3M [00:15<00:28, 2.09MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  29%|##9       | 23.2M/79.3M [00:15<00:29, 1.98MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  30%|##9       | 23.4M/79.3M [00:15<00:30, 1.93MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  30%|##9       | 23.6M/79.3M [00:15<00:29, 1.96MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  30%|###       | 23.8M/79.3M [00:15<00:29, 1.96MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  30%|###       | 24.1M/79.3M [00:15<00:27, 2.10MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  31%|###       | 24.3M/79.3M [00:15<00:27, 2.09MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  31%|###       | 24.5M/79.3M [00:15<00:29, 1.98MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  31%|###1      | 24.7M/79.3M [00:16<00:29, 1.96MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  31%|###1      | 24.9M/79.3M [00:16<00:29, 1.94MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  32%|###1      | 25.1M/79.3M [00:16<00:27, 2.08MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  32%|###1      | 25.3M/79.3M [00:16<00:27, 2.07MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  32%|###2      | 25.5M/79.3M [00:16<00:26, 2.10MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  32%|###2      | 25.7M/79.3M [00:16<00:29, 1.92MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  33%|###2      | 25.9M/79.3M [00:16<00:29, 1.93MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  33%|###2      | 26.2M/79.3M [00:16<00:27, 2.04MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  33%|###3      | 26.4M/79.3M [00:16<00:26, 2.10MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  34%|###3      | 26.6M/79.3M [00:17<00:28, 1.95MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  34%|###3      | 26.8M/79.3M [00:17<00:27, 1.97MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  34%|###4      | 27.0M/79.3M [00:17<00:27, 2.00MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  34%|###4      | 27.2M/79.3M [00:17<00:26, 2.03MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  35%|###4      | 27.4M/79.3M [00:17<00:27, 2.01MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  35%|###4      | 27.6M/79.3M [00:17<00:27, 1.98MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  35%|###5      | 27.9M/79.3M [00:17<00:26, 2.01MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  35%|###5      | 28.1M/79.3M [00:17<00:26, 2.02MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  36%|###5      | 28.3M/79.3M [00:17<00:25, 2.13MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  36%|###5      | 28.5M/79.3M [00:17<00:24, 2.14MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  36%|###6      | 28.7M/79.3M [00:18<00:25, 2.04MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  36%|###6      | 28.9M/79.3M [00:18<00:26, 2.03MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  37%|###6      | 29.1M/79.3M [00:18<00:25, 2.05MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  37%|###7      | 29.4M/79.3M [00:18<00:24, 2.11MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  37%|###7      | 29.6M/79.3M [00:18<00:24, 2.15MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  38%|###7      | 29.8M/79.3M [00:18<00:22, 2.28MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  38%|###7      | 30.1M/79.3M [00:18<00:23, 2.16MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  38%|###8      | 30.3M/79.3M [00:18<00:24, 2.14MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  38%|###8      | 30.5M/79.3M [00:18<00:24, 2.12MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  39%|###8      | 30.7M/79.3M [00:19<00:22, 2.26MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  39%|###9      | 31.0M/79.3M [00:19<00:23, 2.20MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  39%|###9      | 31.2M/79.3M [00:19<00:21, 2.33MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  40%|###9      | 31.4M/79.3M [00:19<00:22, 2.25MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  40%|###9      | 31.7M/79.3M [00:19<00:21, 2.28MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  40%|####      | 31.9M/79.3M [00:19<00:21, 2.30MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  41%|####      | 32.1M/79.3M [00:19<00:21, 2.33MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  41%|####      | 32.4M/79.3M [00:19<00:20, 2.39MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  41%|####1     | 32.7M/79.3M [00:19<00:19, 2.49MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  42%|####1     | 32.9M/79.3M [00:20<00:20, 2.40MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  42%|####1     | 33.2M/79.3M [00:20<00:19, 2.45MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  42%|####2     | 33.5M/79.3M [00:20<00:19, 2.50MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  43%|####2     | 33.8M/79.3M [00:20<00:18, 2.62MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  43%|####2     | 34.1M/79.3M [00:20<00:17, 2.70MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  43%|####3     | 34.3M/79.3M [00:20<00:17, 2.72MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  44%|####3     | 34.6M/79.3M [00:20<00:17, 2.66MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  44%|####3     | 34.8M/79.3M [00:20<00:17, 2.67MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  44%|####4     | 35.1M/79.3M [00:20<00:17, 2.72MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  45%|####4     | 35.4M/79.3M [00:20<00:16, 2.82MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  45%|####5     | 35.7M/79.3M [00:21<00:15, 2.92MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  45%|####5     | 36.1M/79.3M [00:21<00:14, 3.08MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  46%|####5     | 36.4M/79.3M [00:21<00:14, 3.07MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  46%|####6     | 36.7M/79.3M [00:21<00:14, 3.08MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  47%|####6     | 37.0M/79.3M [00:21<00:14, 3.07MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  47%|####7     | 37.3M/79.3M [00:21<00:14, 3.07MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  47%|####7     | 37.6M/79.3M [00:21<00:13, 3.20MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  48%|####7     | 38.0M/79.3M [00:21<00:12, 3.38MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  48%|####8     | 38.4M/79.3M [00:21<00:12, 3.43MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  49%|####8     | 38.7M/79.3M [00:22<00:12, 3.47MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  49%|####9     | 39.1M/79.3M [00:22<00:11, 3.65MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  50%|####9     | 39.5M/79.3M [00:22<00:11, 3.58MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  50%|#####     | 39.8M/79.3M [00:22<00:11, 3.60MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  51%|#####     | 40.2M/79.3M [00:22<00:11, 3.56MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  51%|#####1    | 40.7M/79.3M [00:22<00:10, 3.99MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  52%|#####1    | 41.2M/79.3M [00:22<00:09, 4.20MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  52%|#####2    | 41.6M/79.3M [00:22<00:09, 4.05MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  53%|#####3    | 42.1M/79.3M [00:22<00:09, 4.10MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  54%|#####3    | 42.5M/79.3M [00:23<00:09, 3.99MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  54%|#####4    | 43.0M/79.3M [00:23<00:08, 4.53MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  55%|#####4    | 43.5M/79.3M [00:23<00:08, 4.57MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  55%|#####5    | 44.0M/79.3M [00:23<00:07, 4.80MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  56%|#####6    | 44.5M/79.3M [00:23<00:07, 4.66MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  57%|#####6    | 45.0M/79.3M [00:23<00:07, 4.67MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  57%|#####7    | 45.5M/79.3M [00:23<00:07, 4.61MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  58%|#####8    | 46.1M/79.3M [00:23<00:06, 5.32MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  59%|#####8    | 46.7M/79.3M [00:23<00:06, 5.44MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  60%|#####9    | 47.2M/79.3M [00:23<00:06, 5.52MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  60%|######    | 47.8M/79.3M [00:24<00:06, 5.45MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  61%|######    | 48.4M/79.3M [00:24<00:06, 5.39MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  62%|######1   | 49.0M/79.3M [00:24<00:05, 5.32MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  63%|######2   | 49.8M/79.3M [00:24<00:04, 6.25MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  64%|######3   | 50.4M/79.3M [00:24<00:04, 6.22MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  64%|######4   | 51.1M/79.3M [00:24<00:04, 6.51MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  65%|######5   | 51.7M/79.3M [00:24<00:04, 6.25MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  66%|######5   | 52.3M/79.3M [00:24<00:04, 6.25MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  67%|######6   | 53.0M/79.3M [00:24<00:04, 6.40MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  68%|######7   | 53.6M/79.3M [00:25<00:04, 6.34MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  69%|######8   | 54.5M/79.3M [00:25<00:03, 7.18MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  70%|######9   | 55.3M/79.3M [00:25<00:03, 7.47MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  71%|#######   | 56.1M/79.3M [00:25<00:03, 7.68MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  72%|#######1  | 56.9M/79.3M [00:25<00:03, 7.51MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  73%|#######2  | 57.7M/79.3M [00:25<00:02, 7.62MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  74%|#######3  | 58.4M/79.3M [00:25<00:02, 7.69MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  75%|#######4  | 59.2M/79.3M [00:25<00:02, 7.53MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  76%|#######5  | 60.2M/79.3M [00:25<00:02, 8.52MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  77%|#######7  | 61.2M/79.3M [00:25<00:02, 8.85MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  78%|#######8  | 62.1M/79.3M [00:26<00:02, 8.99MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  79%|#######9  | 63.0M/79.3M [00:26<00:01, 8.87MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  81%|########  | 63.9M/79.3M [00:26<00:01, 8.99MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  82%|########1 | 64.9M/79.3M [00:26<00:01, 8.82MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  83%|########3 | 65.8M/79.3M [00:26<00:01, 9.19MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  85%|########4 | 67.1M/79.3M [00:26<00:01, 10.3MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  86%|########5 | 68.2M/79.3M [00:26<00:01, 10.4MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  87%|########7 | 69.2M/79.3M [00:26<00:00, 10.6MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  89%|########8 | 70.3M/79.3M [00:26<00:00, 10.4MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  90%|########9 | 71.3M/79.3M [00:27<00:00, 10.5MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  91%|#########1| 72.4M/79.3M [00:27<00:00, 10.3MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  93%|#########2| 73.5M/79.3M [00:27<00:00, 10.6MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  94%|#########4| 74.7M/79.3M [00:27<00:00, 11.2MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  96%|#########5| 76.1M/79.3M [00:27<00:00, 12.1MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  98%|#########7| 77.5M/79.3M [00:27<00:00, 12.9MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz:  99%|#########9| 78.8M/79.3M [00:27<00:00, 12.6MiB/s]C:\Users\maxi1\.cache\chroma\onnx_models\all-MiniLM-L6-v2\onnx.tar.gz: 100%|##########| 79.3M/79.3M [00:27<00:00, 3.00MiB/s]
+Fertig in 69.1s
+  Dateien verarbeitet: 76
+  Chunks eingefügt/aktualisiert: 1239
+  Chunks insgesamt in Collection: 1239
+ 
+==== FERTIG ==== 

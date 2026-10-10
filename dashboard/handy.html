@@ -1,0 +1,718 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#04080d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Jarvis</title>
+<!-- Handy-Oberflaeche von Jarvis (24.09.2026, Claude). Aufruf im Heimnetz ueber
+     1 Starten/HANDY_STARTEN.bat: http://<PC-Adresse>:8000/handy?zugang=CODE
+     Nutzt nur: /api/chat/stream, /api/briefing, /api/denkblock, /api/vorschlaege, /api/health -->
+<style>
+  :root {
+    --bg: #04080d; --panel: rgba(12,24,36,.85); --panel-2: rgba(18,34,50,.9);
+    --line: rgba(56,225,255,.22); --text: #dff3fb; --muted: #7fa2b6;
+    --accent: #38e1ff; --gold: #f5b642; --up: #2ee6a8; --down: #ff5f7a;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: radial-gradient(120% 60% at 50% 0%, rgba(56,225,255,.10), transparent 60%), var(--bg);
+    color: var(--text); font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: flex; flex-direction: column; height: 100dvh; overflow: hidden;
+  }
+  header {
+    display: flex; align-items: center; gap: 10px; padding: calc(10px + env(safe-area-inset-top)) 16px 10px;
+    border-bottom: 1px solid var(--line); background: rgba(4,8,13,.8);
+  }
+  .logo { font-weight: 700; letter-spacing: .28em; font-size: 18px;
+    background: linear-gradient(90deg, var(--accent), #e8fbff 45%, var(--gold)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .punkt { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); box-shadow: 0 0 8px currentColor; }
+  .punkt.ok { background: var(--up); } .punkt.aus { background: var(--down); }
+  .status { font-size: 12px; color: var(--muted); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .schalter { border: 1px solid var(--line); background: transparent; color: var(--muted); border-radius: 999px; padding: 6px 10px; font-size: 13px; }
+  .schalter.an { color: var(--bg); background: var(--accent); border-color: var(--accent); }
+  main { flex: 1; overflow-y: auto; padding: 14px 14px 8px; -webkit-overflow-scrolling: touch; }
+  .msg { max-width: 88%; margin: 0 0 12px; padding: 10px 13px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); white-space: pre-wrap; word-wrap: break-word; }
+  .msg.ich { margin-left: auto; background: rgba(245,182,66,.12); border-color: rgba(245,182,66,.35); }
+  .msg.fehler { border-color: var(--down); color: #ffd3db; }
+  .quellen { margin-top: 6px; font-size: 12px; color: var(--muted); }
+  .leer { color: var(--muted); text-align: center; margin-top: 18vh; padding: 0 20px; }
+  .leer b { color: var(--text); }
+  .schnell { display: flex; gap: 8px; padding: 0 14px 8px; overflow-x: auto; }
+  .schnell button { flex: 0 0 auto; border: 1px solid var(--line); background: var(--panel-2); color: var(--text); border-radius: 999px; padding: 9px 14px; font-size: 14px; }
+  form { display: flex; gap: 8px; align-items: flex-end; padding: 8px 12px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: rgba(4,8,13,.9); }
+  textarea { flex: 1; resize: none; max-height: 120px; min-height: 46px; border-radius: 14px; border: 1px solid var(--line); background: var(--panel); color: var(--text); padding: 12px; font: inherit; }
+  textarea:focus { outline: none; border-color: var(--accent); }
+  .rund { flex: 0 0 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line); background: var(--panel-2); color: var(--accent); font-size: 20px; }
+  .rund.senden { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .rund.hoert { background: var(--down); color: #fff; border-color: var(--down); }
+  .rund:disabled { opacity: .45; }
+  .rund.gespraech { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+  .rund.spricht { background: var(--up); color: var(--bg); border-color: var(--up); }
+  .karte { border: 1px solid rgba(245,182,66,.45); background: rgba(245,182,66,.08); border-radius: 14px; padding: 12px 14px; margin: 0 0 12px; font-size: 14px; }
+  .karte b { color: var(--gold); }
+  .karte code { display: block; margin: 6px 0; padding: 8px; border-radius: 8px; background: rgba(0,0,0,.4); color: var(--accent); word-break: break-all; font-size: 13px; }
+  .karte button { margin-top: 6px; border: 1px solid var(--line); background: var(--panel-2); color: var(--text); border-radius: 10px; padding: 8px 12px; font-size: 14px; }
+  .blatt { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: none; align-items: flex-end; z-index: 10; }
+  .blatt.offen { display: flex; }
+  .blatt > div { width: 100%; max-height: 82dvh; overflow-y: auto; background: #07111a; border-top: 1px solid var(--line); border-radius: 18px 18px 0 0; padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); }
+  .blatt h2 { margin: 0 0 10px; font-size: 17px; color: var(--gold); }
+  .blatt textarea { width: 100%; min-height: 160px; max-height: none; }
+  .knopfreihe { display: flex; gap: 8px; margin-top: 10px; }
+  .knopf { flex: 1; border: 1px solid var(--line); background: var(--panel-2); color: var(--text); border-radius: 12px; padding: 12px; font-size: 15px; }
+  .knopf.haupt { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; }
+  .knopf.nein { border-color: rgba(255,95,122,.5); }
+  .vorschlag { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; background: var(--panel); }
+  .vorschlag .ziel { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .vorschlag .text { white-space: pre-wrap; font-size: 14px; max-height: 160px; overflow: auto; }
+  .datei-wahl { display: block; border: 1px dashed var(--line); border-radius: 12px; padding: 18px 12px; text-align: center; color: var(--muted); background: var(--panel); }
+  .datei-wahl input { display: block; width: 100%; margin-top: 10px; color: var(--text); }
+  .ablage-zeile { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+  .ablage-zeile a { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ablage-zeile span { color: var(--muted); flex: 0 0 auto; }
+  .tt-wahl { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--text); font-size: 15px; }
+  .tt-bilder { display: flex; gap: 6px; overflow-x: auto; margin-top: 8px; }
+  .tt-bilder img { height: 110px; border-radius: 6px; border: 1px solid var(--line); }
+  .tt-text { white-space: pre-wrap; font-size: 13px; max-height: 200px; overflow: auto; margin-top: 8px; color: var(--muted); }
+  .hinweis { font-size: 13px; color: var(--muted); margin-top: 8px; }
+</style>
+</head>
+<body>
+<header>
+  <span class="punkt" id="punkt"></span>
+  <span class="logo">JARVIS</span>
+  <span class="status" id="status">verbinde ...</span>
+  <button class="schalter" id="vorlesen" type="button" aria-pressed="false">Stimme</button>
+</header>
+
+<main id="verlauf">
+  <div class="leer" id="leer"><b>Guten Tag, Sir.</b><br>Tippen Sie auf das Mikrofon und sprechen Sie mit mir.<br>Ich antworte mit meiner Stimme und höre danach wieder zu.<br>„Stopp“ oder „Danke Jarvis“ beendet das Gespräch.</div>
+</main>
+
+<div class="schnell">
+  <button type="button" id="kBriefing">Briefing</button>
+  <button type="button" data-senden="Plan meinen Tag">Tag planen</button>
+  <button type="button" data-einfuegen="Schreib eine WhatsApp an ">WhatsApp</button>
+  <button type="button" data-einfuegen="Mind Map: ">Mind Map</button>
+  <button type="button" data-einfuegen="Neues Projekt: ">Projekt</button>
+  <button type="button" id="kNotiz">Notiz festhalten</button>
+  <button type="button" id="kVorschlaege">Vorschläge</button>
+  <button type="button" id="kDatei">Datei senden</button>
+  <button type="button" id="kSlides">TikTok-Slides</button>
+  <button type="button" id="kMemo">Sprachmemo</button>
+  <button type="button" id="kNeu">Neues Gespräch</button>
+</div>
+
+<form id="formular" autocomplete="off">
+  <button class="rund" id="mikro" type="button" aria-label="Sprechen">&#127908;</button>
+  <textarea id="eingabe" rows="1" placeholder="Frage an Jarvis ..." enterkeyhint="send"></textarea>
+  <button class="rund senden" id="senden" type="submit" aria-label="Senden">&#10148;</button>
+</form>
+
+<div class="blatt" id="blattNotiz"><div>
+  <h2>Gedanken festhalten</h2>
+  <textarea id="notizText" placeholder="Einfach losschreiben oder die Mikrofon-Taste der Tastatur nutzen ..."></textarea>
+  <div class="hinweis">Landet als neue Denk-Notiz im Vault (Wissen/10 - Denkblock). Kostet nichts.</div>
+  <div class="knopfreihe">
+    <button class="knopf" type="button" data-zu="blattNotiz">Abbrechen</button>
+    <button class="knopf haupt" type="button" id="notizSpeichern">Speichern</button>
+  </div>
+</div></div>
+
+<div class="blatt" id="blattVorschlaege"><div>
+  <h2>Vorschläge von Jarvis</h2>
+  <div id="vorschlagListe"><div class="hinweis">lade ...</div></div>
+  <div class="knopfreihe"><button class="knopf" type="button" data-zu="blattVorschlaege">Schließen</button></div>
+</div></div>
+
+<div class="blatt" id="blattDatei"><div>
+  <h2>Datei an Jarvis senden</h2>
+  <label class="datei-wahl">Foto oder Datei wählen (mehrere möglich)
+    <input type="file" id="dateiWahl" multiple />
+  </label>
+  <div class="hinweis">Landet am PC in Jarvis\data\ablage. Höchstens 50 MB je Datei, keine Programme. Nichts wird überschrieben. Kostet nichts.</div>
+  <div class="hinweis" id="dateiStatus"></div>
+  <div class="knopfreihe">
+    <button class="knopf" type="button" data-zu="blattDatei">Schließen</button>
+    <button class="knopf haupt" type="button" id="dateiSenden">Senden</button>
+  </div>
+  <h2 style="margin-top:16px">Zuletzt abgelegt</h2>
+  <div id="ablageListe"><div class="hinweis">lade ...</div></div>
+</div></div>
+
+<div class="blatt" id="blattMemo"><div>
+  <h2>Sprachmemos (Ideen)</h2>
+  <input class="tt-wahl" id="memoTitel" placeholder="Titel (optional)" maxlength="120" style="width:100%" />
+  <div class="knopfreihe">
+    <button class="knopf haupt" type="button" id="memoAufnehmen">&#9679; Aufnehmen</button>
+    <button class="knopf" type="button" id="memoDateiKnopf">Datei hochladen</button>
+  </div>
+  <input type="file" id="memoAufnahme" accept="audio/*" capture style="display:none" />
+  <input type="file" id="memoDatei" accept="audio/*" multiple style="display:none" />
+  <div class="hinweis" id="memoStatus">Landet in Jarvis\data\sprachmemos. Kostet nichts, nichts wird gelöscht.</div>
+  <div id="memoListe" style="margin-top:10px"><div class="hinweis">lade ...</div></div>
+  <div class="knopfreihe"><button class="knopf" type="button" data-zu="blattMemo">Schließen</button></div>
+</div></div>
+
+<div class="blatt" id="blattSlides"><div>
+  <h2>TikTok-Slides an Jarvis</h2>
+  <div class="hinweis" style="margin-top:0">1. Beitrag wählen oder Link einfügen · 2. Slides in Reihenfolge wählen · 3. Text lesen · 4. In den Vault</div>
+  <select class="tt-wahl" id="ttWahl" style="margin-top:8px"><option value="">lade ...</option></select>
+  <div class="knopfreihe">
+    <input class="tt-wahl" id="ttLink" placeholder="oder neuen TikTok-Link einfügen" style="flex:1" />
+    <button class="knopf" type="button" id="ttLinkHinzu" style="flex:0 0 auto">+</button>
+  </div>
+  <label class="datei-wahl" style="margin-top:10px">Slides wählen (in der richtigen Reihenfolge)
+    <input type="file" id="ttSlideWahl" multiple accept="image/jpeg,image/png,image/webp,image/gif" />
+  </label>
+  <div class="tt-bilder" id="ttBilder"></div>
+  <div class="hinweis" id="ttStatus"></div>
+  <div class="knopfreihe">
+    <button class="knopf" type="button" id="ttLesen">Text lesen</button>
+    <button class="knopf haupt" type="button" id="ttVault">In den Vault</button>
+  </div>
+  <div class="tt-text" id="ttText"></div>
+  <div class="knopfreihe"><button class="knopf" type="button" data-zu="blattSlides">Schließen</button></div>
+</div></div>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const verlauf = [];              // {role, content} für den Gesprächsverlauf (letzte 8)
+let vorlesen = true;
+try { vorlesen = localStorage.getItem("jarvis_handy_vorlesen") !== "0"; } catch (e) { /* egal */ }
+
+function vorlesenZeigen() {
+  $("vorlesen").classList.toggle("an", vorlesen);
+  $("vorlesen").setAttribute("aria-pressed", vorlesen ? "true" : "false");
+}
+vorlesenZeigen();
+$("vorlesen").addEventListener("click", () => {
+  vorlesen = !vorlesen; vorlesenZeigen();
+  try { localStorage.setItem("jarvis_handy_vorlesen", vorlesen ? "1" : "0"); } catch (e) { /* egal */ }
+  if (!vorlesen) stummschalten();
+});
+
+/* Sprachausgabe: zuerst die Jarvis-Stimme vom PC (Fish Audio, sonst Piper),
+   sonst die Stimme des Handys. Gibt ein Promise zurück, das nach dem Sprechen erfüllt ist. */
+let stimmeQuelle = null;          // "fish" | "piper" | "handy"
+let audioJetzt = null;
+async function stimmeErmitteln() {
+  if (stimmeQuelle) return stimmeQuelle;
+  stimmeQuelle = "handy";
+  try { const r = await fetch("/api/sprache/status"); if (r.ok) { const d = await r.json(); if (d.verfuegbar) { stimmeQuelle = "fish"; return stimmeQuelle; } } } catch (e) { /* weiter */ }
+  try { const r = await fetch("/api/sprache/piper/status"); if (r.ok) { const d = await r.json(); if (d.verfuegbar) stimmeQuelle = "piper"; } } catch (e) { /* weiter */ }
+  return stimmeQuelle;
+}
+function sprechText(text) {
+  let t = String(text || "").replace(/\[\[([^\]|]+)(\|[^\]]+)?\]\]/g, "$1").replace(/[*#_`>|]/g, " ").replace(/\s+/g, " ").trim();
+  if (t.length > 700) { const cut = t.lastIndexOf(".", 700); t = t.slice(0, cut > 200 ? cut + 1 : 700); }
+  return t;
+}
+function handyStimme(t) {
+  return new Promise((fertig) => {
+    if (!window.speechSynthesis) return fertig();
+    const u = new SpeechSynthesisUtterance(t);
+    u.lang = "de-DE";
+    const stimme = speechSynthesis.getVoices().find((v) => v.lang && v.lang.startsWith("de"));
+    if (stimme) u.voice = stimme;
+    u.onend = u.onerror = () => fertig();
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  });
+}
+async function sprich(text) {
+  const t = sprechText(text);
+  if (!vorlesen || !t) return;
+  anzeige("spricht");
+  try {
+    const quelle = await stimmeErmitteln();
+    if (quelle === "handy") { await handyStimme(t); return; }
+    const r = await fetch(quelle === "fish" ? "/api/sprache" : "/api/sprache/piper", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: t, tempo: 1 }),
+    });
+    if (!r.ok) throw new Error("Stimme " + r.status);
+    const url = URL.createObjectURL(await r.blob());
+    await new Promise((fertig) => {
+      audioJetzt = new Audio(url);
+      audioJetzt.onended = audioJetzt.onerror = audioJetzt.onpause = () => { URL.revokeObjectURL(url); audioJetzt = null; fertig(); };
+      audioJetzt.play().catch(() => { audioJetzt = null; handyStimme(t).then(fertig); });
+    });
+  } catch (e) {
+    stimmeQuelle = "handy";
+    await handyStimme(t);
+  } finally {
+    anzeige(gespraech ? "bereit" : "");
+  }
+}
+function stummschalten() {
+  if (audioJetzt) { try { audioJetzt.pause(); } catch (e) { /* egal */ } audioJetzt = null; }
+  if (window.speechSynthesis) speechSynthesis.cancel();
+}
+
+function blase(text, art) {
+  const leer = $("leer"); if (leer) leer.remove();
+  const d = document.createElement("div");
+  d.className = "msg" + (art ? " " + art : "");
+  d.textContent = text;
+  $("verlauf").appendChild(d);
+  $("verlauf").scrollTop = $("verlauf").scrollHeight;
+  return d;
+}
+
+let letzterStatus = "";
+function anzeige(was) {
+  const m = $("mikro");
+  m.classList.toggle("hoert", was === "hoert");
+  m.classList.toggle("spricht", was === "spricht");
+  m.classList.toggle("gespraech", gespraech && was !== "hoert" && was !== "spricht");
+  const texte = { hoert: "hört zu …", denkt: "denkt nach …", spricht: "spricht …", bereit: "Gespräch läuft" };
+  $("status").textContent = texte[was] || letzterStatus;
+}
+async function status() {
+  try {
+    const r = await fetch("/api/health", { cache: "no-store" });
+    if (r.status === 401) { $("punkt").className = "punkt aus"; $("status").textContent = "Zugangscode fehlt - Link neu öffnen"; return; }
+    const d = await r.json();
+    $("punkt").className = "punkt ok";
+    letzterStatus = d.vault_indexed ? (d.chunk_count + " Abschnitte im Gedächtnis" + (d.reindex_running ? " · liest ein" : "")) : "Vault noch nicht eingelesen";
+    if (!gespraech && !laeuft) $("status").textContent = letzterStatus;
+  } catch (e) {
+    $("punkt").className = "punkt aus"; $("status").textContent = "PC nicht erreichbar";
+  }
+}
+status(); setInterval(status, 30000);
+
+let laeuft = false;
+async function fragen(text) {
+  text = (text || "").trim();
+  if (!text || laeuft) return;
+  laeuft = true; $("senden").disabled = true;
+  blase(text, "ich");
+  const antwortBlase = blase("…");
+  anzeige("denkt");
+  let antwort = "", quellen = [];
+  try {
+    const r = await fetch("/api/chat/stream", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text, history: verlauf.slice(-8), laenge: "kurz", top_k: 3 }),
+    });
+    if (!r.ok) throw new Error(r.status === 401 ? "Zugangscode fehlt - Link neu öffnen, Sir." : ("Jarvis antwortet nicht (" + r.status + ")."));
+    const leser = r.body.getReader(); const dec = new TextDecoder(); let rest = "";
+    for (;;) {
+      const { value, done } = await leser.read();
+      if (done) break;
+      rest += dec.decode(value, { stream: true });
+      const teile = rest.split("\n\n"); rest = teile.pop();
+      for (const teil of teile) {
+        const zeile = teil.split("\n").find((z) => z.startsWith("data: "));
+        if (!zeile) continue;
+        const ev = JSON.parse(zeile.slice(6));
+        if (ev.typ === "text") { antwort += ev.text; antwortBlase.textContent = antwort; $("verlauf").scrollTop = $("verlauf").scrollHeight; }
+        else if (ev.typ === "ersetzen") { antwort = ""; antwortBlase.textContent = "…"; }   // 05.10.2026: lokale Antwort unbrauchbar, Claude antwortet
+        else if (ev.typ === "quellen") { quellen = ev.quellen || []; }
+        else if (ev.typ === "fehler") { throw new Error(ev.text); }
+        else if (ev.typ === "vorschlag" && ev.vorschlag) { antwort += "\n\n(Vorschlag angelegt - unter „Vorschläge“ übernehmen.)"; antwortBlase.textContent = antwort; }
+      }
+    }
+    if (!antwort) antwort = "Keine Antwort erhalten, Sir.";
+    antwortBlase.innerHTML = mitLinks(antwort);
+    if (quellen.length) {
+      const q = document.createElement("div"); q.className = "quellen";
+      const namen = [...new Set(quellen.map((s) => (s.file_path || "").split("/").pop().replace(/\.md$/, "")))].filter(Boolean);
+      q.textContent = "Quellen: " + namen.join(" · ");
+      antwortBlase.appendChild(q);
+    }
+    verlauf.push({ role: "user", content: text }, { role: "assistant", content: antwort });
+    laeuft = false;
+    await sprich(ohneLinks(antwort));
+    if (gespraech) hoeren();
+  } catch (e) {
+    antwortBlase.className = "msg fehler";
+    antwortBlase.textContent = e.message || "Fehler.";
+    gespraechEnde();
+  } finally {
+    laeuft = false; $("senden").disabled = false;
+    if (!gespraech) anzeige("");
+  }
+}
+
+/* 27.09.2026: Links in Antworten antippbar (WhatsApp, Kalender, Dateien), Codeblöcke als Text.
+   Alles wird zuerst maskiert - nur [Text](https://...), [Text](/api/...) und [Text](obsidian://...) werden Links. */
+function mitLinks(text) {
+  const e = (text || "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  return e.replace(/```[a-z]*\n?/g, "")
+    .replace(/\[([^\]]+)\]\(((?:https?:\/\/|obsidian:\/\/|\/api\/)[^)\s]+)\)/g,
+      '<a href="$2" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600">$1</a>');
+}
+function ohneLinks(text) {
+  return (text || "").replace(/```[a-z]*\n?/g, "").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/https?:\/\/\S+/g, "");
+}
+/* Schnellknöpfe: data-senden = sofort fragen, data-einfuegen = Anfang ins Feld, Sir ergänzt */
+document.querySelector(".schnell").addEventListener("click", (e) => {
+  const k = e.target.closest("button");
+  if (!k) return;
+  if (k.dataset.senden) fragen(k.dataset.senden);
+  else if (k.dataset.einfuegen) { $("eingabe").value = k.dataset.einfuegen; $("eingabe").focus(); groesse(); }
+});
+
+$("formular").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const t = $("eingabe").value; $("eingabe").value = ""; groesse();
+  fragen(t);
+});
+$("eingabe").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("formular").requestSubmit(); }
+});
+function groesse() { const t = $("eingabe"); t.style.height = "auto"; t.style.height = Math.min(t.scrollHeight, 120) + "px"; }
+$("eingabe").addEventListener("input", groesse);
+
+/* Gespräch: Mikrofon antippen -> Jarvis hört zu -> antwortet mit Stimme ->
+   hört wieder zu. "Stopp", "Danke Jarvis", "Ende" oder erneutes Antippen beendet.
+   Die Spracherkennung des Browsers braucht eine gesicherte Verbindung. Im Heimnetz
+   (http://) geht das über eine einmalige Chrome-Einstellung (Karte unten). */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const STOPP = /^(stopp?|stop|ende|danke,? jarvis|tschüss,? jarvis|das wars|das war's|gespräch beenden)[.!]?$/i;
+let gespraech = false, erkennung = null, stilleFehler = 0;
+
+function gespraechEnde() {
+  gespraech = false;
+  if (erkennung) { try { erkennung.abort(); } catch (e) { /* egal */ } erkennung = null; }
+  anzeige("");
+}
+function hoeren() {
+  if (!gespraech || laeuft) return;
+  const r = new SR();
+  erkennung = r;
+  r.lang = "de-DE"; r.interimResults = false; r.maxAlternatives = 1;
+  let gehoert = false;
+  r.onresult = (e) => {
+    gehoert = true; stilleFehler = 0;
+    const t = (e.results[0][0].transcript || "").trim();
+    if (STOPP.test(t)) { gespraechEnde(); sprich("Gern, Sir."); return; }
+    fragen(t);
+  };
+  r.onerror = (e) => {
+    if (e.error === "not-allowed" || e.error === "service-not-allowed") { gespraechEnde(); blase("Das Mikrofon ist für diese Seite nicht erlaubt, Sir. In Chrome: Schloss-Symbol neben der Adresse - Mikrofon - Zulassen.", "fehler"); }
+  };
+  r.onend = () => {
+    erkennung = null;
+    if (!gespraech || gehoert || laeuft) return;
+    stilleFehler++;
+    if (stilleFehler >= 3) { gespraechEnde(); return; }   // dreimal nichts gehört: Pause
+    setTimeout(hoeren, 300);
+  };
+  anzeige("hoert");
+  try { r.start(); } catch (e) { setTimeout(hoeren, 500); }
+}
+$("mikro").addEventListener("click", () => {
+  if (!SR || !window.isSecureContext) { sicherheitsKarte(); return; }
+  if (gespraech) { stummschalten(); gespraechEnde(); return; }
+  if (audioJetzt || (window.speechSynthesis && speechSynthesis.speaking)) stummschalten();
+  gespraech = true; stilleFehler = 0;
+  stimmeErmitteln();
+  hoeren();
+});
+
+function sicherheitsKarte() {
+  if (document.getElementById("sicherKarte")) return;
+  const leer = $("leer"); if (leer) leer.remove();
+  const k = document.createElement("div"); k.className = "karte"; k.id = "sicherKarte";
+  const herkunft = location.origin;
+  k.innerHTML = "<b>Einmalig einrichten, Sir:</b> Chrome erlaubt das Mikrofon nur auf gesicherten Seiten. " +
+    "So geben Sie Jarvis im Heimnetz frei:<br>1. Neuen Tab öffnen und diese Adresse eingeben:" +
+    "<code>chrome://flags/#unsafely-treat-insecure-origin-as-secure</code>" +
+    "2. In das Feld diese Adresse eintragen:<code id=\"herkunft\"></code>" +
+    "3. Rechts auf <b>Enabled</b> stellen, unten <b>Relaunch</b> tippen.<br>4. Jarvis wieder öffnen und das Mikrofon erlauben.";
+  const knopf = document.createElement("button"); knopf.type = "button"; knopf.textContent = "Adresse kopieren";
+  knopf.addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(herkunft); knopf.textContent = "Kopiert"; }
+    catch (e) { knopf.textContent = "Bitte abtippen"; }
+  });
+  k.appendChild(knopf);
+  $("verlauf").appendChild(k);
+  document.getElementById("herkunft").textContent = herkunft;
+  $("verlauf").scrollTop = $("verlauf").scrollHeight;
+}
+
+$("kBriefing").addEventListener("click", async () => {
+  if (laeuft) return;
+  laeuft = true;
+  const b = blase("Briefing wird geholt …");
+  try {
+    const r = await fetch("/api/briefing");
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail || ("Fehler " + r.status));
+    b.textContent = d.text + "\n\n(Stand " + d.stand + ")";
+    laeuft = false;
+    await sprich(d.text);
+  } catch (e) { b.className = "msg fehler"; b.textContent = "Briefing ging nicht: " + e.message; }
+  finally { laeuft = false; anzeige(gespraech ? "bereit" : ""); }
+});
+
+$("kNeu").addEventListener("click", () => {
+  stummschalten(); gespraechEnde();
+  verlauf.length = 0;
+  $("verlauf").innerHTML = '<div class="leer" id="leer"><b>Neues Gespräch, Sir.</b></div>';
+});
+
+function oeffnen(id) { $(id).classList.add("offen"); }
+function schliessen(id) { $(id).classList.remove("offen"); }
+document.querySelectorAll("[data-zu]").forEach((k) => k.addEventListener("click", () => schliessen(k.dataset.zu)));
+document.querySelectorAll(".blatt").forEach((b) => b.addEventListener("click", (e) => { if (e.target === b) schliessen(b.id); }));
+
+$("kNotiz").addEventListener("click", () => { oeffnen("blattNotiz"); setTimeout(() => $("notizText").focus(), 50); });
+$("notizSpeichern").addEventListener("click", async () => {
+  const text = $("notizText").value.trim();
+  if (!text) return;
+  const j = new Date(), z = (n) => String(n).padStart(2, "0");
+  const name = "Handy " + j.getFullYear() + "-" + z(j.getMonth() + 1) + "-" + z(j.getDate()) + " " + z(j.getHours()) + "-" + z(j.getMinutes());
+  $("notizSpeichern").disabled = true;
+  try {
+    const r = await fetch("/api/denkblock", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, text }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.detail || ("Fehler " + r.status));
+    $("notizText").value = ""; schliessen("blattNotiz");
+    blase("Festgehalten, Sir: Denkblock „" + name + "“.");
+  } catch (e) { blase("Notiz ging nicht: " + e.message, "fehler"); }
+  finally { $("notizSpeichern").disabled = false; }
+});
+
+async function vorschlaegeLaden() {
+  const liste = $("vorschlagListe");
+  liste.innerHTML = '<div class="hinweis">lade ...</div>';
+  try {
+    const r = await fetch("/api/vorschlaege?status=offen");
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail || r.status);
+    if (!d.length) { liste.innerHTML = '<div class="hinweis">Keine offenen Vorschläge, Sir.</div>'; return; }
+    liste.innerHTML = "";
+    d.slice(0, 30).forEach((v) => {
+      const k = document.createElement("div"); k.className = "vorschlag";
+      const ziel = document.createElement("div"); ziel.className = "ziel";
+      ziel.textContent = (v.art === "anhaengen" ? "anhängen an: " : "neue Notiz: ") + v.ziel;
+      const titel = document.createElement("b"); titel.textContent = v.titel || v.id;
+      const text = document.createElement("div"); text.className = "text"; text.textContent = v.text || "";
+      const reihe = document.createElement("div"); reihe.className = "knopfreihe";
+      const ja = document.createElement("button"); ja.className = "knopf haupt"; ja.textContent = "Übernehmen";
+      const nein = document.createElement("button"); nein.className = "knopf nein"; nein.textContent = "Verwerfen";
+      const aktion = async (was) => {
+        ja.disabled = nein.disabled = true;
+        try {
+          const rr = await fetch("/api/vorschlaege/" + encodeURIComponent(v.id) + "/" + was, { method: "POST" });
+          const dd = await rr.json().catch(() => ({}));
+          if (!rr.ok) throw new Error(dd.detail || rr.status);
+          k.remove();
+          if (!liste.children.length) liste.innerHTML = '<div class="hinweis">Alles erledigt, Sir.</div>';
+        } catch (e) { ja.disabled = nein.disabled = false; alertErsatz(k, "Ging nicht: " + e.message); }
+      };
+      ja.addEventListener("click", () => aktion("uebernehmen"));
+      nein.addEventListener("click", () => aktion("verwerfen"));
+      reihe.append(nein, ja);
+      k.append(ziel, titel, text, reihe);
+      liste.appendChild(k);
+    });
+  } catch (e) { liste.innerHTML = ""; alertErsatz(liste, "Vorschläge gingen nicht: " + e.message); }
+}
+function alertErsatz(wo, text) { const h = document.createElement("div"); h.className = "hinweis"; h.style.color = "var(--down)"; h.textContent = text; wo.appendChild(h); }
+$("kVorschlaege").addEventListener("click", () => { oeffnen("blattVorschlaege"); vorschlaegeLaden(); });
+
+/* Datei-Ablage vom Handy (26.09.2026): gleicher Weg wie im HUD, /api/ablage */
+function mb(b) { return b >= 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(b / 1024)) + " KB"; }
+async function ablageLaden() {
+  const liste = $("ablageListe");
+  try {
+    const r = await fetch("/api/ablage", { cache: "no-store" });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail || r.status);
+    liste.innerHTML = "";
+    if (!d.length) { liste.innerHTML = '<div class="hinweis">Noch leer.</div>'; return; }
+    d.slice(0, 10).forEach((f) => {
+      const z = document.createElement("div"); z.className = "ablage-zeile";
+      const a = document.createElement("a"); a.href = "/api/ablage/datei?name=" + encodeURIComponent(f.name); a.textContent = f.name;
+      const i = document.createElement("span"); i.textContent = mb(f.bytes) + " · " + String(f.geaendert || "").replace("T", " ").slice(5, 16);
+      z.append(a, i); liste.appendChild(z);
+    });
+  } catch (e) { liste.innerHTML = ""; alertErsatz(liste, "Liste ging nicht: " + e.message); }
+}
+$("kDatei").addEventListener("click", () => { oeffnen("blattDatei"); $("dateiStatus").textContent = ""; ablageLaden(); });
+$("dateiSenden").addEventListener("click", async () => {
+  const dateien = Array.from($("dateiWahl").files || []);
+  if (!dateien.length) { $("dateiStatus").textContent = "Erst eine Datei wählen, Sir."; return; }
+  $("dateiSenden").disabled = true;
+  const ok = [], fehler = [];
+  for (const [n, f] of dateien.entries()) {
+    $("dateiStatus").textContent = "sende " + (n + 1) + " von " + dateien.length + ": " + f.name + " ...";
+    try {
+      const r = await fetch("/api/ablage?name=" + encodeURIComponent(f.name || "handy-datei"), { method: "POST", body: f });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.detail || ("Fehler " + r.status));
+      ok.push(d.name || f.name);
+    } catch (e) { fehler.push(f.name + ": " + e.message); }
+  }
+  $("dateiSenden").disabled = false;
+  $("dateiWahl").value = "";
+  $("dateiStatus").textContent = ok.length + " gesendet" + (fehler.length ? ", " + fehler.length + " fehlgeschlagen: " + fehler.join(" / ") : ".");
+  if (ok.length) blase("Abgelegt, Sir: " + ok.join(", ") + " (Jarvis\\data\\ablage).");
+  ablageLaden();
+});
+
+/* TikTok-Slides vom Handy (26.09.2026): gleiche Adressen wie im HUD */
+async function ttJson(url, opt) {
+  const r = await fetch(url, opt);
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(typeof d.detail === "string" ? d.detail : "Fehler " + r.status);
+  return d;
+}
+function ttName(e) { return (e.titel || e.url.replace(/^https?:\/\/(www\.)?/, "")).slice(0, 60); }
+async function ttListe(auswahl) {
+  const w = $("ttWahl");
+  try {
+    const d = await ttJson("/api/tiktok", { cache: "no-store" });
+    const offen = d.links.filter((e) => e.status !== "im_vault").reverse();
+    w.innerHTML = offen.length ? offen.map((e) => `<option value="${e.id}">${(e.art === "foto" || e.url.includes("/photo/") ? "[Slides] " : "") + ttName(e).replace(/</g, "&lt;")}</option>`).join("")
+      : '<option value="">Keine offenen Beiträge - Link einfügen</option>';
+    if (auswahl) w.value = auswahl;
+    ttZeigen();
+  } catch (e) { w.innerHTML = '<option value="">Liste ging nicht</option>'; $("ttStatus").textContent = e.message; }
+}
+async function ttZeigen() {
+  const id = $("ttWahl").value;
+  $("ttBilder").innerHTML = ""; $("ttText").textContent = ""; $("ttStatus").textContent = "";
+  if (!id) return;
+  try {
+    const e = await ttJson("/api/tiktok/" + encodeURIComponent(id), { cache: "no-store" });
+    (e.bilder || []).forEach((b) => { const i = document.createElement("img"); i.loading = "lazy"; i.src = "/api/tiktok/" + encodeURIComponent(id) + "/bilder/datei?name=" + encodeURIComponent(b.name); $("ttBilder").appendChild(i); });
+    const n = (e.bilder || []).length;
+    $("ttLesen").textContent = n ? "Text lesen (ca. " + (n * 0.35).toFixed(1).replace(".", ",") + " Cent)" : "Text lesen";
+    $("ttStatus").textContent = n + " Slides zugeordnet" + (e.status === "geholt" ? " · gelesen, bereit für den Vault" : e.status === "im_vault" ? " · im Vault" : "") + ".";
+    $("ttText").textContent = e.transkript || "";
+  } catch (err) { $("ttStatus").textContent = err.message; }
+}
+$("kSlides").addEventListener("click", () => { oeffnen("blattSlides"); ttListe(); });
+$("ttWahl").addEventListener("change", ttZeigen);
+$("ttLinkHinzu").addEventListener("click", async () => {
+  const text = $("ttLink").value.trim(); if (!text) return;
+  try {
+    await ttJson("/api/tiktok/links", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
+    const d = await ttJson("/api/tiktok", { cache: "no-store" });
+    const neu = d.links.filter((e) => text.includes(e.url) || e.url.includes(text.split("?")[0].replace(/\/$/, ""))).pop();
+    $("ttLink").value = "";
+    await ttListe(neu ? neu.id : undefined);
+  } catch (e) { $("ttStatus").textContent = "Link ging nicht: " + e.message; }
+});
+$("ttSlideWahl").addEventListener("change", async (ev) => {
+  const id = $("ttWahl").value, dateien = Array.from(ev.target.files || []);
+  if (!id) { $("ttStatus").textContent = "Erst einen Beitrag wählen, Sir."; ev.target.value = ""; return; }
+  const fehler = [];
+  for (const [n, f] of dateien.entries()) {
+    $("ttStatus").textContent = "sende Slide " + (n + 1) + " von " + dateien.length + " ...";
+    try { await ttJson("/api/tiktok/" + encodeURIComponent(id) + "/bilder", { method: "POST", body: f }); }
+    catch (e) { fehler.push(f.name + ": " + e.message); }
+  }
+  ev.target.value = "";
+  await ttZeigen();
+  if (fehler.length) $("ttStatus").textContent += " Fehler: " + fehler.join(" / ");
+});
+$("ttLesen").addEventListener("click", async () => {
+  const id = $("ttWahl").value; if (!id) return;
+  $("ttLesen").disabled = true; $("ttStatus").textContent = "Jarvis liest die Slides, ca. 5 Sekunden je Bild ...";
+  try {
+    const e = await ttJson("/api/tiktok/" + encodeURIComponent(id) + "/bilder/lesen", { method: "POST" });
+    await ttZeigen();
+    $("ttStatus").textContent = "Gelesen: " + (e.bilder || 0) + " Slides, " + ((e.slides_kosten_usd || 0) * 100).toFixed(2).replace(".", ",") + " US-Cent.";
+  } catch (err) { $("ttStatus").textContent = "Lesen ging nicht: " + err.message; }
+  finally { $("ttLesen").disabled = false; }
+});
+$("ttVault").addEventListener("click", async () => {
+  const id = $("ttWahl").value; if (!id) return;
+  try {
+    const e = await ttJson("/api/tiktok/" + encodeURIComponent(id) + "/vault", { method: "POST" });
+    blase("Im Vault, Sir: " + e.notiz);
+    await ttListe();
+  } catch (err) { $("ttStatus").textContent = "Vault ging nicht: " + err.message; }
+});
+
+if (window.speechSynthesis) speechSynthesis.getVoices();
+/* Sprachmemos (02.10.2026): Ideen einsprechen/hochladen und anhören - Backend app/sprachmemos.py.
+   Über http im Heimnetz sperrt der Browser das Mikrofon. Dann öffnet "Aufnehmen" die
+   Aufnahme-App des Handys (input capture) und die Datei wird hochgeladen. */
+const MEMO = { rec: null, teile: [], strom: null, uhr: null, start: 0 };
+function memoZeit(iso) { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleString("de-DE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }); }
+async function memoSenden(blob, name, titel) {
+  const url = "/api/sprachmemos?name=" + encodeURIComponent(name || "aufnahme") + (titel ? "&titel=" + encodeURIComponent(titel) : "");
+  const r = await fetch(url, { method: "POST", headers: { "Content-Type": blob.type || "application/octet-stream" }, body: blob });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.detail || ("Fehler " + r.status));
+  return d;
+}
+async function memoLaden() {
+  const liste = $("memoListe");
+  try {
+    const r = await fetch("/api/sprachmemos", { cache: "no-store" });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail || r.status);
+    liste.innerHTML = "";
+    if (!d.memos.length) { liste.innerHTML = '<div class="hinweis">Noch keine Sprachmemos, Sir.</div>'; return; }
+    d.memos.slice(0, 30).forEach((m) => {
+      const k = document.createElement("div"); k.style.cssText = "border-bottom:1px solid var(--line); padding:8px 0";
+      const t = document.createElement("b"); t.textContent = m.titel;
+      const i = document.createElement("div"); i.className = "hinweis"; i.style.marginTop = "2px";
+      i.textContent = memoZeit(m.erstellt) + (m.geraet ? " · " + m.geraet : "") + " · " + mb(m.bytes);
+      const a = document.createElement("audio"); a.controls = true; a.preload = "none"; a.style.cssText = "width:100%; margin-top:6px";
+      a.src = "/api/sprachmemos/" + encodeURIComponent(m.id) + "/audio";
+      k.append(t, i, a);
+      if (m.text) { const tx = document.createElement("div"); tx.className = "hinweis"; tx.style.whiteSpace = "pre-wrap"; tx.textContent = m.text; k.append(tx); }
+      liste.appendChild(k);
+    });
+  } catch (e) { liste.innerHTML = ""; alertErsatz(liste, "Liste ging nicht: " + e.message); }
+}
+async function memoDateienSenden(dateien) {
+  if (!dateien.length) return;
+  const ok = [], fehler = [];
+  for (const [n, f] of dateien.entries()) {
+    $("memoStatus").textContent = "lade hoch " + (n + 1) + " von " + dateien.length + " ...";
+    try { ok.push((await memoSenden(f, f.name, dateien.length === 1 ? $("memoTitel").value.trim() : "")).titel); }
+    catch (e) { fehler.push((f.name || "Aufnahme") + ": " + e.message); }
+  }
+  $("memoTitel").value = "";
+  $("memoStatus").textContent = ok.length + " gespeichert" + (fehler.length ? ", Fehler: " + fehler.join(" / ") : ".");
+  if (ok.length) blase("Sprachmemo gespeichert, Sir: " + ok.join(", ") + ".");
+  memoLaden();
+}
+$("kMemo").addEventListener("click", () => { oeffnen("blattMemo"); memoLaden(); });
+$("memoDateiKnopf").addEventListener("click", () => $("memoDatei").click());
+$("memoDatei").addEventListener("change", async () => { await memoDateienSenden(Array.from($("memoDatei").files || [])); $("memoDatei").value = ""; });
+$("memoAufnahme").addEventListener("change", async () => { await memoDateienSenden(Array.from($("memoAufnahme").files || [])); $("memoAufnahme").value = ""; });
+$("memoAufnehmen").addEventListener("click", async () => {
+  if (MEMO.rec && MEMO.rec.state === "recording") { MEMO.rec.stop(); return; }
+  if (!window.isSecureContext || !navigator.mediaDevices || !window.MediaRecorder) { $("memoAufnahme").click(); return; }
+  try { MEMO.strom = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+  catch (e) { $("memoAufnahme").click(); return; }
+  const typ = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : (MediaRecorder.isTypeSupported("audio/mp4") ? "audio/mp4" : "");
+  MEMO.rec = new MediaRecorder(MEMO.strom, typ ? { mimeType: typ } : undefined);
+  MEMO.teile = [];
+  MEMO.rec.ondataavailable = (e) => { if (e.data && e.data.size) MEMO.teile.push(e.data); };
+  MEMO.rec.onstop = async () => {
+    clearInterval(MEMO.uhr);
+    MEMO.strom.getTracks().forEach((t) => t.stop());
+    $("memoAufnehmen").innerHTML = "&#9679; Aufnehmen";
+    const art = (MEMO.rec.mimeType || "audio/webm").split(";")[0];
+    const blob = new Blob(MEMO.teile, { type: art });
+    if (blob.size) await memoDateienSenden([new File([blob], art.includes("mp4") ? "aufnahme.m4a" : "aufnahme.webm", { type: art })]);
+  };
+  MEMO.rec.start(1000);
+  MEMO.start = Date.now();
+  $("memoAufnehmen").innerHTML = "&#9632; Stopp";
+  MEMO.uhr = setInterval(() => {
+    const s = Math.round((Date.now() - MEMO.start) / 1000);
+    $("memoStatus").textContent = "Aufnahme läuft ... " + Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+    if (s >= 900) MEMO.rec.stop();
+  }, 500);
+});
+</script>
+</body>
+</html>

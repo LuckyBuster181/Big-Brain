@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agenten-Station</title>
+<style>
+/* Agenten-Station (10.10.2026): wer arbeitet gerade, woran, auf welchem Rechner, an welcher Codestelle.
+   Läuft im Modulfenster von Auron (/werkstatt/agenten/index.html?farbe=...), fragt alle 3 s /api/agenten. */
+:root {
+  --nacht: #0b0c10; --tiefe: #15171d; --glas: rgba(30, 32, 40, .66); --rand: rgba(200, 206, 216, .18);
+  --text: #e8e9ec; --leise: #9a9ea8; --metall: #d0d5de; --glut: #b8333a;
+  --gruen: #86d3a6; --gelb: #e2c26a; --rot: #e0656a; --grau: #6b707b;
+  --schrift: "Nunito", "Segoe UI", system-ui, sans-serif; --mono: "Cascadia Mono", Consolas, ui-monospace, monospace;
+}
+:root[data-farbe="graphit"] { --nacht: #0d0e11; --tiefe: #17181c; --metall: #c4c9d2; --glut: #6c7383; }
+:root[data-farbe="gold"] { --nacht: #0f1222; --tiefe: #171a2e; --rand: rgba(226, 184, 102, .22); --text: #ece6da; --metall: #e2b866; --glut: #d98d7c; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--nacht); color: var(--text); font: 15px/1.45 var(--schrift); }
+body { padding: 16px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+.kopf { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-bottom: 14px; }
+.kopf h1 { margin: 0; font-size: 17px; letter-spacing: .04em; color: var(--metall); }
+.kopf .zeit { color: var(--leise); font-size: 13px; }
+.rechner { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border: 1px solid var(--rand); border-radius: 999px;
+  font-size: 13px; background: var(--glas); white-space: nowrap; }
+.chip.aus { color: var(--leise); }
+.licht { width: 9px; height: 9px; border-radius: 50%; background: var(--grau); flex: none; }
+.licht.arbeitet { background: var(--gruen); box-shadow: 0 0 10px var(--gruen); animation: puls 1.4s ease-in-out infinite; }
+.licht.wartet { background: var(--gelb); }
+.licht.fehler { background: var(--rot); }
+.licht.an { background: var(--gruen); }
+@keyframes puls { 50% { opacity: .45; } }
+@media (prefers-reduced-motion: reduce) { .licht.arbeitet { animation: none; } }
+.haupt { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 340px); gap: 16px; align-items: start; }
+@media (max-width: 820px) { .haupt { grid-template-columns: 1fr; } }
+.gitter { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.karte { text-align: left; background: var(--tiefe); border: 1px solid var(--rand); border-radius: 16px; padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 6px; min-height: 118px; transition: border-color .15s, transform .15s; }
+.karte:hover, .karte:focus-visible { border-color: var(--metall); outline: none; transform: translateY(-1px); }
+.karte.gewaehlt { border-color: var(--glut); }
+.karte.arbeitet { border-color: rgba(134, 211, 166, .55); }
+.karte .zeile { display: flex; align-items: center; gap: 8px; }
+.karte b { font-size: 15px; }
+.karte .zustand { margin-left: auto; font-size: 12px; color: var(--leise); }
+.karte .rolle { color: var(--leise); font-size: 12.5px; }
+.karte .tut { font-size: 13.5px; }
+.code { font: 12px/1.4 var(--mono); color: var(--metall); background: rgba(0, 0, 0, .28); border-radius: 8px; padding: 4px 7px;
+  overflow-wrap: anywhere; }
+.seite { background: var(--tiefe); border: 1px solid var(--rand); border-radius: 16px; padding: 14px; }
+.seite h2 { margin: 0 0 8px; font-size: 14px; color: var(--metall); letter-spacing: .03em; }
+.liste { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; max-height: 62vh; overflow: auto; }
+.liste li { font-size: 13px; border-bottom: 1px solid var(--rand); padding-bottom: 7px; }
+.liste .wann { color: var(--leise); font-variant-numeric: tabular-nums; margin-right: 6px; }
+.liste .wer { color: var(--metall); margin-right: 6px; }
+.liste .fehler { color: var(--rot); }
+.detail { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.detail[hidden] { display: none; }
+.detail .knoepfe { display: flex; gap: 8px; flex-wrap: wrap; }
+.detail button { background: transparent; border: 1px solid var(--rand); border-radius: 999px; padding: 5px 12px; font-size: 13px; }
+.detail button:hover { border-color: var(--metall); }
+.leer { color: var(--leise); font-size: 13px; }
+.hinweis { color: var(--leise); font-size: 12.5px; margin-top: 12px; }
+</style>
+</head>
+<body>
+<header class="kopf">
+  <h1>AGENTEN</h1><span class="zeit" id="zeit">verbinde …</span>
+  <div class="rechner" id="rechner" aria-label="Rechner"></div>
+</header>
+<div class="haupt">
+  <main class="gitter" id="gitter" aria-live="polite"></main>
+  <aside>
+    <section class="seite detail" id="detail" hidden>
+      <h2 id="dName"></h2>
+      <div class="leer" id="dRolle"></div>
+      <div class="code" id="dDatei"></div>
+      <div class="knoepfe"><button type="button" id="dBereich">Bereich öffnen</button><button type="button" id="dZu">Schließen</button></div>
+      <ul class="liste" id="dListe"></ul>
+    </section>
+    <section class="seite">
+      <h2>Verlauf</h2>
+      <ul class="liste" id="verlauf"><li class="leer">Noch nichts gemeldet.</li></ul>
+    </section>
+  </aside>
+</div>
+<p class="hinweis">Live aus dem Backend, alle 3 Sekunden. Die Codestelle ist die Funktion, aus der die laufende KI-Anfrage kommt. Nach einem Neustart beginnt der Verlauf leer.</p>
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const SP = new URLSearchParams(location.search);
+const farbe = SP.get("farbe"); if (["graphit", "gold"].includes(farbe)) document.documentElement.dataset.farbe = farbe;
+const ZUSTAND = { arbeitet: "arbeitet", wartet: "wartet auf Sie", fehler: "Fehler", ruht: "ruht" };
+let daten = null, gewaehlt = null, uhr = null;
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+function codeText(c) { return c ? c.datei + " · " + c.funktion + "() · Zeile " + c.zeile : ""; }
+function dauer(s) { return s == null ? "" : s < 60 ? "seit " + s + " s" : "seit " + Math.round(s / 60) + " min"; }
+function namen() { const m = {}; (daten ? daten.agenten : []).forEach((a) => { m[a.id] = a.name; }); return m; }
+function eintrag(e, mitName) {
+  const li = el("li");
+  li.appendChild(el("span", "wann", String(e.zeit || "").slice(11, 19)));
+  if (mitName) li.appendChild(el("span", "wer", namen()[e.agent] || e.agent));
+  li.appendChild(el("span", e.art === "fehler" ? "fehler" : "", e.text));
+  if (e.code) { const c = el("div", "code", codeText(e.code)); c.style.marginTop = "4px"; li.appendChild(c); }
+  return li;
+}
+function zeigen() {
+  if (!daten) return;
+  $("zeit").textContent = "Stand " + String(daten.zeit).slice(11, 19);
+  const r = $("rechner"); r.textContent = "";
+  daten.rechner.forEach((x) => {
+    const c = el("span", "chip" + (x.erreichbar ? "" : " aus")); c.title = x.fehler || x.hinweis || x.modell || "";
+    c.appendChild(el("span", "licht" + (x.erreichbar ? " an" : " fehler"))); c.appendChild(document.createTextNode(x.name));
+    r.appendChild(c);
+  });
+  const g = $("gitter"); g.textContent = "";
+  daten.agenten.forEach((a) => {
+    const k = el("button", "karte " + a.zustand + (gewaehlt === a.id ? " gewaehlt" : "")); k.type = "button";
+    k.setAttribute("aria-label", a.name + ", " + (ZUSTAND[a.zustand] || a.zustand));
+    const z = el("div", "zeile"); z.appendChild(el("span", "licht " + a.zustand)); z.appendChild(el("b", "", a.name));
+    z.appendChild(el("span", "zustand", ZUSTAND[a.zustand] || a.zustand)); k.appendChild(z);
+    k.appendChild(el("div", "rolle", a.rolle));
+    if (a.text) k.appendChild(el("div", "tut", a.text + (a.zustand === "arbeitet" && a.seit_s != null ? " · " + dauer(a.seit_s) : "")));
+    if (a.zustand === "arbeitet" && a.code) k.appendChild(el("div", "code", codeText(a.code)));
+    k.addEventListener("click", () => { gewaehlt = gewaehlt === a.id ? null : a.id; zeigen(); });
+    g.appendChild(k);
+  });
+  const v = $("verlauf"); v.textContent = "";
+  if (!daten.verlauf.length) v.appendChild(el("li", "leer", "Noch nichts gemeldet."));
+  daten.verlauf.forEach((e) => v.appendChild(eintrag(e, true)));
+  const a = daten.agenten.find((x) => x.id === gewaehlt);
+  $("detail").hidden = !a;
+  if (a) {
+    $("dName").textContent = a.name; $("dRolle").textContent = a.rolle;
+    $("dDatei").textContent = a.code ? codeText(a.code) : a.datei;
+    $("dBereich").hidden = !a.seite; $("dBereich").dataset.seite = a.seite || "";
+    const l = $("dListe"); l.textContent = "";
+    if (!a.letzte.length) l.appendChild(el("li", "leer", "Seit dem Start nichts gemeldet."));
+    a.letzte.forEach((e) => l.appendChild(eintrag(e, false)));
+  }
+}
+async function holen() {
+  clearTimeout(uhr);
+  try {
+    const r = await fetch("/api/agenten?anzahl=40", { cache: "no-store" });
+    if (!r.ok) throw new Error("Status " + r.status);
+    daten = await r.json(); zeigen();
+  } catch (e) { $("zeit").textContent = "keine Verbindung (" + e.message + ")"; }
+  if (document.visibilityState === "visible") uhr = setTimeout(holen, 3000);
+}
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") holen(); else clearTimeout(uhr); });
+$("dZu").addEventListener("click", () => { gewaehlt = null; zeigen(); });
+$("dBereich").addEventListener("click", (e) => {
+  const seite = e.currentTarget.dataset.seite;
+  if (seite && window.parent !== window) window.parent.postMessage({ auron: "bereich", seite }, location.origin);
+});
+window.addEventListener("message", (e) => {   // Auron wechselt die Farbwelt
+  if (e.origin !== location.origin || !e.data || e.data.auron !== "modul") return;
+  if (e.data.farbe) { if (["graphit", "gold"].includes(e.data.farbe)) document.documentElement.dataset.farbe = e.data.farbe; else delete document.documentElement.dataset.farbe; }
+});
+holen().then(() => { if (window.parent !== window) window.parent.postMessage({ auron: "modul-bereit" }, location.origin); });
+</script>
+</body>
+</html>

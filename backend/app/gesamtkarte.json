@@ -1,0 +1,1086 @@
+{
+ "stand": "2026-09-24",
+ "ziel_antworten": "Wissen/03 - KI und Technik/12 - Jarvis Gesamtidee Plan und Fragen an Sir.md",
+ "karte": {
+  "id": "root",
+  "titel": "Jarvis + Big Brain",
+  "stand": "ok",
+  "text": "Digitaler Mitarbeiter auf Basis des Obsidian-Vaults „Big Brain“. Backend FastAPI, HUD im Browser, Claude als Sprachmodell. Stand 24.09.2026.",
+  "kinder": [
+   {
+    "id": "idee",
+    "titel": "Idee und Regeln",
+    "stand": "ok",
+    "text": "So ist die Idee bisher verstanden (Notiz 12). Korrekturen gehen direkt in die Notiz.",
+    "kinder": [
+     {
+      "id": "idee.mitarbeiter-statt-chatbot",
+      "titel": "Mitarbeiter statt Chatbot",
+      "stand": "ok",
+      "text": "Jarvis soll Wissen aufnehmen, ordnen, wiederfinden und Aufgaben möglichst selbst erledigen."
+     },
+     {
+      "id": "idee.das-gehirn-ist-der-vault",
+      "titel": "Das Gehirn ist der Vault",
+      "stand": "ok",
+      "text": "Fragen zu Sir, seinen Projekten und Notizen nur aus dem Vault, mit Quelle. Findet sich nichts, sagt Jarvis das."
+     },
+     {
+      "id": "idee.jeden-tag-35-besser",
+      "titel": "Jeden Tag 3–5 % besser",
+      "stand": "ok",
+      "text": "Neue Inhalte, bessere Suche, geringere Kosten oder eine neue Funktion, die danach wirklich läuft."
+     },
+     {
+      "id": "idee.anrede-sir-iron-man-stil",
+      "titel": "Anrede „Sir“, Iron-Man-Stil",
+      "stand": "ok",
+      "text": "Sprache, HUD, Anrede „Sir“. Fehlt „Sir“, schlägt der Kanarienvogel an."
+     },
+     {
+      "id": "idee.guenstig-20-im-monat",
+      "titel": "Günstig: 20 $ im Monat",
+      "stand": "ok",
+      "text": "Rahmen für Claude-Anfragen von Jarvis seit 22.09.2026. Arbeit ohne Claude wird bevorzugt."
+     },
+     {
+      "id": "idee.nachts-allein-weiterarbeiten",
+      "titel": "Nachts allein weiterarbeiten",
+      "stand": "ok",
+      "text": "Seit 23.09. Ziel. Deckel: 3 $ pro Nacht, höchstens 4 Nächte im Monat, Stopp vor 20 $."
+     },
+     {
+      "id": "idee.harte-grenzen",
+      "titel": "Harte Grenzen",
+      "stand": "ok",
+      "text": "Nichts löschen, nur nach Freigabe schreiben, jede Änderung ankündigen, keine echten Trades, Web-Suche nur auf Nachfrage."
+     }
+    ]
+   },
+   {
+    "id": "p1",
+    "titel": "Phase 1 · Wissen",
+    "stand": "ok",
+    "text": "Wissensfähiger Prototyp. Seit 19.09.2026 fertig.",
+    "kinder": [
+     {
+      "id": "p1.vault-einlesen",
+      "titel": "Vault einlesen",
+      "stand": "ok",
+      "text": "Notizen nach Überschriften geteilt, zuletzt ca. 1.311 Abschnitte."
+     },
+     {
+      "id": "p1.deutsche-suche",
+      "titel": "Deutsche Suche",
+      "stand": "ok",
+      "text": "Mehrsprachiges Modell (e5) plus Stichwörter. Suchtest 26/28 auf Platz 1, 28/28 unter den ersten 3 (21.09.)."
+     },
+     {
+      "id": "p1.chat-mit-quellen",
+      "titel": "Chat mit Quellen",
+      "stand": "ok",
+      "text": "Quellenliste, Status der Notiz, Gesprächsverlauf, Schutz vor versteckten Anweisungen in Notizen."
+     },
+     {
+      "id": "p1.index-bleibt-aktuell",
+      "titel": "Index bleibt aktuell",
+      "stand": "ok",
+      "text": "Beim Start, per Knopf und automatisch bei Änderungen im Vault."
+     },
+     {
+      "id": "p1.wissensluecken-liste",
+      "titel": "Wissenslücken-Liste",
+      "stand": "ok",
+      "text": "Sammelt Fragen, zu denen nichts im Vault stand."
+     },
+     {
+      "id": "p1.token-protokoll",
+      "titel": "Token-Protokoll",
+      "stand": "ok",
+      "text": "Jede Claude-Anfrage in data/usage_log.jsonl."
+     },
+     {
+      "id": "p1.hud",
+      "titel": "HUD",
+      "stand": "ok",
+      "text": "Seiten Markt, Alltag, Jarvis, Vault, Einstellungen. Wetter, Kalender, Briefing-Knopf."
+     },
+     {
+      "id": "p1.git-sicherung",
+      "titel": "Git-Sicherung",
+      "stand": "ok",
+      "text": "Erster Commit am 20.09.: 68 Dateien, .env nicht dabei."
+     }
+    ]
+   },
+   {
+    "id": "p2",
+    "titel": "Phase 2 · Fragen und Aufgaben",
+    "stand": "test",
+    "text": "Als Code fertig. 493/493 Tests am PC grün (24.09.), im Browser noch nicht durchgeklickt. Details: Notiz 10.",
+    "kinder": [
+     {
+      "id": "p2.absicht-ohne-claude",
+      "titel": "Absicht ohne Claude",
+      "stand": "test",
+      "text": "Uhrzeit, Datum, Rechnen, Seite wechseln, „Stopp“. Kostet 0 Cent."
+     },
+     {
+      "id": "p2.diktat-merk-dir",
+      "titel": "Diktat „Merk dir …“",
+      "stand": "test",
+      "text": "Jarvis zeigt einen Vorschlag, geschrieben wird erst nach „ja“. Ziel: Wissen/00 - Eingang/Gemerkt von Jarvis.md."
+     },
+     {
+      "id": "p2.webseite-speichern",
+      "titel": "Webseite speichern",
+      "stand": "test",
+      "text": "Link rein, Vorschlag als Notiz im Webseiten-Ordner."
+     },
+     {
+      "id": "p2.werkzeug-modus",
+      "titel": "Werkzeug-Modus",
+      "stand": "test",
+      "text": "Vault-Suche mit Filtern, Notiz lesen, Rechner, Termine, Gespräche durchsuchen, Notiz vorschlagen."
+     },
+     {
+      "id": "p2.modellwahl-je-frage",
+      "titel": "Modellwahl je Frage",
+      "stand": "test",
+      "text": "Sonnet 5 (Standard), Haiku 4.5, Opus 5.5; dazu Kurz oder Ausführlich. Ca. 0,5 Cent je Frage (Sonnet), 1 Cent (Opus)."
+     },
+     {
+      "id": "p2.gespraechs-gedaechtnis",
+      "titel": "Gesprächs-Gedächtnis",
+      "stand": "test",
+      "text": "Jede Frage gespeichert, Karte „Verlauf“, Knopf „Tagesnotiz aus den Chats“ (ca. 0,3 Cent)."
+     },
+     {
+      "id": "p2.bewerten-und-pruefen",
+      "titel": "Bewerten und Prüfen",
+      "stand": "test",
+      "text": "Gut/schlecht unter jeder Antwort. Haiku prüft, ob die Antwort belegt ist (0,2–0,4 Cent)."
+     },
+     {
+      "id": "p2.kanarienvogel",
+      "titel": "Kanarienvogel",
+      "stand": "test",
+      "text": "Fehlt „Sir“ in der Antwort, erscheint ein Hinweis. Idee aus TikTok."
+     },
+     {
+      "id": "p2.ampel",
+      "titel": "Ampel",
+      "stand": "test",
+      "text": "Punkte oben rechts: grün läuft, gelb wartet, rot Fehler, grau ruht."
+     },
+     {
+      "id": "p2.kalender-und-briefing",
+      "titel": "Kalender und Briefing",
+      "stand": "test",
+      "text": "Termine aus Google (nur lesen), Feiertage, Tagesbriefing mit einem Claude-Aufruf. Browsertest steht aus."
+     },
+     {
+      "id": "p2.termine-anlegen",
+      "titel": "Termine anlegen",
+      "stand": "sir",
+      "text": "Offen: eigener Google-Zugang mit Schreibrecht oder eigene Terminliste ohne Rückweg zu Google. Google-Zugang (OAuth) fehlt noch.",
+      "wer": "Sir entscheidet",
+      "frage": "Termine im HUD anlegen: eigener Google-Zugang mit Schreibrecht, oder eine eigene Terminliste ohne Rückweg zu Google?"
+     },
+     {
+      "id": "p2.denkblock",
+      "titel": "Denkblock",
+      "stand": "test",
+      "text": "Eigene HUD-Seite für Denk-Notizen, Autospeichern, „Mitdenken“ für ca. 1 Cent. Braucht NEUSTART."
+     },
+     {
+      "id": "p2.gesamtkarte-im-hud",
+      "titel": "Gesamtkarte im HUD",
+      "stand": "test",
+      "text": "Seite \"Karte\" mit Fragen-Runde und Gespräch mit Jarvis über jeden Punkt. Gebaut 24.09., braucht NEUSTART."
+     }
+    ]
+   },
+   {
+    "id": "p3",
+    "titel": "Phase 3 · Sprache",
+    "stand": "test",
+    "text": "Als Code fertig, Tests am PC grün (24.09.), im Alltag noch nicht ausprobiert.",
+    "kinder": [
+     {
+      "id": "p3.sprache-im-browser",
+      "titel": "Sprache im Browser",
+      "stand": "test",
+      "text": "Mikrofon und Vorlesen über den Browser, gebaut am 20.09."
+     },
+     {
+      "id": "p3.kurzfassung-vorlesen",
+      "titel": "Kurzfassung vorlesen",
+      "stand": "test",
+      "text": "Gesprochen werden die ersten zwei Sätze, der Rest steht im Chat."
+     },
+     {
+      "id": "p3.fish-audio-stimme",
+      "titel": "Fish-Audio-Stimme",
+      "stand": "test",
+      "text": "Kostenlos bis 30.11.2026, danach Rückfall auf Windows-Stimme. Schlüssel liegt in .env."
+     },
+     {
+      "id": "p3.piper-lokale-stimme",
+      "titel": "Piper (lokale Stimme)",
+      "stand": "sir",
+      "text": "Optional, kostenlos. Einrichten mit PIPER_EINRICHTEN.bat.",
+      "wer": "Sir am PC"
+     },
+     {
+      "id": "p3.whisper-lokale-erkennung",
+      "titel": "Whisper (lokale Erkennung)",
+      "stand": "sir",
+      "text": "Optional, 2 Threads, schont den PC. Einrichten mit WHISPER_EINRICHTEN.bat.",
+      "wer": "Sir am PC"
+     },
+     {
+      "id": "p3.weckwort-jarvis",
+      "titel": "Weckwort „Jarvis“",
+      "stand": "idee",
+      "text": "Z. B. openWakeWord. Noch nicht geplant."
+     },
+     {
+      "id": "p3.spotify",
+      "titel": "Spotify",
+      "stand": "ok",
+      "text": "Läuft."
+     }
+    ]
+   },
+   {
+    "id": "p4",
+    "titel": "Phase 4 · Trading",
+    "stand": "test",
+    "text": "Nur Simulation, keine Anlageberatung. Tests am PC grün (24.09.). Echtes Geld ist nicht Teil des Plans.",
+    "kinder": [
+     {
+      "id": "p4.20-maerkte-mit-datenpruefung",
+      "titel": "20 Märkte mit Datenprüfung",
+      "stand": "test",
+      "text": "Metalle, Devisen, Indizes, Aktien, Krypto. Quellen Yahoo, Binance, Stooq. Lokal in SQLite."
+     },
+     {
+      "id": "p4.markt-erklaeren",
+      "titel": "Markt erklären",
+      "stand": "test",
+      "text": "Kerzen, EMA, RSI, ATR, Erklärung in einfachem Deutsch. „Jarvis erklärt“ ca. 0,5 Cent."
+     },
+     {
+      "id": "p4.bots-im-labor",
+      "titel": "Bots im Labor",
+      "stand": "test",
+      "text": "Nachbau Haupt-Bot, David-V2, Divergenz, mit Kosten, Jahrestabelle und Zufallsvergleich."
+     },
+     {
+      "id": "p4.paper-trading-mit-risiko-waechter",
+      "titel": "Paper-Trading mit Risiko-Wächter",
+      "stand": "test",
+      "text": "Stopp Pflicht, höchstens 1 % Risiko, 3 Positionen, Tagesverlust 3 %."
+     },
+     {
+      "id": "p4.mt5-export",
+      "titel": "MT5-Export",
+      "stand": "sir",
+      "text": "Holt lange Kurshistorie aus MetaTrader, kann nicht handeln. MT5_DATEN_EXPORT.bat.",
+      "wer": "Sir am PC"
+     },
+     {
+      "id": "p4.bots-auf-voller-historie",
+      "titel": "Bots auf voller Historie",
+      "stand": "plan",
+      "text": "Sobald der MT5-Export da ist.",
+      "wer": "Claude"
+     },
+     {
+      "id": "p4.uhrzeit-filter",
+      "titel": "Uhrzeit-Filter",
+      "stand": "plan",
+      "text": "Nur zu bestimmten Zeiten handeln, z. B. 15:30–17:30. Aus TikTok „Anfänger vs Profi“.",
+      "wer": "Claude"
+     },
+     {
+      "id": "p4.london-breakout",
+      "titel": "London-Breakout",
+      "stand": "plan",
+      "text": "Labor-Strategie aus TikTok (21 Min.). Braucht 5-Minuten-Daten.",
+      "wer": "Claude"
+     },
+     {
+      "id": "p4.sweep-regel",
+      "titel": "Sweep-Regel",
+      "stand": "plan",
+      "text": "Hoch/Tief kurz überschritten, dann Umkehr. Nach London-Breakout.",
+      "wer": "Claude"
+     },
+     {
+      "id": "p4.spread-aus-mt5-im-labor",
+      "titel": "Spread aus MT5 im Labor",
+      "stand": "idee",
+      "text": "mt5_spreads.json für realistischere Kosten."
+     },
+     {
+      "id": "p4.versuchszaehler",
+      "titel": "Versuchszähler",
+      "stand": "idee",
+      "text": "Zählt, wie oft eine Strategie getestet wurde, damit Glückstreffer auffallen."
+     },
+     {
+      "id": "p4.david-v2-nur-long",
+      "titel": "David-V2: nur Long",
+      "stand": "sir",
+      "text": "TRADE_SHORT=False im echten Bot setzen.",
+      "wer": "Sir"
+     },
+     {
+      "id": "p4.echtes-geld",
+      "titel": "Echtes Geld",
+      "stand": "nein",
+      "text": "Nicht Teil des Plans. Frage 11 an Sir ist noch offen."
+     }
+    ]
+   },
+   {
+    "id": "p5",
+    "titel": "Phase 5 · Selbstständig und Server",
+    "stand": "test",
+    "text": "Vorschlag für eine neue Phase. Alles, was Jarvis ohne Sir tut, und der Umzug auf den Mini-PC.",
+    "kinder": [
+     {
+      "id": "p5.nachtarbeit",
+      "titel": "Nachtarbeit",
+      "stand": "ok",
+      "text": "Läuft: Testlauf 24.09. 13:11, 62 Studium-Entwürfe in 97 Sekunden geprüft (25 in Ordnung, 36 lückenhaft, 1 unklar), 0,12 $. Nachts allein noch nie gelaufen.",
+      "kinder": [
+       {
+        "id": "p5.nachtarbeit.deckel",
+        "titel": "Deckel",
+        "stand": "ok",
+        "text": "3 $ pro Nacht, höchstens 4 Nächte im Monat, Stopp 0,50 $ vor dem 20-$-Rahmen. Steht im Code."
+       },
+       {
+        "id": "p5.nachtarbeit.zeitfenster-03-0007-00",
+        "titel": "Zeitfenster 03:00–07:00",
+        "stand": "ok",
+        "text": "Entscheidung Sir, 24.09."
+       },
+       {
+        "id": "p5.nachtarbeit.claude-auftrag-03-00",
+        "titel": "Claude-Auftrag 03:00",
+        "stand": "test",
+        "text": "Eingerichtet 24.09., erster Lauf 25.09. ca. 03:04. Startet NACHTARBEIT.bat und schreibt den Bericht in die Tagesnotiz. Ob der Ordnerzugriff nachts trägt, zeigt erst dieser Lauf."
+       },
+       {
+        "id": "p5.nachtarbeit.nachtbericht-uebernehmen",
+        "titel": "Nachtbericht übernehmen",
+        "stand": "sir",
+        "wer": "Sir",
+        "text": "Vorschlag \"Nachtbericht 2026-09-24\" im HUD (Jarvis-Seite, Vorschläge) übernehmen, dann steht er in der Tagesnotiz."
+       },
+       {
+        "id": "p5.nachtarbeit.datum-in-der-pruefanweisung",
+        "titel": "Datum in der Prüfanweisung",
+        "stand": "sir",
+        "wer": "Sir entscheidet",
+        "text": "Haiku hält Quellen von 2026 für \"aus der Zukunft\" (5 Urteile). Lösung: heutiges Datum mitgeben, kostet nichts, danach NEUSTART.",
+        "frage": "Soll Claude den Datums-Fehler der Nachtarbeit beheben? Haiku hält sonst Quellen von 2026 für verdächtig."
+       },
+       {
+        "id": "p5.nachtarbeit.protokoll-fuer-die-bat",
+        "titel": "Protokoll für NACHTARBEIT.bat",
+        "stand": "idee",
+        "text": "Das Fenster schließt sofort. Eine kleine Protokolldatei würde zeigen, was passiert ist."
+       },
+       {
+        "id": "p5.nachtarbeit.test-bei-tageslicht",
+        "titel": "Test bei Tageslicht",
+        "stand": "ok",
+        "text": "Erledigt 24.09. 13:11. Ergebnis siehe Nachtarbeit."
+       },
+       {
+        "id": "p5.nachtarbeit.windows-aufgabenplanung",
+        "titel": "Windows-Aufgabenplanung",
+        "stand": "sir",
+        "text": "Erst nach einem erfolgreichen Testlauf einrichten.",
+        "wer": "Sir am PC"
+       },
+       {
+        "id": "p5.nachtarbeit.weitere-nacht-aufgaben",
+        "titel": "Weitere Nacht-Aufgaben",
+        "stand": "plan",
+        "text": "TikTok-Links abrufen, Whisper für Videos, Backtests, Vault neu einlesen. Alle 0 $.",
+        "wer": "Claude"
+       },
+       {
+        "id": "p5.nachtarbeit.morgens-nachhaken",
+        "titel": "Morgens nachhaken",
+        "stand": "plan",
+        "text": "Was gestern liegen blieb, im Briefing nennen. Aus TikTok „Jarvis is the MVP“.",
+        "wer": "Claude"
+       }
+      ]
+     },
+     {
+      "id": "p5.studium-und-aufgaben-loop",
+      "titel": "Studium und Aufgaben-Loop",
+      "stand": "test",
+      "text": "Studium lief zweimal (62 Entwürfe). Aufgaben-Loop gebaut, nicht eingerichtet. Ca. 8,6 Cent je Aufgabe.",
+      "kinder": [
+       {
+        "id": "p5.studium-und-aufgaben-loop.studium-deckel",
+        "titel": "Studium-Deckel",
+        "stand": "sir",
+        "text": "„Risiko-Berechnung“ kostete 2,86 $ statt 1 $. Frage 8.",
+        "wer": "Sir"
+       },
+       {
+        "id": "p5.studium-und-aufgaben-loop.62-entwuerfe",
+        "titel": "62 Entwürfe",
+        "stand": "sir",
+        "text": "So lassen, prüfen und übernehmen, oder nur Trading? Frage 9.",
+        "wer": "Sir"
+       }
+      ]
+     },
+     {
+      "id": "p5.mini-pc-als-server",
+      "titel": "Mini-PC als Server",
+      "stand": "plan",
+      "text": "Lenovo ThinkCentre M93p Tiny, per Kabel. Läuft nachts, braucht wenig Strom. Erst Windows 10, später Linux.",
+      "kinder": [
+       {
+        "id": "p5.mini-pc-als-server.syncthing-aufraeumen",
+        "titel": "Syncthing aufräumen",
+        "stand": "sir",
+        "text": "Ordner in SyncTrayzor entfernen, AUFRAEUMEN_SYNC.bat, dann neu nach Notiz 13 „Zweiter Versuch“. Nur Jarvis und Brain teilen.",
+        "wer": "Sir am PC"
+       },
+       {
+        "id": "p5.mini-pc-als-server.mini-pc-einrichten",
+        "titel": "Mini-PC einrichten",
+        "stand": "sir",
+        "text": "JARVIS_MINIPC_EINRICHTEN.bat am Mini-PC, dann JARVIS_MINIPC_OEFFNEN.bat am großen PC.",
+        "wer": "Sir am PC"
+       },
+       {
+        "id": "p5.mini-pc-als-server.linux",
+        "titel": "Linux",
+        "stand": "sir",
+        "text": "Später. USB-Stick mit mindestens 8 GB fehlt.",
+        "wer": "Sir"
+       }
+      ]
+     },
+     {
+      "id": "p5.pc-2-hub",
+      "titel": "PC-2-Hub",
+      "stand": "test",
+      "text": "Linux-Agent für den Mini-PC (Livewerte, Steuerung, Bildschirm, Wake-on-LAN). Aus dem Claude-Code-Chat. Braucht Linux."
+     },
+     {
+      "id": "p5.handy-zugang",
+      "titel": "Handy-Zugang",
+      "stand": "idee",
+      "text": "HUD über privates Netz (Tailscale) mit Zugangsschutz. Backend bleibt auf 127.0.0.1."
+     },
+     {
+      "id": "p5.git-backup-online",
+      "titel": "Git-Backup online",
+      "stand": "idee",
+      "text": "Privates Repository, .env ausgeschlossen. Noch nicht entschieden."
+     }
+    ]
+   },
+   {
+    "id": "p6",
+    "titel": "Phase 6 · Ausbau",
+    "stand": "idee",
+    "text": "Vorschlag für eine neue Phase. Nichts davon ist beschlossen.",
+    "kinder": [
+     {
+      "id": "p6.windows-steuern",
+      "titel": "Windows steuern",
+      "stand": "idee",
+      "text": "Lautstärke, Programme. Großer Aufwand, Sicherheit zuerst. Frage 15."
+     },
+     {
+      "id": "p6.zuhause-steuern",
+      "titel": "Zuhause steuern",
+      "stand": "idee",
+      "text": "Licht und Ähnliches. Frage 15."
+     },
+     {
+      "id": "p6.englisch-coach",
+      "titel": "Englisch-Coach",
+      "stand": "idee",
+      "text": "Merkt sich Sirs Fehler, ca. 0,5 Cent je Übung. Frage 14."
+     },
+     {
+      "id": "p6.lokale-mitschrift",
+      "titel": "Lokale Mitschrift",
+      "stand": "idee",
+      "text": "Whisper für Besprechungen und Unterricht, Zusammenfassung ca. 1 Cent."
+     },
+     {
+      "id": "p6.pdf-einlesen",
+      "titel": "PDF einlesen",
+      "stand": "idee",
+      "text": "Anleitungen und Unterlagen durchsuchbar machen."
+     },
+     {
+      "id": "p6.lernmodus",
+      "titel": "Lernmodus",
+      "stand": "idee",
+      "text": "Quizfragen aus den eigenen Notizen, z. B. Trading-Grundlagen."
+     },
+     {
+      "id": "p6.denkblock-erweitern",
+      "titel": "Denkblock erweitern",
+      "stand": "idee",
+      "text": "Chat liest die offene Denk-Notiz mit, Diktat direkt in den Denkblock."
+     },
+     {
+      "id": "p6.offline-mit-ollama",
+      "titel": "Offline mit Ollama",
+      "stand": "idee",
+      "text": "Lokales Modell statt Claude. Deutlich schwächer, erst nach Klärung der Abstürze."
+     },
+     {
+      "id": "p6.mails-einbeziehen",
+      "titel": "Mails einbeziehen",
+      "stand": "idee",
+      "text": "„Was steht morgen an?“ mit Mails. Großer Aufwand."
+     }
+    ]
+   },
+   {
+    "id": "tiktok",
+    "titel": "TikTok-Ideen",
+    "stand": "ok",
+    "text": "83 Videos von 53 Kanälen ausgewertet: 8 sehr gut, 16 brauchbar, 29 nur Wissen, 30 ohne Nutzen. Details: TikTok-Auswertung mit Daten.",
+    "kinder": [
+     {
+      "id": "tiktok.umgesetzt",
+      "titel": "Umgesetzt",
+      "stand": "ok",
+      "text": "7 der 8 besten Ideen sind schon drin.",
+      "kinder": [
+       {
+        "id": "tiktok.umgesetzt.uebersicht-suche",
+        "titel": "Übersicht + Suche",
+        "stand": "ok",
+        "text": "Aus „How to build Jarvis“ (jaredrhod)."
+       },
+       {
+        "id": "tiktok.umgesetzt.bot-ampel",
+        "titel": "Bot-Ampel",
+        "stand": "ok",
+        "text": "Aus „My Bots do my busywork“ (liambuilds.ai)."
+       },
+       {
+        "id": "tiktok.umgesetzt.tagesnotiz-mit-index",
+        "titel": "Tagesnotiz mit Index",
+        "stand": "ok",
+        "text": "Aus „Obsidian vault + Claude Code“ (jaredrhod)."
+       },
+       {
+        "id": "tiktok.umgesetzt.tiktok-abruf-und-hud",
+        "titel": "TikTok-Abruf und HUD",
+        "stand": "ok",
+        "text": "Aus „4 Dinge fürs Wochenende“ (denizdeke)."
+       },
+       {
+        "id": "tiktok.umgesetzt.stand-dokument",
+        "titel": "Stand-Dokument",
+        "stand": "ok",
+        "text": "Aus „Snapshot gegen Gedächtnisverlust“."
+       },
+       {
+        "id": "tiktok.umgesetzt.kanarienvogel",
+        "titel": "Kanarienvogel",
+        "stand": "ok",
+        "text": "Aus „The canary trick“ (nathanhodgson.ai)."
+       },
+       {
+        "id": "tiktok.umgesetzt.rollen-teilung-der-modelle",
+        "titel": "Rollen-Teilung der Modelle",
+        "stand": "ok",
+        "text": "Sucher, Antworter, Prüfer. Aus „Your strongest model is overworked“."
+       },
+       {
+        "id": "tiktok.umgesetzt.fragenkatalog-an-sir",
+        "titel": "Fragenkatalog an Sir",
+        "stand": "ok",
+        "text": "Aus „10 Zeichen, dass du KI kannst“."
+       },
+       {
+        "id": "tiktok.umgesetzt.morgen-briefing",
+        "titel": "Morgen-Briefing",
+        "stand": "ok",
+        "text": "Teilweise aus „Jarvis is the MVP“."
+       }
+      ]
+     },
+     {
+      "id": "tiktok.geplant",
+      "titel": "Geplant",
+      "stand": "plan",
+      "text": "Stehen im Plan (Notiz 12).",
+      "kinder": [
+       {
+        "id": "tiktok.geplant.routinen-nachtarbeit",
+        "titel": "Routinen = Nachtarbeit",
+        "stand": "plan",
+        "text": "Aus „Tag 216: Jarvis mit Claude bauen“. Gebaut, ungetestet."
+       },
+       {
+        "id": "tiktok.geplant.whisper-fuer-videos-ohne-untertitel",
+        "titel": "Whisper für Videos ohne Untertitel",
+        "stand": "plan",
+        "text": "4 Videos betroffen. Aus „Claude Augen geben“."
+       },
+       {
+        "id": "tiktok.geplant.notizen-ohne-link-in-der-ampel",
+        "titel": "Notizen ohne Link in der Ampel",
+        "stand": "plan",
+        "text": "Ordnung spart Tokens. Aus „How do I stop burning through my usage“."
+       },
+       {
+        "id": "tiktok.geplant.trading-regeln-fuers-labor",
+        "titel": "Trading-Regeln fürs Labor",
+        "stand": "plan",
+        "text": "Uhrzeit-Filter, London-Breakout, Sweep-Regel, danach TJR prüfen."
+       },
+       {
+        "id": "tiktok.geplant.4-foto-beitraege",
+        "titel": "4 Foto-Beiträge",
+        "stand": "plan",
+        "text": "Noch nicht ausgewertet."
+       }
+      ]
+     },
+     {
+      "id": "tiktok.ideen-fuer-spaeter",
+      "titel": "Ideen für später",
+      "stand": "idee",
+      "text": "Keine davon ist beschlossen.",
+      "kinder": [
+       {
+        "id": "tiktok.ideen-fuer-spaeter.windows-steuern",
+        "titel": "Windows steuern",
+        "stand": "idee",
+        "text": "Aus „Jarvis Live-Test“."
+       },
+       {
+        "id": "tiktok.ideen-fuer-spaeter.cli-anything",
+        "titel": "CLI-Anything",
+        "stand": "idee",
+        "text": "Windows-Programme über die Kommandozeile bedienen."
+       },
+       {
+        "id": "tiktok.ideen-fuer-spaeter.eigene-meeting-app",
+        "titel": "Eigene Meeting-App",
+        "stand": "idee",
+        "text": "Mitschrift lokal mit Whisper."
+       },
+       {
+        "id": "tiktok.ideen-fuer-spaeter.englisch-coach",
+        "titel": "Englisch-Coach",
+        "stand": "idee",
+        "text": "Aus „Duolingo gelöscht“."
+       },
+       {
+        "id": "tiktok.ideen-fuer-spaeter.hud-ohne-ki-look",
+        "titel": "HUD ohne KI-Look",
+        "stand": "idee",
+        "text": "Checkliste, 6 Frontend-Skills, Apple-Design-Regeln. Beim nächsten HUD-Umbau."
+       },
+       {
+        "id": "tiktok.ideen-fuer-spaeter.tabellen-ausgabe",
+        "titel": "Tabellen-Ausgabe",
+        "stand": "idee",
+        "text": "Aus „Jarvis: iPhone vs Samsung in Excel“."
+       }
+      ]
+     },
+     {
+      "id": "tiktok.bewusst-nicht",
+      "titel": "Bewusst nicht",
+      "stand": "nein",
+      "text": "Mit Grund abgelehnt.",
+      "kinder": [
+       {
+        "id": "tiktok.bewusst-nicht.gratis-tokens-ueber-fremde-server",
+        "titel": "Gratis-Tokens über fremde Server",
+        "stand": "nein",
+        "text": "FreeLLM, Omniroute, Dahl, Schlüssel-Listen: der fremde Server sieht alle Vault-Inhalte."
+       },
+       {
+        "id": "tiktok.bewusst-nicht.mehrere-konten",
+        "titel": "Mehrere Konten",
+        "stand": "nein",
+        "text": "Gratis-Kontingente stapeln verstößt gegen die Nutzungsbedingungen."
+       },
+       {
+        "id": "tiktok.bewusst-nicht.jarvis-telefoniert",
+        "titel": "Jarvis telefoniert",
+        "stand": "nein",
+        "text": "Laufende Kosten, Mitschnitt braucht in Deutschland Einwilligung."
+       },
+       {
+        "id": "tiktok.bewusst-nicht.ki-indikatoren-chart-foto-signale",
+        "titel": "KI-Indikatoren, Chart-Foto-Signale",
+        "stand": "nein",
+        "text": "Ohne Test im Labor Glücksspiel."
+       },
+       {
+        "id": "tiktok.bewusst-nicht.viele-agenten-gleichzeitig",
+        "titel": "Viele Agenten gleichzeitig",
+        "stand": "nein",
+        "text": "Mehr Kosten und mehr Last für den PC (Ruflow und ähnliche)."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "id": "vorschlag",
+    "titel": "Vorschläge von Claude",
+    "stand": "plan",
+    "text": "Änderungen, die Claude vorgeschlagen hat, mit Stand.",
+    "kinder": [
+     {
+      "id": "vorschlag.kosten-senken",
+      "titel": "Kosten senken",
+      "stand": "test",
+      "text": "Prompt-Caching, top_k 3, max_tokens 800. Eingebaut, Bestätigung am PC steht aus."
+     },
+     {
+      "id": "vorschlag.priming-sets",
+      "titel": "Priming-Sets",
+      "stand": "idee",
+      "text": "Vorbereitete Kontexte für wiederkehrende Fragetypen. Ungeprüft."
+     },
+     {
+      "id": "vorschlag.studium-mit-deckel-nicht-taeglich",
+      "titel": "Studium mit Deckel, nicht täglich",
+      "stand": "plan",
+      "text": "Größter Kostenposten im September (ca. 88 %)."
+     },
+     {
+      "id": "vorschlag.opus-nur-fuer-schwere-fragen",
+      "titel": "Opus nur für schwere Fragen",
+      "stand": "ok",
+      "text": "Sonnet 5 bleibt Standard."
+     },
+     {
+      "id": "vorschlag.entwuerfe-pruefen-statt-neue-schreib",
+      "titel": "Entwürfe prüfen statt neue schreiben",
+      "stand": "test",
+      "text": "Erste Nachtarbeits-Aufgabe."
+     },
+     {
+      "id": "vorschlag.notizen-verlinken",
+      "titel": "Notizen verlinken",
+      "stand": "ok",
+      "text": "58 Notizen ohne Link am 23.09. auf 0 gebracht."
+     },
+     {
+      "id": "vorschlag.waisen-zaehler-in-der-ampel",
+      "titel": "Waisen-Zähler in der Ampel",
+      "stand": "plan",
+      "text": "Zeigt neue Notizen ohne Link.",
+      "wer": "Claude"
+     },
+     {
+      "id": "vorschlag.dubletten-aufraeumen",
+      "titel": "Dubletten aufräumen",
+      "stand": "sir",
+      "text": "3 doppelte Notizen, 3 TikTok-Dubletten, 8 Physik-Paare. Selbst löschen, per .bat verschieben oder zusammenlegen? Frage 10.",
+      "wer": "Sir"
+     },
+     {
+      "id": "vorschlag.sammelnotizen-teilen",
+      "titel": "Sammelnotizen teilen",
+      "stand": "idee",
+      "text": "Große Notizen wie „Claude_Trading-Bots_Wissen“ und „02 - Token, Kontext und RAG“ aufteilen."
+     },
+     {
+      "id": "vorschlag.metadaten-ergaenzen",
+      "titel": "Metadaten ergänzen",
+      "stand": "idee",
+      "text": "Status, Quelle, Vertrauen in allen Notizen."
+     },
+     {
+      "id": "vorschlag.liste-jarvis-darf-nie",
+      "titel": "Liste „Jarvis darf nie“",
+      "stand": "sir",
+      "text": "Vorschlag: Mails senden, Käufe, echte Trades, Termine löschen, Notizen löschen. Frage 16.",
+      "wer": "Sir"
+     },
+     {
+      "id": "vorschlag.erst-suchen-dann-bauen",
+      "titel": "Erst suchen, dann bauen",
+      "stand": "ok",
+      "text": "Arbeitsregel: nichts doppelt bauen."
+     }
+    ]
+   },
+   {
+    "id": "offen",
+    "titel": "Offen · Sir am PC",
+    "stand": "sir",
+    "text": "Alles, was nur am PC geht. Reihenfolge von oben nach unten.",
+    "kinder": [
+     {
+      "id": "offen.1-neustart-bat",
+      "titel": "1 · NEUSTART.bat",
+      "stand": "ok",
+      "text": "Erledigt 24.09. mittags. Code wurde geändert, danach im Browser Strg+F5.",
+      "wer": "Sir am PC"
+     },
+     {
+      "id": "offen.2-tests-ausfuehren-bat",
+      "titel": "2 · TESTS_AUSFUEHREN.bat",
+      "stand": "ok",
+      "text": "Erledigt 24.09. mittags. „fertig“ melden, Claude wertet backend\\tests_log.txt aus.",
+      "wer": "Sir am PC"
+     },
+     {
+      "id": "offen.3-nachtarbeit-testen",
+      "titel": "3 · Nachtarbeit testen",
+      "stand": "ok",
+      "text": "Erledigt 24.09. mittags. /api/nachtarbeit/start einmal bei Tageslicht.",
+      "wer": "Sir am PC"
+     },
+     {
+      "id": "offen.nachtbericht-uebernehmen",
+      "titel": "4 · Nachtbericht übernehmen",
+      "stand": "sir",
+      "wer": "Sir",
+      "text": "Im HUD auf der Jarvis-Seite unter Vorschläge."
+     },
+     {
+      "id": "offen.4-alle-maerkte-laden",
+      "titel": "5 · Alle Märkte laden",
+      "stand": "sir",
+      "text": "Markt-Seite, ca. 1–2 Minuten, gedrosselt.",
+      "wer": "Sir am PC"
+     },
+     {
+      "id": "offen.5-syncthing-aufraeumen",
+      "titel": "6 · Syncthing aufräumen",
+      "stand": "sir",
+      "text": "Siehe Mini-PC. Notiz 13, „Zweiter Versuch“.",
+      "wer": "Sir am PC"
+     },
+     {
+      "id": "offen.6-mini-pc-einrichten",
+      "titel": "7 · Mini-PC einrichten",
+      "stand": "sir",
+      "text": "JARVIS_MINIPC_EINRICHTEN.bat, dann JARVIS_MINIPC_OEFFNEN.bat.",
+      "wer": "Sir am PC"
+     },
+     {
+      "id": "offen.7-aufgabenplanung",
+      "titel": "8 · Aufgabenplanung",
+      "stand": "sir",
+      "text": "NACHTARBEIT.bat, erst nach erfolgreichem Test.",
+      "wer": "Sir am PC"
+     },
+     {
+      "id": "offen.8-optionale-bat",
+      "titel": "9 · Optionale .bat",
+      "stand": "sir",
+      "text": "WHISPER_EINRICHTEN, PIPER_EINRICHTEN, MT5_DATEN_EXPORT.",
+      "wer": "Sir am PC"
+     },
+     {
+      "id": "offen.9-google-kalender-zugang",
+      "titel": "10 · Google-Kalender-Zugang",
+      "stand": "sir",
+      "text": "Nur nötig, wenn Jarvis Termine anlegen soll.",
+      "wer": "Sir"
+     },
+     {
+      "id": "offen.10-nas-fehlerbild",
+      "titel": "11 · NAS-Fehlerbild",
+      "stand": "sir",
+      "text": "Noch offen, Details fehlen.",
+      "wer": "Sir"
+     }
+    ]
+   },
+   {
+    "id": "fragen",
+    "titel": "Offene Fragen an Sir",
+    "stand": "sir",
+    "text": "Aus Notiz 12. Beantwortet sind 4, 5 und 6. Antworten reichen kurz, auch am Handy.",
+    "kinder": [
+     {
+      "id": "fragen.wie-viele-phasen",
+      "titel": "Wie viele Phasen?",
+      "stand": "sir",
+      "text": "Neu: Phase 5 und 6 wie in den Phasen-Ästen vorgeschlagen, oder bei 4 bleiben?",
+      "frage": "Wie viele Phasen soll Jarvis haben? Vorschlag: 1 bis 4 wie bisher, dazu Phase 5 \"Selbstständig und Server\" und Phase 6 \"Ausbau\". Oder bei 4 bleiben?",
+      "nr": ""
+     },
+     {
+      "id": "fragen.1-wichtigstes-ziel-in-6-monaten",
+      "titel": "1 · Wichtigstes Ziel in 6 Monaten",
+      "stand": "sir",
+      "text": "Reihenfolge: Wissen, Trading, Alltag, Schule, Bundeswehr, Geld verdienen.",
+      "frage": "Wofür soll Jarvis in 6 Monaten am meisten da sein? Bitte in Reihenfolge: Wissen und Vault, Trading, Alltag, Schule und Ausbildung, Bundeswehr, Geld verdienen.",
+      "nr": "1"
+     },
+     {
+      "id": "fragen.2-assistent-oder-mitarbeiter",
+      "titel": "2 · Assistent oder Mitarbeiter?",
+      "stand": "sir",
+      "text": "Wenn Mitarbeiter: welche drei Aufgaben zuerst?",
+      "frage": "Soll Jarvis vor allem antworten, also Assistent sein, oder selbst Aufgaben erledigen, also Mitarbeiter? Wenn Mitarbeiter: welche drei Aufgaben zuerst?",
+      "nr": "2"
+     },
+     {
+      "id": "fragen.3-wo-nutzen-sie-jarvis",
+      "titel": "3 · Wo nutzen Sie Jarvis?",
+      "stand": "sir",
+      "text": "Am PC, am Handy oder per Sprache im Raum.",
+      "frage": "Wo nutzen Sie Jarvis am meisten: am PC, am Handy oder per Sprache im Raum?",
+      "nr": "3"
+     },
+     {
+      "id": "fragen.7-pro-limit-nachts",
+      "titel": "7 · Pro-Limit nachts",
+      "stand": "sir",
+      "text": "Wie viel vom Wochenlimit darf Claude nachts verbrauchen?",
+      "frage": "Wie viel vom Pro-Wochenlimit darf Claude nachts verbrauchen: nur wenn noch viel übrig ist, bis zu einem Drittel, oder egal?",
+      "nr": "7"
+     },
+     {
+      "id": "fragen.8-studium-deckel",
+      "titel": "8 · Studium-Deckel",
+      "stand": "sir",
+      "text": "Warum 2,86 $ statt 1 $? Wie oft soll das Studium laufen?",
+      "frage": "Das Studium \"Risiko-Berechnung\" hat 2,86 Dollar gekostet statt 1 Dollar. War der Deckel absichtlich höher? Und wie oft soll das Studium laufen?",
+      "nr": "8"
+     },
+     {
+      "id": "fragen.9-62-studium-entwuerfe",
+      "titel": "9 · 62 Studium-Entwürfe",
+      "stand": "sir",
+      "text": "Lassen, prüfen und übernehmen, oder nur Trading?",
+      "frage": "Die 62 Studium-Entwürfe: so lassen, nach und nach prüfen und in die Grundlagen übernehmen, oder nur die fürs Trading wichtigen?",
+      "nr": "9"
+     },
+     {
+      "id": "fragen.10-dubletten",
+      "titel": "10 · Dubletten",
+      "stand": "sir",
+      "text": "Selbst löschen, per .bat verschieben oder zusammenlegen?",
+      "frage": "Doppelte Notizen: löschen Sie selbst, soll eine bat-Datei sie in einen Ordner \"Zum Löschen\" verschieben, oder sollen Physik-Paare zusammengelegt werden?",
+      "nr": "10"
+     },
+     {
+      "id": "fragen.11-trading-ziel",
+      "titel": "11 · Trading-Ziel",
+      "stand": "sir",
+      "text": "Nur lernen, später kleines echtes Konto, oder eigene Bots echt laufen lassen?",
+      "frage": "Trading-Ziel: nur lernen und simulieren, später ein kleines echtes Konto, oder die eigenen Bots irgendwann echt laufen lassen?",
+      "nr": "11"
+     },
+     {
+      "id": "fragen.12-zeit-fuer-die-maerkte",
+      "titel": "12 · Zeit für die Märkte",
+      "stand": "sir",
+      "text": "Passt 15:30–17:30 zum Dienst?",
+      "frage": "Wann haben Sie Zeit für die Märkte? Passt das Zeitfenster 15:30 bis 17:30 zum Dienst?",
+      "nr": "12"
+     },
+     {
+      "id": "fragen.13-was-zuerst-ins-labor",
+      "titel": "13 · Was zuerst ins Labor?",
+      "stand": "sir",
+      "text": "Eigene Bots auf MT5-Historie, London-Breakout oder Sweep-Regel?",
+      "frage": "Was zuerst ins Labor: Ihre drei Bots auf voller MT5-Historie, London-Breakout oder die Sweep-Regel?",
+      "nr": "13"
+     },
+     {
+      "id": "fragen.14-englisch-coach",
+      "titel": "14 · Englisch-Coach?",
+      "stand": "sir",
+      "text": "Ja oder nein.",
+      "frage": "Soll Jarvis ein Englisch-Coach werden, der sich Ihre Fehler merkt? Ja oder nein?",
+      "nr": "14"
+     },
+     {
+      "id": "fragen.15-was-soll-jarvis-steuern",
+      "titel": "15 · Was soll Jarvis steuern?",
+      "stand": "sir",
+      "text": "Licht, Windows, Programme, anderes?",
+      "frage": "Was soll Jarvis am PC oder zu Hause noch steuern können: Licht, Windows, Programme oder anderes?",
+      "nr": "15"
+     },
+     {
+      "id": "fragen.16-was-darf-jarvis-nie",
+      "titel": "16 · Was darf Jarvis nie?",
+      "stand": "sir",
+      "text": "Vorschlag: Mails senden, Käufe, echte Trades, Termine löschen, Notizen löschen.",
+      "frage": "Was darf Jarvis nie, auch nicht mit Freigabe? Vorschlag: Mails senden, Käufe, echte Trades, Termine löschen, Notizen löschen.",
+      "nr": "16"
+     }
+    ]
+   },
+   {
+    "id": "technik",
+    "titel": "Technik und Kosten",
+    "stand": "ok",
+    "text": "Rahmenbedingungen und Betrieb.",
+    "kinder": [
+     {
+      "id": "technik.kostenrahmen-20",
+      "titel": "Kostenrahmen 20 $",
+      "stand": "ok",
+      "text": "September bis 23.09. ca. 7,32 $ (Schätzung aus dem Protokoll). Studium war der größte Posten."
+     },
+     {
+      "id": "technik.preise-je-mio-tokens",
+      "titel": "Preise je Mio. Tokens",
+      "stand": "ok",
+      "text": "Haiku 4.5: 1/5 $, Sonnet 5: 2/10 $, Opus 5.5: 4/20 $ (Eingabe/Ausgabe)."
+     },
+     {
+      "id": "technik.pc-abstuerze",
+      "titel": "PC-Abstürze",
+      "stand": "sir",
+      "text": "RAM auf 32 GB umgebaut, BIOS angepasst. Weiter beobachten, schwere Läufe gedrosselt (2 Threads).",
+      "wer": "Sir"
+     },
+     {
+      "id": "technik.zwei-chats-am-selben-ordner",
+      "titel": "Zwei Chats am selben Ordner",
+      "stand": "ok",
+      "text": "Cowork und Claude Code. Regel: vor jedem Schreiben die PC-Fassung neu lesen und vergleichen."
+     },
+     {
+      "id": "technik.claude-arbeit-kostet-das-pro-limit",
+      "titel": "Claude-Arbeit kostet das Pro-Limit",
+      "stand": "ok",
+      "text": "Nicht die 20 $ von Jarvis. Limit wird freitags zurückgesetzt."
+     },
+     {
+      "id": "technik.hud-in-chrome",
+      "titel": "HUD öffnet in Chrome",
+      "stand": "test",
+      "text": "NEUSTART.bat, start_jarvis.bat und JARVIS_MINIPC_OEFFNEN.bat öffnen das HUD in Chrome (gibt es Chrome nicht, im Standard-Browser)."
+     }
+    ]
+   }
+  ]
+ }
+}

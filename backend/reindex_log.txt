@@ -1,0 +1,12 @@
+Lese Vault ein: ..\..\..\..\Documents\KI\Obsidian\AI Gehrin 1.1\Brain
+Modell: e5-base (multilingual-e5-base, int8-quantisiert (~280 MB)), Modus: nur Änderungen
+  [1/1] Wissen/06 - Quellen und Pflege/Vault-Pflegebericht.md
+Fertig in 0.26s
+  Notizen im Vault:        88
+  neu indexiert:           0
+  geändert:                0
+  entfernt:                0
+  unverändert:             87
+  leer (ohne Inhalt):      1
+  Chunks geschrieben:      0
+  Chunks insgesamt:        1320

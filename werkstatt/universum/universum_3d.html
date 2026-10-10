@@ -1,0 +1,733 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Auron Universum</title>
+<!-- universum_3d.html (04.10.2026, Claude): Zoom vom Planeten bis zur Galaxie und weiter.
+     Laedt Szenen aus szenen/*.json (ubox_lesen.py oder standard_szene.py).
+     Technik: schwebender Ursprung (Kamera immer bei 0, Abstaende in doppelter Genauigkeit),
+     logarithmischer Tiefenpuffer, Koerper mit Mindestgroesse in Pixeln, Galaxien als Leuchtwolken + Sterne. -->
+<style>
+:root{--hg:#050506;--text:#d9dce1;--leise:#8a8f98;--akzent:#c4202b;--rand:rgba(200,205,214,.18);--feld:rgba(14,15,18,.82)}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--hg);color:var(--text);font:14px/1.4 system-ui,"Segoe UI",sans-serif;overflow:hidden}
+#leinwand{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#leinwand.zieht{cursor:grabbing}
+#marken{position:fixed;inset:0;pointer-events:none}
+.marke{position:absolute;transform:translate(10px,-50%);white-space:nowrap;font-size:12px;color:var(--text);
+  text-shadow:0 0 4px #000,0 0 2px #000;pointer-events:auto;cursor:pointer;opacity:.85}
+.marke:hover{opacity:1;color:#fff}
+.marke.galaxie{transform:translate(-50%,-50%);font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#c9ced8}
+.marke.ziel{color:#fff}
+.marke.ziel::before{content:"";position:absolute;left:-14px;top:50%;width:8px;height:8px;margin-top:-4px;border:1px solid var(--akzent);transform:rotate(45deg)}
+#seite{position:fixed;top:12px;left:12px;width:250px;max-height:calc(100% - 110px);overflow:auto;background:var(--feld);
+  border:1px solid var(--rand);border-radius:10px;padding:10px 12px;backdrop-filter:blur(6px)}
+#seite h1{font-size:13px;margin:0 0 8px;letter-spacing:.12em;text-transform:uppercase;color:#fff}
+#seite h1 b{color:var(--akzent)}
+#seite h2{font-size:11px;margin:12px 0 4px;color:var(--leise);letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+#seite select{width:100%;background:#0b0c0e;color:var(--text);border:1px solid var(--rand);border-radius:6px;padding:5px}
+#seite button.eintrag{display:block;width:100%;text-align:left;background:none;border:0;color:var(--text);padding:3px 6px;border-radius:5px;cursor:pointer;font:inherit}
+#seite button.eintrag:hover{background:rgba(196,32,43,.18)}
+#seite button.eintrag.aktiv{background:rgba(196,32,43,.32);color:#fff}
+#seite .hinweis{font-size:11.5px;color:var(--leise);margin-top:10px}
+#zu{position:fixed;top:12px;left:12px;display:none;background:var(--feld);color:var(--text);border:1px solid var(--rand);border-radius:8px;padding:6px 10px;cursor:pointer}
+#unten{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);background:var(--feld);border:1px solid var(--rand);
+  border-radius:10px;padding:8px 14px;display:flex;gap:16px;align-items:center;max-width:calc(100% - 24px)}
+#unten .name{font-weight:600;color:#fff}
+#unten .art{color:var(--leise);font-size:12px}
+#unten .abstand{font-variant-numeric:tabular-nums;color:var(--text)}
+#unten button{background:none;border:1px solid var(--rand);color:var(--text);border-radius:6px;padding:4px 9px;cursor:pointer;font:inherit;font-size:12px}
+#unten button:hover{border-color:var(--akzent)}
+#meldung{position:fixed;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:24px}
+#meldung div{max-width:460px;background:var(--feld);border:1px solid var(--rand);border-radius:12px;padding:18px}
+body.auron #seite,body.auron #zu,body.auron #unten button{display:none}
+/* Modus frei (?auron=2, Sir 04.10.2026): Universum erkunden; Liste klappt ueber den kleinen Knopf "Liste" unten auf */
+#knopfListe{display:none}
+body.frei #knopfListe{display:inline-block}
+body.frei #zu,body.frei #einklappen,body.frei #seite .hinweis{display:none}
+body.frei #seite{display:none;top:auto;left:50%;bottom:62px;transform:translateX(-50%);width:min(320px,calc(100% - 24px));max-height:52%}
+body.frei.liste-auf #seite{display:block}
+#oeffnen{position:fixed;left:50%;bottom:70px;transform:translateX(-50%);display:none;background:var(--akzent);color:#fff;border:0;border-radius:8px;padding:9px 18px;font:inherit;font-weight:600;cursor:pointer;box-shadow:0 0 18px rgba(196,32,43,.45)}
+#oeffnen:hover{filter:brightness(1.12)}
+@media (max-width:640px){#seite{width:calc(100% - 24px);max-height:45%}#unten{gap:10px;font-size:13px}}
+</style>
+</head>
+<body>
+<canvas id="leinwand"></canvas>
+<div id="marken"></div>
+<button id="zu" title="Liste zeigen">Liste</button>
+<div id="seite">
+  <h1>Auron <b>Universum</b></h1>
+  <select id="szenenwahl" aria-label="Szene"></select>
+  <div id="liste"></div>
+  <div class="hinweis">Ziehen = drehen, Mausrad = zoomen, Klick auf Namen = hinfliegen. Taste U = ganzes Universum, Esc = Flug stoppen.</div>
+  <div class="hinweis"><button class="eintrag" id="einklappen">Liste ausblenden</button></div>
+</div>
+<div id="unten">
+  <div><div class="name" id="zielname">-</div><div class="art" id="zielart"></div></div>
+  <div class="abstand" id="abstand">-</div>
+  <button id="knopfListe" aria-expanded="false">Liste &#9652;</button>
+  <button id="knopfUniversum">Universum</button>
+</div>
+<div id="meldung"><div id="meldungText"></div></div>
+
+<script src="../lib/three/build/three.min.js"></script>
+<script src="../lib/three/examples/js/shaders/CopyShader.js"></script>
+<script src="../lib/three/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="../lib/three/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="../lib/three/examples/js/postprocessing/RenderPass.js"></script>
+<script src="../lib/three/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="../lib/three/examples/js/postprocessing/UnrealBloomPass.js"></script>
+<script src="station.js"></script>
+<script>
+"use strict";
+const T = THREE;
+const P = new URLSearchParams(location.search);
+const AURON = P.get("auron") === "1";
+const NIEDRIG = P.get("q") === "niedrig";
+if (AURON) document.body.classList.add("auron");
+const FREI = P.get("auron") === "2";
+if (FREI) document.body.classList.add("frei");
+
+const S = 1e-6;                 // Szeneneinheit: 1 = 1000 km
+const AE = 1.495978707e11, LJ = 9.4607e15;
+const DE = {"Sun":"Sonne","Earth":"Erde","Moon":"Mond","Mercury":"Merkur","Neptune":"Neptun","Milky Way":"Milchstraße",
+  "Milchstrasse":"Milchstraße","Small Magellanic Cloud":"Kleine Magellansche Wolke","Large Magellanic Cloud":"Große Magellansche Wolke",
+  "Grosse Magellansche Wolke":"Große Magellansche Wolke","Andromeda Galaxy":"Andromeda"};
+const ARTEN = {termin:"Termin",star:"Stern",planet:"Planet",moon:"Mond",blackhole:"Schwarzes Loch",objekt:"Objekt",galaxie:"Galaxie",
+  dwarfplanet:"Zwergplanet",asteroid:"Asteroid",comet:"Komet",station:"Raumstation",modul:"Modul",fiktiv:"Erfundener Planet",riesenloch:"Schwarzes Loch · 66 Mrd. Sonnenmassen"};
+const anzeigeName = n => DE[n] || n;
+
+// ---------- Hilfen ----------
+function zufall(samen){ let a = samen >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a);
+  t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function gauss(r){ let u = 0, v = 0; while (u === 0) u = r(); v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+function tempFarbe(k){ // Naeherung Schwarzkoerper-Farbe (Tanner Helland)
+  const t = Math.min(Math.max(k, 1000), 40000) / 100; let r, g, b;
+  r = t <= 66 ? 1 : Math.min(Math.max(1.292936 * Math.pow(t - 60, -0.1332047592), 0), 1);
+  g = t <= 66 ? Math.min(Math.max(0.39008157 * Math.log(t) - 0.63184144, 0), 1) : Math.min(Math.max(1.12989086 * Math.pow(t - 60, -0.0755148492), 0), 1);
+  b = t >= 66 ? 1 : (t <= 19 ? 0 : Math.min(Math.max(0.54320678 * Math.log(t - 10) - 1.19625408, 0), 1));
+  return [r, g, b];
+}
+const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const laenge = a => Math.hypot(a[0], a[1], a[2]);
+const glatt = t => t * t * t * (t * (t * 6 - 15) + 10);
+function abstandText(m){
+  if (m < 1e3) return m.toFixed(0) + " m";
+  if (m < 0.05 * AE) return Math.round(m / 1e3).toLocaleString("de-DE") + " km";
+  if (m < 0.05 * LJ) return (m / AE).toLocaleString("de-DE", {maximumFractionDigits: m < 10 * AE ? 2 : 0}) + " AE";
+  const lj = m / LJ;
+  if (lj < 1e6) return lj.toLocaleString("de-DE", {maximumFractionDigits: lj < 10 ? 2 : 0}) + " Lichtjahre";
+  return (lj / 1e6).toLocaleString("de-DE", {maximumFractionDigits: 2}) + " Mio. Lichtjahre";
+}
+
+// ---------- Grundgeruest ----------
+const leinwand = document.getElementById("leinwand");
+const renderer = new T.WebGLRenderer({canvas: leinwand, antialias: !NIEDRIG, logarithmicDepthBuffer: true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, NIEDRIG ? 1 : 2));
+renderer.toneMapping = T.NoToneMapping;
+renderer.setClearColor(0x000000, 1);
+const szene = new T.Scene();
+const kamera = new T.PerspectiveCamera(45, 1, 1e-3, 1e20);
+const umgebung = new T.AmbientLight(0xffffff, 0.05); szene.add(umgebung);
+let composer = null, bloom = null;
+if (!NIEDRIG && T.EffectComposer && T.UnrealBloomPass) {
+  composer = new T.EffectComposer(renderer);
+  composer.addPass(new T.RenderPass(szene, kamera));
+  bloom = new T.UnrealBloomPass(new T.Vector2(256, 256), 0.6, 0.4, 0.75);
+  composer.addPass(bloom);
+}
+let pxProEinheit = 1, hoehePx = 1; // Pixel je Einheit Groesse bei Abstand 1
+function groesseAnpassen(){
+  const b = window.innerWidth, h = window.innerHeight;
+  renderer.setSize(b, h, false); if (composer) composer.setSize(b, h);
+  kamera.aspect = b / h; kamera.updateProjectionMatrix();
+  hoehePx = h * renderer.getPixelRatio();
+  pxProEinheit = hoehePx / (2 * Math.tan(T.MathUtils.degToRad(kamera.fov) / 2));
+  for (const g of galaxieObjekte) for (const m of g.materialien) { m.uniforms.uPx.value = pxProEinheit; m.uniforms.uH.value = hoehePx; }
+}
+window.addEventListener("resize", groesseAnpassen);
+
+const KUGEL = new T.SphereGeometry(1, 48, 24);
+
+// ---------- Shader fuer Galaxien ----------
+const WOLKE_VS = `
+#include <common>
+#include <logdepthbuf_pars_vertex>
+attribute float groesse; attribute vec3 farbe; attribute float hell;
+uniform float uPx; uniform float uH; uniform float uHell;
+varying vec3 vFarbe; varying float vA;
+void main(){
+  vec4 mv = modelViewMatrix * vec4(position, 1.0);
+  gl_Position = projectionMatrix * mv;
+  float d = max(-mv.z, 1e-6);
+  float px = groesse * uPx / d;
+  float a = hell * uHell;
+  a *= 1.0 - smoothstep(0.30 * uH, 0.85 * uH, px);   // zu nah: ausblenden (spart Rechenzeit)
+  if (px < 2.0) { a *= px * px / 4.0; px = 2.0; }   // weit weg: Gesamthelligkeit erhalten
+  if (mv.z > 0.0) a = 0.0;
+  gl_PointSize = a < 0.0015 ? 0.0 : px;
+  vFarbe = farbe; vA = a;
+  #include <logdepthbuf_vertex>
+}`;
+const WOLKE_FS = `
+#include <logdepthbuf_pars_fragment>
+varying vec3 vFarbe; varying float vA;
+void main(){
+  vec2 p = gl_PointCoord * 2.0 - 1.0; float r2 = dot(p, p); if (r2 > 1.0) discard;
+  float f = exp(-r2 * 4.5) - 0.011;
+  gl_FragColor = vec4(vFarbe, max(f, 0.0) * vA);
+  #include <logdepthbuf_fragment>
+}`;
+const STERN_VS = `
+#include <common>
+#include <logdepthbuf_pars_vertex>
+attribute vec3 farbe; attribute float hell; attribute float zufall;
+uniform float uPx; uniform float uH; uniform float uSichtbar; uniform float uNah; uniform float uPr;
+varying vec3 vFarbe; varying float vA;
+void main(){
+  vec4 mv = modelViewMatrix * vec4(position, 1.0);
+  gl_Position = projectionMatrix * mv;
+  float d = max(-mv.z, 1e-6);
+  float s = (0.9 + 1.5 * zufall) * uPr;
+  s *= clamp(uNah / d, 1.0, 2.6);                   // sehr nahe Sterne etwas groesser
+  float a = hell * uSichtbar;
+  if (mv.z > 0.0) a = 0.0;
+  gl_PointSize = a < 0.002 ? 0.0 : s;
+  vFarbe = farbe; vA = a;
+  #include <logdepthbuf_vertex>
+}`;
+const STERN_FS = `
+#include <logdepthbuf_pars_fragment>
+varying vec3 vFarbe; varying float vA;
+void main(){
+  vec2 p = gl_PointCoord * 2.0 - 1.0; float r2 = dot(p, p); if (r2 > 1.0) discard;
+  gl_FragColor = vec4(vFarbe, (1.0 - r2) * vA);
+  #include <logdepthbuf_fragment>
+}`;
+
+// Leuchtpunkt (ein Punkt, Groesse in Pixeln) - ersetzt Sprites, die auf grosse Entfernung zerfallen
+const GLUT_VS = `
+#include <common>
+#include <logdepthbuf_pars_vertex>
+uniform float uGr;
+void main(){ vec4 mv = modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0); gl_Position = projectionMatrix * mv;
+  gl_PointSize = mv.z > 0.0 ? 0.0 : uGr;
+  #include <logdepthbuf_vertex>
+}`;
+const GLUT_FS = `
+#include <logdepthbuf_pars_fragment>
+uniform vec3 uFarbe; uniform float uA; uniform float uRing;
+void main(){ float r = length(gl_PointCoord * 2.0 - 1.0); if (r > 1.0) discard;
+  float a = uRing > 1.5 ? exp(-r * r * 6.0) * 0.8 + exp(-r * r * 40.0) * 0.6
+          : uRing > 0.5 ? exp(-pow((r - 0.42) / 0.09, 2.0)) * 0.9 + exp(-r * 5.0) * 0.12
+                        : exp(-r * r * 30.0) + exp(-r * 6.0) * 0.45;
+  a *= 1.0 - smoothstep(0.75, 1.0, r);
+  gl_FragColor = vec4(uFarbe, a * uA);
+  #include <logdepthbuf_fragment>
+}`;
+const EIN_PUNKT = new T.BufferGeometry(); EIN_PUNKT.setAttribute("position", new T.BufferAttribute(new Float32Array(3), 3));
+EIN_PUNKT.boundingSphere = new T.Sphere(new T.Vector3(), 1e30);
+function leuchtPunkt(farbe, ring){ // ring: false = Stern, true = Ring (Schwarzes Loch), 2 = weicher Galaxiekern
+  const m = new T.ShaderMaterial({uniforms: {uGr: {value: 10}, uFarbe: {value: new T.Color(...farbe)}, uA: {value: 1}, uRing: {value: ring === 2 ? 2 : ring ? 1 : 0}},
+    vertexShader: GLUT_VS, fragmentShader: GLUT_FS, transparent: true, depthWrite: false, depthTest: false, blending: T.AdditiveBlending});
+  const p = new T.Points(EIN_PUNKT, m); p.frustumCulled = false; p.renderOrder = 2; return p;
+}
+const MAX_PUNKT = Math.min(1024, (renderer.capabilities && renderer.getContext().getParameter(renderer.getContext().ALIASED_POINT_SIZE_RANGE)[1]) || 256);
+
+function punkteWolke(daten, art){
+  const geo = new T.BufferGeometry();
+  geo.setAttribute("position", new T.BufferAttribute(daten.pos, 3));
+  geo.setAttribute("farbe", new T.BufferAttribute(daten.farbe, 3));
+  geo.setAttribute("hell", new T.BufferAttribute(daten.hell, 1));
+  if (art === "wolke") geo.setAttribute("groesse", new T.BufferAttribute(daten.groesse, 1));
+  else geo.setAttribute("zufall", new T.BufferAttribute(daten.zufall, 1));
+  geo.boundingSphere = new T.Sphere(new T.Vector3(), 1e30); // nie wegschneiden, Kamera rechnet selbst
+  const mat = new T.ShaderMaterial({
+    uniforms: art === "wolke"
+      ? {uPx: {value: pxProEinheit}, uH: {value: hoehePx}, uHell: {value: 1}}
+      : {uPx: {value: pxProEinheit}, uH: {value: hoehePx}, uSichtbar: {value: 1}, uNah: {value: 1}, uPr: {value: renderer.getPixelRatio()}},
+    vertexShader: art === "wolke" ? WOLKE_VS : STERN_VS, fragmentShader: art === "wolke" ? WOLKE_FS : STERN_FS,
+    transparent: true, depthWrite: false, blending: T.AdditiveBlending});
+  const pts = new T.Points(geo, mat); pts.frustumCulled = false; return pts;
+}
+
+// ---------- Galaxie erzeugen ----------
+// Liefert Wolken (grosse weiche Flecken) und Sterne, Positionen in Szeneneinheiten relativ zur Mitte.
+function basis(n){
+  const N = new T.Vector3(n[0], n[1], n[2]).normalize();
+  const hilf = Math.abs(N.y) < 0.9 ? new T.Vector3(0, 1, 0) : new T.Vector3(1, 0, 0);
+  const U = new T.Vector3().crossVectors(hilf, N).normalize(), W = new T.Vector3().crossVectors(N, U);
+  return {N, U, W};
+}
+function sammler(n, mitGroesse){
+  return {i: 0, pos: new Float32Array(n * 3), farbe: new Float32Array(n * 3), hell: new Float32Array(n),
+    groesse: mitGroesse ? new Float32Array(n) : null, zufall: mitGroesse ? null : new Float32Array(n), n};
+}
+function setze(s, x, y, z, f, h, g, r){
+  if (s.i >= s.n) return; const i = s.i++;
+  s.pos[i * 3] = x; s.pos[i * 3 + 1] = y; s.pos[i * 3 + 2] = z;
+  s.farbe[i * 3] = f[0]; s.farbe[i * 3 + 1] = f[1]; s.farbe[i * 3 + 2] = f[2];
+  s.hell[i] = h; if (s.groesse) s.groesse[i] = g; else s.zufall[i] = r;
+}
+function kuerzen(s){ // falls weniger gesetzt als reserviert
+  const k = s.i; return {pos: s.pos.subarray(0, k * 3), farbe: s.farbe.subarray(0, k * 3), hell: s.hell.subarray(0, k),
+    groesse: s.groesse ? s.groesse.subarray(0, k) : null, zufall: s.zufall ? s.zufall.subarray(0, k) : null};
+}
+function mische(a, b, t){ return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
+
+function galaxieProzedural(g){
+  const r = zufall(g.samen || 1), R = g.r * S, {N, U, W} = basis(g.normale || [0, 1, 0]);
+  const anteil = (g.sterne || 0.5) * (NIEDRIG ? 0.35 : 1);
+  const nSterne = Math.round(60000 * anteil), nWolken = Math.round(1400 * Math.max(anteil, 0.3));
+  const st = sammler(nSterne, false), wo = sammler(nWolken, true);
+  const pkt = (a, b, h) => [U.x * a + W.x * b + N.x * h, U.y * a + W.y * b + N.y * h, U.z * a + W.z * b + N.z * h];
+  const typ = g.typ;
+  const arme = Math.max(0, g.arme | 0), steig = Math.tan(T.MathUtils.degToRad(13)), r0 = 0.12 * R;
+  const balken = typ === "balken" || typ === 11 || typ === 12;
+  const spirale = arme > 0 && typ !== "unregel" && typ !== "elliptisch";
+  const KERN = tempFarbe(4300), GELB = tempFarbe(5600), BLAU = tempFarbe(14000), ROSA = [1.0, 0.42, 0.62];
+  // Ort im Arm k bei Radius rr
+  const armOrt = (k, rr, streu) => { const th = 2 * Math.PI * k / arme + Math.log(rr / r0) / steig + gauss(r) * streu;
+    return [Math.cos(th) * rr, Math.sin(th) * rr]; };
+  // Sterne
+  for (let i = 0; i < nSterne; i++) {
+    const w = r(); let a, b, h, f, hell = 0.55 + 0.45 * r();
+    if (!spirale) { // unregelmaessig oder elliptisch: Klumpen
+      const klumpen = Math.floor(r() * 6), kr = zufall(klumpen + (g.samen || 1) * 31);
+      const ka = (kr() - 0.5) * R * 0.9, kb = (kr() - 0.5) * R * 0.9;
+      const s = typ === "unregel" ? 0.22 : 0.45;
+      a = (typ === "unregel" ? ka : 0) + gauss(r) * R * s; b = (typ === "unregel" ? kb : 0) + gauss(r) * R * s;
+      h = gauss(r) * R * (typ === "unregel" ? 0.08 : 0.3);
+      f = mische(GELB, BLAU, typ === "unregel" ? r() * 0.9 : r() * 0.2);
+    } else if (w < 0.16) { // Kern
+      a = gauss(r) * R * 0.07; b = gauss(r) * R * 0.07; h = gauss(r) * R * 0.045; f = mische(KERN, GELB, r() * 0.5); hell *= 0.6;
+    } else if (balken && w < 0.24) { // Balken
+      a = (r() * 2 - 1) * R * 0.24; b = gauss(r) * R * 0.035; h = gauss(r) * R * 0.02; f = mische(KERN, GELB, r()); hell += 0.15;
+    } else if (w < 0.72) { // Spiralarme
+      const rr = r0 + (R - r0) * Math.pow(r(), 0.85); const o = armOrt(Math.floor(r() * arme), rr, 0.16 + 0.05 * (rr / R));
+      a = o[0] + gauss(r) * R * 0.012; b = o[1] + gauss(r) * R * 0.012; h = gauss(r) * R * 0.008;
+      f = r() < 0.45 ? mische(BLAU, GELB, r() * 0.4) : mische(GELB, BLAU, r() * 0.3);
+    } else { // Scheibe
+      const rr = -Math.log(1 - r() * 0.97) * R * 0.32, th = r() * Math.PI * 2;
+      a = Math.cos(th) * rr; b = Math.sin(th) * rr; h = gauss(r) * R * 0.012; f = mische(GELB, KERN, r() * 0.5); hell *= 0.7;
+    }
+    const p = pkt(a, b, h); setze(st, p[0], p[1], p[2], f, hell, 0, r());
+  }
+  // Leuchtwolken
+  for (let i = 0; i < nWolken; i++) {
+    const w = r(); let a, b, h, f, gr, hell;
+    if (!spirale) {
+      a = gauss(r) * R * 0.3; b = gauss(r) * R * 0.3; h = gauss(r) * R * (typ === "unregel" ? 0.08 : 0.25);
+      f = typ === "unregel" ? mische(BLAU, ROSA, r() * 0.5) : mische(KERN, GELB, r()); gr = R * (0.12 + 0.15 * r()); hell = 0.10;
+    } else if (w < 0.18) {
+      a = gauss(r) * R * 0.06; b = gauss(r) * R * 0.06; h = gauss(r) * R * 0.035; f = mische(KERN, GELB, r() * 0.4);
+      gr = R * (0.05 + 0.06 * r()); hell = 0.11;
+    } else if (balken && w < 0.26) {
+      a = (r() * 2 - 1) * R * 0.22; b = gauss(r) * R * 0.03; h = gauss(r) * R * 0.015; f = KERN; gr = R * 0.05; hell = 0.14;
+    } else {
+      const rr = r0 + (R - r0) * Math.pow(r(), 0.9); const o = armOrt(Math.floor(r() * arme), rr, 0.12);
+      a = o[0]; b = o[1]; h = gauss(r) * R * 0.006;
+      const rosa = r() < 0.22; f = rosa ? ROSA : mische(BLAU, GELB, r() * 0.5);
+      gr = R * (rosa ? 0.006 + 0.01 * r() : 0.03 + 0.04 * r()); hell = rosa ? 0.22 : 0.075;
+    }
+    const p = pkt(a, b, h); setze(wo, p[0], p[1], p[2], f, hell, gr, 0);
+  }
+  return {sterne: kuerzen(st), wolken: kuerzen(wo)};
+}
+
+function galaxieAusTeilchen(g, t){ // Universe-Sandbox-Teilchen als Wolken, dazu Sterne darum herum
+  const n = t.temp.length, r = zufall(g.id * 97 + 3), gr = t.groesse * S;
+  const deckung = Math.max(1, n * Math.pow(t.groesse / Math.max(g.r, 1), 2));          // wie oft sich Flecken ueberlagern
+  const mittelHell = t.hell.reduce((a, b) => a + b, 0) / Math.max(n, 1) || 0.1, faktor = 0.9 / deckung / mittelHell;
+  const proStern = NIEDRIG ? 6 : 16;
+  const wo = sammler(n, true), st = sammler(n * proStern, false), fg = t.farbe || [1, 1, 1];
+  for (let i = 0; i < n; i++) {
+    const x = t.pos[i * 3] * S, y = t.pos[i * 3 + 1] * S, z = t.pos[i * 3 + 2] * S;
+    const f = mische(tempFarbe(t.temp[i]), fg, 0.35), h = Math.min(0.5, Math.max(t.hell[i], 0.02) * faktor);
+    setze(wo, x, y, z, f, h, gr * (0.6 + 0.8 * r()), 0);
+    for (let k = 0; k < proStern; k++)
+      setze(st, x + gauss(r) * gr * 0.35, y + gauss(r) * gr * 0.12, z + gauss(r) * gr * 0.35, mische(f, [1, 1, 1], r() * 0.4), 0.5 + 0.5 * r(), 0, r());
+  }
+  return {sterne: kuerzen(st), wolken: kuerzen(wo)};
+}
+
+// Einfache Oberflaeche ohne Texturdatei: Rauschen (Gesteinsplaneten) oder Baender (Gasriesen)
+const RAUSCHEN = `
+vec3 hash3(vec3 p){ p = vec3(dot(p, vec3(127.1, 311.7, 74.7)), dot(p, vec3(269.5, 183.3, 246.1)), dot(p, vec3(113.5, 271.9, 124.6)));
+  return -1.0 + 2.0 * fract(sin(p) * 43758.5453123); }
+float rausch(vec3 p){ vec3 i = floor(p), f = fract(p), u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(mix(dot(hash3(i), f), dot(hash3(i + vec3(1,0,0)), f - vec3(1,0,0)), u.x),
+                 mix(dot(hash3(i + vec3(0,1,0)), f - vec3(0,1,0)), dot(hash3(i + vec3(1,1,0)), f - vec3(1,1,0)), u.x), u.y),
+             mix(mix(dot(hash3(i + vec3(0,0,1)), f - vec3(0,0,1)), dot(hash3(i + vec3(1,0,1)), f - vec3(1,0,1)), u.x),
+                 mix(dot(hash3(i + vec3(0,1,1)), f - vec3(0,1,1)), dot(hash3(i + vec3(1,1,1)), f - vec3(1,1,1)), u.x), u.y), u.z); }
+float fbm(vec3 p){ float s = 0.0, a = 0.5; for (int i = 0; i < 5; i++) { s += a * rausch(p); p *= 2.03; a *= 0.5; } return s; }`;
+function oberflaeche(mat, k){
+  const gas = (k.r || 0) > 2e7, samen = ((k.id || 1) * 7.31) % 50;
+  mat.onBeforeCompile = sh => {
+    sh.vertexShader = sh.vertexShader.replace("#include <common>", "#include <common>\nvarying vec3 vObjN;")
+      .replace("#include <begin_vertex>", "#include <begin_vertex>\nvObjN = normalize(position);");
+    sh.fragmentShader = sh.fragmentShader.replace("#include <common>", "#include <common>\nvarying vec3 vObjN;" + RAUSCHEN)
+      .replace("#include <color_fragment>", "#include <color_fragment>\n" + (gas
+        ? "{ float b = sin(vObjN.y * 22.0 + fbm(vObjN * 3.0 + " + samen.toFixed(2) + ") * 3.0); diffuseColor.rgb *= 0.82 + 0.22 * b; }"
+        : "{ float n = fbm(vObjN * 3.5 + " + samen.toFixed(2) + "); diffuseColor.rgb *= 0.70 + 0.75 * smoothstep(-0.35, 0.45, n); }"));
+  };
+  mat.customProgramCacheKey = () => gas ? "gas" + samen : "fels" + samen;
+}
+
+// ---------- Szene laden ----------
+let daten = null, koerperObjekte = [], galaxieObjekte = [], lichter = [], himmel = null;
+let ziel = null;            // {art:"koerper"|"galaxie"|"punkt", obj, punkt}
+let zielPunktFest = [0, 0, 0];
+let gier = 0.6, nick = 0.35, abstand = 1e9, wunschAbstand = 1e9;
+let flug = null;
+
+function leeren(){
+  AuronStation.leeren();
+  for (const k of koerperObjekte) { szene.remove(k.mesh); if (k.glut) szene.remove(k.glut); k.mesh.material.dispose();
+    if (k.bahn) { szene.remove(k.bahn.linie); k.bahn.linie.geometry.dispose(); k.bahn.linie.material.dispose(); } }
+  for (const g of galaxieObjekte) { szene.remove(g.gruppe); g.gruppe.traverse(o => { if (o.geometry && o.geometry !== KUGEL) o.geometry.dispose(); if (o.material) o.material.dispose(); }); }
+  for (const l of lichter) szene.remove(l);
+  if (himmel) { szene.remove(himmel); himmel.geometry.dispose(); himmel.material.dispose(); himmel = null; }
+  koerperObjekte = []; galaxieObjekte = []; lichter = []; flug = null;
+  document.getElementById("marken").innerHTML = "";
+}
+
+function szeneAufbauen(d){
+  leeren(); daten = d;
+  const spiegeln = d.achsen === "unity";  // Unity zaehlt linkshaendig -> z umdrehen
+  const v = p => spiegeln ? [p[0], p[1], -p[2]] : [p[0], p[1], p[2]];
+  const skala = d.koerper_skala || 1;
+  // Koerper
+  for (const k of d.koerper || []) {
+    const art = k.art || "objekt", f = k.farbe || [1, 1, 1, 1];
+    let mat;
+    if (art === "star") mat = new T.MeshBasicMaterial({color: new T.Color(f[0], f[1], f[2]).multiplyScalar(1.4), toneMapped: false});
+    else if (art === "blackhole") mat = new T.MeshBasicMaterial({color: 0x000000});
+    else { mat = new T.MeshStandardMaterial({color: new T.Color(f[0], f[1], f[2]), roughness: 0.9, metalness: 0,
+      emissive: new T.Color(f[0], f[1], f[2]).multiplyScalar(0.02)}); oberflaeche(mat, k); }
+    const mesh = new T.Mesh(KUGEL, mat); mesh.frustumCulled = false; szene.add(mesh);
+    let glut = null;
+    if (art === "star" || art === "blackhole") {
+      glut = leuchtPunkt(art === "star" ? [f[0], f[1], f[2]] : [1.0, 0.62, 0.32], art === "blackhole"); szene.add(glut);
+    }
+    koerperObjekte.push({daten: k, name: anzeigeName(k.name), art, pos: v(k.pos), r: k.r || 1, rSicht: (k.r || 1) * skala,
+      masse: k.masse || 0, mesh, glut, nachbar: Infinity, marke: null, sichtbar: true});
+  }
+  // naechster schwererer Koerper (zum Ausblenden, wenn er im Bild mit ihm verschmilzt)
+  for (const a of koerperObjekte) for (const b of koerperObjekte)
+    if (b !== a && b.masse > a.masse) { const dd = laenge(sub(a.pos, b.pos)); if (dd < a.nachbar) { a.nachbar = dd; a.eltern = b; } }
+  for (const k of koerperObjekte) k.bahn = bahnBauen(k, v);
+  // Lichter (bis 4 Sterne gleichzeitig)
+  for (let i = 0; i < 4; i++) { const l = new T.PointLight(0xffffff, 0, 0, 0); szene.add(l); lichter.push(l); }
+  umgebung.intensity = koerperObjekte.some(k => k.art === "star") ? 0.05 : 0.6;
+  // Galaxien
+  const teilchenNach = {}; for (const t of d.teilchen || []) teilchenNach[t.galaxie] = t;
+  for (const g of d.galaxien || []) {
+    const mitte = v(g.mitte), t = teilchenNach[g.id];
+    let inhalt;
+    if (t && t.temp && t.temp.length) {
+      const t2 = Object.assign({}, t); if (spiegeln) { t2.pos = t.pos.slice(); for (let i = 2; i < t2.pos.length; i += 3) t2.pos[i] = -t2.pos[i]; }
+      inhalt = galaxieAusTeilchen(g, t2);
+    } else inhalt = galaxieProzedural(Object.assign({}, g, {normale: g.normale ? v(g.normale) : [0, 1, 0]}));
+    const gruppe = new T.Group(), wolken = punkteWolke(inhalt.wolken, "wolke"), sterne = punkteWolke(inhalt.sterne, "stern");
+    wolken.material.uniforms.uHell.value = 1.0;
+    sterne.renderOrder = 1; gruppe.add(wolken); gruppe.add(sterne); szene.add(gruppe);
+    const kern = leuchtPunkt(tempFarbe(g.prozedural ? 5200 : 6500), 2); kern.renderOrder = 1; gruppe.add(kern);
+    galaxieObjekte.push({daten: g, name: anzeigeName(g.name), art: "galaxie", pos: mitte, r: g.r, gruppe,
+      materialien: [wolken.material, sterne.material], sterne, wolken, kern, normale: g.normale ? v(g.normale) : scheibenNormale(inhalt.wolken), marke: null});
+  }
+  // Himmel nur ohne Galaxien (sonst liefern die Galaxie-Sterne den Hintergrund)
+  if (!galaxieObjekte.length) himmel = himmelBauen();
+  AuronStation.aufbauen(d);
+  groesseAnpassen();
+  listeBauen();
+  // Startansicht
+  const zk = koerperObjekte.find(k => k.daten.id === (d.kamera || {}).ziel)
+    || koerperObjekte.find(k => k.art === "planet") || koerperObjekte.find(k => k.art === "star") || koerperObjekte[0];
+  if (zk) { setzeZiel({art: "koerper", obj: zk}); abstand = wunschAbstand = Math.max((d.kamera || {}).abstand || 0, minAbstand()) || zk.rSicht * 6; }
+  else if (galaxieObjekte.length) { setzeZiel({art: "galaxie", obj: galaxieObjekte[0]}); abstand = wunschAbstand = galaxieObjekte[0].r * 2.2; }
+  if (P.get("ziel")) { const z = sucheZiel(P.get("ziel")); if (z) { setzeZiel(z); abstand = wunschAbstand = zielAbstandFuer(z); } }
+  if (P.get("abstand")) abstand = wunschAbstand = Math.max(parseFloat(P.get("abstand")), minAbstand());
+  if (P.get("blick")) { const b = P.get("blick").split(",").map(Number); if (b.length === 2) { gier = b[0]; nick = b[1]; } }
+  if (window.parent !== window) window.parent.postMessage({auron: "bereit", szene: d.name}, "*");
+}
+
+const GRAV = 6.674e-11;
+function bahnBauen(k, v){ // Bahnellipse aus Ort und Geschwindigkeit relativ zum schwereren Nachbarn
+  const e = k.eltern; if (!e || !k.daten.v || !e.daten.v) return null;
+  const mu = GRAV * (e.masse + k.masse); if (!(mu > 0)) return null;
+  const r = new T.Vector3(...sub(k.pos, e.pos)), vv = new T.Vector3(...sub(v(k.daten.v), v(e.daten.v)));
+  const rl = r.length(), v2 = vv.lengthSq(); if (!rl || !v2) return null;
+  const a = 1 / (2 / rl - v2 / mu); if (!(a > 0)) return null;
+  const h = new T.Vector3().crossVectors(r, vv); if (h.lengthSq() === 0) return null;
+  const ev = new T.Vector3().crossVectors(vv, h).divideScalar(mu).sub(r.clone().divideScalar(rl)); const ex = ev.length();
+  if (ex >= 0.97) return null;
+  const pH = ex > 1e-6 ? ev.clone().normalize() : r.clone().normalize(), qH = new T.Vector3().crossVectors(h.clone().normalize(), pH);
+  const n = 256, pts = new Float32Array(n * 3), b = a * Math.sqrt(1 - ex * ex);
+  for (let i = 0; i < n; i++) { const E = i / n * Math.PI * 2, x = a * (Math.cos(E) - ex), y = b * Math.sin(E);
+    pts[i * 3] = (pH.x * x + qH.x * y) * S; pts[i * 3 + 1] = (pH.y * x + qH.y * y) * S; pts[i * 3 + 2] = (pH.z * x + qH.z * y) * S; }
+  const geo = new T.BufferGeometry(); geo.setAttribute("position", new T.BufferAttribute(pts, 3));
+  const linie = new T.LineLoop(geo, new T.LineBasicMaterial({color: 0xb9c0cc, transparent: true, opacity: 0.28, depthWrite: false}));
+  linie.frustumCulled = false; szene.add(linie);
+  return {a, linie};
+}
+
+function scheibenNormale(w){ // kleinste Hauptachse der Wolken = Scheibennormale
+  const n = w.pos.length / 3; if (n < 3) return [0, 1, 0];
+  let c = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], m = [0, 0, 0];
+  for (let i = 0; i < n; i++) for (let a = 0; a < 3; a++) m[a] += w.pos[i * 3 + a] / n;
+  for (let i = 0; i < n; i++) for (let a = 0; a < 3; a++) for (let b = 0; b < 3; b++) c[a][b] += (w.pos[i * 3 + a] - m[a]) * (w.pos[i * 3 + b] - m[b]) / n;
+  const M = new T.Matrix3().set(c[0][0], c[0][1], c[0][2], c[1][0], c[1][1], c[1][2], c[2][0], c[2][1], c[2][2]);
+  const inv = M.clone().invert(); let x = new T.Vector3(0.3, 1, 0.2);  // inverse Potenzmethode
+  for (let k = 0; k < 40; k++) { x.applyMatrix3(inv); const l = x.length(); if (!isFinite(l) || l === 0) return [0, 1, 0]; x.divideScalar(l); }
+  if (x.y < 0) x.negate(); return [x.x, x.y, x.z];
+}
+
+function himmelBauen(){
+  const r = zufall(5), n = NIEDRIG ? 1500 : 4000, s = sammler(n, false);
+  for (let i = 0; i < n; i++) { const z = r() * 2 - 1, t = r() * Math.PI * 2, q = Math.sqrt(1 - z * z), R = 1e15;
+    setze(s, Math.cos(t) * q * R, z * R, Math.sin(t) * q * R, tempFarbe(3000 + r() * 12000), 0.25 + 0.6 * r() * r(), 0, r()); }
+  const p = punkteWolke(kuerzen(s), "stern"); p.renderOrder = -1; p.material.depthTest = false; szene.add(p); return p;
+}
+
+// ---------- Ziele und Kamera ----------
+function zielPunkt(z){ z = z || ziel; if (!z) return zielPunktFest; return z.art === "punkt" ? z.punkt : z.obj.pos; }
+function minAbstand(z){ z = z || ziel; if (!z) return 1e3; if (z.art === "galaxie") return z.obj.r * 0.02; if (z.art === "punkt") return 1e3;
+  return Math.max(z.obj.rSicht * 2.2, 1e3); }
+function zielAbstandFuer(z){ if (z.art === "punkt") return z.abstand || 1e12; if (z.art === "galaxie") return z.obj.r * 2.4; const k = z.obj;
+  if (k.art === "blackhole") return Math.max(k.r * 40, 1e12); if (k.art === "star") return k.rSicht * 14; return k.rSicht * 7; }
+function setzeZiel(z){ ziel = z; if (!flug) zielPunktFest = zielPunkt(z).slice(); for (const b of document.querySelectorAll("#liste button")) b.classList.toggle("aktiv", b._ziel && b._ziel.obj === z.obj);
+  document.getElementById("zielname").textContent = z.obj ? z.obj.name : "Punkt";
+  document.getElementById("zielart").textContent = z.obj ? (ARTEN[z.obj.art] || z.obj.art) : ""; }
+function sucheZiel(text){ const t = String(text || "").toLowerCase().trim(); if (!t) return null;
+  const alle = [...galaxieObjekte.map(o => ({art: "galaxie", obj: o})), ...koerperObjekte.map(o => ({art: "koerper", obj: o})),
+    ...AuronStation.ziele().map(o => ({art: "koerper", obj: o}))];
+  return alle.find(z => z.obj.name.toLowerCase() === t || String(z.obj.daten.name).toLowerCase() === t)
+    || alle.find(z => z.obj.name.toLowerCase().includes(t)) || null; }
+function blickRichtung(){ return [Math.cos(nick) * Math.sin(gier), Math.sin(nick), Math.cos(nick) * Math.cos(gier)]; }
+function kameraPos(){ const o = blickRichtung(), p = zielPunktFest; return [p[0] + o[0] * abstand, p[1] + o[1] * abstand, p[2] + o[2] * abstand]; }
+function winkelFuerGalaxie(g){ // schraeg von oben auf die Scheibe
+  const n = new T.Vector3(...g.normale).normalize(), hilf = Math.abs(n.y) < 0.9 ? new T.Vector3(0, 1, 0) : new T.Vector3(1, 0, 0);
+  const t = new T.Vector3().crossVectors(n, hilf).normalize(); const o = n.multiplyScalar(Math.cos(0.75)).add(t.multiplyScalar(Math.sin(0.75)));
+  return [Math.atan2(o.x, o.z), Math.asin(Math.max(-0.99, Math.min(0.99, o.y)))]; }
+
+function fliegen(z, sofort){
+  if (!z) return;
+  const p0 = zielPunktFest.slice(), d0 = abstand, p1 = zielPunkt(z), d1 = zielAbstandFuer(z);
+  const weg = laenge(sub(p1, p0)), l0 = Math.log(d0), l1 = Math.log(d1);
+  const huegel = Math.max(0, Math.log(weg * 1.3 + 1) - Math.max(l0, l1));
+  const w = z.blick || (z.art === "galaxie" ? winkelFuerGalaxie(z.obj) : [gier, nick]);
+  const dauer = sofort ? 0 : Math.min(7, Math.max(1.6, 1.0 + 0.16 * (Math.abs(l1 - l0) + 2 * huegel)));
+  let dg = w[0] - gier; dg = Math.atan2(Math.sin(dg), Math.cos(dg));
+  flug = {z, p0, p1, l0, l1, huegel, weg, g0: gier, g1: gier + dg, n0: nick, n1: w[1], t: 0, dauer};
+  setzeZiel(z);
+  if (sofort) flugSchritt(1e9);
+}
+function flugSchritt(dt){
+  const f = flug; f.p1 = zielPunkt(f.z); f.t = f.dauer ? Math.min(1, f.t + dt / f.dauer) : 1;
+  const e = glatt(f.t), dJetzt = Math.exp(f.l0 + (f.l1 - f.l0) * e + f.huegel * Math.sin(Math.PI * f.t));
+  const d0 = Math.exp(f.l0), d1 = Math.exp(f.l1);
+  let ep;
+  if (f.huegel > 0.5) ep = glatt(Math.min(1, Math.max(0, (f.t - 0.12) / 0.7)));
+  else if (Math.abs(d1 - d0) > f.weg * 0.5) ep = Math.min(1, Math.max(0, (dJetzt - d0) / (d1 - d0))); // Ziel bleibt im Bild
+  else ep = e;
+  if (f.t >= 1) ep = 1;
+  zielPunktFest = [f.p0[0] + (f.p1[0] - f.p0[0]) * ep, f.p0[1] + (f.p1[1] - f.p0[1]) * ep, f.p0[2] + (f.p1[2] - f.p0[2]) * ep];
+  abstand = wunschAbstand = dJetzt;
+  gier = f.g0 + (f.g1 - f.g0) * e; nick = f.n0 + (f.n1 - f.n0) * e;
+  if (f.t >= 1) { flug = null; ziel = f.z; wunschAbstand = abstand;
+    if (window.parent !== window) window.parent.postMessage({auron: "angekommen", ziel: f.z.obj.name, id: f.z.tourId}, "*"); }
+}
+function universumZeigen(tourId){
+  const alle = galaxieObjekte.length ? galaxieObjekte.map(g => g.pos) : koerperObjekte.map(k => k.pos); if (!alle.length) return;
+  const m = [0, 1, 2].map(i => (Math.min(...alle.map(p => p[i])) + Math.max(...alle.map(p => p[i]))) / 2);  // Mitte des Rahmens
+  let r = 0; for (const p of alle) r = Math.max(r, laenge(sub(p, m)));
+  for (const g of galaxieObjekte) r = Math.max(r, laenge(sub(g.pos, m)) + g.r);
+  const halbWinkel = Math.atan(Math.tan(T.MathUtils.degToRad(kamera.fov) / 2) * Math.min(1, kamera.aspect));
+  const z = {art: "punkt", punkt: m, abstand: Math.max(r / Math.sin(halbWinkel) * 1.05, 1e3), obj: {name: "Universum", art: "Überblick", pos: m, daten: {name: "Universum"}}};
+  if (galaxieObjekte.length >= 3) { // von dort schauen, wo sich die Galaxien am wenigsten ueberdecken
+    const w = {pos: new Float32Array(galaxieObjekte.flatMap(g => sub(g.pos, m).map(x => x * 1e-18)))};
+    const n = scheibenNormale(w); z.blick = winkelFuerGalaxie({normale: n}); }
+  z.tourId = tourId;
+  fliegen(z); }
+
+// ---------- Bedienung ----------
+let zieht = null, zeiger = new Map(), letzteEingabe = performance.now(), klickStart = null;
+leinwand.addEventListener("pointerdown", e => { leinwand.setPointerCapture(e.pointerId); zeiger.set(e.pointerId, [e.clientX, e.clientY]);
+  klickStart = [e.clientX, e.clientY]; leinwand.classList.add("zieht"); letzteEingabe = performance.now(); });
+leinwand.addEventListener("pointermove", e => {
+  if (!zeiger.has(e.pointerId)) return; const alt = zeiger.get(e.pointerId); zeiger.set(e.pointerId, [e.clientX, e.clientY]);
+  if (zeiger.size === 2) { const [a, b] = [...zeiger.values()]; const d = Math.hypot(a[0] - b[0], a[1] - b[1]);
+    if (zieht && zieht.pinch) wunschAbstand *= zieht.pinch / Math.max(d, 1); zieht = {pinch: d}; return; }
+  zieht = null; if (flug) flug = null;
+  gier -= (e.clientX - alt[0]) * 0.005; nick = Math.max(-1.5, Math.min(1.5, nick + (e.clientY - alt[1]) * 0.005));
+  letzteEingabe = performance.now(); });
+const loslassen = e => { zeiger.delete(e.pointerId); if (!zeiger.size) { leinwand.classList.remove("zieht"); zieht = null; }
+  if (klickStart && e.type === "pointerup" && Math.hypot(e.clientX - klickStart[0], e.clientY - klickStart[1]) < 5) klickAuf(e.clientX, e.clientY);
+  klickStart = null; };
+leinwand.addEventListener("pointerup", loslassen); leinwand.addEventListener("pointercancel", loslassen);
+leinwand.addEventListener("wheel", e => { e.preventDefault(); if (flug) { ziel = flug.z; flug = null; }
+  wunschAbstand *= Math.exp(Math.max(-300, Math.min(300, e.deltaY)) * 0.0016); letzteEingabe = performance.now(); }, {passive: false});
+window.addEventListener("keydown", e => {
+  if (e.key === "Escape" && flug) { ziel = flug.z; flug = null; wunschAbstand = abstand; }
+  if (e.key === "u" || e.key === "U") universumZeigen();
+  if (e.key === "+") wunschAbstand /= 1.6; if (e.key === "-") wunschAbstand *= 1.6; });
+document.getElementById("knopfUniversum").onclick = () => universumZeigen();
+function listeZuklappen() { document.body.classList.remove("liste-auf"); const k = document.getElementById("knopfListe"); if (k) { k.setAttribute("aria-expanded", "false"); k.innerHTML = "Liste &#9652;"; } }
+document.getElementById("knopfListe").onclick = () => { const auf = document.body.classList.toggle("liste-auf"); const k = document.getElementById("knopfListe"); k.setAttribute("aria-expanded", String(auf)); k.innerHTML = auf ? "Liste &#9662;" : "Liste &#9652;"; };
+document.getElementById("einklappen").onclick = () => { document.getElementById("seite").style.display = "none"; document.getElementById("zu").style.display = "block"; };
+document.getElementById("zu").onclick = () => { document.getElementById("seite").style.display = ""; document.getElementById("zu").style.display = "none"; };
+
+let bildschirmOrte = []; // fuer Klicks: [{x,y,z}]
+function klickAuf(x, y){
+  let bester = null, bd = 30;
+  for (const o of bildschirmOrte) { const d = Math.hypot(o.x - x, o.y - y); if (d < bd) { bd = d; bester = o.z; } }
+  if (bester) fliegen(bester); }
+
+function listeBauen(){
+  const box = document.getElementById("liste"); box.innerHTML = "";
+  const gruppen = [["Auron Station", AuronStation.ziele().filter(o => o.art === "station" || o.art === "modul").map(o => ({art: "koerper", obj: o}))],
+    ["Termine (nächste 7 Tage)", AuronStation.ziele().filter(o => o.art === "termin").map(o => ({art: "koerper", obj: o}))],
+    ["Riesen-Schwarzes-Loch", AuronStation.ziele().filter(o => o.art === "riesenloch").map(o => ({art: "koerper", obj: o}))],
+    ["Erfundene Planeten", AuronStation.ziele().filter(o => o.art === "fiktiv").map(o => ({art: "koerper", obj: o}))],
+    ["Galaxien", galaxieObjekte.map(o => ({art: "galaxie", obj: o}))]];
+  for (const [art, titel] of [["star", "Sterne"], ["planet", "Planeten"], ["dwarfplanet", "Zwergplaneten"], ["moon", "Monde"], ["blackhole", "Schwarze Löcher"]])
+    gruppen.push([titel, koerperObjekte.filter(k => k.art === art).map(o => ({art: "koerper", obj: o}))]);
+  gruppen.push(["Weitere", koerperObjekte.filter(k => !["star", "planet", "dwarfplanet", "moon", "blackhole"].includes(k.art)).slice(0, 60).map(o => ({art: "koerper", obj: o}))]);
+  for (const [titel, liste] of gruppen) { if (!liste.length) continue;
+    const h = document.createElement("h2"); h.textContent = titel; box.appendChild(h);
+    for (const z of liste) { const b = document.createElement("button"); b.className = "eintrag"; b.textContent = z.obj.name; b._ziel = z; b.onclick = () => { fliegen(z); if (FREI) listeZuklappen(); }; box.appendChild(b); } }
+}
+
+// ---------- Bild fuer Bild ----------
+const markenBox = document.getElementById("marken"), v3 = new T.Vector3();
+function marke(o, klasse){ if (!o.marke) { const m = document.createElement("div"); m.className = "marke " + (klasse || ""); m.textContent = o.name;
+    m.onclick = () => fliegen(o.art === "galaxie" ? {art: "galaxie", obj: o} : {art: "koerper", obj: o}); markenBox.appendChild(m); o.marke = m; } return o.marke; }
+function aufBildschirm(rel){ v3.set(rel[0] * S, rel[1] * S, rel[2] * S).project(kamera);
+  if (v3.z > 1 || v3.z < -1) return null; return [(v3.x + 1) / 2 * window.innerWidth, (1 - v3.y) / 2 * window.innerHeight]; }
+
+let zuletzt = performance.now();
+function bild(jetzt){
+  if (beendetFlag) { bildLaeuft = false; return; }   // Grafik schon freigegeben: nichts mehr zeichnen
+  const dt = Math.min(0.1, (jetzt - zuletzt) / 1000); zuletzt = jetzt;
+  AuronStation.schritt(dt);
+  if (flug) flugSchritt(dt);
+  else {
+    wunschAbstand = Math.min(Math.max(wunschAbstand, minAbstand()), 3e24);
+    abstand = Math.exp(Math.log(abstand) + (Math.log(wunschAbstand) - Math.log(abstand)) * (1 - Math.exp(-dt * 9)));
+    if ((AURON || P.get("drehen") === "1") && jetzt - letzteEingabe > 4000) gier += dt * 0.025;
+  }
+  if (!flug && ziel) zielPunktFest = zielPunkt().slice();
+  const kp = kameraPos(), o = blickRichtung();
+  kamera.position.set(0, 0, 0); kamera.up.set(0, 1, 0); kamera.lookAt(-o[0], -o[1], -o[2]); kamera.updateMatrixWorld();
+  const pxProM = pxProEinheit * S / S; // Pixel je Meter Groesse bei 1 m Abstand (Einheiten kuerzen sich)
+  bildschirmOrte = []; const kandidaten = [];
+  // Koerper
+  const sterne = [];
+  for (const k of koerperObjekte) {
+    const rel = sub(k.pos, kp), d = Math.max(laenge(rel), 1);
+    const istZiel = ziel && ziel.obj === k;
+    const pxNachbar = k.nachbar * pxProM / d / renderer.getPixelRatio();
+    const sicht = istZiel || pxNachbar > 5;
+    const minPx = k.art === "star" ? 2.4 : k.art === "blackhole" ? 2.0 : 1.6;
+    const rv = Math.max(k.rSicht, d * minPx * renderer.getPixelRatio() / pxProM);
+    k.mesh.visible = sicht; k.mesh.position.set(rel[0] * S, rel[1] * S, rel[2] * S); k.mesh.scale.setScalar(rv * S);
+    if (k.glut) { k.glut.visible = sicht; k.glut.position.copy(k.mesh.position);
+      const gpx = (k.art === "star" ? 22 : 14) * renderer.getPixelRatio(), echt = k.rSicht * (k.art === "star" ? 10 : 7) * pxProM / d;
+      k.glut.material.uniforms.uGr.value = Math.min(Math.max(gpx, echt), MAX_PUNKT);
+      k.glut.material.uniforms.uA.value = k.art === "star" ? 0.95 : 0.85; }
+    if (k.art === "star" && sicht) sterne.push([d, k]);
+    if (k.bahn) { const er = sub(k.eltern.pos, kp), de = Math.max(laenge(er), 1), bpx = k.bahn.a * pxProM / de / renderer.getPixelRatio();
+      k.bahn.linie.visible = sicht && bpx > 10 && (k.eltern.mesh.visible || bpx > 40)
+        && d > k.bahn.a * 0.02 && de > k.bahn.a * 0.25; // nicht quer durchs Bild, wenn die Kamera auf/in der Bahn sitzt
+      k.bahn.linie.position.set(er[0] * S, er[1] * S, er[2] * S);
+      k.bahn.linie.material.opacity = (istZiel ? 0.55 : 0.28) * Math.min(1, (bpx - 10) / 30); }
+    const s = sicht ? aufBildschirm(rel) : null;
+    if (s) bildschirmOrte.push({x: s[0], y: s[1], z: {art: "koerper", obj: k}});
+    const zeigen = s && (istZiel || !AuronStation.nah()) && (istZiel || pxNachbar > 60 || ((k.art === "star" || k.art === "blackhole") && pxNachbar > 12));
+    if (zeigen) kandidaten.push({o: k, x: s[0], y: s[1], prio: (istZiel ? 1e9 : 0) + (k.art === "star" ? 3 : k.art === "blackhole" ? 1 : 2) * 1e3 + Math.log(k.masse + 1), ziel: istZiel});
+    else if (k.marke) k.marke.style.display = "none";
+  }
+  sterne.sort((a, b) => a[0] - b[0]);
+  lichter.forEach((l, i) => { const e = sterne[i]; if (!e) { l.intensity = 0; return; } const rel = sub(e[1].pos, kp);
+    l.position.set(rel[0] * S, rel[1] * S, rel[2] * S); l.color.copy(e[1].mesh.material.color).multiplyScalar(1 / 1.4); l.intensity = 1.5; });
+  AuronStation.bild(kp, kandidaten, bildschirmOrte);
+  // Galaxien
+  let innen = 0;
+  for (const g of galaxieObjekte) {
+    const rel = sub(g.pos, kp), d = Math.max(laenge(rel), 1);
+    g.gruppe.position.set(rel[0] * S, rel[1] * S, rel[2] * S);
+    const galPx = g.r * pxProM / d;
+    const [wm, sm] = g.materialien;
+    sm.uniforms.uSichtbar.value = Math.min(1, Math.max(0.004, Math.pow(galPx / hoehePx, 2) * 1.0) + (d < g.r * 1.5 ? 1 : 0));
+    wm.uniforms.uHell.value = 1 + 3 * Math.min(1, Math.max(0, 1 - galPx / (0.3 * hoehePx)));  // ferne Galaxien heller
+    g.kern.material.uniforms.uGr.value = Math.min(Math.max(galPx * 0.8, 22 * renderer.getPixelRatio()), MAX_PUNKT);
+    g.kern.material.uniforms.uA.value = d < g.r * 1.2 ? 0 : 0.75 * Math.min(1, Math.max(0.1, 1 - galPx / (0.4 * hoehePx)));
+    sm.uniforms.uNah.value = g.r * S * 0.01;
+    innen = Math.max(innen, d < g.r ? 1 : 0);
+    const istZiel = ziel && ziel.obj === g;
+    const s = aufBildschirm(rel);
+    if (s && galPx > 3) bildschirmOrte.push({x: s[0], y: s[1], z: {art: "galaxie", obj: g}});
+    const zeigen = s && (istZiel || abstand > 1e18) && (galPx / renderer.getPixelRatio() > 4 || abstand > 5e21) && d > g.r * 0.9;
+    if (zeigen) kandidaten.push({o: g, x: s[0], y: s[1] + Math.min(galPx / renderer.getPixelRatio() * 0.55, 160), prio: (istZiel ? 1e9 : 0) + 5e3 + galPx, ziel: istZiel, galaxie: true});
+    else if (g.marke) g.marke.style.display = "none";
+  }
+  if (bloom) bloom.strength = innen ? 0.45 : 0.6;
+  // Namen ohne Ueberlappung setzen (wichtigste zuerst)
+  kandidaten.sort((a, b) => b.prio - a.prio); const belegt = [];
+  for (const c of kandidaten) {
+    const bw = c.o.name.length * (c.galaxie ? 8.5 : 7) + 14, x0 = c.galaxie ? c.x - bw / 2 : c.x + 6, box = [x0, c.y - 9, x0 + bw, c.y + 9];
+    const frei = !belegt.some(b => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1]);
+    const m = marke(c.o, c.galaxie ? "galaxie" : "");
+    if (!frei && !c.ziel) { m.style.display = "none"; continue; }
+    belegt.push(box); m.style.display = ""; m.style.left = c.x + "px"; m.style.top = c.y + "px"; m.classList.toggle("ziel", !!c.ziel);
+  }
+  // Anzeige unten
+  document.getElementById("abstand").textContent = abstandText(laenge(sub(kp, zielPunktFest)));
+  if (composer) composer.render(); else renderer.render(szene, kamera);
+  if (!angehalten) requestAnimationFrame(bild); else bildLaeuft = false;
+}
+// 05.10.2026: Auron haelt das Universum an, solange ein Bereich davor offen ist (Grafikkarte frei),
+// und gibt die Grafik vor dem Schliessen sauber frei (sonst "Seite reagiert nicht" beim Zurueck).
+let angehalten = false, bildLaeuft = true, beendetFlag = false;
+function anhalten(){ angehalten = true; }
+function weiterlaufen(){ if (!angehalten) return; angehalten = false; if (!bildLaeuft) { bildLaeuft = true; zuletzt = performance.now(); requestAnimationFrame(bild); } }
+function beenden(){ angehalten = true; beendetFlag = true;
+  try { if (composer) { composer.renderTarget1.dispose(); composer.renderTarget2.dispose(); } renderer.dispose(); renderer.forceContextLoss(); } catch (e) {} }
+
+// ---------- Laden ----------
+function meldung(html){ const m = document.getElementById("meldung"); m.style.display = html ? "flex" : "none"; document.getElementById("meldungText").innerHTML = html || ""; }
+async function szeneLaden(datei){
+  try {
+    const r = await fetch("szenen/" + encodeURIComponent(datei), {cache: "no-cache"}); if (!r.ok) throw new Error("HTTP " + r.status);
+    const d = await r.json(); if (d.format !== "auron-universum-1") throw new Error("unbekanntes Format");
+    szeneAufbauen(d); meldung("");
+    try { localStorage.setItem("auron-universum-szene", datei); } catch (e) {}
+  } catch (e) { meldung("Szene <b>" + datei + "</b> konnte nicht geladen werden (" + e.message + ").<br><br>Die Seite muss über den Auron-Server laufen: <code>http://127.0.0.1:8001/werkstatt/universum/universum_3d.html</code>"); }
+}
+async function start(){
+  let liste = [];
+  try { const r = await fetch("szenen/liste.json", {cache: "no-cache"}); if (r.ok) liste = await r.json(); } catch (e) {}
+  const wahl = document.getElementById("szenenwahl");
+  for (const e of liste) { const o = document.createElement("option"); o.value = e.datei; o.textContent = e.name + " (" + e.koerper + " Körper, " + e.galaxien + " Galaxien)"; wahl.appendChild(o); }
+  let gemerkt = null; try { gemerkt = localStorage.getItem("auron-universum-szene"); } catch (e) {}
+  const erste = P.get("szene") || (liste.some(e => e.datei === gemerkt) ? gemerkt : null) || (liste[0] && liste[0].datei) || "Milchstrasse.json";
+  wahl.value = erste; wahl.onchange = () => szeneLaden(wahl.value);
+  groesseAnpassen(); requestAnimationFrame(bild); await szeneLaden(erste);
+}
+window.addEventListener("message", e => { const m = e.data || {}; if (!m.auron) return;
+  if (m.auron === "fliege") fliegen(sucheZiel(m.ziel)); if (m.auron === "szene" && m.datei) szeneLaden(m.datei); if (m.auron === "universum") universumZeigen();
+  if (m.auron === "fahre") { if (!AuronStation.fahre(m.id) && window.parent !== window) window.parent.postMessage({auron: "angekommen", id: m.id}, "*"); }
+  if (m.auron === "modulStatus") AuronStation.status(m.an);
+  if (m.auron === "pause") anhalten(); if (m.auron === "weiter") weiterlaufen();
+  if (m.auron === "beenden") { beenden(); if (window.parent !== window) window.parent.postMessage({auron: "beendet"}, "*"); } });
+// fuer Tests
+window.__universum = {fliege: (n, sofort) => fliegen(sucheZiel(n), sofort), universum: universumZeigen,
+  zustand: () => ({ziel: ziel && ziel.obj ? ziel.obj.name : null, abstand, flug: !!flug, galaxien: galaxieObjekte.length, koerper: koerperObjekte.length}),
+  setzeAbstand: m => { abstand = wunschAbstand = m; }, intern: () => ({galaxieObjekte, koerperObjekte, kamera, szene}), blick: (g, n) => { gier = g; nick = n; }, station: AuronStation};
+start();
+</script>
+</body>
+</html>

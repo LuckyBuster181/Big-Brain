@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jarvis Insel-Stadt</title>
+<!--
+  Jarvis Insel-Stadt in 3D (04.10.2026, Entwurf 4: echter Maßstab, 1 Einheit = 1 Meter, Insel ca. 2,8 km). Three.js r147, sonst keine Abhängigkeiten.
+  Bibliothek: zuerst lokal aus lib/three/ (THREE_HOLEN.bat legt sie dort ab), sonst aus dem Internet (jsdelivr).
+  Es wird nichts gespeichert und nichts gesendet.
+
+  TESTPLAN (Sir):
+   1. Datei per Doppelklick öffnen (Chrome oder Edge). Nach kurzem Laden: große Insel (ca. 2,8 km) mit Strand, weißer
+      Promenade, Wiesen, Parks, vielen weißen und gläsernen Zukunftsbauten, Einschienenbahn mit Zug, Riesenrad,
+      Booten, Luftschiffen und in der Mitte dem sehr hohen goldenen Turm "Jarvis".
+   2. "Licht": Morgen, Tag, Sonnenuntergang, Nacht. Himmel, Sonne, Wasser, Schatten, Fenster, Laternen ändern sich.
+   3. Klick auf Jarvis, ein Arbeitsgebäude oder ein Namensschild öffnet das Detailfeld. Andere Häuser reagieren nicht.
+   4. "Rundgang" fliegt alle 13 Gebäude an (je 3 s). "Stopp" bricht ab. Ziehen dreht, Rechtsklick/zwei Finger
+      verschieben, Mausrad/zwei Finger zoomen.
+  EHRLICH UNGETESTET / FEHLERQUELLEN:
+   - Beispieldaten von Hand, nicht live (datenLaden() ist vorbereitet).
+   - Handy: einfachere Grafik (keine Spiegelung, kein Leuchten), auf echten Handys ungetestet.
+   - Ohne lib/three/ und ohne Internet startet die Seite nicht (Hinweis erscheint).
+-->
+<style>
+  :root { color-scheme:dark; --bg:#060810; --panel:#121624; --linie:#2a3144; --text:#ece9e1; --leise:#9aa3b5; --gold:#d4af37; }
+  * { box-sizing:border-box; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--text);
+    font-family:system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; overflow:hidden; }
+  body { display:flex; flex-direction:column; height:100%; }
+  header { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; padding:9px 14px;
+    border-bottom:1px solid var(--linie); background:#0b0e18; z-index:3; }
+  header h1 { font-size:17px; margin:0; color:var(--gold); font-weight:600; letter-spacing:.4px; }
+  .steuer { display:flex; flex-wrap:wrap; gap:8px; margin-left:auto; align-items:center; }
+  label.licht { font-size:13px; color:var(--leise); display:flex; align-items:center; gap:6px; }
+  select, button { font:inherit; font-size:14px; color:var(--text); background:var(--panel);
+    border:1px solid var(--linie); border-radius:8px; padding:7px 12px; min-height:38px; }
+  button { cursor:pointer; }
+  button:hover, select:hover { border-color:var(--gold); }
+  button.haupt { background:#2b2410; border-color:var(--gold); color:#f3d98a; }
+  button:disabled { opacity:.4; cursor:default; }
+  button:focus-visible, select:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
+  .zeile { display:flex; flex-wrap:wrap; gap:4px 16px; padding:5px 14px; font-size:13px; color:var(--leise);
+    border-bottom:1px solid var(--linie); background:#0b0e18; z-index:3; }
+  .punkt { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:5px; vertical-align:middle; }
+  .hinweis { color:#ffc43d; }
+  main { position:relative; flex:1; min-height:0; overflow:hidden; }
+  canvas#stadt { width:100%; height:100%; display:block; touch-action:none; }
+  #schilder { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+  .schild { position:absolute; left:0; top:0; transform:translate(-50%,-100%); white-space:nowrap; pointer-events:auto;
+    background:rgba(10,12,20,.74); border:1px solid rgba(255,255,255,.22); color:#f1efe8; border-radius:11px;
+    padding:3px 10px 3px 8px; font-size:12px; font-weight:600; cursor:pointer; backdrop-filter:blur(3px);
+    display:flex; align-items:center; gap:6px; }
+  .schild .punkt { width:8px; height:8px; margin:0; }
+  .schild.aktiv { background:rgba(60,48,14,.95); border-color:#ffdc78; color:#ffe9a8; }
+  .schild.klein { padding:0; width:14px; height:14px; border-radius:50%; justify-content:center; }
+  .schild.klein .text { display:none; }
+  #untertitel { position:absolute; left:50%; top:12px; transform:translateX(-50%); max-width:min(92%,660px);
+    background:rgba(12,15,25,.86); border:1px solid var(--gold); border-radius:10px; padding:10px 16px;
+    font-size:15px; text-align:center; display:none; pointer-events:none; backdrop-filter:blur(4px); z-index:2; }
+  #untertitel.an { display:block; }
+  #detail { position:absolute; right:12px; top:12px; width:330px; max-height:calc(100% - 24px); overflow:auto;
+    background:rgba(18,22,36,.92); border:1px solid var(--linie); border-radius:12px; padding:14px 16px; display:none;
+    backdrop-filter:blur(6px); z-index:2; }
+  #detail.an { display:block; }
+  #detail h2 { margin:0 28px 6px 0; font-size:18px; }
+  #detail .status { font-size:14px; margin-bottom:10px; }
+  #detail dl { margin:0 0 10px; display:grid; grid-template-columns:auto 1fr; gap:4px 12px; font-size:14px; }
+  #detail dt { color:var(--leise); }
+  #detail dd { margin:0; text-align:right; }
+  #detail p { margin:0; font-size:14px; line-height:1.45; color:#cfd3dc; }
+  #schliessen { position:absolute; right:8px; top:8px; min-height:30px; padding:2px 10px; }
+  #laden { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column;
+    gap:10px; background:var(--bg); z-index:4; font-size:15px; color:var(--leise); text-align:center; padding:20px; }
+  #laden b { color:var(--gold); font-weight:600; }
+  .unsichtbar { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+  .unsichtbar button:focus { position:fixed; left:12px; bottom:12px; width:auto; height:auto; clip:auto; z-index:5; }
+  /* Auron-Modus (?auron=1, 04.10.2026): nur die Stadt, Steuerung und Texte kommen von auron.html */
+  body.auron header, body.auron .zeile, body.auron #untertitel, body.auron #detail, body.auron #schilder,
+  body.auron .unsichtbar { display:none !important; }
+  body.auron #laden { background:#0b0c10; }
+  body.auron #laden b { color:#d0d5de; }
+  @media (max-width:700px) {
+    header h1 { font-size:15px; }
+    .steuer { width:100%; margin-left:0; }
+    .steuer button { flex:1; }
+    label.licht { width:100%; }
+    label.licht select { flex:1; }
+    #detail { left:8px; right:8px; top:auto; bottom:8px; width:auto; max-height:55%; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Jarvis – Insel-Stadt</h1>
+  <div class="steuer">
+    <label class="licht">Licht
+      <select id="licht">
+        <option value="auto">Automatisch (Uhrzeit)</option>
+        <option value="7.2">Morgen</option>
+        <option value="12">Tag</option>
+        <option value="18.75">Sonnenuntergang</option>
+        <option value="23">Nacht</option>
+      </select>
+    </label>
+    <button id="knopfRundgang" class="haupt" type="button">Rundgang</button>
+    <button id="knopfStopp" type="button" disabled>Stopp</button>
+    <button id="knopfUebersicht" type="button">Übersicht</button>
+  </div>
+</header>
+<div class="zeile" id="zusammenfassung" aria-live="polite"></div>
+<main>
+  <canvas id="stadt" aria-label="3D-Insel-Stadt mit Jarvis in der Mitte und 12 Arbeitsgebäuden"></canvas>
+  <div id="schilder"></div>
+  <div id="untertitel" role="status"></div>
+  <aside id="detail" aria-live="polite">
+    <button id="schliessen" type="button" aria-label="Detailfeld schließen">x</button>
+    <h2 id="detailName"></h2>
+    <div class="status" id="detailStatus"></div>
+    <dl id="detailZahlen"></dl>
+    <p id="detailText"></p>
+  </aside>
+  <div id="laden"><div><b>Jarvis</b> baut die Stadt …</div><div id="ladenText"></div></div>
+  <div class="unsichtbar" id="tastaturListe"></div>
+</main>
+
+<script>
+"use strict";
+
+/* =====================================================================================
+   0. BIBLIOTHEK LADEN (lokal zuerst, sonst Internet)
+   ===================================================================================== */
+const THREE_VERSION = "0.147.0";
+const BIBLIOTHEK = [
+  "build/three.min.js",
+  "examples/js/controls/OrbitControls.js",
+  "examples/js/objects/Water.js",
+  "examples/js/objects/Sky.js",
+  "examples/js/shaders/CopyShader.js",
+  "examples/js/shaders/LuminosityHighPassShader.js",
+  "examples/js/postprocessing/EffectComposer.js",
+  "examples/js/postprocessing/RenderPass.js",
+  "examples/js/postprocessing/ShaderPass.js",
+  "examples/js/postprocessing/UnrealBloomPass.js"
+];
+function skriptLaden(src) {
+  return new Promise((ok, fehler) => {
+    const s = document.createElement("script");
+    s.src = src; s.onload = ok; s.onerror = () => { s.remove(); fehler(new Error(src)); };
+    document.head.appendChild(s);
+  });
+}
+async function bibliothekLaden() {
+  let quelle = "lokal";
+  const lokalZuerst = location.protocol !== "https:";
+  for (const p of BIBLIOTHEK) {
+    try { if (!lokalZuerst) throw new Error("online"); await skriptLaden("lib/three/" + p); }
+    catch (e) { quelle = "Internet"; await skriptLaden(`https://cdn.jsdelivr.net/npm/three@${THREE_VERSION}/` + p); }
+  }
+  return quelle;
+}
+
+/* =====================================================================================
+   1. DATEN (BEISPIELDATEN, von Hand eingetragen, Stand 04.10.2026, NICHT live)
+   ===================================================================================== */
+const DATEN_BEISPIEL = {
+  stand: "Beispieldaten von Hand eingetragen (04.10.2026), nicht live",
+  gebaeude: [
+    { id:"jarvis", name:"Jarvis", status:"laeuft",
+      kennzahlen:[["KI-Anbieter","lokal (Ollama)"],["Antwortzeit Notizfragen","2,5 bis 8,5 s"],["Anrede","Sir"]],
+      text:"Die Zentrale: beantwortet Fragen aus dem Vault mit Quellenangabe und steuert alle anderen Bereiche." },
+    { id:"testpc", name:"Test-PC", status:"laeuft",
+      kennzahlen:[["Modell","qwen3.5:9b"],["Tempo","15,4 Token/s"],["Speichertest","bestanden (0 Fehler)"]],
+      text:"Ubuntu-Rechner mit RX 580, bevorzugter Rechner für die Nachtarbeit." },
+    { id:"hauptpc", name:"Haupt-PC", status:"laeuft",
+      kennzahlen:[["Modell","qwen3.5:9b"],["Tempo","49,5 Token/s"],["Grafikkarte","RTX 2070 Super"]],
+      text:"Der schnellste KI-Rechner, antwortet im Chat zuerst." },
+    { id:"minipc", name:"Mini-PC", status:"laeuft",
+      kennzahlen:[["Modell","qwen3.5:4b"],["Tempo","4,6 Token/s"],["Jarvis-Dienst","läuft"]],
+      text:"Das Zuhause von Jarvis: Dienst, Nacht-Timer und Syncthing laufen hier." },
+    { id:"nachtarbeit", name:"Nachtarbeit", status:"wartet",
+      kennzahlen:[["Nächster Lauf","03:00 Uhr"],["Letzte Nacht","1 fertig, 2 Fehler"],["KI","nur lokal (neu)"]],
+      text:"Arbeitet nachts Aufträge ab. Seit dem 04.10. ohne Claude-Anbindung, kostet nichts." },
+    { id:"aufgabenloop", name:"Aufgaben-Loop", status:"wartet",
+      kennzahlen:[["Offener Vorschlag","Wärmepumpe"],["Schreiber","lokal"],["Recherche","Claude (Websuche)"]],
+      text:"Macht aus Wissenslücken Notiz-Entwürfe. Wartet auf Ihre Freigabe im HUD." },
+    { id:"vault", name:"Vault", status:"laeuft",
+      kennzahlen:[["Suchtest","26/28 auf Platz 1"],["Index","aktuell"],["Änderungen","werden überwacht"]],
+      text:"Big Brain: Ihre Notizen in Obsidian, durchsucht von Jarvis." },
+    { id:"briefing", name:"Briefing & Gmail", status:"laeuft",
+      kennzahlen:[["Mails (2 Tage)","15"],["Wichtig","2"],["Quelle","Gmail per IMAP"]],
+      text:"Fasst Mails, Termine und Stand des Vortags zu einem Tagesbriefing zusammen." },
+    { id:"kalender", name:"Kalender", status:"laeuft",
+      kennzahlen:[["Termine heute","0"],["Quelle","Google Kalender (iCal)"],["Schreiben","über Termin-Links"]],
+      text:"Zeigt Ihre Termine und Feiertage im HUD an." },
+    { id:"kosten", name:"Kosten", status:"laeuft",
+      kennzahlen:[["Heute","0,00 €"],["Monat (Schätzung)","ca. 0,30 $"],["Rahmen","30 $ im Monat"]],
+      text:"Zählt, was die Claude-API kostet. Lokale KI kostet nichts." },
+    { id:"trading", name:"Trading", status:"aus",
+      kennzahlen:[["Modus","Demokonto"],["Laufende Bots","0"],["Kandidat","Divergenz Gold-Silber"]],
+      text:"Trading-Labor. Aktuell nichts aktiv, der Umbau auf MQL5 steht aus." },
+    { id:"sicherheit", name:"Sicherheit", status:"wartet",
+      kennzahlen:[["Ampel","gelb"],["Rote Funde","0"],["Letzter Check","04.10."]],
+      text:"Prüft nur lesend auf offene Zugangsdaten. Gelb heißt: aufräumen, aber nichts Akutes." },
+    { id:"tiktok", name:"TikTok", status:"wartet",
+      kennzahlen:[["Ausgewertet","178 Videos"],["Fehlgeschlagen","9"],["Nächster Schritt","Bild-Auswertung"]],
+      text:"Wertet gespeicherte Videos aus und legt Notizen im Vault an." }
+  ]
+};
+/** Holt die Daten. Später: const a = await fetch("/api/stadt"); return await a.json(); (gleiches Format). */
+async function datenLaden() { return DATEN_BEISPIEL; }
+
+const STATUS = {
+  laeuft: { text:"läuft",  farbe:[61,220,132] },
+  wartet: { text:"wartet", farbe:[255,196,61] },
+  fehler: { text:"Fehler", farbe:[255,82,82] },
+  aus:    { text:"aus",    farbe:[120,128,140] }
+};
+const REIHENFOLGE = ["testpc","hauptpc","minipc","nachtarbeit","aufgabenloop","vault",
+                     "briefing","kalender","kosten","trading","sicherheit","tiktok"];
+const AGENT_FARBE = { testpc:0x4e74aa, hauptpc:0x5c82be, minipc:0x42628e, nachtarbeit:0x6c56a6, aufgabenloop:0x3a9280,
+  vault:0xb07c48, briefing:0x4692b8, kalender:0x709e4a, kosten:0xa04c60, trading:0xb67238, sicherheit:0x96964c, tiktok:0x8a4aa0 };
+
+/* =====================================================================================
+   2. HILFEN
+   ===================================================================================== */
+function zufallsquelle(start) {
+  let a = start >>> 0;
+  return function () {
+    a = (a + 0x6D2B79F5) >>> 0; let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const zufall = zufallsquelle(20261004);
+const mix = (a, b, t) => a + (b - a) * t;
+const klemme = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const rgbText = c => `rgb(${c[0]|0},${c[1]|0},${c[2]|0})`;
+const RI = 1400, BODEN = 6;                                // Inselradius und Bodenhöhe in Metern
+function inselRand(w) { return RI * (1 + 0.07 * Math.sin(3 * w + 1) + 0.045 * Math.sin(5 * w + 2) + 0.025 * Math.sin(7 * w + 0.5)); }
+const wDes = (x, z) => Math.atan2(z, x);
+const params = new URLSearchParams(location.search);
+/* Auron-Modus (04.10.2026): Die Seite läuft als Hintergrund der Tour in dashboard/auron.html.
+   Nachrichten von dort: {auron:"fahre", id} (id eines Gebäudes oder "uebersicht"), {auron:"farbe", turm:0xRRGGBB}.
+   Antworten: {auron:"bereit"}, {auron:"angekommen", id}, {auron:"fehler", text}. */
+const AURON = params.get("auron") === "1" && window.parent !== window;
+function anAuron(nachricht) { if (AURON) { try { window.parent.postMessage(nachricht, location.origin); } catch (e) {} } }
+if (AURON) {
+  document.body.classList.add("auron");
+  const b = document.querySelector("#laden b"); if (b) b.textContent = "Auron";
+}
+
+/* =====================================================================================
+   3. START
+   ===================================================================================== */
+const ladenText = document.getElementById("ladenText");
+window.__fehler = [];
+window.addEventListener("error", e => { window.__fehler.push(String(e.message)); ladenText.textContent = "Fehler: " + e.message; anAuron({ auron: "fehler", text: String(e.message) }); });
+(async function () {
+  let quelle;
+  try { quelle = await bibliothekLaden(); }
+  catch (e) {
+    ladenText.innerHTML = "Die 3D-Bibliothek (Three.js) fehlt.<br>Bitte <b>werkstatt\\THREE_HOLEN.bat</b> einmal starten oder mit dem Internet verbinden.";
+    console.error("Bibliothek fehlt:", e);
+    anAuron({ auron: "fehler", text: "3D-Bibliothek fehlt" });
+    return;
+  }
+  try {
+    const daten = await datenLaden().catch(() => DATEN_BEISPIEL);
+    stadtStarten(daten, quelle);
+  } catch (e) {
+    ladenText.textContent = "Fehler beim Aufbau: " + e.message;
+    console.error(e);
+    anAuron({ auron: "fehler", text: "Aufbau: " + e.message });
+  }
+})();
+
+function stadtStarten(startDaten, quelle) {
+const T = THREE;
+if (T.ColorManagement) T.ColorManagement.legacyMode = false;   // Farben korrekt (sRGB -> linear)
+const mobil = matchMedia("(pointer: coarse)").matches || innerWidth < 700;
+const stufe = params.get("q") || (mobil ? "niedrig" : "hoch");
+const Q = { hoch: stufe === "hoch", schatten: stufe === "hoch" ? 4096 : 1024, dpr: Math.min(devicePixelRatio || 1, stufe === "hoch" ? 2 : 1.5) };
+
+/* ---------- Renderer, Szene, Kamera ---------- */
+const leinwand = document.getElementById("stadt");
+const renderer = new T.WebGLRenderer({ canvas: leinwand, antialias: true, powerPreference: "high-performance" });
+renderer.setPixelRatio(Q.dpr);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = T.PCFSoftShadowMap;
+renderer.outputEncoding = T.sRGBEncoding;
+renderer.toneMapping = T.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.55;
+const szene = new T.Scene();
+szene.fog = new T.FogExp2(0xbcd4e6, 0.00009);
+const kamera = new T.PerspectiveCamera(35, 1, 5, 150000);
+kamera.position.set(3400, 1800, 1700);
+const steuerung = new T.OrbitControls(kamera, leinwand);
+steuerung.target.set(0, 120, 0);
+steuerung.enableDamping = true; steuerung.dampingFactor = 0.08;
+steuerung.maxPolarAngle = 1.45; steuerung.minDistance = 60; steuerung.maxDistance = 9000;
+steuerung.update();
+
+/* ---------- Licht, Himmel, Wasser ---------- */
+const sonne = new T.DirectionalLight(0xffffff, 2.5);
+sonne.castShadow = true;
+sonne.shadow.mapSize.set(Q.schatten, Q.schatten);
+Object.assign(sonne.shadow.camera, { left: -800, right: 800, top: 800, bottom: -800, near: 100, far: 7000 });
+sonne.shadow.bias = -0.0004; sonne.shadow.normalBias = 0.8;
+szene.add(sonne); szene.add(sonne.target);
+const himmelsLicht = new T.HemisphereLight(0xbfd8ff, 0x6a5a48, 0.6);
+szene.add(himmelsLicht);
+const mondLicht = new T.DirectionalLight(0x9fb4ff, 0);
+mondLicht.position.set(-400, 500, 300);
+szene.add(mondLicht);
+
+const himmel = new T.Sky();
+himmel.scale.setScalar(80000);
+szene.add(himmel);
+const himmelUmgebung = new T.Sky();
+himmelUmgebung.scale.setScalar(80000);
+const umgebungsSzene = new T.Scene();
+umgebungsSzene.add(himmelUmgebung);
+const pmrem = new T.PMREMGenerator(renderer);
+let umgebungsZiel = null;
+
+/** Wellen-Normalenbild selbst erzeugt (kachelbar), damit keine Bilddatei nötig ist. */
+function wellenNormalen() {
+  const N = 256, c = document.createElement("canvas"); c.width = c.height = N;
+  const x = c.getContext("2d"), bild = x.createImageData(N, N), z = zufallsquelle(3);
+  const wellen = [];
+  for (let i = 0; i < 24; i++) wellen.push({ kx: Math.round((z() - 0.5) * 16), ky: Math.round((z() - 0.5) * 16), a: 0.4 / (1 + i * 0.25), p: z() * 6.28 });
+  const h = (u, v) => wellen.reduce((s, w) => s + w.a * Math.sin(2 * Math.PI * (w.kx * u + w.ky * v) + w.p), 0);
+  for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+    const u = i / N, v = j / N, e = 1 / N;
+    const dx = (h(u + e, v) - h(u - e, v)) * 6, dy = (h(u, v + e) - h(u, v - e)) * 6;
+    const l = Math.hypot(dx, dy, 1), k = (j * N + i) * 4;
+    bild.data[k] = (-dx / l * 0.5 + 0.5) * 255; bild.data[k + 1] = (-dy / l * 0.5 + 0.5) * 255; bild.data[k + 2] = (1 / l * 0.5 + 0.5) * 255; bild.data[k + 3] = 255;
+  }
+  x.putImageData(bild, 0, 0);
+  const t = new T.CanvasTexture(c); t.wrapS = t.wrapT = T.RepeatWrapping;
+  return t;
+}
+const normalen = wellenNormalen();
+let wasser;
+if (Q.hoch) {
+  wasser = new T.Water(new T.PlaneGeometry(240000, 240000), {
+    textureWidth: 1024, textureHeight: 1024, waterNormals: normalen, sunDirection: new T.Vector3(0, 1, 0),
+    sunColor: 0xffffff, waterColor: 0x0f5e78, distortionScale: 2.4, fog: true, alpha: 1.0
+  });
+  wasser.material.uniforms.size.value = 0.35;
+} else {
+  normalen.repeat.set(3000, 3000);
+  wasser = new T.Mesh(new T.PlaneGeometry(240000, 240000), new T.MeshStandardMaterial({ color: 0x0f5e78, roughness: 0.08, metalness: 0.6, normalMap: normalen, normalScale: new T.Vector2(0.35, 0.35) }));
+}
+wasser.rotation.x = -Math.PI / 2;
+szene.add(wasser);
+
+/* ---------- Sterne und Mond ---------- */
+const sterne = (function () {
+  const z = zufallsquelle(7), pos = [];
+  for (let i = 0; i < 2200; i++) {
+    const w = z() * Math.PI * 2, h = 0.04 + z() * 0.96, r = 60000;
+    pos.push(Math.cos(w) * Math.sqrt(1 - h * h) * r, h * r, Math.sin(w) * Math.sqrt(1 - h * h) * r);
+  }
+  const g = new T.BufferGeometry(); g.setAttribute("position", new T.Float32BufferAttribute(pos, 3));
+  const p = new T.Points(g, new T.PointsMaterial({ color: 0xffffff, size: 1.6, sizeAttenuation: false, transparent: true, opacity: 0, fog: false, depthWrite: false }));
+  szene.add(p); return p;
+})();
+function glanzBild(innen, aussen) {
+  const c = document.createElement("canvas"); c.width = c.height = 128;
+  const x = c.getContext("2d"), v = x.createRadialGradient(64, 64, 0, 64, 64, 64);
+  v.addColorStop(0, innen); v.addColorStop(0.25, aussen); v.addColorStop(1, "rgba(255,255,255,0)");
+  x.fillStyle = v; x.fillRect(0, 0, 128, 128);
+  return new T.CanvasTexture(c);
+}
+const glanz = glanzBild("rgba(255,255,255,1)", "rgba(255,255,255,.35)");
+const mond = new T.Sprite(new T.SpriteMaterial({ map: glanzBild("rgba(245,247,255,1)", "rgba(200,210,255,.25)"), transparent: true, opacity: 0, fog: false, depthWrite: false }));
+mond.position.set(-34000, 17000, 28000); mond.scale.setScalar(5800);
+szene.add(mond);
+
+/* =====================================================================================
+   4. MATERIALIEN (Fassaden mit Fenstern, die nachts leuchten)
+   ===================================================================================== */
+const U = { uLicht: { value: 0.0 }, uNacht: { value: 0.0 } };
+/** MeshStandardMaterial plus Fensterraster aus der Weltposition (kein Bild nötig, passt zu jeder Größe). */
+function fassade(farbe, opt) {
+  const o = Object.assign({ stock: 3.4, spalte: 2.6, rand: 0.14, glas: [0.12, 0.17, 0.24], staerke: 0.85, rund: 0, rundFaktor: 9,
+    rough: 0.5, metal: 0.05, warm: [1.0, 0.78, 0.45], glanz: 0 }, opt || {});
+  const m = new T.MeshStandardMaterial({ color: farbe, roughness: o.rough, metalness: o.metal });
+  m.onBeforeCompile = s => {
+    Object.assign(s.uniforms, U, {
+      uStock: { value: o.stock }, uSpalte: { value: o.spalte }, uRand: { value: o.rand }, uGlas: { value: new T.Color().fromArray(o.glas) },
+      uStaerke: { value: o.staerke }, uRund: { value: o.rund }, uRundFaktor: { value: o.rundFaktor }, uWarm: { value: new T.Color().fromArray(o.warm) },
+      uBoden: { value: BODEN }, uGlanz: { value: o.glanz }
+    });
+    s.vertexShader = s.vertexShader
+      .replace("#include <common>", "#include <common>\nvarying vec3 vWPos;\nvarying vec3 vWNorm;")
+      .replace("#include <worldpos_vertex>", `#include <worldpos_vertex>
+        vec4 fw = vec4(transformed, 1.0);
+        #ifdef USE_INSTANCING
+          fw = instanceMatrix * fw;
+        #endif
+        fw = modelMatrix * fw; vWPos = fw.xyz;
+        vec3 fn = objectNormal;
+        #ifdef USE_INSTANCING
+          fn = mat3(instanceMatrix) * fn;
+        #endif
+        vWNorm = normalize(mat3(modelMatrix) * fn);`);
+    s.fragmentShader = s.fragmentShader
+      .replace("#include <common>", `#include <common>
+        varying vec3 vWPos; varying vec3 vWNorm;
+        uniform float uLicht, uNacht, uStock, uSpalte, uRand, uStaerke, uRund, uRundFaktor, uBoden, uGlanz;
+        uniform vec3 uGlas, uWarm;
+        float hash12(vec2 p) { vec3 p3 = fract(vec3(p.xyx) * .1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }`)
+      .replace("#include <metalnessmap_fragment>", `#include <metalnessmap_fragment>
+        float fenster = 0.0, fLicht = 0.0, fZufall = 0.0;
+        vec3 wn = normalize(vWNorm);
+        if (abs(wn.y) < 0.5 && vWPos.y > uBoden + 1.2) {
+          vec2 tg = normalize(vec2(-wn.z, wn.x));
+          float u = mix(dot(vWPos.xz, tg), atan(wn.z, wn.x) * uRundFaktor, uRund);
+          float v = vWPos.y - uBoden;
+          vec2 zelle = vec2(floor(u / uSpalte), floor(v / uStock));
+          vec2 f = vec2(fract(u / uSpalte), fract(v / uStock));
+          fenster = step(uRand, f.x) * step(f.x, 1.0 - uRand) * step(0.24, f.y) * step(f.y, 0.86);
+          fZufall = hash12(zelle * 1.37 + floor(vWPos.xz / 19.0) * 7.1 + vec2(wn.x * 3.1, wn.z * 5.3));
+          fLicht = step(fZufall, uLicht) * fenster;
+        }
+        diffuseColor.rgb = mix(diffuseColor.rgb, uGlas, fenster * uStaerke);
+        roughnessFactor = mix(roughnessFactor, 0.05, fenster * uStaerke);
+        metalnessFactor = mix(metalnessFactor, 0.9, fenster * uStaerke * 0.85);`)
+      .replace("#include <emissivemap_fragment>", `#include <emissivemap_fragment>
+        totalEmissiveRadiance += fLicht * uNacht * uWarm * (1.6 + 1.6 * fZufall) + diffuseColor.rgb * uGlanz * uNacht;`);
+  };
+  m.customProgramCacheKey = () => "fassade";
+  return m;
+}
+const MAT = {
+  weiss:      fassade(0xf2f1ec, { rough: 0.55 }),
+  weissRund:  fassade(0xf2f1ec, { rough: 0.5, rund: 1, rundFaktor: 7 }),
+  glas:       fassade(0x9fc2d4, { rough: 0.12, metal: 0.65, stock: 3.2, spalte: 1.7, rand: 0.05, glas: [0.10, 0.16, 0.22], staerke: 0.55 }),
+  glasRund:   fassade(0x9fc2d4, { rough: 0.12, metal: 0.65, stock: 3.2, spalte: 1.7, rand: 0.05, glas: [0.10, 0.16, 0.22], staerke: 0.55, rund: 1, rundFaktor: 11 }),
+  band:       fassade(0xf4f3ee, { rough: 0.5, stock: 3.6, spalte: 6, rand: 0.01, staerke: 0.9 }),
+  bandRund:   fassade(0xf4f3ee, { rough: 0.5, stock: 3.6, spalte: 6, rand: 0.01, staerke: 0.9, rund: 1, rundFaktor: 7 }),
+  gold:       fassade(0xd9b45e, { rough: 0.22, metal: 0.92, stock: 4.2, spalte: 2.0, rand: 0.08, glas: [0.22, 0.17, 0.08], staerke: 0.55, warm: [1.0, 0.82, 0.48], glanz: 0.05 }),
+  goldRund:   fassade(0xd9b45e, { rough: 0.22, metal: 0.92, stock: 4.2, spalte: 2.0, rand: 0.08, glas: [0.22, 0.17, 0.08], staerke: 0.55, rund: 1, rundFaktor: 8, warm: [1.0, 0.82, 0.48], glanz: 0.05 }),
+  balkon:     new T.MeshStandardMaterial({ color: 0xf7f6f2, roughness: 0.6 }),
+  gruen:      new T.MeshStandardMaterial({ color: 0x5f9a48, roughness: 0.95 }),
+  krone:      new T.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9, flatShading: true }),
+  stamm:      new T.MeshStandardMaterial({ color: 0x6b4c34, roughness: 0.9 }),
+  kuppel:     new T.MeshStandardMaterial({ color: 0xcfe8f0, roughness: 0.05, metalness: 0.3, transparent: true, opacity: 0.38, depthWrite: false }),
+  rippe:      new T.MeshBasicMaterial({ color: 0xf4f4f0, wireframe: true, transparent: true, opacity: 0.55 }),
+  metall:     new T.MeshStandardMaterial({ color: 0xc8ccd2, roughness: 0.35, metalness: 0.8 }),
+  dunkel:     new T.MeshStandardMaterial({ color: 0x2b2f36, roughness: 0.6 }),
+  lampe:      new T.MeshBasicMaterial({ color: 0x666666 }),
+  rotLicht:   new T.MeshBasicMaterial({ color: 0x551111 }),
+  auto:       new T.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3, metalness: 0.5 }),
+  scheinw:    new T.MeshBasicMaterial({ color: 0x222222 }),
+  ruecklicht: new T.MeshBasicMaterial({ color: 0x220000 })
+};
+
+/* =====================================================================================
+   5. INSEL (Maßstab: 1 Einheit = 1 Meter; Insel ca. 2,8 km breit)
+   ===================================================================================== */
+function inselForm(plus, N) {
+  N = N || 360;
+  const s = new T.Shape();
+  for (let i = 0; i < N; i++) {
+    const w = i / N * Math.PI * 2, r = inselRand(w) + plus;
+    const x = Math.cos(w) * r, z = Math.sin(w) * r;
+    if (i) s.lineTo(x, -z); else s.moveTo(x, -z);
+  }
+  s.closePath();
+  return s;
+}
+/** Inselschicht (Strand, Promenade, Wiese) mit weich abfallendem Rand. plus = Abstand zum Inselrand in Metern. */
+function schicht(plus, tiefe, bt, bs, oben, mat) {
+  const g = new T.ExtrudeGeometry(inselForm(plus), { depth: tiefe, bevelEnabled: true, bevelThickness: bt, bevelSize: bs, bevelSegments: 6, curveSegments: 1 });
+  g.rotateX(-Math.PI / 2);
+  const m = new T.Mesh(g, mat);
+  m.position.y = oben - tiefe - bt;
+  m.receiveShadow = true;
+  szene.add(m);
+  return m;
+}
+function rauschBild(basis, streu, n, groesse) {
+  const c = document.createElement("canvas"); c.width = c.height = groesse || 256;
+  const x = c.getContext("2d"), z = zufallsquelle(n);
+  x.fillStyle = rgbText(basis); x.fillRect(0, 0, c.width, c.height);
+  for (let i = 0; i < 2600; i++) {
+    const f = 1 + (z() - 0.5) * streu;
+    x.fillStyle = `rgba(${basis[0] * f | 0},${basis[1] * f | 0},${basis[2] * f | 0},.5)`;
+    const r = 2 + z() * 7; x.beginPath(); x.arc(z() * c.width, z() * c.height, r, 0, 6.3); x.fill();
+  }
+  const t = new T.CanvasTexture(c); t.wrapS = t.wrapT = T.RepeatWrapping; t.encoding = T.sRGBEncoding; t.anisotropy = 8;
+  return t;
+}
+const sandBild = rauschBild([226, 208, 168], 0.12, 4); sandBild.repeat.set(1 / 30, 1 / 30);
+const grasBild = rauschBild([96, 150, 72], 0.35, 5); grasBild.repeat.set(1 / 25, 1 / 25);
+schicht(0, 3, 8, 45, 3.5, new T.MeshStandardMaterial({ map: sandBild, roughness: 1 }));
+schicht(-45, 1.5, 1.5, 2.5, 5.4, new T.MeshStandardMaterial({ color: 0xebe9e3, roughness: 0.8 }));
+schicht(-65, 0.6, 0.6, 1, BODEN, new T.MeshStandardMaterial({ map: grasBild, roughness: 0.95 }));
+
+/** Ring zwischen zwei Umrissen (Flachwasser, Gischt, Uferstraße). innen/aussen: Meter zum Rand oder Funktion (r, w). */
+function randStreifen(innen, aussen, y, farbe, aInnen, aAussen, mat) {
+  const N = 360, pos = [], col = [], idx = [];
+  for (let i = 0; i < N; i++) {
+    const w = i / N * Math.PI * 2, r = inselRand(w);
+    for (const [plus, a] of [[innen, aInnen], [aussen, aAussen]]) {
+      const rr = typeof plus === "function" ? plus(r, w) : r + plus;
+      pos.push(Math.cos(w) * rr, y, Math.sin(w) * rr);
+      if (farbe) col.push(farbe[0], farbe[1], farbe[2], a);
+    }
+    const a = i * 2, b = ((i + 1) % N) * 2;
+    idx.push(a, b, a + 1, b, b + 1, a + 1);
+  }
+  const g = new T.BufferGeometry();
+  g.setAttribute("position", new T.Float32BufferAttribute(pos, 3));
+  if (farbe) g.setAttribute("color", new T.Float32BufferAttribute(col, 4));
+  g.setIndex(idx); g.computeVertexNormals();
+  const m = new T.Mesh(g, mat || new T.MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, side: T.DoubleSide }));
+  m.receiveShadow = !!mat;
+  szene.add(m);
+  return m;
+}
+const flachwasser = randStreifen(30, (r) => r * 1.22 + 60, 0.4, [0.32, 0.86, 0.82], 0.62, 0.0);
+const gischt = randStreifen(33, 47, 0.6, [1, 1, 1], 0.75, 0.0);
+
+/* ---------- Bodenbeläge ---------- */
+const versatz = (f) => ({ polygonOffset: true, polygonOffsetFactor: f, polygonOffsetUnits: f });
+MAT.asphalt = new T.MeshStandardMaterial(Object.assign({ color: 0x3b3e45, roughness: 0.9 }, versatz(-2)));
+MAT.markierung = new T.MeshBasicMaterial(Object.assign({ color: 0xd8d4c4 }, versatz(-4)));
+MAT.gehweg = new T.MeshStandardMaterial(Object.assign({ color: 0xe0ddd5, roughness: 0.85 }, versatz(-1)));
+MAT.pflaster = new T.MeshStandardMaterial(Object.assign({ color: 0xd6d3cb, roughness: 0.85 }, versatz(-1)));
+MAT.rasen = new T.MeshStandardMaterial(Object.assign({ map: grasBild, color: 0xeaf5e0, roughness: 0.95 }, versatz(-1)));
+MAT.teich = new T.MeshStandardMaterial(Object.assign({ color: 0x2c7590, roughness: 0.05, metalness: 0.4 }, versatz(-3)));
+MAT.dach = new T.MeshStandardMaterial({ color: 0xffffff, roughness: 0.7 });
+
+const r_ = (x, z) => inselRand(Math.atan2(z, x));
+/** Liegt der Punkt mindestens "rand" Meter innerhalb des Inselrands? */
+const imLand = (x, z, rand) => Math.hypot(x, z) < r_(x, z) - rand;
+
+/* ---------- Großer Platz um den Turm ---------- */
+function platzBild() {
+  const c = document.createElement("canvas"); c.width = c.height = 2048;
+  const x = c.getContext("2d"), m = 1024;
+  x.fillStyle = "#e9e5dc"; x.fillRect(0, 0, 2048, 2048);
+  const ring = (r, b, f) => { x.beginPath(); x.arc(m, m, r, 0, 6.3); x.lineWidth = b; x.strokeStyle = f; x.stroke(); };
+  ring(1000, 30, "#cfc8b8"); ring(900, 10, "#bdb4a2"); ring(700, 90, "#7fae64"); ring(520, 8, "#bdb4a2"); ring(330, 60, "#c9b27a");
+  for (let i = 0; i < 24; i++) {
+    const w = i * Math.PI / 12;
+    x.save(); x.translate(m, m); x.rotate(w);
+    x.beginPath(); x.moveTo(0, -360); x.quadraticCurveTo(110, -600, 0, -860); x.quadraticCurveTo(-110, -600, 0, -360);
+    x.fillStyle = i % 2 ? "#d8cfbd" : "#cdbf9f"; x.fill(); x.lineWidth = 5; x.strokeStyle = "#b9ab8b"; x.stroke();
+    x.restore();
+  }
+  const t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding; t.anisotropy = 16;
+  return t;
+}
+const PLATZ_R = 135;
+{
+  const kante = new T.MeshStandardMaterial({ color: 0xdedad2, roughness: 0.8 });
+  const platz = new T.Mesh(new T.CylinderGeometry(PLATZ_R, PLATZ_R + 1, 0.8, 180), [kante, new T.MeshStandardMaterial({ map: platzBild(), roughness: 0.8 }), kante]);
+  platz.position.y = BODEN + 0.4; platz.receiveShadow = true; szene.add(platz);
+  for (const [a, b, mat] of [[140, 162, MAT.asphalt], [150.75, 151.25, MAT.markierung]]) {
+    const g = new T.RingGeometry(a, b, 240, 1); g.rotateX(-Math.PI / 2);
+    const m = new T.Mesh(g, mat); m.position.y = BODEN + 0.05; m.receiveShadow = true; szene.add(m);
+  }
+}
+
+/* ---------- Uferstraße (ringsum, mit Mittelstreifen für die Bahnpfeiler) ---------- */
+randStreifen(-112, -90, BODEN + 0.05, null, 0, 0, MAT.asphalt);
+randStreifen(-101.6, -100.4, BODEN + 0.06, null, 0, 0, MAT.gehweg);
+randStreifen(-120, -112, BODEN + 0.05, null, 0, 0, MAT.gehweg);
+
+/* ---------- Straßenraster wie in einer Innenstadt ---------- */
+const BX = 140, BZ = 110, SB = 22;                  // Blockraster in Metern, Straßenbreite
+const strassen = [];                                // {achse: "x" (verläuft entlang x bei z=k) | "z", k, a, b}
+function abschnitte(achse, k) {
+  const teile = []; let start = null;
+  for (let s = -RI * 1.35; s <= RI * 1.35; s += 4) {
+    const x = achse === "x" ? s : k, z = achse === "x" ? k : s;
+    const ok = imLand(x, z, 100) && Math.hypot(x, z) > 160;
+    if (ok && start === null) start = s;
+    if (!ok && start !== null) { if (s - start > 40) teile.push([start, s - 4]); start = null; }
+  }
+  if (start !== null) teile.push([start, RI * 1.35]);
+  return teile;
+}
+for (let j = -16; j <= 16; j++) for (const [a, b] of abschnitte("x", j * BZ)) strassen.push({ achse: "x", k: j * BZ, a, b });
+for (let i = -13; i <= 13; i++) for (const [a, b] of abschnitte("z", i * BX)) strassen.push({ achse: "z", k: i * BX, a, b });
+
+/* =====================================================================================
+   6. GEBÄUDE (Instanzen: viele gleiche Formen in einem Zeichenaufruf)
+   ===================================================================================== */
+const GEO = {
+  quader: new T.BoxGeometry(1, 1, 1).translate(0, 0.5, 0),
+  zylinder: new T.CylinderGeometry(0.5, 0.5, 1, 32).translate(0, 0.5, 0),
+  stamm: new T.CylinderGeometry(0.5, 0.5, 1, 6).translate(0, 0.5, 0),
+  kapsel: new T.LatheGeometry([[0.42, 0], [0.5, 0.32], [0.5, 0.6], [0.45, 0.78], [0.35, 0.9], [0.2, 0.975], [0, 1]].map(p => new T.Vector2(p[0], p[1])), 40),
+  terrasse: (function () {
+    const s = new T.Shape(), r = 0.32;
+    s.moveTo(-0.5 + r, -0.5); s.lineTo(0.5 - r, -0.5); s.quadraticCurveTo(0.5, -0.5, 0.5, -0.5 + r); s.lineTo(0.5, 0.5 - r);
+    s.quadraticCurveTo(0.5, 0.5, 0.5 - r, 0.5); s.lineTo(-0.5 + r, 0.5); s.quadraticCurveTo(-0.5, 0.5, -0.5, 0.5 - r);
+    s.lineTo(-0.5, -0.5 + r); s.quadraticCurveTo(-0.5, -0.5, -0.5 + r, -0.5);
+    const g = new T.ExtrudeGeometry(s, { depth: 1, bevelEnabled: false, curveSegments: 8 }); g.rotateX(-Math.PI / 2);
+    return g;
+  })(),
+  halbkugel: new T.SphereGeometry(1, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2),
+  halbkugelGitter: new T.SphereGeometry(1.002, 14, 6, 0, Math.PI * 2, 0, Math.PI / 2),
+  krone: new T.IcosahedronGeometry(1, 1),
+  kegel: new T.ConeGeometry(1, 1, 7).translate(0, 0.5, 0),
+  dach: new T.ConeGeometry(Math.SQRT1_2, 1, 4).rotateY(Math.PI / 4).translate(0, 0.5, 0),
+  scheibe: new T.CircleGeometry(0.5, 32).rotateX(-Math.PI / 2),
+  platte: new T.PlaneGeometry(1, 1).rotateX(-Math.PI / 2),
+  kugel: new T.SphereGeometry(1, 12, 8)
+};
+const SAMMLUNG = {};
+/** Merkt eine Instanz vor; am Ende wird je Form+Material ein InstancedMesh gebaut. */
+function setze(geo, mat, x, y, z, sx, sy, sz, rotY, farbe, opt) {
+  const k = geo + "|" + mat;
+  if (!SAMMLUNG[k]) SAMMLUNG[k] = { geo, mat, liste: [], opt: opt || {} };
+  SAMMLUNG[k].liste.push({ x, y, z, sx, sy, sz, rotY: rotY || 0, farbe });
+}
+function instanzenBauen() {
+  const m4 = new T.Matrix4(), q = new T.Quaternion(), e = new T.Euler(), v = new T.Vector3(), s = new T.Vector3(), c = new T.Color();
+  const ergebnis = {};
+  for (const k in SAMMLUNG) {
+    const { geo, mat, liste, opt } = SAMMLUNG[k];
+    const im = new T.InstancedMesh(GEO[geo], MAT[mat], liste.length);
+    liste.forEach((p, i) => {
+      e.set(0, p.rotY, 0); q.setFromEuler(e); v.set(p.x, p.y, p.z); s.set(p.sx, p.sy, p.sz);
+      m4.compose(v, q, s); im.setMatrixAt(i, m4);
+      if (p.farbe !== undefined) im.setColorAt(i, c.set(p.farbe));
+    });
+    if (im.instanceColor) im.instanceColor.needsUpdate = true;
+    im.castShadow = opt.schatten !== false; im.receiveShadow = true;
+    szene.add(im);
+    ergebnis[k] = im;
+  }
+  return ergebnis;
+}
+
+/* ---------- Straßen als Instanzen: Fahrbahn, Mittellinie, Bäume, Laternen ---------- */
+const baeume = [], laternen = [], hPlaetze = [], antennen = [];
+const baumSetzen = (x, z, s, form) => baeume.push({ x, z, s, form: form || (zufall() < 0.25 ? "kegel" : "krone") });
+const nahKreuzung = (wert, raster) => { const m = ((wert % raster) + raster) % raster; return m < 16 || m > raster - 16; };
+for (const st of strassen) {
+  const l = st.b - st.a, mitte = (st.a + st.b) / 2, entlangX = st.achse === "x";
+  const px = entlangX ? mitte : st.k, pz = entlangX ? st.k : mitte;
+  setze("platte", "asphalt", px, BODEN + (entlangX ? 0.05 : 0.06), pz, entlangX ? l : SB, 1, entlangX ? SB : l, 0, undefined, { schatten: false });
+  for (let s = st.a + 6; s < st.b - 6; s += 9) {
+    if (nahKreuzung(s, entlangX ? BX : BZ)) continue;
+    setze("platte", "markierung", entlangX ? s : st.k, BODEN + 0.08, entlangX ? st.k : s, entlangX ? 3.5 : 0.35, 1, entlangX ? 0.35 : 3.5, 0, undefined, { schatten: false });
+  }
+  for (let s = st.a + 10; s < st.b - 10; s += entlangX ? 22 : 44) {
+    if (nahKreuzung(s, entlangX ? BX : BZ)) continue;
+    if (entlangX) { baumSetzen(s, st.k + SB / 2 + 2, 2.4, "krone"); baumSetzen(s + 11, st.k - SB / 2 - 2, 2.4, "krone"); }
+    const seite = ((Math.round(s / 44)) % 2) ? 1 : -1;
+    if (((s - st.a) % 44) < 22) {
+      const lx = entlangX ? s : st.k + seite * (SB / 2 + 1.2), lz = entlangX ? st.k + seite * (SB / 2 + 1.2) : s;
+      setze("stamm", "metall", lx, BODEN, lz, 0.4, 10, 0.4, 0, undefined, { schatten: false });
+      laternen.push({ x: lx, y: BODEN + 10.3, z: lz });
+    }
+  }
+}
+// Uferstraße: Bäume außen, Laternen innen
+for (let i = 0; i < 520; i++) {
+  const w = i / 520 * Math.PI * 2, r = inselRand(w);
+  baumSetzen(Math.cos(w) * (r - 84), Math.sin(w) * (r - 84), 2.6, i % 3 ? "krone" : "kegel");
+  if (i % 2 === 0) { const x = Math.cos(w) * (r - 116), z = Math.sin(w) * (r - 116); setze("stamm", "metall", x, BODEN, z, 0.4, 10, 0.4, 0, undefined, { schatten: false }); laternen.push({ x, y: BODEN + 10.3, z }); }
+}
+
+/* ---------- Plätze freihalten: Arbeitsgebäude, Riesenrad, Hafen ---------- */
+const AGENT_R = 460;
+const AGENT_POS = {};
+REIHENFOLGE.forEach((id, k) => {
+  const w = k * Math.PI / 6 + Math.PI / 12;
+  AGENT_POS[id] = { x: Math.cos(w) * AGENT_R, z: Math.sin(w) * AGENT_R, w };
+});
+const nahAgent = (x, z, r) => REIHENFOLGE.some(id => Math.hypot(AGENT_POS[id].x - x, AGENT_POS[id].z - z) < r);
+
+/* ---------- Bausteine (Maße in Metern) ---------- */
+const HELL = [0xffffff, 0xf4f1ea, 0xeef2f4, 0xf6efe4, 0xe9eef0];
+const FASSADE_FARBEN = [0xf4f1ea, 0xe8e2d6, 0xdfe6ea, 0xf2e6d8, 0xe0d8cc, 0xd9e2e6];
+const DACH_FARBEN = [0x9a4a38, 0x7a4a38, 0x5c6068, 0xa4603c, 0x6e3a30];
+const hell = () => HELL[(zufall() * HELL.length) | 0];
+let gebaeudeZahl = 0;
+function sockel(x, z, b, t, h, rot) { setze("quader", "band", x, BODEN, z, b, h, t, rot, hell()); }
+function turmGlas(x, z, b, t, h, rot) {
+  sockel(x, z, b, t, 8 + zufall() * 8, rot);
+  const tb = b * (0.55 + zufall() * 0.15), tt = t * (0.55 + zufall() * 0.15);
+  setze("quader", "glas", x, BODEN, z, tb, h * 0.8, tt, rot, 0xdfeaf0);
+  setze("quader", "glas", x, BODEN + h * 0.8, z, tb * 0.78, h * 0.2, tt * 0.78, rot, 0xdfeaf0);
+  if (h > 170 && zufall() < 0.55) { setze("zylinder", "weiss", x, BODEN + h, z, tb * 0.7, 0.8, tb * 0.7); hPlaetze.push({ x, y: BODEN + h + 0.85, z, d: tb * 0.65 }); }
+  else antenne(x, BODEN + h, z, 12 + zufall() * 20);
+}
+function turmRinge(x, z, d, h, glas) {
+  setze("zylinder", glas ? "glasRund" : "weissRund", x, BODEN, z, d, h, d, 0, hell());
+  for (let y = 6.8; y < h - 2; y += 6.8) {
+    setze("zylinder", "balkon", x, BODEN + y, z, d * 1.14, 0.7, d * 1.14);
+    if (zufall() < 0.3) setze("zylinder", "gruen", x, BODEN + y + 0.7, z, d * 1.1, 1.1, d * 1.1);
+  }
+  setze("zylinder", "gruen", x, BODEN + h, z, d * 0.92, 1.5, d * 0.92);
+}
+function turmScheiben(x, z, d, h) {
+  const n = Math.max(2, Math.floor(h / 8));
+  for (let i = 0; i < n; i++) {
+    const w = i * 1.3 + zufall() * 0.6, dx = Math.cos(w) * d * 0.2, dz = Math.sin(w) * d * 0.2;
+    setze("zylinder", "glasRund", x + dx, BODEN + i * 8, z + dz, d, 7.2, d, 0, 0xdfeef4);
+    setze("zylinder", "dunkel", x + dx, BODEN + i * 8 + 7.2, z + dz, d * 0.98, 0.8, d * 0.98);
+  }
+}
+function turmDreh(x, z, b, t, h) {
+  const n = Math.floor(h / 3.6), dreh = (zufall() < 0.5 ? 1 : -1) * (0.02 + zufall() * 0.02);
+  for (let i = 0; i < n; i++) setze("quader", "glas", x, BODEN + i * 3.6, z, b, 3.4, t, i * dreh, 0xe8f2f6);
+}
+function turmKapsel(x, z, d, h) { setze("kapsel", zufall() < 0.5 ? "bandRund" : "weissRund", x, BODEN, z, d, h, d, 0, hell()); }
+function terrassen(x, z, b, t, stufen, rot) {
+  let y = BODEN;
+  for (let i = 0; i < stufen; i++) {
+    const f = 1 - i * 0.17, hh = 7 + zufall() * 3;
+    setze("terrasse", "band", x + i * 1.5, y, z - i * 1.2, b * f, hh, t * f, rot, hell());
+    setze("terrasse", "gruen", x + i * 1.5, y + hh, z - i * 1.2, b * f * 0.9, 0.6, t * f * 0.9, rot);
+    y += hh + 0.6;
+  }
+}
+function kuppel(x, z, r) {
+  setze("halbkugel", "kuppel", x, BODEN, z, r, r * 0.75, r, 0, undefined, { schatten: false });
+  setze("halbkugelGitter", "rippe", x, BODEN, z, r, r * 0.75, r, 0, undefined, { schatten: false });
+  for (let i = 0; i < 6; i++) baumSetzen(x + (zufall() - 0.5) * r, z + (zufall() - 0.5) * r, 2 + zufall() * 1.5);
+}
+function haus(x, z, b, t, rot) {
+  const h = 6 + zufall() * 4, f = FASSADE_FARBEN[(zufall() * FASSADE_FARBEN.length) | 0];
+  setze("quader", "weiss", x, BODEN, z, b, h, t, rot, f);
+  setze("dach", "dach", x, BODEN + h, z, b * 1.08, 3 + zufall() * 2, t * 1.08, rot, DACH_FARBEN[(zufall() * DACH_FARBEN.length) | 0]);
+}
+function antenne(x, y, z, l) { setze("stamm", "metall", x, y, z, 0.6, l, 0.6, 0, undefined, { schatten: false }); antennen.push({ x, y: y + l, z }); }
+
+/* ---------- Häuserblöcke füllen ---------- */
+function parzellen(x0, z0, b, t, nx, nz) {
+  const l = [];
+  for (let i = 0; i < nx; i++) for (let j = 0; j < nz; j++) l.push({ x: x0 + (i + 0.5) * b / nx, z: z0 + (j + 0.5) * t / nz, b: b / nx, t: t / nz });
+  return l;
+}
+function park(cx, cz, b, t) {
+  setze("quader", "rasen", cx, BODEN, cz, b, 0.3, t, 0, undefined, { schatten: false });
+  const flaeche = b * t, n = Math.round(flaeche / 220);
+  if (zufall() < 0.35) setze("scheibe", "teich", cx, BODEN + 0.35, cz, Math.min(b, t) * 0.55, 1, Math.min(b, t) * 0.4, 0, undefined, { schatten: false });
+  else if (zufall() < 0.3) kuppel(cx, cz, Math.min(b, t) * 0.32);
+  for (let i = 0; i < n; i++) {
+    const x = cx + (zufall() - 0.5) * (b - 6), z = cz + (zufall() - 0.5) * (t - 6);
+    if (Math.abs(x - cx) < Math.min(b, t) * 0.3 && Math.abs(z - cz) < Math.min(b, t) * 0.22) continue;
+    baumSetzen(x, z, 2 + zufall() * 2.6);
+  }
+}
+function wohnblock(cx, cz, b, t) {
+  // Blockrand-Bebauung mit grünem Innenhof (wie in europäischen Innenstädten)
+  const h = 16 + zufall() * 14, d = 14, f = FASSADE_FARBEN[(zufall() * FASSADE_FARBEN.length) | 0];
+  setze("quader", "weiss", cx, BODEN, cz - t / 2 + d / 2 + 2, b - 4, h, d, 0, f);
+  setze("quader", "weiss", cx, BODEN, cz + t / 2 - d / 2 - 2, b - 4, h, d, 0, f);
+  setze("quader", "weiss", cx - b / 2 + d / 2 + 2, BODEN, cz, d, h, t - 2 * d - 4, 0, f);
+  setze("quader", "weiss", cx + b / 2 - d / 2 - 2, BODEN, cz, d, h, t - 2 * d - 4, 0, f);
+  setze("quader", "rasen", cx, BODEN, cz, b - 2 * d - 6, 0.35, t - 2 * d - 6, 0, undefined, { schatten: false });
+  for (let i = 0; i < 5; i++) baumSetzen(cx + (zufall() - 0.5) * (b - 2 * d - 14), cz + (zufall() - 0.5) * (t - 2 * d - 14), 2.2 + zufall());
+}
+const blockZahl = { kern: 0, mitte: 0, aussen: 0, park: 0 };
+for (let i = -13; i < 13; i++) for (let j = -16; j < 16; j++) {
+  const x0 = i * BX + SB / 2, x1 = (i + 1) * BX - SB / 2, z0 = j * BZ + SB / 2, z1 = (j + 1) * BZ - SB / 2;
+  const ecken = [[x0, z0], [x1, z0], [x0, z1], [x1, z1]];
+  if (!ecken.every(([x, z]) => imLand(x, z, 124) && Math.hypot(x, z) > 168)) continue;
+  const cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, b = x1 - x0, t = z1 - z0, d = Math.hypot(cx, cz);
+  if (nahAgent(cx, cz, 150)) continue;
+  const zone = d < 650 ? "kern" : d < 1000 ? "mitte" : "aussen";
+  const parkAnteil = { kern: 0.06, mitte: 0.1, aussen: 0.16 }[zone];
+  if (zufall() < parkAnteil) { park(cx, cz, b, t); blockZahl.park++; continue; }
+  blockZahl[zone]++;
+  setze("quader", "pflaster", cx, BODEN, cz, b, 0.25, t, 0, undefined, { schatten: false });
+  if (zone === "kern") {
+    let hMax = 110 + 160 * klemme(1 - (d - 170) / 480, 0, 1);
+    if (nahAgent(cx, cz, 290)) hMax = Math.min(hMax, 105);   // Arbeitsgebäude sollen herausragen
+    for (const p of parzellen(x0, z0, b, t, 2, 2)) {
+      const h = hMax * (0.35 + 0.65 * Math.pow(zufall(), 0.8)), m = Math.min(p.b, p.t), wahl = zufall();
+      gebaeudeZahl++;
+      if (wahl < 0.3) turmGlas(p.x, p.z, p.b - 8, p.t - 8, h, 0);
+      else if (wahl < 0.48) { sockel(p.x, p.z, p.b - 8, p.t - 8, 10, 0); turmRinge(p.x, p.z, m * 0.62, h, zufall() < 0.3); }
+      else if (wahl < 0.64) { sockel(p.x, p.z, p.b - 8, p.t - 8, 10, 0); turmKapsel(p.x, p.z, m * 0.7, h); }
+      else if (wahl < 0.78) turmDreh(p.x, p.z, m * 0.8, m * 0.48, h);
+      else if (wahl < 0.88) turmScheiben(p.x, p.z, m * 0.6, h * 0.7);
+      else sockel(p.x, p.z, p.b - 6, p.t - 6, 14 + zufall() * 14, 0);
+    }
+  } else if (zone === "mitte") {
+    if (zufall() < 0.35) { wohnblock(cx, cz, b, t); gebaeudeZahl += 4; continue; }
+    for (const p of parzellen(x0, z0, b, t, 2, 2)) {
+      const m = Math.min(p.b, p.t), wahl = zufall();
+      gebaeudeZahl++;
+      if (wahl < 0.3) turmRinge(p.x, p.z, m * 0.6, 22 + zufall() * 45, zufall() < 0.25);
+      else if (wahl < 0.55) terrassen(p.x, p.z, p.b - 6, p.t - 6, 2 + Math.floor(zufall() * 3), 0);
+      else if (wahl < 0.72) turmKapsel(p.x, p.z, m * 0.62, 26 + zufall() * 40);
+      else if (wahl < 0.9) turmGlas(p.x, p.z, p.b - 8, p.t - 8, 24 + zufall() * 50, 0);
+      else kuppel(p.x, p.z, m * 0.38);
+    }
+  } else {
+    if (zufall() < 0.3) {
+      for (const p of parzellen(x0, z0, b, t, 2, 2)) { terrassen(p.x, p.z, p.b - 8, p.t - 8, 1 + Math.floor(zufall() * 2), 0); gebaeudeZahl++; }
+    } else {
+      for (const p of parzellen(x0, z0, b, t, 4, 3)) {
+        if (zufall() < 0.12) { baumSetzen(p.x, p.z, 2.5 + zufall() * 1.5); continue; }
+        haus(p.x + (zufall() - 0.5) * 3, p.z + (zufall() - 0.5) * 3, p.b * (0.45 + zufall() * 0.15), p.t * (0.42 + zufall() * 0.12), (zufall() < 0.5 ? 0 : Math.PI / 2));
+        gebaeudeZahl++;
+        if (zufall() < 0.6) baumSetzen(p.x + p.b * 0.32, p.z - p.t * 0.3, 1.8 + zufall());
+      }
+    }
+  }
+}
+// Wiesenstreifen am Ufer: lockere Bäume
+for (let i = 0; i < 2600; i++) {
+  const w = zufall() * Math.PI * 2, r = inselRand(w) - 66 - zufall() * 14;
+  baumSetzen(Math.cos(w) * r, Math.sin(w) * r, 1.6 + zufall() * 2.2);
+}
+// Bäume um den Platz
+for (let i = 0; i < 48; i++) { const w = i / 48 * Math.PI * 2; baumSetzen(Math.cos(w) * 168, Math.sin(w) * 168, 2.6, "kegel"); }
+
+// Bäume als Instanzen
+{
+  const gruen = [0x4f8a3c, 0x5d9a44, 0x3f7a36, 0x6aa24c, 0x47803a];
+  for (const b of baeume) {
+    const f = gruen[(zufall() * gruen.length) | 0];
+    if (b.form === "kegel") setze("kegel", "krone", b.x, BODEN + b.s * 0.8, b.z, b.s * 1.1, b.s * 4.2, b.s * 1.1, 0, f);
+    else setze("krone", "krone", b.x, BODEN + b.s * 1.9, b.z, b.s * 1.3, b.s * 1.2, b.s * 1.3, zufall() * 6, f);
+    setze("stamm", "stamm", b.x, BODEN, b.z, b.s * 0.25, b.s * 1.3, b.s * 0.25, 0, undefined, { schatten: false });
+  }
+}
+
+/* =====================================================================================
+   7. HAUPTTURM JARVIS (gestuft wie der Burj Khalifa, Y-förmiger Grundriss, ca. 650 m)
+   ===================================================================================== */
+const turm = new T.Group();
+turm.position.set(0, BODEN + 0.8, 0);
+szene.add(turm);
+const TURM_XZ = 2.2, TURM_Y = 1.12;
+const turmKoerper = new T.Group(); turmKoerper.scale.set(TURM_XZ, TURM_Y, TURM_XZ); turm.add(turmKoerper);
+function teilMesh(geo, mat, x, y, z, sx, sy, sz, rotY) {
+  const m = new T.Mesh(GEO[geo], MAT[mat] || mat);
+  m.position.set(x, y, z); m.scale.set(sx, sy, sz); m.rotation.y = rotY || 0;
+  m.castShadow = true; m.receiveShadow = true;
+  return m;
+}
+[[40, 5], [34, 5], [28, 5]].forEach(([d, h], i) => turmKoerper.add(teilMesh("zylinder", "weissRund", 0, i * 5, 0, d * 2, h, d * 2)));
+turmKoerper.add(teilMesh("zylinder", "goldRund", 0, 15, 0, 18, 400, 18));
+for (let k = 0; k < 3; k++) {
+  const w = k * Math.PI * 2 / 3;
+  const stufenHoehen = [120, 190, 250, 300, 340].map(h => h + k * 22);
+  stufenHoehen.forEach((h, i) => {
+    const abstand = 15 - i * 1.6, laenge = 24 - i * 4, breite = 13 - i * 1.4;
+    const mx = Math.cos(w) * (abstand + laenge / 2 - 6), mz = Math.sin(w) * (abstand + laenge / 2 - 6);
+    const y0 = i === 0 ? 15 : stufenHoehen[i - 1] - 30;
+    turmKoerper.add(teilMesh("quader", "gold", mx, y0, mz, laenge, h - y0, breite, -w));
+    const ex = Math.cos(w) * (abstand + laenge - 6), ez = Math.sin(w) * (abstand + laenge - 6);
+    turmKoerper.add(teilMesh("zylinder", "goldRund", ex, y0, ez, breite, h - y0, breite));
+  });
+}
+turmKoerper.add(teilMesh("zylinder", "goldRund", 0, 415, 0, 13, 40, 13));
+turmKoerper.add(teilMesh("zylinder", "goldRund", 0, 455, 0, 8, 25, 8));
+const spitze = new T.Mesh(new T.ConeGeometry(3.2, 100, 16).translate(0, 50, 0), MAT.metall);
+spitze.position.y = 480; turmKoerper.add(spitze);
+const turmRingMat = new T.MeshBasicMaterial({ color: 0x332a10 });
+for (const y of [120, 250, 340, 412, 455, 478]) {
+  const r = new T.Mesh(new T.TorusGeometry(y > 400 ? 7.5 : 10, 0.5, 8, 48), turmRingMat);
+  r.rotation.x = Math.PI / 2; r.position.y = y; turmKoerper.add(r);
+}
+const TURM_OBEN = 582 * TURM_Y;
+const leuchtfeuer = new T.Mesh(GEO.kugel, new T.MeshBasicMaterial({ color: 0x3ddc84 }));
+leuchtfeuer.position.y = TURM_OBEN; leuchtfeuer.scale.setScalar(5); turm.add(leuchtfeuer);
+const leuchtfeuerGlanz = new T.Sprite(new T.SpriteMaterial({ map: glanz, color: 0x3ddc84, transparent: true, blending: T.AdditiveBlending, depthWrite: false }));
+leuchtfeuerGlanz.position.y = TURM_OBEN; leuchtfeuerGlanz.scale.setScalar(120); turm.add(leuchtfeuerGlanz);
+function strahlBild() {
+  const c = document.createElement("canvas"); c.width = 4; c.height = 256;
+  const x = c.getContext("2d"), v = x.createLinearGradient(0, 0, 0, 256);
+  v.addColorStop(0, "rgba(255,255,255,0)"); v.addColorStop(0.7, "rgba(255,255,255,.25)"); v.addColorStop(1, "rgba(255,255,255,.9)");
+  x.fillStyle = v; x.fillRect(0, 0, 4, 256);
+  return new T.CanvasTexture(c);
+}
+const strahlMat = new T.MeshBasicMaterial({ map: strahlBild(), color: 0xcfe0ff, transparent: true, opacity: 0, blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide, fog: false });
+const strahlen = [0, 1, 2, 3].map(i => {
+  const g = new T.CylinderGeometry(70, 3, 3200, 24, 1, true).translate(0, 1600, 0);
+  const m = new T.Mesh(g, strahlMat);
+  const w = i * Math.PI / 2 + Math.PI / 4;
+  m.position.set(Math.cos(w) * 125, BODEN + 1, Math.sin(w) * 125);
+  szene.add(m); return m;
+});
+
+/* =====================================================================================
+   8. DIE 12 ARBEITSGEBÄUDE (je auf einem eigenen Platz, ca. 460 m vom Turm)
+   ===================================================================================== */
+const AGENT_XZ = 2.2, AGENT_Y = 1.8;                 // Maßstab der Gebäudeformen
+const agentGruppen = {}, statusMats = {}, akzente = [], bildschirme = [];
+function agentMat(id, art) {
+  const basis = new T.Color(AGENT_FARBE[id]).lerp(new T.Color(0xffffff), 0.55);
+  const opt = art === "glas" ? { rough: 0.15, metal: 0.6, stock: 3.2, spalte: 1.8, rand: 0.05, staerke: 0.6 } : { rough: 0.45 };
+  if (art === "rund") opt.rund = 1;
+  return fassade(basis.getHex(), opt);
+}
+function akzentMat(id) { return new T.MeshBasicMaterial({ color: new T.Color(AGENT_FARBE[id]).multiplyScalar(0.6) }); }
+function mesh(geo, mat, x, y, z, sx, sy, sz, rotY) {
+  const m = new T.Mesh(geo, mat); m.position.set(x, y, z); m.scale.set(sx, sy, sz); m.rotation.y = rotY || 0;
+  m.castShadow = true; m.receiveShadow = true; return m;
+}
+function lauftext(breite, hoehe) {
+  const c = document.createElement("canvas"); c.width = breite; c.height = hoehe;
+  const t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding;
+  return { c, x: c.getContext("2d"), t };
+}
+function agentPlatzBild(farbe) {
+  const c = document.createElement("canvas"); c.width = c.height = 1024;
+  const x = c.getContext("2d"), m = 512;
+  x.fillStyle = "#e6e2d8"; x.fillRect(0, 0, 1024, 1024);
+  const ring = (r, b, f) => { x.beginPath(); x.arc(m, m, r, 0, 6.3); x.lineWidth = b; x.strokeStyle = f; x.stroke(); };
+  ring(495, 18, "#c8c0ae"); ring(430, 46, "#7fae64"); ring(360, 6, farbe); ring(300, 4, "#bdb4a2");
+  for (let i = 0; i < 12; i++) { x.save(); x.translate(m, m); x.rotate(i * Math.PI / 6); x.fillStyle = "#d4cab4"; x.fillRect(-14, -400, 28, 120); x.restore(); }
+  const t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding; t.anisotropy = 8;
+  return t;
+}
+function baueAgent(id) {
+  const p = AGENT_POS[id], g = new T.Group();
+  g.position.set(p.x, BODEN, p.z); g.rotation.y = -p.w + Math.PI / 2;
+  g.userData.id = id;
+  // Platz mit Ring in der Farbe des Bereichs
+  const farbeText = "#" + new T.Color(AGENT_FARBE[id]).getHexString();
+  const kante = new T.MeshStandardMaterial({ color: 0xdedad2, roughness: 0.8 });
+  const platz = new T.Mesh(new T.CylinderGeometry(85, 86, 0.8, 96), [kante, new T.MeshStandardMaterial({ map: agentPlatzBild(farbeText), roughness: 0.8 }), kante]);
+  platz.position.y = 0.4; platz.receiveShadow = true; g.add(platz);
+  const koerper = new T.Group(); koerper.scale.set(AGENT_XZ, AGENT_Y, AGENT_XZ); koerper.position.y = 0.8; g.add(koerper);
+  const wand = agentMat(id), glasM = agentMat(id, "glas"), rundM = agentMat(id, "rund"), akz = akzentMat(id);
+  akzente.push({ mat: akz, farbe: new T.Color(AGENT_FARBE[id]) });
+  const randRing = new T.Mesh(new T.TorusGeometry(78, 0.9, 6, 96), akz); randRing.rotation.x = Math.PI / 2; randRing.position.y = 1; g.add(randRing);
+  let oben = 60;
+  const ring = (y, r) => { const t = new T.Mesh(new T.TorusGeometry(r, 0.7, 8, 48), akz); t.rotation.x = Math.PI / 2; t.position.y = y; koerper.add(t); };
+  const band = (y, b, t2) => koerper.add(mesh(GEO.quader, akz, 0, y, 0, b + 0.5, 1, t2 + 0.5));
+  switch (id) {
+    case "testpc": case "hauptpc": case "minipc": {
+      const h = { testpc: 34, hauptpc: 42, minipc: 28 }[id];
+      koerper.add(mesh(GEO.terrasse, wand, 0, 0, 0, 34, h, 26));
+      for (const y of [h * 0.33, h * 0.66]) band(y, 31, 23);
+      for (let i = 0; i < 4; i++) {
+        const fx = (i % 2 - 0.5) * 16, fz = (Math.floor(i / 2) - 0.5) * 10;
+        koerper.add(mesh(GEO.zylinder, MAT.metall, fx, h, fz, 7, 2.2, 7));
+        const rotor = mesh(new T.BoxGeometry(6, 0.3, 0.8), MAT.dunkel, fx, h + 2.4, fz, 1, 1, 1); rotor.userData.dreh = 3 + i; koerper.add(rotor);
+      }
+      koerper.add(mesh(GEO.zylinder, MAT.metall, 12, h, -9, 0.8, 40, 0.8));
+      const schuessel = mesh(new T.SphereGeometry(5, 16, 8, 0, Math.PI * 2, 0, Math.PI / 3), MAT.metall, -12, h + 6, -8, 1, 1, 1); schuessel.rotation.x = -0.9; schuessel.userData.dreh = 0.4; koerper.add(schuessel);
+      koerper.add(mesh(GEO.zylinder, MAT.metall, -12, h, -8, 0.8, 6, 0.8));
+      oben = h + 40; break;
+    }
+    case "nachtarbeit": {
+      koerper.add(mesh(GEO.quader, wand, 0, 0, 0, 26, 90, 26));
+      koerper.add(mesh(GEO.quader, glasM, 0, 90, 0, 18, 60, 18));
+      band(90, 26, 26);
+      const mondSichel = new T.Mesh(new T.TorusGeometry(10, 1.6, 12, 48, Math.PI * 1.25), akz);
+      mondSichel.position.y = 166; mondSichel.rotation.z = 0.6; mondSichel.userData.dreh = 0.5; koerper.add(mondSichel);
+      koerper.add(mesh(GEO.zylinder, MAT.metall, 0, 150, 0, 1, 10, 1));
+      oben = 178; break;
+    }
+    case "aufgabenloop": {
+      for (let i = 0; i < 36; i++) koerper.add(mesh(GEO.quader, glasM, 0, i * 3.6, 0, 24, 3.4, 14, i * 0.05));
+      ring(130, 9);
+      oben = 136; break;
+    }
+    case "vault": {
+      koerper.add(mesh(GEO.zylinder, rundM, 0, 0, 0, 16, 34, 16));
+      koerper.add(mesh(GEO.halbkugel, MAT.kuppel, 0, 0, 0, 24, 30, 24));
+      const gitter = new T.MeshBasicMaterial({ color: new T.Color(AGENT_FARBE[id]).multiplyScalar(0.6), wireframe: true });
+      akzente.push({ mat: gitter, farbe: new T.Color(AGENT_FARBE[id]) });
+      koerper.add(mesh(GEO.halbkugelGitter, gitter, 0, 0, 0, 24, 30, 24));
+      for (let i = 0; i < 10; i++) { const w = i / 10 * 6.28; koerper.add(mesh(GEO.krone, MAT.krone, Math.cos(w) * 15, 3, Math.sin(w) * 15, 3, 3, 3)); }
+      oben = 36; break;
+    }
+    case "briefing": {
+      koerper.add(mesh(GEO.quader, wand, 0, 0, 0, 26, 70, 22));
+      koerper.add(mesh(GEO.quader, wand, 0, 70, 0, 20, 50, 18));
+      const b = lauftext(512, 256);
+      const schirm = new T.Mesh(new T.PlaneGeometry(18, 40), new T.MeshBasicMaterial({ map: b.t }));
+      schirm.position.set(0, 96, 9.1); koerper.add(schirm);
+      bildschirme.push({ art: "nachrichten", ...b, mat: schirm.material });
+      oben = 124; break;
+    }
+    case "kalender": {
+      for (let i = 0; i < 11; i++) {
+        const dx = Math.sin(i * 1.7) * 3, dz = Math.cos(i * 1.7) * 3;
+        koerper.add(mesh(GEO.zylinder, rundM, dx, i * 9, dz, 22, 8, 22));
+        koerper.add(mesh(GEO.zylinder, akz, dx, i * 9 + 8, dz, 21.5, 0.8, 21.5));
+      }
+      oben = 102; break;
+    }
+    case "kosten": {
+      koerper.add(mesh(GEO.terrasse, wand, 0, 0, 0, 34, 18, 34));
+      const pyr = new T.Mesh(new T.ConeGeometry(22, 46, 4).translate(0, 23, 0), new T.MeshStandardMaterial({ color: 0xe8c66a, metalness: 0.85, roughness: 0.18, emissive: 0x000000 }));
+      pyr.position.y = 18; pyr.rotation.y = Math.PI / 4; pyr.castShadow = true; koerper.add(pyr);
+      akzente.push({ mat: pyr.material, farbe: new T.Color(0xffc060), emissiv: true });
+      oben = 66; break;
+    }
+    case "trading": {
+      koerper.add(mesh(GEO.quader, glasM, -9, 0, 0, 12, 150, 14));
+      koerper.add(mesh(GEO.quader, glasM, 9, 0, 0, 12, 128, 14));
+      koerper.add(mesh(GEO.quader, wand, 0, 92, 0, 8, 6, 10));
+      const b = lauftext(512, 32);
+      for (const [x, h] of [[-9, 136], [9, 114]]) {
+        const s = new T.Mesh(new T.PlaneGeometry(12, 3), new T.MeshBasicMaterial({ map: b.t })); s.position.set(x, h, 7.05); koerper.add(s);
+      }
+      bildschirme.push({ art: "kurse", ...b });
+      oben = 152; break;
+    }
+    case "sicherheit": {
+      koerper.add(mesh(GEO.zylinder, rundM, 0, 0, 0, 12, 110, 12));
+      koerper.add(mesh(GEO.kugel, glasM, 0, 112, 0, 10, 8, 10));
+      ring(112, 10.5);
+      koerper.add(mesh(GEO.zylinder, MAT.metall, 0, 118, 0, 1, 10, 1));
+      const radar = mesh(new T.SphereGeometry(6, 16, 8, 0, Math.PI * 2, 0, Math.PI / 3.2), MAT.metall, 0, 130, 0, 1, 0.5, 1);
+      radar.rotation.x = Math.PI / 2.3; const rg = new T.Group(); rg.add(radar); rg.userData.dreh = 1.2; koerper.add(rg);
+      oben = 140; break;
+    }
+    case "tiktok": {
+      koerper.add(mesh(GEO.kapsel, rundM, 0, 0, 0, 26, 128, 26));
+      const punkte = [];
+      for (let i = 0; i <= 160; i++) { const t = i / 160, w = t * Math.PI * 10, r = 13.4 * (t < 0.6 ? 1 : Math.max(0.2, 1 - (t - 0.6) * 1.9)); punkte.push(new T.Vector3(Math.cos(w) * r, t * 122, Math.sin(w) * r)); }
+      const spirale = new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(punkte), 400, 0.7, 6, false), new T.MeshBasicMaterial({ color: 0xff40c0 }));
+      koerper.add(spirale); bildschirme.push({ art: "bunt", mat: spirale.material });
+      oben = 130; break;
+    }
+  }
+  const obenM = oben * AGENT_Y + 0.8;                 // Höhe in Metern
+  const sm = new T.MeshBasicMaterial({ color: 0xffffff });
+  const kugel = new T.Mesh(GEO.kugel, sm); kugel.scale.setScalar(4.5); kugel.position.y = obenM + 8; g.add(kugel);
+  const gl = new T.Sprite(new T.SpriteMaterial({ map: glanz, transparent: true, blending: T.AdditiveBlending, depthWrite: false }));
+  gl.scale.setScalar(70); gl.position.y = obenM + 8; g.add(gl);
+  statusMats[id] = { kugel: sm, glanz: gl };
+  g.userData.oben = obenM + 8;
+  szene.add(g);
+  agentGruppen[id] = g;
+}
+REIHENFOLGE.forEach(baueAgent);
+agentGruppen.jarvis = turm; turm.userData.id = "jarvis"; turm.userData.oben = TURM_OBEN;
+statusMats.jarvis = { kugel: leuchtfeuer.material, glanz: leuchtfeuerGlanz };
+
+/* =====================================================================================
+   9. BAHN, RIESENRAD, HAFEN, BOOTE, LUFTSCHIFFE
+   ===================================================================================== */
+const weissGlanz = new T.MeshStandardMaterial({ color: 0xf6f6f4, roughness: 0.25, metalness: 0.25 });
+// Einschienenbahn über dem Mittelstreifen der Uferstraße
+const bahnKurve = new T.CatmullRomCurve3((function () {
+  const p = [];
+  for (let i = 0; i < 96; i++) {
+    const w = i / 96 * Math.PI * 2, r = inselRand(w) - 101;
+    p.push(new T.Vector3(Math.cos(w) * r, BODEN + 26 + 4 * Math.sin(3 * w), Math.sin(w) * r));
+  }
+  return p;
+})(), true, "centripetal");
+{
+  const schiene = new T.Mesh(new T.TubeGeometry(bahnKurve, 1600, 3.2, 10, true), weissGlanz);
+  schiene.castShadow = true; schiene.receiveShadow = true; szene.add(schiene);
+  for (const p of bahnKurve.getSpacedPoints(130).slice(0, -1)) setze("zylinder", "balkon", p.x, BODEN, p.z, 3, p.y - BODEN - 3, 3);
+}
+const ZUG_WAGEN = 5, ZUG_TEMPO = 0.0028, WAGEN_ABSTAND = 0.0032;
+const zuege = [0, 0.5].map(start => {
+  const wagen = [];
+  for (let i = 0; i < ZUG_WAGEN; i++) {
+    const g = new T.Group();
+    const k = new T.Mesh(new T.CapsuleGeometry(3.4, 18, 6, 14).rotateX(Math.PI / 2), weissGlanz); k.castShadow = true; g.add(k);
+    const f = new T.Mesh(new T.BoxGeometry(7, 1.5, 18), new T.MeshBasicMaterial({ color: 0x0a2236 })); f.position.y = 0.9; g.add(f);
+    szene.add(g); wagen.push(g);
+  }
+  return { start, wagen };
+});
+const zugFenster = zuege.map(z => z.wagen.map(w => w.children[1].material)).flat();
+
+// Riesenrad (110 m) an der Promenade
+const RIESENRAD = { w: 0.62 }; RIESENRAD.r = inselRand(RIESENRAD.w) - 58;
+const rad = new T.Group(), radDreh = new T.Group(), radGondeln = [];
+{
+  rad.position.set(Math.cos(RIESENRAD.w) * RIESENRAD.r, 5.4, Math.sin(RIESENRAD.w) * RIESENRAD.r);
+  rad.rotation.y = -RIESENRAD.w + Math.PI / 2;
+  const R0 = 55, mitte = R0 + 12;
+  radDreh.position.y = mitte; rad.add(radDreh);
+  for (const z of [-4, 4]) { const t = new T.Mesh(new T.TorusGeometry(R0, 1, 8, 128), weissGlanz); t.position.z = z; radDreh.add(t); }
+  const ledMat = new T.MeshBasicMaterial({ color: 0x334455 });
+  radDreh.add(new T.Mesh(new T.TorusGeometry(R0 + 1.2, 0.5, 6, 192), ledMat));
+  for (let i = 0; i < 24; i++) { const sp = new T.Mesh(new T.BoxGeometry(0.8, R0, 0.8).translate(0, R0 / 2, 0), weissGlanz); sp.rotation.z = i / 24 * Math.PI * 2; radDreh.add(sp); }
+  for (const s of [-1, 1]) for (const z of [-7, 7]) {
+    const bein = new T.Mesh(new T.CylinderGeometry(1.2, 1.6, Math.hypot(mitte, 30), 8), weissGlanz);
+    bein.position.set(s * 15, mitte / 2, z); bein.rotation.z = -s * Math.atan2(30, mitte); rad.add(bein);
+  }
+  const gondelMat = new T.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
+  for (let i = 0; i < 32; i++) {
+    const gd = new T.Mesh(new T.CapsuleGeometry(2.8, 2.4, 4, 10), gondelMat);
+    gd.userData.w = i / 32 * Math.PI * 2; rad.add(gd); radGondeln.push(gd);
+  }
+  rad.userData = { mitte, R0, ledMat };
+  szene.add(rad);
+}
+
+// Boote mit Kielwasser
+function kielwasserBild() {
+  const c = document.createElement("canvas"); c.width = 64; c.height = 256;
+  const x = c.getContext("2d");
+  for (let j = 0; j < 256; j++) {
+    const t = j / 256, b = 4 + t * 26, a = (1 - t) * 0.8;
+    x.fillStyle = `rgba(255,255,255,${a})`; x.fillRect(32 - b, j, 3, 1); x.fillRect(32 + b - 3, j, 3, 1);
+    x.fillStyle = `rgba(255,255,255,${a * 0.25})`; x.fillRect(32 - b * 0.6, j, b * 1.2, 1);
+  }
+  return new T.CanvasTexture(c);
+}
+const kielMat = new T.MeshBasicMaterial({ map: kielwasserBild(), transparent: true, depthWrite: false });
+function bootBauen(k) {
+  const g = new T.Group();
+  const rumpfG = new T.BoxGeometry(4 * k, 2 * k, 13 * k), pos = rumpfG.attributes.position;
+  for (let i = 0; i < pos.count; i++) { if (pos.getZ(i) < -2 * k) pos.setX(i, pos.getX(i) * 0.25); if (pos.getY(i) < 0) pos.setX(i, pos.getX(i) * 0.7); }
+  rumpfG.computeVertexNormals();
+  const rumpf = new T.Mesh(rumpfG, weissGlanz); rumpf.position.y = 0.6 * k; rumpf.castShadow = true; g.add(rumpf);
+  const aufbau = new T.Mesh(new T.BoxGeometry(3 * k, 1.6 * k, 5 * k), MAT.glas); aufbau.position.set(0, 2.2 * k, 1.5 * k); g.add(aufbau);
+  const kiel = new T.Mesh(new T.PlaneGeometry(26 * k, 70 * k).rotateX(-Math.PI / 2), kielMat); kiel.position.set(0, 0.25, 40 * k); g.add(kiel);
+  szene.add(g);
+  return g;
+}
+const boote = Array.from({ length: 10 }, (_, i) => { const w = i * 0.63 + zufall(); return { g: bootBauen(2.2 + zufall() * 3), w, r: inselRand(w) + 260 + zufall() * 1300, v: (0.004 + zufall() * 0.004) * (i % 2 ? 1 : -1) }; });
+// Hafen mit Stegen und Jachten
+{
+  const w = 2.35, rr = inselRand(w);
+  const stegMat = new T.MeshStandardMaterial({ color: 0xcdb08a, roughness: 0.9 });
+  for (let s = -2; s <= 2; s++) {
+    const ww = w + s * 0.035, x0 = Math.cos(ww) * (rr + 20), z0 = Math.sin(ww) * (rr + 20);
+    const steg = new T.Mesh(new T.BoxGeometry(150, 1.2, 6).translate(75, 0, 0), stegMat);
+    steg.position.set(x0, 1.8, z0); steg.rotation.y = -ww; steg.receiveShadow = true; szene.add(steg);
+    for (const d of [45, 85, 125]) {
+      const j = bootBauen(2.4);
+      const sx = -Math.sin(ww) * 14, sz = Math.cos(ww) * 14;
+      j.position.set(Math.cos(ww) * (rr + 20 + d) + sx, 0, Math.sin(ww) * (rr + 20 + d) + sz);
+      j.rotation.y = -ww - Math.PI / 2; j.children[2].visible = false;
+    }
+  }
+}
+// Luftschiffe
+const luftschiffe = [0, 1].map(i => {
+  const g = new T.Group();
+  const huelle = new T.Mesh(new T.SphereGeometry(1, 32, 16), weissGlanz); huelle.scale.set(19, 19, 70); huelle.castShadow = true; g.add(huelle);
+  for (let k = 0; k < 4; k++) { const f = new T.Mesh(new T.BoxGeometry(1, 14, 14), weissGlanz); f.position.set(Math.cos(k * Math.PI / 2) * 12, Math.sin(k * Math.PI / 2) * 12, -58); f.rotation.z = k * Math.PI / 2; g.add(f); }
+  const gondel = new T.Mesh(new T.BoxGeometry(8, 5, 20), MAT.glas); gondel.position.y = -21; g.add(gondel);
+  szene.add(g);
+  return { g, w: i * Math.PI + 0.6, r: 1900 + i * 450, h: 460 + i * 90, v: 0.006 + i * 0.002 };
+});
+// Hubschrauberplätze
+{
+  const c = document.createElement("canvas"); c.width = c.height = 256;
+  const x = c.getContext("2d");
+  x.fillStyle = "#3a3f47"; x.fillRect(0, 0, 256, 256);
+  x.strokeStyle = "#f2f2f2"; x.lineWidth = 12; x.beginPath(); x.arc(128, 128, 96, 0, 6.3); x.stroke();
+  x.fillStyle = "#e24a3a"; x.font = "bold 120px system-ui, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("H", 128, 134);
+  const t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding;
+  MAT.heli = new T.MeshStandardMaterial({ map: t, roughness: 0.7 });
+  for (const h of hPlaetze) setze("scheibe", "heli", h.x, h.y, h.z, h.d, 1, h.d, 0, undefined, { schatten: false });
+}
+for (const l of laternen) setze("kugel", "lampe", l.x, l.y, l.z, 0.8, 0.8, 0.8, 0, undefined, { schatten: false });
+for (const a of antennen) setze("kugel", "rotLicht", a.x, a.y, a.z, 1.2, 1.2, 1.2, 0, undefined, { schatten: false });
+
+const INST = instanzenBauen();
+
+// Autos: im Straßenraster und auf der Uferstraße
+const autoFarben = [0xd23a3a, 0xf0f0f0, 0x26282f, 0x3a6cc8, 0xe8c03c, 0x7c7c86, 0x2e8c5c, 0xf0f0f0, 0x101010];
+const autos = [];
+for (let i = 0; i < 560 && strassen.length; i++) {
+  const st = strassen[(zufall() * strassen.length) | 0], r = zufall() < 0.5 ? 1 : -1;
+  autos.push({ art: "raster", st, p: mix(st.a, st.b, zufall()), v: r * (10 + zufall() * 7), farbe: autoFarben[(zufall() * autoFarben.length) | 0] });
+}
+for (let i = 0; i < 180; i++) {
+  const r = zufall() < 0.5 ? 1 : -1;
+  autos.push({ art: "ufer", w: zufall() * Math.PI * 2, v: r * (12 + zufall() * 6), farbe: autoFarben[(zufall() * autoFarben.length) | 0] });
+}
+const autoMesh = new T.InstancedMesh(new T.BoxGeometry(2.1, 1.5, 4.5).translate(0, 0.75, 0), MAT.auto, autos.length);
+const scheinMesh = new T.InstancedMesh(new T.BoxGeometry(1.9, 0.4, 0.2), MAT.scheinw, autos.length);
+const rueckMesh = new T.InstancedMesh(new T.BoxGeometry(1.9, 0.4, 0.2), MAT.ruecklicht, autos.length);
+autos.forEach((a, i) => autoMesh.setColorAt(i, new T.Color(a.farbe)));
+autoMesh.castShadow = true; autoMesh.receiveShadow = true;
+szene.add(autoMesh, scheinMesh, rueckMesh);
+const gebaeudeZaehler = { anzahl: gebaeudeZahl, bloecke: blockZahl };
+
+/* =====================================================================================
+   10. LICHT NACH UHRZEIT
+   ===================================================================================== */
+const LICHT = [
+  { h: 0,     hoehe: -25, trueb: 2,  rayleigh: 0.5, bel: 0.42, sonneI: 0,   sFarbe: [255,220,180], hemiI: 0.22, hemiH: [70,90,150],  hemiB: [20,20,32], nebel: [10,14,30],    dichte: 0.00012, wasser: [4,16,32],   fenster: 0.66, nacht: 1,   lampen: 1,   bloomS: 0.95, bloomT: 0.55, mond: 1 },
+  { h: 5.4,   hoehe: -8,  trueb: 4,  rayleigh: 1,   bel: 0.45, sonneI: 0,   sFarbe: [255,200,170], hemiI: 0.28, hemiH: [90,90,150],  hemiB: [30,26,40], nebel: [40,40,70],    dichte: 0.00011,  wasser: [10,24,48],  fenster: 0.5,  nacht: 1,   lampen: 1,   bloomS: 0.85, bloomT: 0.6,  mond: 0.6 },
+  { h: 7.2,   hoehe: 6,   trueb: 8,  rayleigh: 2.6, bel: 0.5,  sonneI: 1.6, sFarbe: [255,192,140], hemiI: 0.5,  hemiH: [210,190,180],hemiB: [70,56,44], nebel: [235,196,172], dichte: 0.00011,  wasser: [26,80,110], fenster: 0.12, nacht: 0.25,lampen: 0,   bloomS: 0.35, bloomT: 1.4,  mond: 0 },
+  { h: 10,    hoehe: 44,  trueb: 4,  rayleigh: 1.2, bel: 0.42, sonneI: 2.6, sFarbe: [255,248,236], hemiI: 0.75, hemiH: [186,214,255],hemiB: [90,78,62], nebel: [196,218,236], dichte: 0.00008, wasser: [14,104,134],fenster: 0.03, nacht: 0,   lampen: 0,   bloomS: 0.12, bloomT: 2.8,  mond: 0 },
+  { h: 16,    hoehe: 30,  trueb: 5,  rayleigh: 1.4, bel: 0.45, sonneI: 2.4, sFarbe: [255,236,212], hemiI: 0.7,  hemiH: [190,210,250],hemiB: [92,78,60], nebel: [204,214,228], dichte: 0.00009,  wasser: [18,100,130],fenster: 0.04, nacht: 0.05,lampen: 0,   bloomS: 0.15, bloomT: 2.5,  mond: 0 },
+  { h: 18.75, hoehe: 2.5, trueb: 10, rayleigh: 3,   bel: 0.6,  sonneI: 1.8, sFarbe: [255,150,88],  hemiI: 0.45, hemiH: [255,170,140],hemiB: [70,40,50], nebel: [250,166,128], dichte: 0.00012, wasser: [36,58,88], fenster: 0.36, nacht: 0.65,lampen: 0.8, bloomS: 0.5,  bloomT: 1.0,  mond: 0 },
+  { h: 19.8,  hoehe: -3,  trueb: 6,  rayleigh: 2,   bel: 0.5,  sonneI: 0.3, sFarbe: [255,120,90],  hemiI: 0.35, hemiH: [120,90,150],hemiB: [30,24,40], nebel: [80,56,86],    dichte: 0.00011,  wasser: [18,28,56],  fenster: 0.56, nacht: 0.95,lampen: 1,   bloomS: 0.8,  bloomT: 0.7,  mond: 0.3 },
+  { h: 21.2,  hoehe: -18, trueb: 2,  rayleigh: 0.6, bel: 0.42, sonneI: 0,   sFarbe: [255,220,180], hemiI: 0.22, hemiH: [70,90,150],  hemiB: [20,20,32], nebel: [12,16,32],    dichte: 0.00012, wasser: [5,17,34],   fenster: 0.66, nacht: 1,   lampen: 1,   bloomS: 0.95, bloomT: 0.55, mond: 1 },
+  { h: 24,    hoehe: -25, trueb: 2,  rayleigh: 0.5, bel: 0.42, sonneI: 0,   sFarbe: [255,220,180], hemiI: 0.22, hemiH: [70,90,150],  hemiB: [20,20,32], nebel: [10,14,30],    dichte: 0.00012, wasser: [4,16,32],   fenster: 0.66, nacht: 1,   lampen: 1,   bloomS: 0.95, bloomT: 0.55, mond: 1 }
+];
+function lichtFuer(st) {
+  let i = 0;
+  while (i < LICHT.length - 2 && LICHT[i + 1].h <= st) i++;
+  const a = LICHT[i], b = LICHT[i + 1], t = klemme((st - a.h) / (b.h - a.h), 0, 1), e = { stunde: st };
+  for (const k in a) if (k !== "h") e[k] = Array.isArray(a[k]) ? a[k].map((v, j) => mix(v, b[k][j], t)) : mix(a[k], b[k], t);
+  e.azimut = 90 + klemme((st - 6) / 13.5, 0, 1) * 180;
+  return e;
+}
+const lichtWahl = document.getElementById("licht");
+function stundeJetzt() {
+  if (lichtWahl.value !== "auto") return parseFloat(lichtWahl.value);
+  const d = new Date(); return d.getHours() + d.getMinutes() / 60;
+}
+let licht = lichtFuer(12), lichtSchluessel = "", infoLicht = "";
+const farbe = (c, f) => new T.Color(c[0] / 255, c[1] / 255, c[2] / 255).convertSRGBToLinear().multiplyScalar(f || 1);
+const sonnenRichtung = new T.Vector3();
+function lichtAktualisieren(erzwingen) {
+  const st = stundeJetzt(), k = st.toFixed(2);
+  if (!erzwingen && k === lichtSchluessel) return;
+  lichtSchluessel = k;
+  licht = lichtFuer(st);
+  const phi = T.MathUtils.degToRad(90 - licht.hoehe), theta = T.MathUtils.degToRad(licht.azimut);
+  sonnenRichtung.setFromSphericalCoords(1, phi, theta);
+  for (const s of [himmel, himmelUmgebung]) {
+    const u = s.material.uniforms;
+    u.turbidity.value = licht.trueb; u.rayleigh.value = licht.rayleigh; u.mieCoefficient.value = 0.005; u.mieDirectionalG.value = 0.8;
+    u.sunPosition.value.copy(sonnenRichtung);
+  }
+  if (umgebungsZiel) umgebungsZiel.dispose();
+  umgebungsZiel = pmrem.fromScene(umgebungsSzene);
+  szene.environment = umgebungsZiel.texture;
+  sonne.position.copy(sonnenRichtung).multiplyScalar(900);
+  sonne.intensity = licht.sonneI * klemme(licht.hoehe / 4 + 0.5, 0, 1);
+  sonne.color.copy(farbe(licht.sFarbe));
+  sonne.castShadow = sonne.intensity > 0.05;
+  himmelsLicht.intensity = licht.hemiI; himmelsLicht.color.copy(farbe(licht.hemiH)); himmelsLicht.groundColor.copy(farbe(licht.hemiB));
+  mondLicht.intensity = 0.35 * licht.mond;
+  szene.fog.color.copy(farbe(licht.nebel)); szene.fog.density = licht.dichte;
+  if (wasser.material.uniforms) {
+    wasser.material.uniforms.sunDirection.value.copy(sonnenRichtung);
+    wasser.material.uniforms.sunColor.value.copy(farbe(licht.sFarbe, licht.sonneI > 0.1 ? 1 : 0.15));
+    wasser.material.uniforms.waterColor.value.copy(farbe(licht.wasser));
+  } else wasser.material.color.copy(farbe(licht.wasser, 1.3));
+  renderer.toneMappingExposure = licht.bel;
+  if (ende) ende.uniforms.belichtung.value = licht.bel;
+  if (bloom) { bloom.strength = licht.bloomS; bloom.threshold = licht.bloomT; }
+  U.uLicht.value = licht.fenster; U.uNacht.value = licht.nacht;
+  sterne.material.opacity = klemme(-licht.hoehe / 10, 0, 1) * 0.9;
+  mond.material.opacity = licht.mond;
+  const n = licht.nacht, l = licht.lampen;
+  MAT.lampe.color.copy(l > 0.3 ? farbe([255, 214, 150], 3.5 * l) : farbe([110, 110, 110]));
+  MAT.scheinw.color.copy(l > 0.3 ? farbe([255, 246, 220], 4 * l) : farbe([200, 200, 200]));
+  MAT.ruecklicht.color.copy(l > 0.3 ? farbe([255, 40, 30], 3 * l) : farbe([120, 20, 20]));
+  turmRingMat.color.copy(n > 0.2 ? farbe([255, 210, 120], 2.8 * n) : farbe([120, 100, 60]));
+  strahlMat.opacity = n > 0.5 ? 0.28 * n : 0;
+  for (const z of zugFenster) z.color.copy(n > 0.2 ? farbe([140, 220, 255], 2.2 * n) : farbe([12, 34, 54]));
+  for (const a of akzente) {
+    if (a.emissiv) a.mat.emissive.copy(a.farbe.clone().convertSRGBToLinear().multiplyScalar(0.55 * n));
+    else a.mat.color.copy(a.farbe.clone().convertSRGBToLinear().multiplyScalar(0.5 + 2.4 * n));
+  }
+  flachwasser.material.opacity = 0.35 + 0.65 * klemme(licht.sonneI / 2, 0, 1);
+  flachwasser.material.color.copy(farbe([255, 255, 255], 0.35 + 0.65 * klemme(licht.hemiI / 0.75, 0, 1)));
+  const hh = Math.floor(st), mm = Math.round((st - hh) * 60) % 60;
+  infoLicht = (lichtWahl.value === "auto" ? "Licht automatisch, " : "Licht fest, ") + String(hh).padStart(2, "0") + ":" + String(mm).padStart(2, "0") + " Uhr";
+  zusammenfassungZeigen();
+}
+
+/* =====================================================================================
+   11. NACHBEARBEITUNG (Leuchten) UND BILDGRÖSSE
+   ===================================================================================== */
+let komposition = null, bloom = null, ende = null;
+if (Q.hoch && T.EffectComposer && T.UnrealBloomPass) {
+  const ziel = new T.WebGLRenderTarget(1, 1, { type: T.HalfFloatType, samples: 4 });
+  komposition = new T.EffectComposer(renderer, ziel);
+  komposition.addPass(new T.RenderPass(szene, kamera));
+  bloom = new T.UnrealBloomPass(new T.Vector2(512, 512), 0.4, 0.55, 1.0);
+  komposition.addPass(bloom);
+  ende = new T.ShaderPass({
+    uniforms: { tDiffuse: { value: null }, belichtung: { value: 0.5 } },
+    vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
+    fragmentShader: `uniform sampler2D tDiffuse; uniform float belichtung; varying vec2 vUv;
+      vec3 jarvisFit(vec3 v){ vec3 a = v * (v + 0.0245786) - 0.000090537; vec3 b = v * (0.983729 * v + 0.4329510) + 0.238081; return a / b; }
+      vec3 jarvisAces(vec3 c){
+        const mat3 ein = mat3(0.59719, 0.07600, 0.02840, 0.35458, 0.90834, 0.13383, 0.04823, 0.01566, 0.83777);
+        const mat3 aus = mat3(1.60475, -0.10208, -0.00327, -0.53108, 1.10813, -0.07276, -0.07367, -0.00605, 1.07602);
+        c *= belichtung / 0.6; c = ein * c; c = jarvisFit(c); c = aus * c; return clamp(c, 0.0, 1.0); }
+      vec3 srgb(vec3 c){ return mix(pow(c, vec3(0.41666)) * 1.055 - vec3(0.055), c * 12.92, vec3(lessThanEqual(c, vec3(0.0031308)))); }
+      void main(){ vec4 t = texture2D(tDiffuse, vUv); gl_FragColor = vec4(srgb(jarvisAces(t.rgb)), 1.0); }`
+  });
+  ende.material.toneMapped = false;   // eigene Tonwertkurve, Three soll keine zweite anhängen
+  komposition.addPass(ende);
+  renderer.toneMapping = T.NoToneMapping;  // Tonwertkurve nur einmal (im letzten Durchgang), sonst wird das Bild doppelt abgedunkelt
+}
+function groesse() {
+  const b = leinwand.clientWidth || 800, h = leinwand.clientHeight || 600;
+  renderer.setSize(b, h, false);
+  kamera.aspect = b / h; kamera.updateProjectionMatrix();
+  if (komposition) { komposition.setPixelRatio(Q.dpr); komposition.setSize(b, h); }
+}
+groesse();
+window.addEventListener("resize", groesse);
+
+/* =====================================================================================
+   12. BEWEGUNG
+   ===================================================================================== */
+const wenigBewegung = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const m4 = new T.Matrix4(), q4 = new T.Quaternion(), v3 = new T.Vector3(), s3 = new T.Vector3(1, 1, 1), e3 = new T.Euler();
+let zeit = 0, daten = null, markiert = null;
+const statusSchluessel = id => { const g = daten.gebaeude.find(x => x.id === id); return g ? g.status : "aus"; };
+function bewegen(dt) {
+  zeit += dt;
+  if (wasser.material.uniforms) wasser.material.uniforms.time.value += dt * 0.6;
+  else wasser.material.normalMap.offset.set(zeit * 0.004, zeit * 0.003);
+  // Gischt pulsiert
+  const col = gischt.geometry.attributes.color;
+  for (let i = 0; i < col.count; i += 2) col.setW(i, 0.45 + 0.35 * Math.sin(zeit * 1.3 + i * 0.37));
+  col.needsUpdate = true;
+  // Autos: Rechtsverkehr im Raster und auf der Uferstraße
+  autos.forEach((a, i) => {
+    let x, z, fx, fz;
+    const r = Math.sign(a.v);
+    if (a.art === "raster") {
+      a.p += a.v * dt;
+      if (a.p > a.st.b) a.p = a.st.a; else if (a.p < a.st.a) a.p = a.st.b;
+      if (a.st.achse === "x") { x = a.p; z = a.st.k + 5.5 * r; fx = r; fz = 0; }
+      else { x = a.st.k - 5.5 * r; z = a.p; fx = 0; fz = r; }
+    } else {
+      const rr = inselRand(a.w) - 101 - 5 * r;
+      a.w += a.v / rr * dt;
+      x = Math.cos(a.w) * rr; z = Math.sin(a.w) * rr; fx = -Math.sin(a.w) * r; fz = Math.cos(a.w) * r;
+    }
+    e3.set(0, Math.atan2(fx, fz), 0); q4.setFromEuler(e3);
+    m4.compose(v3.set(x, BODEN + 0.1, z), q4, s3.set(1, 1, 1)); autoMesh.setMatrixAt(i, m4);
+    m4.compose(v3.set(x + fx * 2.3, BODEN + 0.9, z + fz * 2.3), q4, s3); scheinMesh.setMatrixAt(i, m4);
+    m4.compose(v3.set(x - fx * 2.3, BODEN + 0.9, z - fz * 2.3), q4, s3); rueckMesh.setMatrixAt(i, m4);
+  });
+  autoMesh.instanceMatrix.needsUpdate = scheinMesh.instanceMatrix.needsUpdate = rueckMesh.instanceMatrix.needsUpdate = true;
+  // Züge
+  for (const z of zuege) z.wagen.forEach((w, i) => {
+    const u = ((z.start + zeit * ZUG_TEMPO - i * WAGEN_ABSTAND) % 1 + 1) % 1;
+    const p = bahnKurve.getPointAt(u), n = bahnKurve.getPointAt((u + 0.001) % 1);
+    w.position.set(p.x, p.y + 6.4, p.z); w.lookAt(n.x, n.y + 6.4, n.z);
+  });
+  // Riesenrad
+  radDreh.rotation.z = zeit * 0.03;
+  radGondeln.forEach(g => { const w = g.userData.w + radDreh.rotation.z; g.position.set(Math.cos(w) * (rad.userData.R0 + 3), rad.userData.mitte + Math.sin(w) * (rad.userData.R0 + 3) - 4.5, 0); });
+  rad.userData.ledMat.color.setHSL((zeit * 0.05) % 1, 0.9, 0.5).multiplyScalar(licht.nacht > 0.2 ? 2.5 : 0.4);
+  // Boote, Luftschiffe
+  for (const b of boote) {
+    b.w += b.v * dt;
+    b.g.position.set(Math.cos(b.w) * b.r, 0.1 + Math.sin(zeit * 1.5 + b.r) * 0.15, Math.sin(b.w) * b.r);
+    b.g.rotation.y = -b.w + (b.v > 0 ? Math.PI : 0);
+  }
+  for (const l of luftschiffe) {
+    l.w += l.v * dt * 0.5;
+    l.g.position.set(Math.cos(l.w) * l.r, l.h + Math.sin(zeit * 0.3 + l.r) * 4, Math.sin(l.w) * l.r);
+    l.g.rotation.y = -l.w;
+  }
+  // Drehende Teile der Arbeitsgebäude
+  for (const id of REIHENFOLGE) agentGruppen[id].traverse(o => { if (o.userData.dreh) o.rotation.y += o.userData.dreh * dt; });
+  // Antennenlichter blinken
+  MAT.rotLicht.color.copy(licht.nacht > 0.2 && Math.sin(zeit * 2.4) > 0.2 ? farbe([255, 40, 30], 4) : farbe([90, 20, 20]));
+  // Suchscheinwerfer schwenken
+  strahlen.forEach((s, i) => { s.rotation.z = 0.32 * Math.sin(zeit * 0.31 + i * 1.7); s.rotation.x = 0.32 * Math.cos(zeit * 0.27 + i); });
+  // Bildschirme
+  for (const b of bildschirme) {
+    if (b.art === "bunt") b.mat.color.setHSL((zeit * 0.08) % 1, 0.95, 0.55).multiplyScalar(1 + 2 * licht.nacht);
+    else if (b.art === "nachrichten" && Math.floor(zeit * 10) !== b.bild) {
+      b.bild = Math.floor(zeit * 10);
+      const x = b.x; x.fillStyle = "#0d2a46"; x.fillRect(0, 0, 512, 256);
+      x.fillStyle = "#e8f2ff"; x.font = "bold 40px system-ui, sans-serif"; x.fillText("JARVIS", 24, 56);
+      x.fillStyle = "#7fb8ff"; x.font = "26px system-ui, sans-serif";
+      const zeilen = ["Mails: 2 wichtig", "Kalender: frei", "Nachtarbeit lokal", "Speichertest ok", "Kosten 0,00 €", "Vault aktuell"];
+      const ab = Math.floor(zeit / 2.5) % zeilen.length;
+      for (let i = 0; i < 4; i++) x.fillText(zeilen[(ab + i) % zeilen.length], 24, 104 + i * 38);
+      b.t.needsUpdate = true;
+      b.mat.color.setScalar(1 + licht.nacht * 1.5);
+    } else if (b.art === "kurse" && Math.floor(zeit * 8) !== b.bild) {
+      b.bild = Math.floor(zeit * 8);
+      const x = b.x, aus = statusSchluessel("trading") === "aus";
+      x.fillStyle = "#06080c"; x.fillRect(0, 0, 512, 32);
+      if (!aus) { x.font = "bold 22px monospace"; const s = "XAU +0,4%  XAG -0,2%  EURUSD +0,1%  "; x.fillStyle = "#4ce88a"; x.fillText(s + s, -((zeit * 60) % 400), 24); }
+      b.t.needsUpdate = true;
+    }
+  }
+  // Statuslichter pulsieren
+  for (const id in statusMats) {
+    const sk = statusSchluessel(id), st = STATUS[sk] || STATUS.aus, s = statusMats[id];
+    const puls = sk === "laeuft" ? 0.75 + 0.25 * Math.sin(zeit * 3) : sk === "fehler" ? (Math.sin(zeit * 9) > 0 ? 1 : 0.15) : sk === "wartet" ? 0.6 + 0.2 * Math.sin(zeit * 1.2) : 0.25;
+    s.kugel.color.copy(farbe(st.farbe, 1.5 + 2 * puls));
+    s.glanz.material.color.copy(farbe(st.farbe, puls));
+    s.glanz.scale.setScalar((id === "jarvis" ? 130 : 70) * (0.8 + 0.3 * puls));
+  }
+}
+
+/** Schattenbereich folgt dem Blickpunkt: nah = scharf, weit weg = großer Bereich. */
+let schattenHalb = 0;
+function schattenNachfuehren() {
+  const d = kamera.position.distanceTo(steuerung.target), h = klemme(d * 0.55, 260, 2000);
+  const c = sonne.shadow.camera;
+  if (Math.abs(h - schattenHalb) > schattenHalb * 0.12) { schattenHalb = h; c.left = -h; c.right = h; c.top = h; c.bottom = -h; c.updateProjectionMatrix(); }
+  sonne.target.position.set(steuerung.target.x, 0, steuerung.target.z);
+  sonne.position.copy(sonne.target.position).addScaledVector(sonnenRichtung, 3500);
+}
+
+/* =====================================================================================
+   13. NAMENSSCHILDER, KLICKEN, RUNDGANG
+   ===================================================================================== */
+const schilderBox = document.getElementById("schilder");
+const schilder = {};
+function schilderBauen() {
+  schilderBox.textContent = "";
+  for (const id of ["jarvis"].concat(REIHENFOLGE)) {
+    const g = daten.gebaeude.find(x => x.id === id); if (!g) continue;
+    const d = document.createElement("div"); d.className = "schild";
+    const p = document.createElement("span"); p.className = "punkt"; p.style.background = rgbText((STATUS[g.status] || STATUS.aus).farbe);
+    const t = document.createElement("span"); t.className = "text"; t.textContent = g.name;
+    d.appendChild(p); d.appendChild(t);
+    d.addEventListener("click", e => { e.stopPropagation(); oeffneDetail(id); });
+    schilderBox.appendChild(d); schilder[id] = d;
+  }
+}
+const proj = new T.Vector3();
+function schilderSetzen() {
+  const b = leinwand.clientWidth, h = leinwand.clientHeight, rechtecke = [];
+  const ids = Object.keys(schilder).sort((a, c) => (a === markiert ? -1 : c === markiert ? 1 : a === "jarvis" ? -1 : c === "jarvis" ? 1 : 0));
+  for (const id of ids) {
+    const g = agentGruppen[id], d = schilder[id];
+    proj.set(g.position.x, g.position.y + g.userData.oben + 14, g.position.z).project(kamera);
+    if (proj.z > 1) { d.style.display = "none"; continue; }
+    d.style.display = "";
+    const x = (proj.x * 0.5 + 0.5) * b, y = (-proj.y * 0.5 + 0.5) * h;
+    d.style.transform = `translate(${x}px, ${y}px) translate(-50%, -100%)`;
+    d.classList.toggle("aktiv", id === markiert);
+    const breite = id === markiert ? 160 : (d.dataset.breite || (d.dataset.breite = d.querySelector(".text").textContent.length * 7 + 30));
+    const r = { x: x - breite / 2, y: y - 22, w: +breite, h: 22 };
+    const voll = !rechtecke.some(o => r.x < o.x + o.w && r.x + r.w > o.x && r.y < o.y + o.h && r.y + r.h > o.y);
+    d.classList.toggle("klein", !voll && id !== markiert);
+    if (voll || id === markiert) rechtecke.push(r);
+  }
+}
+// Klick auf Gebäude
+const strahl = new T.Raycaster(), maus = new T.Vector2();
+let druck = null;
+leinwand.addEventListener("pointerdown", e => { druck = { x: e.clientX, y: e.clientY }; });
+leinwand.addEventListener("pointerup", e => {
+  if (!druck || Math.hypot(e.clientX - druck.x, e.clientY - druck.y) > 6) return;
+  const r = leinwand.getBoundingClientRect();
+  maus.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
+  strahl.setFromCamera(maus, kamera);
+  const treffer = strahl.intersectObjects(Object.values(agentGruppen), true).find(t => !(t.object.isSprite));
+  if (treffer) { let o = treffer.object; while (o && !o.userData.id) o = o.parent; if (o) { oeffneDetail(o.userData.id); return; } }
+  schliesseDetail();
+});
+let zeigerAufGebaeude = false;
+leinwand.addEventListener("pointermove", e => {
+  if (e.buttons) return;
+  const r = leinwand.getBoundingClientRect();
+  maus.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
+  strahl.setFromCamera(maus, kamera);
+  zeigerAufGebaeude = strahl.intersectObjects(Object.values(agentGruppen), true).some(t => !t.object.isSprite);
+  leinwand.style.cursor = zeigerAufGebaeude ? "pointer" : "grab";
+});
+
+// Kamerafahrten
+let fahrtToken = 0;
+function fahre(pos, ziel, ms) {
+  const mein = ++fahrtToken, p0 = kamera.position.clone(), z0 = steuerung.target.clone();
+  if (wenigBewegung || ms <= 0) { kamera.position.copy(pos); steuerung.target.copy(ziel); return Promise.resolve(); }
+  return new Promise(fertig => {
+    const start = performance.now();
+    (function schritt(j) {
+      if (mein !== fahrtToken) { fertig(); return; }
+      const t = Math.min(1, (j - start) / ms), e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      kamera.position.lerpVectors(p0, pos, e); steuerung.target.lerpVectors(z0, ziel, e);
+      if (t < 1) requestAnimationFrame(schritt); else fertig();
+    })(start);
+  });
+}
+const UEBERSICHT = { pos: new T.Vector3(3400, 1800, 1700), ziel: new T.Vector3(0, 120, 0) };
+function uebersichtPos() {
+  const a = leinwand.clientWidth / leinwand.clientHeight, f = a < 1 ? 1.9 / Math.max(a, 0.45) * 0.62 : 1;
+  return { pos: UEBERSICHT.pos.clone().multiplyScalar(f), ziel: UEBERSICHT.ziel.clone() };
+}
+function zielFuer(id) {
+  const g = agentGruppen[id], o = g.userData.oben;
+  if (id === "jarvis") return { pos: new T.Vector3(1150, 720, 620), ziel: new T.Vector3(0, 320, 0) };
+  const aussen = new T.Vector3(g.position.x, 0, g.position.z).normalize();
+  const ziel = new T.Vector3(g.position.x, BODEN + o * 0.42, g.position.z);
+  const abstand = 190 + o * 0.75;
+  const pos = ziel.clone().add(aussen.multiplyScalar(abstand)).add(new T.Vector3(0, 70 + o * 0.3, 0));
+  return { pos, ziel };
+}
+steuerung.addEventListener("start", () => { fahrtToken++; if (rundgangLaeuft) stopp(false); });
+
+/* ---------- Detailfeld, Rundgang, Zusammenfassung ---------- */
+const detail = document.getElementById("detail"), untertitel = document.getElementById("untertitel");
+const knopfRundgang = document.getElementById("knopfRundgang"), knopfStopp = document.getElementById("knopfStopp");
+function oeffneDetail(id) {
+  const g = daten.gebaeude.find(x => x.id === id); if (!g) return;
+  const st = STATUS[g.status] || STATUS.aus;
+  markiert = id;
+  document.getElementById("detailName").textContent = g.name;
+  const s = document.getElementById("detailStatus"); s.textContent = "";
+  const p = document.createElement("span"); p.className = "punkt"; p.style.background = rgbText(st.farbe);
+  s.appendChild(p); s.appendChild(document.createTextNode("Status: " + st.text));
+  const dl = document.getElementById("detailZahlen"); dl.textContent = "";
+  (g.kennzahlen || []).slice(0, 3).forEach(z => {
+    const dt = document.createElement("dt"); dt.textContent = z[0];
+    const dd = document.createElement("dd"); dd.textContent = z[1];
+    dl.appendChild(dt); dl.appendChild(dd);
+  });
+  document.getElementById("detailText").textContent = g.text || "";
+  detail.classList.add("an");
+}
+function schliesseDetail() { detail.classList.remove("an"); if (!rundgangLaeuft) markiert = null; }
+let rundgangToken = 0, rundgangLaeuft = false;
+const warte = ms => new Promise(f => setTimeout(f, ms));
+async function rundgang() {
+  if (rundgangLaeuft) return;
+  rundgangLaeuft = true;
+  const mein = ++rundgangToken;
+  knopfRundgang.disabled = true; knopfStopp.disabled = false;
+  schliesseDetail();
+  for (const id of ["jarvis"].concat(REIHENFOLGE)) {
+    if (mein !== rundgangToken) return;
+    const g = daten.gebaeude.find(x => x.id === id); if (!g) continue;
+    markiert = id;
+    untertitel.textContent = g.name + " – " + (STATUS[g.status] || STATUS.aus).text + ". " + (g.text || "");
+    untertitel.classList.add("an");
+    const z = zielFuer(id);
+    await fahre(z.pos, z.ziel, 1300);
+    if (mein !== rundgangToken) return;
+    await warte(1700);
+  }
+  if (mein !== rundgangToken) return;
+  untertitel.classList.remove("an"); markiert = null;
+  const u = uebersichtPos(); await fahre(u.pos, u.ziel, 1600);
+  if (mein === rundgangToken) { rundgangLaeuft = false; knopfRundgang.disabled = false; knopfStopp.disabled = true; }
+}
+function stopp(zurueck) {
+  if (!rundgangLaeuft) return;
+  rundgangToken++; rundgangLaeuft = false;
+  untertitel.classList.remove("an"); markiert = null;
+  knopfRundgang.disabled = false; knopfStopp.disabled = true;
+  if (zurueck !== false) { const u = uebersichtPos(); fahre(u.pos, u.ziel, 900); }
+}
+function zusammenfassungZeigen() {
+  if (!daten) return;
+  const zahl = { laeuft: 0, wartet: 0, fehler: 0, aus: 0 };
+  daten.gebaeude.forEach(g => { if (zahl[g.status] !== undefined) zahl[g.status]++; });
+  const z = document.getElementById("zusammenfassung"); z.textContent = "";
+  Object.keys(STATUS).forEach(k => {
+    const s = document.createElement("span"), p = document.createElement("span");
+    p.className = "punkt"; p.style.background = rgbText(STATUS[k].farbe);
+    s.appendChild(p); s.appendChild(document.createTextNode(zahl[k] + " " + STATUS[k].text)); z.appendChild(s);
+  });
+  const l = document.createElement("span"); l.textContent = infoLicht; z.appendChild(l);
+  const h = document.createElement("span"); h.className = "hinweis"; h.textContent = daten.stand || ""; z.appendChild(h);
+}
+function tastaturListeBauen() {
+  const liste = document.getElementById("tastaturListe"); liste.textContent = "";
+  for (const id of ["jarvis"].concat(REIHENFOLGE)) {
+    const g = daten.gebaeude.find(x => x.id === id); if (!g) continue;
+    const b = document.createElement("button"); b.type = "button";
+    b.textContent = g.name + ", Status " + (STATUS[g.status] || STATUS.aus).text;
+    b.addEventListener("click", () => { oeffneDetail(id); const z = zielFuer(id); fahre(z.pos, z.ziel, 900); });
+    liste.appendChild(b);
+  }
+}
+knopfRundgang.addEventListener("click", rundgang);
+knopfStopp.addEventListener("click", () => stopp());
+document.getElementById("knopfUebersicht").addEventListener("click", () => { stopp(false); schliesseDetail(); const u = uebersichtPos(); fahre(u.pos, u.ziel, 1000); });
+document.getElementById("schliessen").addEventListener("click", schliesseDetail);
+lichtWahl.addEventListener("change", () => lichtAktualisieren(true));
+document.addEventListener("keydown", e => { if (e.key === "Escape") { stopp(); schliesseDetail(); } });
+setInterval(() => lichtAktualisieren(false), 60000);
+
+/* =====================================================================================
+   14. LOS
+   ===================================================================================== */
+daten = startDaten;
+schilderBauen();
+tastaturListeBauen();
+lichtAktualisieren(true);
+{ const u = uebersichtPos(); kamera.position.copy(u.pos); steuerung.target.copy(u.ziel); }
+document.getElementById("laden").style.display = "none";
+window.__stadt = { szene, renderer, kamera, licht: () => licht, quelle, stufe, gebaeude: gebaeudeZaehler.anzahl, bloecke: gebaeudeZaehler.bloecke, baeume: baeume.length, laternen: laternen.length, autos: autos.length, strassen: strassen.length, oeffneDetail, agentGruppen, zielFuer, steuerung,
+  instanzen: Object.fromEntries(Object.entries(SAMMLUNG).map(([k, v]) => [k, v.liste.length])) };
+if (AURON) {
+  // Tour-Licht: Sonnenuntergang. Turmfarbe und Kamerafahrten steuert auron.html.
+  lichtWahl.value = "18.75"; lichtAktualisieren(true);
+  window.addEventListener("message", async e => {
+    if (e.origin !== location.origin || !e.data || typeof e.data !== "object") return;
+    const d = e.data;
+    if (d.auron === "farbe" && Number.isFinite(d.turm)) { MAT.gold.color.setHex(d.turm); MAT.goldRund.color.setHex(d.turm); }
+    else if (d.auron === "fahre") {
+      const z = d.id === "uebersicht" || !agentGruppen[d.id] ? uebersichtPos() : zielFuer(d.id);
+      await fahre(z.pos, z.ziel, Number(d.ms) || 1600);
+      anAuron({ auron: "angekommen", id: d.id });
+    }
+  });
+  anAuron({ auron: "bereit" });
+}
+let letzte = performance.now(), bilder = 0, bildZeit = 0;
+renderer.setAnimationLoop(() => {
+  const jetzt = performance.now(), dt = Math.min(0.1, (jetzt - letzte) / 1000); letzte = jetzt;
+  if (document.hidden) return;
+  if (!wenigBewegung) bewegen(dt); else if (zeit === 0) bewegen(0.016);
+  steuerung.update();
+  schattenNachfuehren();
+  if (komposition) komposition.render(); else renderer.render(szene, kamera);
+  schilderSetzen();
+  bilder++; bildZeit += dt; if (bildZeit > 2) { window.__fps = bilder / bildZeit; bilder = 0; bildZeit = 0; }
+});
+}
+</script>
+</body>
+</html>

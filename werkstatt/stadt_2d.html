@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jarvis – Agenten-Stadt (2D-Entwurf)</title>
+<!--
+  Jarvis Agenten-Stadt, 2D-Entwurf (04.10.2026).
+  Eine einzige Datei, keine Bibliotheken, kein Internet, nichts wird gespeichert.
+
+  TESTPLAN (Sir):
+   1. Datei per Doppelklick im Browser öffnen (Chrome oder Edge). Es muss eine dunkle Stadt erscheinen:
+      in der Mitte das goldene Hauptgebäude "Jarvis", rundherum 12 Gebäude mit Namen und Statuslicht.
+   2. Auf ein Gebäude klicken: Ein Feld zeigt Name, Status, Kennzahlen und einen Satz. Mit "x" oder Esc schließen.
+   3. "Rundgang" drücken: Die Ansicht fährt nacheinander über alle 13 Gebäude (je 3 Sekunden) und blendet
+      oben einen Satz ein. "Stopp" bricht ab, "Übersicht" zeigt wieder die ganze Stadt.
+   4. Fenster schmal ziehen (oder am Handy öffnen): Alles muss bedienbar bleiben, das Detailfeld liegt dann unten.
+   5. Mit der Tab-Taste durch die Gebäude springen, mit Enter öffnen.
+  Gilt als bestanden, wenn 1 bis 5 ohne Fehler laufen.
+
+  EHRLICH UNGETESTET / FEHLERQUELLEN:
+   - Die Daten sind Beispieldaten, von Hand eingetragen, NICHT live. datenLaden() liefert sie nur zurück.
+   - Handy: nur im simulierten schmalen Fenster geprüft, nicht an einem echten Gerät. Mehrfinger-Zoom gibt es nicht.
+   - Nur Chromium geprüft. Firefox und Safari sind ungetestet (der Leuchteffekt per CSS-Filter kann dort anders aussehen).
+   - Bei sehr kleinen Anzeigen (unter 320 Pixel Breite) können sich Namen überlappen.
+-->
+<style>
+  :root {
+    --bg: #0b0d12; --panel: #141824; --linie: #2a3144; --text: #e8e6df; --leise: #9aa3b5;
+    --gold: #d4af37; --gruen: #3ddc84; --gelb: #ffc43d; --rot: #ff5252; --grau: #6b7280;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  body { display: flex; flex-direction: column; height: 100dvh; }
+
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 14px;
+    border-bottom: 1px solid var(--linie); background: #0f121b; }
+  header h1 { font-size: 17px; margin: 0; color: var(--gold); letter-spacing: .5px; font-weight: 600; }
+  .knoepfe { display: flex; gap: 8px; margin-left: auto; }
+  button { font: inherit; font-size: 14px; color: var(--text); background: var(--panel); border: 1px solid var(--linie);
+    border-radius: 8px; padding: 8px 14px; cursor: pointer; min-height: 40px; }
+  button:hover { border-color: var(--gold); }
+  button.haupt { background: #2b2410; border-color: var(--gold); color: #f3d98a; }
+  button:disabled { opacity: .4; cursor: default; }
+  button:focus-visible, .gebaeude:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+  .zeile { display: flex; flex-wrap: wrap; gap: 4px 16px; padding: 6px 14px; font-size: 13px; color: var(--leise);
+    border-bottom: 1px solid var(--linie); }
+  .punkt { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+  .hinweis { color: var(--gelb); }
+
+  main { position: relative; flex: 1; min-height: 0; overflow: hidden;
+    background: radial-gradient(ellipse at 50% 40%, #151b2b 0%, var(--bg) 70%); }
+  svg#stadt { width: 100%; height: 100%; display: block; touch-action: manipulation; }
+
+  .bodenkachel { fill: #121726; stroke: #1d2438; stroke-width: 1.5; }
+  .bodenkachel.weg { fill: #171d2f; }
+  .bodenkachel.platz { fill: #1a2136; }
+  .bodenkachel.mitte { fill: #2a2412; stroke: #5b4a1c; }
+
+  .gebaeude { cursor: pointer; outline: none; }
+  .gebaeude:hover .huelle { filter: brightness(1.18); }
+  .gebaeude.aktiv .huelle { filter: drop-shadow(0 0 10px rgba(255, 215, 110, .95)); }
+  .name { font-size: var(--namensgroesse, 24px); font-weight: 600; fill: #f1efe8; text-anchor: middle;
+    paint-order: stroke; stroke: #0b0d12; stroke-width: calc(var(--namensgroesse, 24px) * 0.22); stroke-linejoin: round; pointer-events: none; }
+  .gebaeude.aktiv .name { fill: #ffe9a8; }
+  @keyframes puls { 0%, 100% { opacity: .15; } 50% { opacity: .55; } }
+  .glimmen { animation: puls 2.4s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) { .glimmen { animation: none; opacity: .35; } }
+
+  #untertitel { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); max-width: min(92%, 640px);
+    background: rgba(15, 18, 27, .92); border: 1px solid var(--gold); border-radius: 10px; padding: 10px 16px;
+    font-size: 15px; text-align: center; display: none; pointer-events: none; }
+  #untertitel.an { display: block; }
+
+  #detail { position: absolute; right: 12px; top: 12px; width: 330px; max-height: calc(100% - 24px); overflow: auto;
+    background: var(--panel); border: 1px solid var(--linie); border-radius: 12px; padding: 14px 16px; display: none; }
+  #detail.an { display: block; }
+  #detail h2 { margin: 0 28px 6px 0; font-size: 18px; }
+  #detail .status { font-size: 14px; margin-bottom: 10px; }
+  #detail dl { margin: 0 0 10px; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 14px; }
+  #detail dt { color: var(--leise); }
+  #detail dd { margin: 0; text-align: right; }
+  #detail p { margin: 0; font-size: 14px; line-height: 1.45; color: #cfd3dc; }
+  #schliessen { position: absolute; right: 8px; top: 8px; min-height: 32px; padding: 2px 10px; }
+
+  @media (max-width: 700px) {
+    header h1 { font-size: 15px; }
+    .knoepfe { width: 100%; margin-left: 0; }
+    .knoepfe button { flex: 1; }
+    #detail { left: 8px; right: 8px; top: auto; bottom: 8px; width: auto; max-height: 55%; }
+    #untertitel { font-size: 14px; top: 8px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Jarvis – Agenten-Stadt</h1>
+  <div class="knoepfe">
+    <button id="knopfRundgang" class="haupt" type="button">Rundgang</button>
+    <button id="knopfStopp" type="button" disabled>Stopp</button>
+    <button id="knopfUebersicht" type="button">Übersicht</button>
+  </div>
+</header>
+<div class="zeile" id="zusammenfassung" aria-live="polite"></div>
+<main>
+  <svg id="stadt" role="group" aria-label="Agenten-Stadt: Übersicht aller Jarvis-Bereiche" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="leuchten" x="-100%" y="-100%" width="300%" height="300%">
+        <feGaussianBlur stdDeviation="5"/>
+      </filter>
+    </defs>
+    <g id="welt"></g>
+  </svg>
+  <div id="untertitel" role="status"></div>
+  <aside id="detail" aria-live="polite">
+    <button id="schliessen" type="button" aria-label="Detailfeld schließen">x</button>
+    <h2 id="detailName"></h2>
+    <div class="status" id="detailStatus"></div>
+    <dl id="detailZahlen"></dl>
+    <p id="detailText"></p>
+  </aside>
+</main>
+
+<script>
+"use strict";
+
+/* =====================================================================================
+   1. DATEN  (BEISPIELDATEN, von Hand eingetragen, Stand 04.10.2026 vormittags, NICHT live)
+   status: "laeuft" | "wartet" | "fehler" | "aus"
+   Später ersetzt datenLaden() diese Daten durch echte Werte vom Backend.
+   ===================================================================================== */
+const DATEN_BEISPIEL = {
+  stand: "Beispieldaten von Hand eingetragen (04.10.2026), nicht live",
+  gebaeude: [
+    { id: "jarvis", name: "Jarvis", status: "laeuft",
+      kennzahlen: [["KI-Anbieter", "lokal (Ollama)"], ["Antwortzeit Notizfragen", "2,5 bis 8,5 s"], ["Anrede", "Sir"]],
+      text: "Die Zentrale: beantwortet Fragen aus dem Vault mit Quellenangabe und steuert alle anderen Bereiche." },
+    { id: "testpc", name: "Test-PC", status: "laeuft",
+      kennzahlen: [["Modell", "qwen3.5:9b"], ["Tempo", "15,4 Token/s"], ["Speichertest", "bestanden (0 Fehler)"]],
+      text: "Ubuntu-Rechner mit RX 580, bevorzugter Rechner für die Nachtarbeit." },
+    { id: "hauptpc", name: "Haupt-PC", status: "laeuft",
+      kennzahlen: [["Modell", "qwen3.5:9b"], ["Tempo", "49,5 Token/s"], ["Grafikkarte", "RTX 2070 Super, 100 %"]],
+      text: "Der schnellste KI-Rechner, antwortet im Chat zuerst. Darf nicht in den Ruhezustand." },
+    { id: "minipc", name: "Mini-PC", status: "laeuft",
+      kennzahlen: [["Modell", "qwen3.5:4b"], ["Tempo", "4,6 Token/s"], ["Jarvis-Dienst", "läuft"]],
+      text: "Das Zuhause von Jarvis: Dienst, Nacht-Timer und Syncthing laufen hier. Letzte Reserve für die KI." },
+    { id: "nachtarbeit", name: "Nachtarbeit", status: "wartet",
+      kennzahlen: [["Nächster Lauf", "03:00 Uhr"], ["Letzte Nacht", "1 fertig, 2 Fehler"], ["KI", "nur lokal (neu)"]],
+      text: "Arbeitet nachts Aufträge ab. Seit dem 04.10. ohne Claude-Anbindung, kostet nichts." },
+    { id: "aufgabenloop", name: "Aufgaben-Loop", status: "wartet",
+      kennzahlen: [["Offener Vorschlag", "Wärmepumpe"], ["Schreiber", "lokal"], ["Recherche", "Claude (Websuche)"]],
+      text: "Macht aus Wissenslücken Notiz-Entwürfe. Wartet auf Ihre Freigabe im HUD." },
+    { id: "vault", name: "Vault", status: "laeuft",
+      kennzahlen: [["Suchtest", "26/28 auf Platz 1"], ["Index", "aktuell"], ["Änderungen", "werden überwacht"]],
+      text: "Big Brain: Ihre Notizen in Obsidian, durchsucht von Jarvis." },
+    { id: "briefing", name: "Briefing & Gmail", status: "laeuft",
+      kennzahlen: [["Mails (2 Tage)", "15"], ["Wichtig", "2"], ["Quelle", "Gmail per IMAP"]],
+      text: "Fasst Mails, Termine und Stand des Vortags zu einem Tagesbriefing zusammen." },
+    { id: "kalender", name: "Kalender", status: "laeuft",
+      kennzahlen: [["Termine heute", "0"], ["Quelle", "Google Kalender (iCal)"], ["Schreiben", "über Termin-Links"]],
+      text: "Zeigt Ihre Termine und Feiertage im HUD an." },
+    { id: "kosten", name: "Kosten", status: "laeuft",
+      kennzahlen: [["Heute", "0,00 €"], ["Monat (Schätzung)", "ca. 0,30 $"], ["Rahmen", "30 $ im Monat"]],
+      text: "Zählt, was die Claude-API kostet. Lokale KI kostet nichts." },
+    { id: "trading", name: "Trading", status: "aus",
+      kennzahlen: [["Modus", "Demokonto"], ["Laufende Bots", "0"], ["Kandidat", "Divergenz Gold-Silber"]],
+      text: "Trading-Labor. Aktuell nichts aktiv, der Umbau auf MQL5 steht aus." },
+    { id: "sicherheit", name: "Sicherheit", status: "wartet",
+      kennzahlen: [["Ampel", "gelb"], ["Rote Funde", "0"], ["Letzter Check", "04.10."]],
+      text: "Prüft nur lesend auf offene Zugangsdaten. Gelb heißt: aufräumen, aber nichts Akutes." },
+    { id: "tiktok", name: "TikTok", status: "wartet",
+      kennzahlen: [["Ausgewertet", "178 Videos"], ["Fehlgeschlagen", "9"], ["Nächster Schritt", "Bild-Auswertung"]],
+      text: "Wertet gespeicherte Videos aus und legt Notizen im Vault an." }
+  ]
+};
+
+/** Holt die Daten. Später hier das Backend abfragen, z. B.:
+ *    const antwort = await fetch("/api/stadt"); return await antwort.json();
+ *  Das Format muss dem von DATEN_BEISPIEL entsprechen. Bis dahin: Beispieldaten. */
+async function datenLaden() {
+  return DATEN_BEISPIEL;
+}
+
+/* =====================================================================================
+   2. LAGEPLAN  (Position, Höhe, Farbe) – getrennt von den Daten
+   Gitter von -3 bis 3. Hauptgebäude in der Mitte, 12 Gebäude auf dem Ring um das 5x5-Feld.
+   ===================================================================================== */
+const RING = [[-1,-2],[0,-2],[1,-2],[2,-1],[2,0],[2,1],[1,2],[0,2],[-1,2],[-2,1],[-2,0],[-2,-1]];
+const REIHENFOLGE = ["testpc","hauptpc","minipc","nachtarbeit","aufgabenloop","vault",
+                     "briefing","kalender","kosten","trading","sicherheit","tiktok"];
+const FARBEN = { testpc:"#4a6fa5", hauptpc:"#5b7fb8", minipc:"#3f5f8a", nachtarbeit:"#6a55a0", aufgabenloop:"#3f8f7e",
+                 vault:"#9a7348", briefing:"#4a8fb0", kalender:"#6d9a47", kosten:"#9a4a5e", trading:"#b06f38",
+                 sicherheit:"#8f8f48", tiktok:"#84489a" };
+const HOEHEN = { testpc:70, hauptpc:80, minipc:56, nachtarbeit:64, aufgabenloop:58, vault:84,
+                 briefing:62, kalender:52, kosten:60, trading:72, sicherheit:66, tiktok:58 };
+const STATUS = {
+  laeuft: { text: "läuft",  farbe: "#3ddc84" },
+  wartet: { text: "wartet", farbe: "#ffc43d" },
+  fehler: { text: "Fehler", farbe: "#ff5252" },
+  aus:    { text: "aus",    farbe: "#6b7280" }
+};
+
+/* =====================================================================================
+   3. ZEICHNEN  (isometrisch: Gitterpunkt -> Bildschirm)
+   ===================================================================================== */
+const SVGNS = "http://www.w3.org/2000/svg";
+const TB = 140, TH = 70;            // Breite und Höhe einer Bodenkachel in Bildpunkten (2:1)
+const welt = document.getElementById("welt");
+const svg = document.getElementById("stadt");
+
+/** Gitter (gx, gy) und Höhe z -> Bildschirmpunkt [x, y]. */
+function proj(gx, gy, z) { return [(gx - gy) * TB / 2, (gx + gy) * TH / 2 - (z || 0)]; }
+function pt(p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }
+
+function el(name, attribute, eltern) {
+  const e = document.createElementNS(SVGNS, name);
+  for (const k in (attribute || {})) e.setAttribute(k, attribute[k]);
+  if (eltern) eltern.appendChild(e);
+  return e;
+}
+
+/** Farbe heller (f > 1) oder dunkler (f < 1) machen. */
+function tonen(hex, f) {
+  const n = parseInt(hex.slice(1), 16);
+  const c = [n >> 16, (n >> 8) & 255, n & 255].map(v => Math.max(0, Math.min(255, Math.round(v * f))));
+  return "rgb(" + c.join(",") + ")";
+}
+
+/** Bodenkachel als Raute. */
+function kachel(gx, gy, klasse, eltern) {
+  const m = proj(gx, gy, 0);
+  const pts = [[m[0], m[1] - TH / 2], [m[0] + TB / 2, m[1]], [m[0], m[1] + TH / 2], [m[0] - TB / 2, m[1]]];
+  el("polygon", { points: pts.map(pt).join(" "), class: "bodenkachel " + klasse }, eltern);
+}
+
+/** Quader aus drei sichtbaren Flächen (oben hell, links mittel, rechts dunkel). */
+function quader(eltern, gx, gy, s, z0, z1, farbe) {
+  const x0 = gx - s, x1 = gx + s, y0 = gy - s, y1 = gy + s;
+  const links = [proj(x0, y1, z0), proj(x1, y1, z0), proj(x1, y1, z1), proj(x0, y1, z1)];
+  const rechts = [proj(x1, y1, z0), proj(x1, y0, z0), proj(x1, y0, z1), proj(x1, y1, z1)];
+  const oben = [proj(x0, y0, z1), proj(x1, y0, z1), proj(x1, y1, z1), proj(x0, y1, z1)];
+  el("polygon", { points: links.map(pt).join(" "), fill: tonen(farbe, 0.82), stroke: tonen(farbe, 0.55), "stroke-width": 1.2 }, eltern);
+  el("polygon", { points: rechts.map(pt).join(" "), fill: tonen(farbe, 0.58), stroke: tonen(farbe, 0.4), "stroke-width": 1.2 }, eltern);
+  el("polygon", { points: oben.map(pt).join(" "), fill: tonen(farbe, 1.12), stroke: tonen(farbe, 0.7), "stroke-width": 1.2 }, eltern);
+}
+
+/** Fenster als kleine helle Parallelogramme an der linken Fläche (nur Zierde). */
+function fenster(eltern, gx, gy, s, hoehe, farbe) {
+  const y = gy + s;
+  const reihen = Math.max(1, Math.floor((hoehe - 18) / 22));
+  for (let r = 0; r < reihen; r++) {
+    for (let k = 0; k < 2; k++) {
+      const xa = gx - s + 0.18 + k * 0.34, xb = xa + 0.16;
+      const za = 10 + r * 22, zb = za + 11;
+      const f = [proj(xa, y, za), proj(xb, y, za), proj(xb, y, zb), proj(xa, y, zb)];
+      el("polygon", { points: f.map(pt).join(" "), fill: tonen(farbe, 1.5), opacity: 0.55 }, eltern);
+    }
+  }
+}
+
+const kameraZiele = {};   // id -> {x, y}: Bildmitte, wenn der Rundgang dort ist
+const gebaeudeElemente = {};
+
+/** Zeichnet die ganze Stadt neu (wird bei neuen Daten wiederholt aufgerufen). */
+function zeichne(daten) {
+  welt.textContent = "";
+  const boden = el("g", {}, welt);
+  for (let gx = -3; gx <= 3; gx++) {
+    for (let gy = -3; gy <= 3; gy++) {
+      const ring = Math.max(Math.abs(gx), Math.abs(gy));
+      const klasse = ring === 0 ? "mitte" : ring === 1 ? "weg" : ring === 2 ? "platz" : "";
+      kachel(gx, gy, klasse, boden);
+    }
+  }
+
+  const nachId = {};
+  daten.gebaeude.forEach(g => { nachId[g.id] = g; });
+
+  // Liste der zu zeichnenden Gebäude mit Gitterposition, von hinten nach vorn sortiert
+  const liste = [{ id: "jarvis", gx: 0, gy: 0 }];
+  REIHENFOLGE.forEach((id, i) => liste.push({ id: id, gx: RING[i][0], gy: RING[i][1] }));
+  liste.sort((a, b) => (a.gx + a.gy) - (b.gx + b.gy));
+
+  liste.forEach(pos => {
+    const g = nachId[pos.id];
+    if (!g) return;                                   // fehlt in den Daten: nichts zeichnen
+    const status = STATUS[g.status] || STATUS.aus;
+    const istJarvis = pos.id === "jarvis";
+    const gr = el("g", { class: "gebaeude", tabindex: "0", role: "button", "data-id": pos.id,
+      "aria-label": g.name + ", Status " + status.text + ". Details öffnen." }, welt);
+    const huelle = el("g", { class: "huelle" }, gr);
+    let oben;                                          // Höhe des Daches (für Licht und Name)
+
+    if (istJarvis) {
+      // Hauptgebäude: Sockel, Turm, Antenne in Goldtönen
+      quader(huelle, 0, 0, 0.62, 0, 70, "#b8912c");
+      quader(huelle, 0, 0, 0.36, 70, 160, "#d4af37");
+      const a1 = proj(0, 0, 160), a2 = proj(0, 0, 200);
+      el("line", { x1: a1[0], y1: a1[1], x2: a2[0], y2: a2[1], stroke: "#f3d98a", "stroke-width": 3 }, huelle);
+      oben = 200;
+      fenster(huelle, 0, 0, 0.62, 70, "#b8912c");
+    } else {
+      const h = HOEHEN[pos.id] || 60;
+      quader(huelle, pos.gx, pos.gy, 0.34, 0, h, FARBEN[pos.id] || "#556");
+      fenster(huelle, pos.gx, pos.gy, 0.34, h, FARBEN[pos.id] || "#556");
+      oben = h;
+    }
+
+    // Statuslicht auf dem Dach (Glimmen nur bei "läuft")
+    const lp = proj(pos.gx, pos.gy, oben + 12);
+    el("circle", { cx: lp[0], cy: lp[1], r: 16, fill: status.farbe, filter: "url(#leuchten)",
+      class: g.status === "laeuft" ? "glimmen" : "", opacity: g.status === "laeuft" ? 0.4 : 0.3 }, gr);
+    el("circle", { cx: lp[0], cy: lp[1], r: 8, fill: status.farbe, stroke: "#0b0d12", "stroke-width": 2 }, gr);
+
+    // Name über dem Gebäude
+    const np = proj(pos.gx, pos.gy, oben + 34);
+    const t = el("text", { x: np[0], y: np[1], class: "name" }, gr);
+    t.textContent = g.name;
+
+    gr.addEventListener("click", ev => { ev.stopPropagation(); oeffneDetail(pos.id); });
+    gr.addEventListener("keydown", ev => {
+      if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); oeffneDetail(pos.id); }
+    });
+    gebaeudeElemente[pos.id] = gr;
+    const mitte = proj(pos.gx, pos.gy, oben / 2);
+    kameraZiele[pos.id] = { x: mitte[0], y: mitte[1] };
+  });
+
+  // Zusammenfassung oben
+  const zahl = { laeuft: 0, wartet: 0, fehler: 0, aus: 0 };
+  daten.gebaeude.forEach(g => { if (zahl[g.status] !== undefined) zahl[g.status]++; });
+  const z = document.getElementById("zusammenfassung");
+  z.textContent = "";
+  Object.keys(STATUS).forEach(k => {
+    const s = document.createElement("span");
+    const p = document.createElement("span");
+    p.className = "punkt"; p.style.background = STATUS[k].farbe;
+    s.appendChild(p);
+    s.appendChild(document.createTextNode(zahl[k] + " " + STATUS[k].text));
+    z.appendChild(s);
+  });
+  const h = document.createElement("span");
+  h.className = "hinweis";
+  h.textContent = daten.stand || "";
+  z.appendChild(h);
+}
+
+/* =====================================================================================
+   4. KAMERA  (sanftes Verschieben und Zoomen über die viewBox)
+   ===================================================================================== */
+const kamera = { x: 0, y: -20, w: 1000 };
+let kameraToken = 0;                                  // erhöhen = laufende Fahrt abbrechen
+const wenigBewegung = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function kameraSetzen() {
+  const br = svg.clientWidth || 800, ho = svg.clientHeight || 600;
+  const h = kamera.w * ho / br;
+  svg.setAttribute("viewBox", (kamera.x - kamera.w / 2) + " " + (kamera.y - h / 2) + " " + kamera.w + " " + h);
+  // Namensgröße so wählen, dass sie auf dem Bildschirm etwa 14 Pixel (Handy 12) hoch bleibt
+  const massstab = br / kamera.w;
+  const ziel = br < 500 ? 12 : 14;
+  const px = Math.max(5, Math.min(44, ziel / massstab));
+  svg.style.setProperty("--namensgroesse", px.toFixed(1) + "px");
+}
+
+function uebersichtBreite() {
+  const br = svg.clientWidth || 800, ho = svg.clientHeight || 600;
+  // Hochformat (Handy): nur die Gebäude zeigen, die äußeren leeren Kacheln dürfen abgeschnitten sein
+  const mindestens = br < ho ? 640 : 1000;
+  return Math.max(mindestens, 720 * br / ho);         // ganze Stadt muss auch in die Höhe passen
+}
+
+/** Fährt die Kamera in "ms" Millisekunden zum Ziel. Gibt ein Versprechen zurück. */
+function fahre(ziel, ms) {
+  const mein = ++kameraToken;
+  const von = { x: kamera.x, y: kamera.y, w: kamera.w };
+  if (wenigBewegung || ms <= 0) { Object.assign(kamera, ziel); kameraSetzen(); return Promise.resolve(); }
+  return new Promise(fertig => {
+    const start = performance.now();
+    function schritt(jetzt) {
+      if (mein !== kameraToken) { fertig(); return; } // eine neuere Fahrt hat übernommen
+      const t = Math.min(1, (jetzt - start) / ms);
+      const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;   // sanft anfahren und bremsen
+      kamera.x = von.x + (ziel.x - von.x) * e;
+      kamera.y = von.y + (ziel.y - von.y) * e;
+      kamera.w = von.w + (ziel.w - von.w) * e;
+      kameraSetzen();
+      if (t < 1) requestAnimationFrame(schritt); else fertig();
+    }
+    requestAnimationFrame(schritt);
+  });
+}
+
+function zumUeberblick(ms) { return fahre({ x: 0, y: -25, w: uebersichtBreite() }, ms); }
+const warte = ms => new Promise(f => setTimeout(f, ms));
+
+/* =====================================================================================
+   5. DETAILFELD UND RUNDGANG
+   ===================================================================================== */
+let aktuelleDaten = DATEN_BEISPIEL;
+const detail = document.getElementById("detail");
+const untertitel = document.getElementById("untertitel");
+
+function markiere(id) {
+  Object.keys(gebaeudeElemente).forEach(k => gebaeudeElemente[k].classList.toggle("aktiv", k === id));
+}
+
+function oeffneDetail(id) {
+  const g = aktuelleDaten.gebaeude.find(x => x.id === id);
+  if (!g) return;
+  const st = STATUS[g.status] || STATUS.aus;
+  markiere(id);
+  document.getElementById("detailName").textContent = g.name;
+  const s = document.getElementById("detailStatus");
+  s.textContent = "";
+  const p = document.createElement("span");
+  p.className = "punkt"; p.style.background = st.farbe;
+  s.appendChild(p);
+  s.appendChild(document.createTextNode("Status: " + st.text));
+  const dl = document.getElementById("detailZahlen");
+  dl.textContent = "";
+  (g.kennzahlen || []).slice(0, 3).forEach(z => {
+    const dt = document.createElement("dt"); dt.textContent = z[0];
+    const dd = document.createElement("dd"); dd.textContent = z[1];
+    dl.appendChild(dt); dl.appendChild(dd);
+  });
+  document.getElementById("detailText").textContent = g.text || "";
+  detail.classList.add("an");
+}
+
+function schliesseDetail() {
+  detail.classList.remove("an");
+  if (!rundgangLaeuft) markiere(null);
+}
+
+let rundgangToken = 0;
+let rundgangLaeuft = false;
+const knopfRundgang = document.getElementById("knopfRundgang");
+const knopfStopp = document.getElementById("knopfStopp");
+
+/** Satz, der beim Rundgang eingeblendet wird. */
+function rundgangSatz(g) {
+  const st = (STATUS[g.status] || STATUS.aus).text;
+  return g.name + " – " + st + ". " + (g.text || "");
+}
+
+async function rundgang() {
+  if (rundgangLaeuft) return;
+  rundgangLaeuft = true;
+  const mein = ++rundgangToken;
+  knopfRundgang.disabled = true; knopfStopp.disabled = false;
+  schliesseDetail();
+  const reihenfolge = ["jarvis"].concat(REIHENFOLGE);
+  for (const id of reihenfolge) {
+    if (mein !== rundgangToken) break;                // Stopp wurde gedrückt
+    const g = aktuelleDaten.gebaeude.find(x => x.id === id);
+    const ziel = kameraZiele[id];
+    if (!g || !ziel) continue;
+    markiere(id);
+    untertitel.textContent = rundgangSatz(g);
+    untertitel.classList.add("an");
+    await fahre({ x: ziel.x, y: ziel.y, w: Math.min(520, uebersichtBreite()) }, 1200);   // 1,2 s fahren
+    if (mein !== rundgangToken) break;
+    await warte(1800);                                // 1,8 s verweilen = 3 s je Gebäude
+  }
+  if (mein === rundgangToken) {                       // normal zu Ende: zurück zur Übersicht
+    await zumUeberblick(1200);
+  }
+  rundgangEnde(mein);
+}
+
+function rundgangEnde(mein) {
+  if (mein !== rundgangToken) return;
+  rundgangLaeuft = false;
+  untertitel.classList.remove("an");
+  markiere(null);
+  knopfRundgang.disabled = false; knopfStopp.disabled = true;
+}
+
+function stopp() {
+  if (!rundgangLaeuft) return;
+  const mein = rundgangToken;
+  rundgangToken++;                                    // alle laufenden Schritte brechen ab
+  rundgangLaeuft = false;
+  untertitel.classList.remove("an");
+  markiere(null);
+  knopfRundgang.disabled = false; knopfStopp.disabled = true;
+  zumUeberblick(700);
+  return mein;
+}
+
+knopfRundgang.addEventListener("click", rundgang);
+knopfStopp.addEventListener("click", stopp);
+document.getElementById("knopfUebersicht").addEventListener("click", () => { stopp(); schliesseDetail(); zumUeberblick(700); });
+document.getElementById("schliessen").addEventListener("click", schliesseDetail);
+svg.addEventListener("click", schliesseDetail);       // Klick ins Leere schließt das Detailfeld
+document.addEventListener("keydown", ev => {
+  if (ev.key === "Escape") { stopp(); schliesseDetail(); }
+});
+window.addEventListener("resize", () => { if (!rundgangLaeuft) zumUeberblick(0); else kameraSetzen(); });
+
+/* =====================================================================================
+   6. START
+   ===================================================================================== */
+(async function start() {
+  try {
+    aktuelleDaten = await datenLaden();
+  } catch (fehler) {
+    console.error("Daten konnten nicht geladen werden, Beispieldaten werden benutzt:", fehler);
+    aktuelleDaten = DATEN_BEISPIEL;
+  }
+  zeichne(aktuelleDaten);
+  zumUeberblick(0);
+})();
+</script>
+</body>
+</html>
