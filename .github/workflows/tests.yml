@@ -23,16 +23,17 @@ jobs:
       TZ: Europe/Berlin
       PYTHONUTF8: "1"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.14"
           cache: pip
           cache-dependency-path: backend/requirements.txt
 
-      - name: PDF-Werkzeuge (fuer die Umwandeln-Tests)
-        run: sudo apt-get install -y --no-install-recommends poppler-utils
+      - name: PDF-Werkzeuge (fuer die Umwandeln-Tests; ohne sie werden 2 Tests uebersprungen)
+        continue-on-error: true
+        run: sudo apt-get update -q && sudo apt-get install -y --no-install-recommends poppler-utils
 
       - name: Pakete installieren
         run: pip install -r requirements.txt
