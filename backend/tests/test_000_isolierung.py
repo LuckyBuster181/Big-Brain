@@ -60,6 +60,7 @@ UMLEITUNGEN = {
     "NACHTARBEIT_LOG_PATH": _TMP / "nachtarbeit_log.jsonl",
     "SICHERHEITSCHECK_PATH": _TMP / "sicherheitscheck_bericht.txt",
     "JARVIS_ENV_PATH": _TMP / ".env",
+    "FEHLER_LOG_PATH": _TMP / "fehler_log.jsonl",
 }
 for _name, _pfad in UMLEITUNGEN.items():
     os.environ[_name] = str(_pfad)

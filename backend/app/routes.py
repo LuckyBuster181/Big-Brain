@@ -172,6 +172,15 @@ def reindex(
     return current
 
 
+@router.get("/api/fehlerbericht")
+def fehlerbericht_abrufen(tage: int = Query(7, ge=1, le=60)) -> Response:
+    """10.10.2026: Fehlerbericht als Markdown (app/fehlerbericht.py). FEHLERBERICHT SENDEN.bat legt ihn
+    ins Repo, damit Claude ihn liest. Nur gelesen, 0 Kosten."""
+    from . import fehlerbericht  # noqa: PLC0415
+
+    return Response(fehlerbericht.bericht(tage), media_type="text/markdown; charset=utf-8")
+
+
 @router.get("/api/agenten")
 def agenten_uebersicht(anzahl: int = Query(40, ge=1, le=300)) -> dict:
     """10.10.2026: Agenten-Station im Universum - wer arbeitet gerade, woran, auf welchem Rechner,

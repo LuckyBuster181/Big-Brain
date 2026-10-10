@@ -260,6 +260,21 @@ def pruefe_chat(basis: str, b: Bericht) -> None:
         b.zeile("Chat-Antworten", f"- **{nachricht}** → {kurz or '(kein Text)'} · Ereignisse: {', '.join(t for t in typen if t)}")
 
 
+def pruefe_fehlerbericht(basis: str, b: Bericht) -> None:
+    """Sammelt das Backend seine Fehler? Die Start-Warnung zum fehlenden Schlüssel muss im Bericht stehen."""
+    try:
+        t = requests.get(basis + "/api/fehlerbericht", timeout=60).text
+    except requests.RequestException as exc:
+        b.f("Fehlerbericht", f"/api/fehlerbericht antwortet nicht ({exc})")
+        return
+    if not t.startswith("# Fehlerbericht Auron"):
+        b.f("Fehlerbericht", f"unerwarteter Inhalt: {t[:200]!r}")
+    elif "ANTHROPIC_API_KEY ist nicht gesetzt" not in t:
+        b.f("Fehlerbericht", "Start-Warnung fehlt im Bericht - Fehlersammlung greift nicht")
+    else:
+        b.ok.append("Fehlerbericht: Backend sammelt seine Meldungen")
+
+
 def _chromium() -> str | None:
     kandidaten = sorted(glob.glob("/opt/pw-browsers/chromium-*/chrome-linux/chrome"))
     return kandidaten[-1] if kandidaten else None
@@ -428,6 +443,7 @@ def main(argv: list[str] | None = None) -> int:
             pruefe_api(basis, b)
             print("[Prüfstand] Chat ...", flush=True)
             pruefe_chat(basis, b)
+            pruefe_fehlerbericht(basis, b)
             if not a.ohne_browser:
                 print("[Prüfstand] Browser ...", flush=True)
                 pruefe_browser(basis, b, ausgabe)

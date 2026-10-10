@@ -42,6 +42,12 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
+# 10.10.2026: Fehler selbst sammeln (Tracebacks, WARNUNG, ...) für den Fehlerbericht an Claude
+# (app/fehlerbericht.py, "1 Starten/FEHLERBERICHT SENDEN.bat"). Abschalten: FEHLERBERICHT=aus in der .env.
+from app import fehlerbericht  # noqa: E402
+
+fehlerbericht.einrichten()
+
 if not os.getenv("ANTHROPIC_API_KEY"):
     print("WARNUNG: ANTHROPIC_API_KEY ist nicht gesetzt - /api/chat wird fehlschlagen (.env prüfen).")
 
