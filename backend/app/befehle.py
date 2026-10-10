@@ -11,6 +11,7 @@ Was erkannt wird (Beispiele in den Modulen):
     art "schreiben"           app/schreiben.py    Text oder Prompt schreiben
     art "recherche"           app/recherche.py    Websuche am Tag
     art "recherche_speichern" app/recherche.py
+    art "sucher_schreiber"    app/agenten.py      "Such und schreib: ..." (10.10.2026)
     art "mindmap"             app/mindmap.py      neu / ergänzen / liste
     art "projekt"             app/projekte.py     neu / ergänzen / liste / zeigen
     art "termin"              app/planung.py      Termin eintragen (Link oder direkt)
@@ -55,6 +56,13 @@ _RECHERCHE = re.compile(
 _RECHERCHE_SPEICHERN = re.compile(
     _V + r"(?:speicher\w*|sicher\w*|merk\s*dir|leg\w*\s+ab)\s+(?:die|diese|das|deine)\s+(?:recherche|ergebnis\w*|suche)"
     r"(?:\s+(?:im|in\s+den)\s+vault)?\s*(?:ab)?\s*[.!]?\s*$", re.I)
+
+# --------------------------------------------------------------- Sucher und Schreiber (10.10.2026, app/agenten.py)
+# "Such und schreib: ..." = nur Vault, "Such und schreib im Internet: ..." = Vault und Websuche (Claude, kostet)
+_SUCHER_SCHREIBER = re.compile(
+    _V + r"(?:such\w*\s+und\s+schreib\w*|sucher\s+und\s+schreiber)"
+    r"(?P<netz>\s+(?:auch\s+)?(?:im|aus\s+dem|mit)\s+(?:internet|netz|web))?\s*[:,]\s*(?P<frage>.{3,})$",
+    re.I | re.S)
 
 # --------------------------------------------------------------- Mind Maps
 _MM_LISTE = re.compile(_V + r"(?:welche\s+|meine\s+|zeig\w*\s+(?:mir\s+)?(?:alle\s+|meine\s+)?|liste\w*\s+(?:alle\s+)?)"
@@ -177,6 +185,9 @@ def absicht(text: str) -> dict | None:
     m = _PR_ERG.match(t)
     if m:
         return {"art": "projekt", "aktion": "ergaenzen", "name": m.group("name").strip(), "text": m.group("text").strip()}
+    m = _SUCHER_SCHREIBER.match(t)
+    if m:
+        return {"art": "sucher_schreiber", "frage": m.group("frage").strip(), "internet": bool(m.group("netz"))}
     if _RECHERCHE_SPEICHERN.match(t):
         return {"art": "recherche_speichern"}
     m = _RECHERCHE.match(t)
