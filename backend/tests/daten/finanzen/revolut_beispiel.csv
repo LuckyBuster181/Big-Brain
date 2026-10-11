@@ -1,0 +1,12 @@
+Art,Produkt,Datum des Beginns,Datum des Abschlusses,Beschreibung,Betrag,Gebühr,Währung,Status,Kontostand
+Kartenbezahlung,Giro,2026-07-15 10:00:00,2026-07-16 08:00:00,Musikdienst Beispiel,-10.99,0.00,EUR,ABGESCHLOSSEN,100.00
+Kartenbezahlung,Giro,2026-08-15 10:00:00,2026-08-16 08:00:00,Musikdienst Beispiel,-10.99,0.00,EUR,ABGESCHLOSSEN,100.00
+Kartenbezahlung,Giro,2026-09-15 10:00:00,2026-09-16 08:00:00,Musikdienst Beispiel,-10.99,0.00,EUR,ABGESCHLOSSEN,100.00
+Kartenbezahlung,Giro,2026-10-15 10:00:00,2026-10-16 08:00:00,Musikdienst Beispiel,-10.99,0.00,EUR,ABGESCHLOSSEN,100.00
+Kartenbezahlung,Giro,2026-10-04 08:10:00,2026-10-05 07:00:00,Baeckerei Beispiel,-3.50,0.00,EUR,ABGESCHLOSSEN,96.50
+Kartenbezahlung,Giro,2026-10-04 08:12:00,2026-10-05 07:00:00,Baeckerei Beispiel,-3.50,0.00,EUR,ABGESCHLOSSEN,93.00
+Einzahlung,Giro,2026-10-02 12:00:00,2026-10-02 12:00:01,Aufladen von Girokonto,200.00,0.00,EUR,ABGESCHLOSSEN,293.00
+Geldautomat,Giro,2026-10-06 18:00:00,2026-10-06 18:00:05,Geldautomat Beispiel,-50.00,1.00,EUR,ABGESCHLOSSEN,242.00
+Kartenbezahlung,Giro,2026-10-07 20:00:00,2026-10-08 06:00:00,Kino Beispiel,-12.00,0.00,EUR,STORNIERT,242.00
+Kartenbezahlung,Giro,2026-10-09 19:30:00,,Restaurant Beispiel,-24.80,0.00,EUR,AUSSTEHEND,217.20
+Zinsen,Einzahlung,2026-10-01 00:00:00,2026-10-01 00:00:00,Zinsen Sparkonto,0.12,0.00,EUR,ABGESCHLOSSEN,500.12

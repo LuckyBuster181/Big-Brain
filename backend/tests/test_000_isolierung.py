@@ -61,6 +61,8 @@ UMLEITUNGEN = {
     "SICHERHEITSCHECK_PATH": _TMP / "sicherheitscheck_bericht.txt",
     "JARVIS_ENV_PATH": _TMP / ".env",
     "FEHLER_LOG_PATH": _TMP / "fehler_log.jsonl",
+    # 11.10.2026: Finanzen (Umsätze, Eingang)
+    "FINANZEN_PATH": _TMP / "finanzen",
 }
 for _name, _pfad in UMLEITUNGEN.items():
     os.environ[_name] = str(_pfad)
@@ -69,6 +71,7 @@ for _name, _pfad in UMLEITUNGEN.items():
 # keine Frage des Tages unter dem Briefing - beides würde echte Aufrufe auslösen.
 os.environ["NACHTARBEIT_FREI"] = ""
 os.environ["BRIEFING_TAGESFRAGE"] = "0"
+os.environ["BRIEFING_FINANZEN"] = "0"   # 11.10.2026: Abo-Übersicht nur in den eigenen Tests (test_finanzen)
 
 
 class Isolierung(unittest.TestCase):

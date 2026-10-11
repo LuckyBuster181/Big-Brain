@@ -12,6 +12,7 @@ Was erkannt wird (Beispiele in den Modulen):
     art "recherche"           app/recherche.py    Websuche am Tag
     art "recherche_speichern" app/recherche.py
     art "sucher_schreiber"    app/agenten.py      "Such und schreib: ..." (10.10.2026)
+    art "finanzen"            app/finanzen.py     Abos, Kontoauszüge einlesen, Monatsausgaben (11.10.2026)
     art "mindmap"             app/mindmap.py      neu / ergänzen / liste
     art "projekt"             app/projekte.py     neu / ergänzen / liste / zeigen
     art "termin"              app/planung.py      Termin eintragen (Link oder direkt)
@@ -63,6 +64,17 @@ _SUCHER_SCHREIBER = re.compile(
     _V + r"(?:such\w*\s+und\s+schreib\w*|sucher\s+und\s+schreiber)"
     r"(?P<netz>\s+(?:auch\s+)?(?:im|aus\s+dem|mit)\s+(?:internet|netz|web))?\s*[:,]\s*(?P<frage>.{3,})$",
     re.I | re.S)
+
+# --------------------------------------------------------------- Finanzen (11.10.2026, app/finanzen.py, nur lesend)
+_FIN_ABOS = re.compile(_V + r"(?:welche\s+abos\s+(?:habe|hab)\s+ich|(?:zeig\w*\s+(?:mir\s+)?)?(?:meine\s+|alle\s+)?abos"
+                       r"(?:\s+an)?|abo-?\s*(?:übersicht|uebersicht|liste)|was\s+(?:zahle|bezahle)\s+ich\s+(?:alles\s+)?"
+                       r"(?:für|fuer|an)\s+abos)\s*[?.!]?\s*$", re.I)
+_FIN_EINLESEN = re.compile(
+    _V + r"(?:(?:kontoausz(?:ü|ue)ge|ums(?:ä|ae)tze|csv-?exporte?)\s+(?:einlesen|importieren)|"
+    r"(?:lies|lade|importier)\w*\s+(?:die\s+|meine\s+)?(?:neuen\s+)?(?:kontoausz(?:ü|ue)ge|ums(?:ä|ae)tze|csv-?exporte?)"
+    r"(?:\s+ein)?)\s*[.!]?\s*$", re.I)
+_FIN_MONAT = re.compile(_V + r"(?:was|wie\s+viel)\s+habe\s+ich\s+(?:diesen|im|letzten)\s+monat\s+(?:schon\s+)?"
+                        r"ausgegeben\s*\??\s*$", re.I)
 
 # --------------------------------------------------------------- Mind Maps
 _MM_LISTE = re.compile(_V + r"(?:welche\s+|meine\s+|zeig\w*\s+(?:mir\s+)?(?:alle\s+|meine\s+)?|liste\w*\s+(?:alle\s+)?)"
@@ -185,6 +197,12 @@ def absicht(text: str) -> dict | None:
     m = _PR_ERG.match(t)
     if m:
         return {"art": "projekt", "aktion": "ergaenzen", "name": m.group("name").strip(), "text": m.group("text").strip()}
+    if _FIN_ABOS.match(t):
+        return {"art": "finanzen", "aktion": "abos"}
+    if _FIN_EINLESEN.match(t):
+        return {"art": "finanzen", "aktion": "einlesen"}
+    if _FIN_MONAT.match(t):
+        return {"art": "finanzen", "aktion": "monat"}
     m = _SUCHER_SCHREIBER.match(t)
     if m:
         return {"art": "sucher_schreiber", "frage": m.group("frage").strip(), "internet": bool(m.group("netz"))}

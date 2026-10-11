@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finanzen</title>
+<style>
+/* Finanzen (11.10.2026, Vault-Notiz P03, Weg A: CSV-Export) - NUR LESEND. Monatskosten, Abos, Verlauf, Kündigungshilfe.
+   Läuft im Modulfenster von Auron (/werkstatt/finanzen/index.html?farbe=...). Daten: /api/finanzen (app/finanzen.py).
+   Inhalte aus den CSV-Dateien werden nur als Text gesetzt (textContent), nie als HTML. */
+:root {
+  --nacht: #0b0c10; --tiefe: #15171d; --glas: rgba(30, 32, 40, .66); --rand: rgba(200, 206, 216, .18);
+  --text: #e8e9ec; --leise: #9a9ea8; --metall: #d0d5de; --glut: #b8333a;
+  --gruen: #86d3a6; --gelb: #e2c26a; --rot: #e0656a;
+  --schrift: "Nunito", "Segoe UI", system-ui, sans-serif; --mono: "Cascadia Mono", Consolas, ui-monospace, monospace;
+}
+:root[data-farbe="graphit"] { --nacht: #0d0e11; --tiefe: #17181c; --metall: #c4c9d2; --glut: #6c7383; }
+:root[data-farbe="gold"] { --nacht: #0f1222; --tiefe: #171a2e; --rand: rgba(226, 184, 102, .22); --text: #ece6da; --metall: #e2b866; --glut: #d98d7c; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--nacht); color: var(--text); font: 15px/1.45 var(--schrift); }
+body { padding: 16px; }
+button { font: inherit; color: inherit; cursor: pointer; background: transparent; border: 1px solid var(--rand);
+  border-radius: 999px; padding: 5px 12px; font-size: 13px; }
+button:hover, button:focus-visible { border-color: var(--metall); outline: none; }
+button:disabled { opacity: .5; cursor: default; }
+.kopf { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-bottom: 14px; }
+.kopf h1 { margin: 0; font-size: 17px; letter-spacing: .04em; color: var(--metall); }
+.kopf .zeit { color: var(--leise); font-size: 13px; }
+.kopf .knoepfe { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+.meldung { background: var(--tiefe); border: 1px solid var(--rand); border-radius: 12px; padding: 10px 14px; margin-bottom: 14px;
+  white-space: pre-line; font-size: 13.5px; }
+.meldung[hidden] { display: none; }
+.kacheln { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.kachel { background: var(--tiefe); border: 1px solid var(--rand); border-radius: 16px; padding: 12px 14px; }
+.kachel .titel { color: var(--leise); font-size: 12.5px; }
+.kachel .wert { font-size: 22px; font-variant-numeric: tabular-nums; color: var(--metall); }
+.haupt { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 360px); gap: 16px; align-items: start; }
+@media (max-width: 860px) { .haupt { grid-template-columns: 1fr; } }
+.seite { background: var(--tiefe); border: 1px solid var(--rand); border-radius: 16px; padding: 14px; margin-bottom: 16px; overflow-x: auto; }
+.seite h2 { margin: 0 0 8px; font-size: 14px; color: var(--metall); letter-spacing: .03em; }
+.seite[hidden] { display: none; }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th { text-align: left; color: var(--leise); font-weight: 600; font-size: 12.5px; padding: 4px 8px 6px 0; }
+td { padding: 6px 8px 6px 0; border-top: 1px solid var(--rand); vertical-align: top; }
+td.zahl, th.zahl { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr.beendet td { color: var(--leise); }
+.klein { color: var(--leise); font-size: 12px; }
+.liste { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; max-height: 50vh; overflow: auto; }
+.liste li { font-size: 13px; border-bottom: 1px solid var(--rand); padding-bottom: 6px; display: flex; gap: 8px; }
+.liste .wann { color: var(--leise); font-variant-numeric: tabular-nums; flex: none; }
+.liste .wer { flex: 1; overflow-wrap: anywhere; }
+.liste .betrag { font-variant-numeric: tabular-nums; flex: none; }
+.minus { color: var(--rot); } .plus { color: var(--gruen); } .intern { color: var(--leise); }
+ol.wege { margin: 0 0 10px; padding-left: 20px; font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+textarea { width: 100%; min-height: 220px; background: rgba(0, 0, 0, .28); color: var(--text); border: 1px solid var(--rand);
+  border-radius: 10px; padding: 8px; font: 12.5px/1.45 var(--mono); resize: vertical; }
+.leer { color: var(--leise); font-size: 13px; }
+.hinweis { color: var(--leise); font-size: 12.5px; margin-top: 4px; }
+input[type=file] { display: none; }
+</style>
+</head>
+<body>
+<header class="kopf">
+  <h1>FINANZEN</h1><span class="zeit" id="stand">lade …</span>
+  <div class="knoepfe">
+    <button type="button" id="knopfEinlesen">Kontoauszüge einlesen</button>
+    <button type="button" id="knopfHochladen">CSV hochladen</button>
+    <input type="file" id="datei" accept=".csv,text/csv" multiple>
+  </div>
+</header>
+<div class="meldung" id="meldung" role="status" aria-live="polite" hidden></div>
+<section class="kacheln" aria-label="Überblick">
+  <div class="kachel"><div class="titel">Ausgaben diesen Monat</div><div class="wert" id="kMonat">–</div></div>
+  <div class="kachel"><div class="titel">Ausgaben letzter Monat</div><div class="wert" id="kVormonat">–</div></div>
+  <div class="kachel"><div class="titel">Abos im Monat</div><div class="wert" id="kAboMonat">–</div></div>
+  <div class="kachel"><div class="titel">Abos im Jahr</div><div class="wert" id="kAboJahr">–</div></div>
+</section>
+<div class="haupt">
+  <main>
+    <section class="seite">
+      <h2>Abos</h2>
+      <div id="abos"><p class="leer">Noch keine Abos erkannt.</p></div>
+    </section>
+    <section class="seite">
+      <h2>Verlauf (12 Monate, ohne Umbuchungen zwischen Ihren Konten)</h2>
+      <table><thead><tr><th>Monat</th><th class="zahl">Ausgaben</th><th class="zahl">Einnahmen</th><th class="zahl">Umsätze</th></tr></thead>
+        <tbody id="monate"></tbody></table>
+    </section>
+  </main>
+  <aside>
+    <section class="seite" id="kuendigung" hidden>
+      <h2 id="kName">Kündigen</h2>
+      <ol class="wege" id="kWege"></ol>
+      <textarea id="kText" aria-label="Kündigungstext" spellcheck="false"></textarea>
+      <p class="hinweis" id="kHinweis"></p>
+      <div class="knoepfe"><button type="button" id="kKopieren">Text kopieren</button> <button type="button" id="kZu">Schließen</button></div>
+    </section>
+    <section class="seite">
+      <h2>Letzte Umsätze</h2>
+      <ul class="liste" id="verlauf"><li class="leer">Noch keine Umsätze.</li></ul>
+    </section>
+  </aside>
+</div>
+<p class="hinweis">Nur lesend: Auron bewegt kein Geld und kennt keine Bank-Zugangsdaten. Die Umsätze liegen nur lokal in data/finanzen.
+  Volksbank: CSV aus dem Online-Banking. Revolut: Original-CSV aus der App (nicht in Excel öffnen und speichern).</p>
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const farbe = new URLSearchParams(location.search).get("farbe");
+if (["graphit", "gold"].includes(farbe)) document.documentElement.dataset.farbe = farbe;
+const EUR = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" });
+const euro = (x) => EUR.format(Number(x) || 0);
+const datum = (iso) => (iso ? iso.slice(8, 10) + "." + iso.slice(5, 7) + "." + iso.slice(0, 4) : "–");
+const MONATE = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
+function el(tag, klasse, text) { const e = document.createElement(tag); if (klasse) e.className = klasse; if (text !== undefined) e.textContent = text; return e; }
+function melden(text) { $("meldung").textContent = text || ""; $("meldung").hidden = !text; }
+
+async function anfrage(url, optionen) {
+  const r = await fetch(url, { cache: "no-store", ...(optionen || {}) });
+  let d = null;
+  try { d = await r.json(); } catch (e) { /* kein JSON */ }
+  if (!r.ok) throw new Error((d && d.detail) || ("Fehler " + r.status));
+  return d;
+}
+
+function zeigen(d) {
+  $("stand").textContent = d.anzahl_umsaetze
+    ? d.anzahl_umsaetze + " Umsätze vom " + datum(d.von) + " bis " + datum(d.bis) + (d.eingang_wartet ? " · " + d.eingang_wartet + " Datei(en) warten im Eingang" : "")
+    : "noch keine Umsätze eingelesen";
+  const [jetzt, vorher] = d.monate || [];
+  $("kMonat").textContent = jetzt ? euro(jetzt.ausgaben) : "–";
+  $("kVormonat").textContent = vorher ? euro(vorher.ausgaben) : "–";
+  $("kAboMonat").textContent = euro(d.abos_pro_monat);
+  $("kAboJahr").textContent = euro(d.abos_pro_jahr);
+
+  const abos = $("abos"); abos.replaceChildren();
+  if (!d.abos.length) abos.appendChild(el("p", "leer", d.anzahl_umsaetze ? "Keine regelmäßigen Abbuchungen erkannt." : "Noch keine Abos erkannt."));
+  else {
+    const t = el("table"), kopf = el("tr");
+    ["Empfänger", "Rhythmus", "Betrag", "pro Monat", "pro Jahr", "Nächste", ""].forEach((s, i) => kopf.appendChild(el("th", i >= 2 && i <= 4 ? "zahl" : "", s)));
+    const thead = el("thead"); thead.appendChild(kopf); t.appendChild(thead);
+    const tb = el("tbody");
+    d.abos.forEach((a) => {
+      const tr = el("tr", a.aktiv ? "" : "beendet");
+      const name = el("td"); name.appendChild(el("div", "", a.name));
+      name.appendChild(el("div", "klein", (a.aktiv ? "" : "vermutlich beendet · ") + a.sicher + " · " + a.anzahl + " Zahlungen · " + a.konto));
+      tr.appendChild(name);
+      tr.appendChild(el("td", "", a.rhythmus));
+      tr.appendChild(el("td", "zahl", euro(a.betrag)));
+      tr.appendChild(el("td", "zahl", euro(a.pro_monat)));
+      tr.appendChild(el("td", "zahl", euro(a.pro_jahr)));
+      tr.appendChild(el("td", "", a.aktiv ? datum(a.naechste) : "–"));
+      const k = el("td"); const b = el("button", "", "Kündigen"); b.type = "button";
+      b.addEventListener("click", () => kuendigen(a.id)); k.appendChild(b); tr.appendChild(k);
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb); abos.appendChild(t);
+  }
+
+  const mon = $("monate"); mon.replaceChildren();
+  (d.monate || []).forEach((m) => {
+    const tr = el("tr");
+    tr.appendChild(el("td", "", MONATE[Number(m.monat.slice(5, 7)) - 1] + " " + m.monat.slice(0, 4)));
+    tr.appendChild(el("td", "zahl", m.anzahl ? euro(m.ausgaben) : "–"));
+    tr.appendChild(el("td", "zahl", m.anzahl ? euro(m.einnahmen) : "–"));
+    tr.appendChild(el("td", "zahl", String(m.anzahl)));
+    mon.appendChild(tr);
+  });
+
+  const v = $("verlauf"); v.replaceChildren();
+  if (!d.verlauf.length) v.appendChild(el("li", "leer", "Noch keine Umsätze."));
+  d.verlauf.forEach((u) => {
+    const li = el("li");
+    li.appendChild(el("span", "wann", datum(u.datum)));
+    li.appendChild(el("span", "wer", (u.empfaenger || u.art || "–") + (u.offen ? " (offen)" : "") + (u.intern ? " (Umbuchung)" : "")));
+    li.appendChild(el("span", "betrag " + (u.intern ? "intern" : u.betrag < 0 ? "minus" : "plus"),
+      u.waehrung && u.waehrung !== "EUR" ? u.betrag.toFixed(2) + " " + u.waehrung : euro(u.betrag)));
+    v.appendChild(li);
+  });
+}
+
+async function laden() {
+  try { zeigen(await anfrage("/api/finanzen")); }
+  catch (e) { $("stand").textContent = "nicht erreichbar"; melden("Finanzen nicht ladbar, Sir: " + e.message); }
+}
+
+async function einlesen(still) {
+  $("knopfEinlesen").disabled = true;
+  try {
+    const e = await anfrage("/api/finanzen/einlesen", { method: "POST" });
+    if (!still || e.dateien.length || e.meldungen.length) melden(e.text);
+  } catch (e) { melden("Einlesen ging nicht, Sir: " + e.message); }
+  $("knopfEinlesen").disabled = false;
+  await laden();
+}
+
+async function hochladen(dateien) {
+  const texte = [];
+  for (const f of dateien) {
+    try {
+      const e = await anfrage("/api/finanzen/hochladen?name=" + encodeURIComponent(f.name), { method: "POST", body: await f.arrayBuffer() });
+      texte.push(e.text);
+    } catch (e) { texte.push(f.name + ": " + e.message); }
+  }
+  melden(texte.join("\n"));
+  $("datei").value = "";
+  await laden();
+}
+
+async function kuendigen(id) {
+  try {
+    const k = await anfrage("/api/finanzen/kuendigung?abo=" + encodeURIComponent(id));
+    $("kName").textContent = "Kündigen: " + k.abo.name;
+    const wege = $("kWege"); wege.replaceChildren(); k.wege.forEach((w) => wege.appendChild(el("li", "", w)));
+    $("kText").value = k.text;
+    $("kHinweis").textContent = k.hinweis;
+    $("kuendigung").hidden = false;
+    $("kuendigung").scrollIntoView({ behavior: "smooth", block: "start" });
+  } catch (e) { melden("Kündigungshilfe ging nicht, Sir: " + e.message); }
+}
+
+$("knopfEinlesen").addEventListener("click", () => einlesen(false));
+$("knopfHochladen").addEventListener("click", () => $("datei").click());
+$("datei").addEventListener("change", (e) => { if (e.target.files.length) hochladen([...e.target.files]); });
+$("kZu").addEventListener("click", () => { $("kuendigung").hidden = true; });
+$("kKopieren").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText($("kText").value); melden("Kündigungstext kopiert, Sir. Verschicken bitte selbst."); }
+  catch (e) { $("kText").select(); melden("Bitte den markierten Text selbst kopieren (Strg+C), Sir."); }
+});
+einlesen(true);   // beim Öffnen: neue Exporte aus Eingang und Ablage still übernehmen
+</script>
+</body>
+</html>

@@ -198,6 +198,19 @@ def _tagesfrage_zusatz() -> str:
         return ""
 
 
+def _finanzen_zusatz() -> str:
+    """11.10.2026: einmal im Monat Abo-Übersicht und Erinnerung an die Kontoauszüge (app/finanzen.py, 0 €).
+    Wird wie die Frage des Tages angehängt, nicht vom Modell formuliert. Abschaltbar mit BRIEFING_FINANZEN=0."""
+    if os.getenv("BRIEFING_FINANZEN", "1").strip() in ("0", "false", "nein", "aus"):
+        return ""
+    try:
+        from . import finanzen  # noqa: PLC0415
+
+        return finanzen.fuer_briefing()
+    except Exception:  # noqa: BLE001 - Finanzen dürfen das Briefing nie verhindern
+        return ""
+
+
 def _angaben(modus: str, mails: dict | None = None) -> str:
     heute = datetime.datetime.now(kalender.ZEITZONE).date()
     gestern = heute - datetime.timedelta(days=1)
@@ -253,7 +266,7 @@ def erzeugen(modus: str | None = None, nur_claude: bool = False) -> dict:
     if not text.strip():
         raise RuntimeError("Das Modell lieferte keinen sichtbaren Briefing-Text"
                            + (" (abgeschnitten)." if e.get("abgeschnitten") else "."))
-    zusatz = _tagesfrage_zusatz()
+    zusatz = "\n\n".join(t for t in (_tagesfrage_zusatz(), _finanzen_zusatz()) if t)
     return {
         "modus": modus,
         "mails": _mails_markieren(mails),

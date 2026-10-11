@@ -124,12 +124,12 @@ def _absicht_ausfuehren(a: dict) -> Iterator[dict]:
 
 
 NEUE_ARTEN = ("pc", "whatsapp", "schreiben", "recherche", "recherche_speichern", "mindmap", "projekt", "termin", "tagesplan",
-              "umwandeln", "sucher_schreiber")
+              "umwandeln", "sucher_schreiber", "finanzen")
 
 
 def _neue_art(a: dict) -> str | tuple[str, list[dict]]:
     """Neue Alltagsfunktionen (27.09.2026). Fehler kommen als freundlicher Satz zurück."""
-    from . import agenten, mindmap, planung, projekte, recherche, schreiben, umwandeln, whatsapp
+    from . import agenten, finanzen, mindmap, planung, projekte, recherche, schreiben, umwandeln, whatsapp
 
     art = a["art"]
     try:
@@ -154,6 +154,9 @@ def _neue_art(a: dict) -> str | tuple[str, list[dict]]:
             e = agenten.sucher_und_schreiber(a["frage"], internet=a.get("internet", False))
             wo = "Vault und Internet" if a.get("internet") else "Vault"
             return f"{e['text']}\n\n*Sucher und Schreiber ({wo}), Kosten ca. {ki_aufruf.cent(e['kosten_usd'])}.*"
+        if art == "finanzen":
+            # 11.10.2026: nur lesend, 0 € (app/finanzen.py)
+            return finanzen.chat_text(a.get("aktion", "abos"))
         if art == "recherche_speichern":
             v = recherche.letzte_speichern()
             return (f'Soll ich die Recherche als Notiz "{v["titel"]}" in "{recherche.ORDNER}" anlegen, Sir? '
