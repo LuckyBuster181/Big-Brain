@@ -50,6 +50,10 @@ class Umgebung(unittest.TestCase):
         s = mock.patch.object(nachtauftraege, "_vault_kontext", return_value="")
         s.start()
         self.addCleanup(s.stop)
+        # 11.10.2026: eigene Suchmaschine (SearXNG, 127.0.0.1:8888) in Tests nie echt fragen
+        w = mock.patch.object(nachtauftraege.websuche_lokal, "verfuegbar", return_value=False)
+        w.start()
+        self.addCleanup(w.stop)
 
 
 class Anlegen(Umgebung):

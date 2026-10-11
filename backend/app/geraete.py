@@ -44,6 +44,8 @@ from urllib.parse import quote
 
 import anyio
 
+from . import geraeteschutz
+
 JARVIS = Path(__file__).resolve().parents[2]
 NOVNC_ORDNER = JARVIS / "dashboard" / "novnc"
 VNC_PORT = 5900
@@ -275,6 +277,7 @@ def vnc_passwort(schluessel: str) -> str:
 def port_offen(ip: str | None, port: int = VNC_PORT, timeout: float = PRUEF_TIMEOUT_S) -> bool:
     if not ip:
         return False
+    geraeteschutz.netz_pruefen(f"{ip}:{port}", "Gerät prüfen")
     try:
         with socket.create_connection((ip, port), timeout=timeout):
             return True
@@ -372,6 +375,7 @@ def anzeige_anwenden(wahl: str | None = None) -> dict:
         # Seitdem gingen die Knöpfe "Monitor 1 / 2 / Beide" nicht mehr. Jetzt stellt der
         # PC-Agent am Haupt-PC (Port 8766, Aktion "anzeige") TightVNC um.
         return _anzeige_ueber_agent(wahl)
+    geraeteschutz.lokal_pruefen("TightVNC umstellen")
     befehl = [exe, "-controlservice", "-sharefull"] if wahl == "alle" else [exe, "-controlservice", "-sharedisplay", wahl]
     try:
         ergebnis = subprocess.run(befehl, capture_output=True, text=True, timeout=10,
@@ -444,6 +448,7 @@ async def vnc_bruecke(websocket) -> None:
     angefragt = websocket.scope.get("subprotocols") or []
     await websocket.accept(subprotocol="binary" if "binary" in angefragt else None)
     try:
+        geraeteschutz.netz_pruefen(f"{ip}:{VNC_PORT}", "VNC-Brücke")
         with anyio.fail_after(VERBINDEN_TIMEOUT_S):
             vnc = await anyio.connect_tcp(ip, VNC_PORT)
     except (OSError, TimeoutError):

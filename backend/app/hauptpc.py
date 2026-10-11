@@ -29,6 +29,8 @@ from typing import Any
 
 import httpx
 
+from . import geraeteschutz
+
 GEFAEHRLICH = {"herunterfahren", "neustart"}
 BESTAETIGUNG_S = 120
 
@@ -127,6 +129,7 @@ def _anfrage(methode: str, pfad: str, json_daten: dict | None = None, timeout: f
     if not (k["url"] and k["token"]):
         raise HauptPcFehler("Die PC-Steuerung ist noch nicht eingerichtet: am Haupt-PC einmal "
                             "\"3 Einrichten\\PC_STEUERUNG_EINRICHTEN.bat\" starten, danach \"JARVIS STARTEN.bat\".")
+    geraeteschutz.netz_pruefen(k["url"] + pfad, "Haupt-PC")
     try:
         r = httpx.request(methode, k["url"] + pfad, headers={"Authorization": f"Bearer {k['token']}"},
                           json=json_daten, timeout=timeout)

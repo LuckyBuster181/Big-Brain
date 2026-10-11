@@ -26,6 +26,8 @@ from urllib.parse import urlparse
 
 import httpx
 
+from . import geraeteschutz
+
 GEFAEHRLICH = {"neustart", "herunterfahren", "prozess_beenden"}
 _MAC = re.compile(r"^([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}$")
 
@@ -94,6 +96,7 @@ def _kopf() -> dict[str, str]:
     k = konfig()
     if not (k["url"] and k["token"]):
         raise Pc2Fehler("PC 2 ist noch nicht eingerichtet (PC2_EINRICHTEN.bat)", 409)
+    geraeteschutz.netz_pruefen(k["url"], "PC 2")  # jeder Aufruf an PC 2 holt vorher den Kopf
     return {"Authorization": f"Bearer {k['token']}"}
 
 
@@ -203,6 +206,7 @@ def magic_packet(mac: str) -> bytes:
 def wecken() -> dict[str, Any]:
     """Wake-on-LAN: Magic Packet als Broadcast (Port 9 und 7)."""
     paket = magic_packet(konfig()["mac"])
+    geraeteschutz.lokal_pruefen("Wake-on-LAN")
     ziele = ["255.255.255.255"]
     host = urlparse(konfig()["url"]).hostname or ""
     if re.match(r"^\d+\.\d+\.\d+\.\d+$", host):

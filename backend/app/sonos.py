@@ -27,6 +27,8 @@ from xml.sax.saxutils import escape
 
 import requests
 
+from . import geraeteschutz
+
 PORT = 1400
 TIMEOUT = 3
 SSDP_ZIEL = ("239.255.255.250", 1900)
@@ -56,6 +58,7 @@ def _feste_ips() -> list[str]:
 def _raumname(ip: str) -> str | None:
     """Fragt die Box, wie ihr Raum heißt (z.B. 'Schlafzimmer')."""
     try:
+        geraeteschutz.netz_pruefen(f"{ip}:{PORT}", "Sonos")
         antwort = requests.get(f"http://{ip}:{PORT}/xml/device_description.xml", timeout=TIMEOUT)
         if antwort.status_code != 200:
             return None
@@ -68,6 +71,7 @@ def _raumname(ip: str) -> str | None:
 def _ssdp_suche() -> list[str]:
     """Rundruf ins Netz. Gibt die IPs antwortender Sonos-Boxen zurück."""
     gefunden: list[str] = []
+    geraeteschutz.lokal_pruefen("Sonos-Suche im Netz")
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -143,6 +147,7 @@ def _soap(ip: str, aktion: str, koerper: str, dienst: str = "RenderingControl") 
         f'<u:{aktion} xmlns:u="urn:schemas-upnp-org:service:{dienst}:1">'
         f"{koerper}</u:{aktion}></s:Body></s:Envelope>"
     )
+    geraeteschutz.netz_pruefen(f"{ip}:{PORT}", "Sonos")
     try:
         antwort = requests.post(
             f"http://{ip}:{PORT}/MediaRenderer/{dienst}/Control",

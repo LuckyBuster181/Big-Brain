@@ -30,7 +30,7 @@ from urllib.parse import urlencode
 
 import requests
 
-from . import sonos
+from . import geraeteschutz, sonos
 
 API = "https://api.spotify.com/v1"
 AUTH = "https://accounts.spotify.com"
@@ -104,6 +104,7 @@ def login_url() -> str:
 
 def code_einloesen(code: str) -> str:
     """Tauscht den Code aus der Rückleitung gegen den Erneuerungs-Schlüssel."""
+    geraeteschutz.netz_pruefen(AUTH, "Spotify")
     antwort = requests.post(
         AUTH + "/api/token",
         data={"grant_type": "authorization_code", "code": code, "redirect_uri": redirect_uri()},
@@ -132,6 +133,7 @@ def _access_token() -> str:
                 "Spotify ist nicht eingerichtet. SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET "
                 "und SPOTIFY_REFRESH_TOKEN in die .env eintragen."
             )
+        geraeteschutz.netz_pruefen(AUTH, "Spotify")
         antwort = requests.post(
             AUTH + "/api/token",
             data={"grant_type": "refresh_token", "refresh_token": refresh_token()},
@@ -152,6 +154,7 @@ def _access_token() -> str:
 
 
 def _ruf(methode: str, pfad: str, **kw) -> dict | None:
+    geraeteschutz.netz_pruefen(API + pfad, "Spotify")
     antwort = requests.request(
         methode,
         API + pfad,
