@@ -536,7 +536,7 @@ class Gruendlich(Umgebung):
         self.assertIn("Nur Startseite", text)
 
     def test_zeitbudget_auftrag_bleibt_offen(self):
-        uhr = iter(range(0, 100000, 400))  # jeder Blick auf die Uhr: + 400 s
+        uhr = iter(range(0, 1000000, 2400))  # jeder Blick auf die Uhr: + 40 min
         ki = _SkriptKi(arbeit=["TITEL: B\nText"], pruefung=[_gut()])
         a = self._auftrag()
         with mock.patch.object(nachtauftraege, "_uhr", side_effect=lambda: next(uhr)):

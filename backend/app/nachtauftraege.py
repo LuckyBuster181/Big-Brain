@@ -28,7 +28,7 @@ Seit 04.10.2026 läuft die Nacht nur lokal (app/nacht_ki.py): jeder Aufruf 0 €
 
 11.10.2026 (P15): Recherche und Plan laufen gründlich (siehe "Gründlich" unten):
 bis 3 Suchrunden mit Verdichtung je Seite, Prüfung Aussage für Aussage mit Pflichtfeld
-"pruefgrund", bis 2 Überarbeitungen, Zeitbudget NACHTAUFTRAG_MAX_MINUTEN (30) je Auftrag,
+"pruefgrund", bis 2 Überarbeitungen, Zeitbudget NACHTAUFTRAG_MAX_MINUTEN (60) je Auftrag,
 nach 06:45 keine neue Runde, höchstens NACHTAUFTRAG_MAX_PRO_NACHT (6) Aufträge.
 Rechnerbedarf (lokal, grob): bis ca. 20 KI-Aufrufe je Auftrag statt 2-4.
 """
@@ -62,7 +62,7 @@ MAX_AUFTRAEGE_PRO_NACHT = int(os.getenv("NACHTAUFTRAG_MAX_PRO_NACHT", "6"))  # 1
 # 11.10.2026 (P15): gründliche Recherche/Plan - mehrere Suchrunden, Prüfung Aussage für Aussage, Zeitbudget
 SUCHRUNDEN = int(os.getenv("NACHTAUFTRAG_SUCHRUNDEN", "3"))
 UEBERARBEITUNGEN = int(os.getenv("NACHTAUFTRAG_UEBERARBEITUNGEN", "2"))
-MAX_MINUTEN = float(os.getenv("NACHTAUFTRAG_MAX_MINUTEN", "30"))
+MAX_MINUTEN = float(os.getenv("NACHTAUFTRAG_MAX_MINUTEN", "60"))  # 11.10.2026: Sir: 1 Stunde
 SCHLUSS = os.getenv("NACHTAUFTRAG_SCHLUSS", "06:45")   # nach dieser Uhrzeit keine neue Runde (nur bei Nachtläufen)
 SUCH_ANTEIL = 0.5          # Suchrunden nutzen höchstens die Hälfte des Zeitbudgets - Rest für Schreiben und Prüfen
 SEITEN_RUNDE = (4, 3, 3)   # gelesene Seiten in Runde 1, 2, 3
