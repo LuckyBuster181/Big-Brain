@@ -29,7 +29,7 @@ Seit 04.10.2026 läuft die Nacht nur lokal (app/nacht_ki.py): jeder Aufruf 0 €
 11.10.2026 (P15): Recherche und Plan laufen gründlich (siehe "Gründlich" unten):
 bis 3 Suchrunden mit Verdichtung je Seite, Prüfung Aussage für Aussage mit Pflichtfeld
 "pruefgrund", bis 2 Überarbeitungen, Zeitbudget NACHTAUFTRAG_MAX_MINUTEN (60) je Auftrag,
-nach 06:45 keine neue Runde, höchstens NACHTAUFTRAG_MAX_PRO_NACHT (6) Aufträge.
+nach 09:00 keine neue Runde, höchstens NACHTAUFTRAG_MAX_PRO_NACHT (6) Aufträge.
 Rechnerbedarf (lokal, grob): bis ca. 20 KI-Aufrufe je Auftrag statt 2-4.
 """
 
@@ -63,7 +63,7 @@ MAX_AUFTRAEGE_PRO_NACHT = int(os.getenv("NACHTAUFTRAG_MAX_PRO_NACHT", "6"))  # 1
 SUCHRUNDEN = int(os.getenv("NACHTAUFTRAG_SUCHRUNDEN", "3"))
 UEBERARBEITUNGEN = int(os.getenv("NACHTAUFTRAG_UEBERARBEITUNGEN", "2"))
 MAX_MINUTEN = float(os.getenv("NACHTAUFTRAG_MAX_MINUTEN", "60"))  # 11.10.2026: Sir: 1 Stunde
-SCHLUSS = os.getenv("NACHTAUFTRAG_SCHLUSS", "06:45")   # nach dieser Uhrzeit keine neue Runde (nur bei Nachtläufen)
+SCHLUSS = os.getenv("NACHTAUFTRAG_SCHLUSS", "09:00")   # nach dieser Uhrzeit keine neue Runde (nur bei Nachtläufen); 11.10.2026 Sir: Lauf meist 03:00-09:00 möglich
 SUCH_ANTEIL = 0.5          # Suchrunden nutzen höchstens die Hälfte des Zeitbudgets - Rest für Schreiben und Prüfen
 SEITEN_RUNDE = (4, 3, 3)   # gelesene Seiten in Runde 1, 2, 3
 SEITE_ZEICHEN = 6000       # so viel Seitentext bekommt das Modell zum Verdichten
@@ -631,7 +631,7 @@ def _lokale_websuche(client: Any, a: dict, art: str) -> tuple[str, dict]:
 #      jede Aussage braucht einen Prüfgrund (Pflichtfeld). Der Code prüft zusätzlich selbst:
 #      URL muss in den Quellen stehen und darf keine Startseite sein, Zahlen müssen in der Quelle stehen.
 #   4. Bis zu UEBERARBEITUNGEN Überarbeitungen, jede mit neuer Prüfung.
-# Zeitbudget: MAX_MINUTEN je Auftrag; in Nachtläufen nach SCHLUSS (06:45) keine neue Runde.
+# Zeitbudget: MAX_MINUTEN je Auftrag; in Nachtläufen nach SCHLUSS (09:00) keine neue Runde.
 # Ist bis dahin kein geprüftes Ergebnis da, bleibt der Auftrag "offen" für die nächste Nacht.
 # Kosten: jeder Aufruf geht an die lokale KI (nacht_ki.client()) und kostet 0 €. Nie Claude.
 
@@ -1073,7 +1073,7 @@ def nacht_abarbeiten(deckel_usd: float, client: Any = None, heute: datetime.date
             # Kein Rückfall auf Claude: die Aufträge bleiben "offen" und warten auf die nächste Nacht.
             return {"ausgegeben_usd": 0.0, "protokoll": [
                 {"auftrag": a["id"], "titel": a.get("titel"), "status": f"wartet: {exc}"} for a in offen]}
-    schluss = schluss_fuer()  # 11.10.2026: nach 06:45 (nur Nachtlauf) beginnt kein neuer Auftrag
+    schluss = schluss_fuer()  # 11.10.2026: nach SCHLUSS (09:00, nur Nachtlauf) beginnt kein neuer Auftrag
     for a in offen[:MAX_AUFTRAEGE_PRO_NACHT]:
         rest = deckel_usd - ausgegeben
         if rest < MIN_REST_USD:

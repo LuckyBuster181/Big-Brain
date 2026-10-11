@@ -562,22 +562,23 @@ class Gruendlich(Umgebung):
         text = (Path(self.vault) / f["ergebnis"]["notiz"]).read_text(encoding="utf-8")
         self.assertIn("Abgebrochen: Zeitbudget", text)
 
-    def test_nach_0645_kein_neuer_auftrag_und_keine_neue_runde(self):
+    def test_nach_schluss_kein_neuer_auftrag_und_keine_neue_runde(self):
         self.assertEqual(nachtauftraege.schluss_fuer(datetime.datetime(2026, 10, 12, 3, 0)),
-                         datetime.datetime(2026, 10, 12, 6, 45))
+                         datetime.datetime(2026, 10, 12, 9, 0))
         self.assertIsNone(nachtauftraege.schluss_fuer(datetime.datetime(2026, 10, 12, 14, 0)))  # Lauf am Tag
         a, b = self._auftrag(), self._auftrag()
         ki = _SkriptKi(arbeit=["TITEL: B\nText"], pruefung=[{**_gut(), "urteil": "nachbessern", "aussagen": []}])
-        # Start 03:00; nach der ersten Prüfung ist es 06:50
-        uhr = lambda: datetime.datetime(2026, 10, 12, 6, 50) if ki.von("pruefen") else datetime.datetime(2026, 10, 12, 3, 0)  # noqa: E731
+        self.assertEqual(nachtauftraege.SCHLUSS, "09:00")
+        # Start 03:00; nach der ersten Prüfung ist es 09:05
+        uhr = lambda: datetime.datetime(2026, 10, 12, 9, 5) if ki.von("pruefen") else datetime.datetime(2026, 10, 12, 3, 0)  # noqa: E731
         with mock.patch.object(nachtauftraege, "_jetzt_dt", side_effect=uhr):
             e = nachtauftraege.nacht_abarbeiten(3.0, client=ki)
         fertig = nachtauftraege.holen(a["id"])
         self.assertEqual((fertig["status"], fertig["ergebnis"]["runden_ueberarbeitung"]), ("fertig", 0))  # keine neue Runde
         text = (Path(self.vault) / fertig["ergebnis"]["notiz"]).read_text(encoding="utf-8")
-        self.assertIn("Abgebrochen: nach 06:45 keine neue Runde", text)
+        self.assertIn("Abgebrochen: nach 09:00 keine neue Runde", text)
         self.assertEqual(nachtauftraege.holen(b["id"])["status"], "offen")
-        self.assertIn("nach 06:45", e["protokoll"][1]["status"])
+        self.assertIn("nach 09:00", e["protokoll"][1]["status"])
 
     def test_max_auftraege_pro_nacht_ist_sechs_und_briefing_zeigt_eckdaten(self):
         self.assertEqual(nachtauftraege.MAX_AUFTRAEGE_PRO_NACHT, 6)
