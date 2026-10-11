@@ -13,10 +13,17 @@ import sys
 import tempfile
 import threading
 import unittest
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from types import SimpleNamespace
 from unittest import mock
 
+try:
+    import testschutz  # noqa: F401  (Testmodus vor dem App-Import)
+except ImportError:
+    from tests import testschutz  # noqa: F401
+
+from app import geraeteschutz
 from app import (alltag, befehle, chat_ablauf, hauptpc, ki_aufruf, mindmap, planung, projekte, recherche, schreiben,
                  umwandeln, werkzeuge)
 
@@ -333,30 +340,69 @@ class Umwandeln(unittest.TestCase):
             umwandeln.umwandeln(self.ordner / "foto.png", "txt")
 
 
+class _PcAgentStub(BaseHTTPRequestHandler):
+    """Ersatz für den PC-Agenten am Haupt-PC: prüft nur den Token und merkt sich Aufträge.
+
+    11.10.2026: Vorher startete der Test den ECHTEN Agenten (pc_agent_windows) im selben Prozess -
+    unter Windows öffnete er dabei Chrome und startete Sirs PC neu. Der Stub führt nie etwas aus.
+    """
+
+    token = "t" * 32
+    auftraege: list = []
+
+    def log_message(self, *args):
+        pass
+
+    def _antworten(self, code: int, daten: dict) -> None:
+        roh = json.dumps(daten).encode("utf-8")
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(roh)))
+        self.end_headers()
+        self.wfile.write(roh)
+
+    def _erlaubt(self) -> bool:
+        if self.headers.get("Authorization") != "Bearer " + self.token:
+            self._antworten(401, {"ok": False, "fehler": "Token falsch"})
+            return False
+        return True
+
+    def do_GET(self):
+        if not self._erlaubt():
+            return
+        if self.path == "/aktionen":
+            self._antworten(200, {"programme": {"chrome": "Google Chrome"}, "ordner": {"downloads": "Downloads"}})
+        else:
+            self._antworten(200, {"ok": True})
+
+    def do_POST(self):
+        if not self._erlaubt():
+            return
+        laenge = int(self.headers.get("Content-Length") or 0)
+        daten = json.loads(self.rfile.read(laenge) or b"{}")
+        self.auftraege.append(daten)
+        self._antworten(200, {"ok": False, "meldung": f"Teststub: {daten.get('aktion')} nicht ausgeführt"})
+
+
 class HauptPc(unittest.TestCase):
-    """Der echte PC-Agent läuft lokal (unter Linux nur Ping/Status/Aktionen, Aktionen melden 'nicht Windows')."""
+    """app/hauptpc.py gegen einen Stub-Agenten - gleich unter Windows und Linux, nichts wird ausgeführt."""
 
     @classmethod
     def setUpClass(cls):
-        ordner = Path(__file__).resolve().parents[2] / "pc_agent_windows"
-        if not (ordner / "jarvis_pc_agent.py").exists():
-            raise unittest.SkipTest("pc_agent_windows fehlt (nur auf Sirs PC, nicht im Repo)")
-        sys.path.insert(0, str(ordner))
-        import jarvis_pc_agent
-
-        cls.agent = jarvis_pc_agent
-        cls.tmp = Path(tempfile.mkdtemp(prefix="pcagent_"))
-        cls.hier = mock.patch.object(jarvis_pc_agent, "HIER", cls.tmp)
-        cls.hier.start()
-        cls.server = jarvis_pc_agent.server_bauen("t" * 32, 0, "127.0.0.1")
+        cls.server = ThreadingHTTPServer(("127.0.0.1", 0), _PcAgentStub)
         cls.port = cls.server.server_address[1]
         threading.Thread(target=cls.server.serve_forever, daemon=True).start()
+        geraeteschutz.testziel_erlauben(cls.port)
 
     @classmethod
     def tearDownClass(cls):
+        geraeteschutz.testziel_entfernen(cls.port)
         cls.server.shutdown()
-        cls.hier.stop()
-        shutil.rmtree(cls.tmp, ignore_errors=True)
+        cls.server.server_close()
+
+    def setUp(self):
+        _PcAgentStub.auftraege.clear()
+        hauptpc._wartend.clear()
 
     def env(self, token="t" * 32):
         return mock.patch.dict(os.environ, {"HAUPTPC_URL": f"http://127.0.0.1:{self.port}", "HAUPTPC_TOKEN": token})
@@ -370,9 +416,10 @@ class HauptPc(unittest.TestCase):
             a = hauptpc.aktionen()
             self.assertIn("chrome", a["programme"])
             self.assertIn("downloads", a["ordner"])
-            self.assertTrue((self.tmp / "programme.json").exists())
             text = hauptpc.ausfuehren({"aktion": "programm", "ziel": "chrome"})
-            self.assertIn("abgelehnt", text)  # Linux: "läuft nicht unter Windows"
+            self.assertIn("abgelehnt", text)
+            self.assertIn("Teststub", text)
+        self.assertEqual(_PcAgentStub.auftraege, [{"aktion": "programm", "ziel": "chrome"}])
         with self.env("falsch" * 5):
             self.assertIn("lehnt den Schlüssel ab", hauptpc.ausfuehren({"aktion": "sperren"}))
 
@@ -380,21 +427,25 @@ class HauptPc(unittest.TestCase):
         with self.env():
             text = hauptpc.ausfuehren({"aktion": "herunterfahren"})
             self.assertIn("wirklich", text)
+            self.assertEqual(_PcAgentStub.auftraege, [])  # ohne "ja" geht nichts raus
             self.assertIsNone(hauptpc.bestaetigung("Wie spät ist es?"))
             self.assertIn("bleibt an", hauptpc.bestaetigung("nein"))
             self.assertIsNone(hauptpc.bestaetigung("ja"))  # nichts mehr offen
             hauptpc.ausfuehren({"aktion": "neustart"})
-            self.assertIn("abgelehnt", hauptpc.bestaetigung("ja"))  # Linux-Agent lehnt ab
+            self.assertIn("abgelehnt", hauptpc.bestaetigung("ja"))  # Stub lehnt ab
             with self.assertRaises(hauptpc.HauptPcFehler):
                 hauptpc.aktion("herunterfahren")
+        self.assertEqual(_PcAgentStub.auftraege, [{"aktion": "neustart", "ziel": None}])
+
+    def test_ohne_freigabe_kein_aufruf(self):
+        """Zentrale Sperre: ein Ziel ohne Freigabe (z.B. Sirs echter Agent) wird nie angesprochen."""
+        with mock.patch.dict(os.environ, {"HAUPTPC_URL": "http://127.0.0.1:8766", "HAUPTPC_TOKEN": "t" * 32}):
+            with self.assertRaises(geraeteschutz.GeraetGesperrt):
+                hauptpc.ausfuehren({"aktion": "programm", "ziel": "chrome"})
+        self.assertEqual(_PcAgentStub.auftraege, [])
 
     def test_werkzeug_verweigert_herunterfahren(self):
         self.assertIn("nur per direktem Befehl", werkzeuge.pc_steuern({"aktion": "herunterfahren"}, werkzeuge.Kontext()))
-
-    def test_agent_listen_nur_lokal(self):
-        (self.tmp / "befehle.json").write_text(json.dumps({"x": {"titel": "X", "datei": "C:/a.exe"},
-                                                           "y": {"titel": "Y", "datei": "C:/b.bat"}}), encoding="utf-8")
-        self.assertEqual(list(self.agent.befehle()), ["y"])
 
 
 class ChatAblauf(unittest.TestCase):

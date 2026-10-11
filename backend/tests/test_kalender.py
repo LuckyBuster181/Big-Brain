@@ -7,6 +7,7 @@ Ausfuehren:
 from __future__ import annotations
 
 import unittest
+from unittest import mock
 from datetime import datetime, timedelta
 
 from dateutil import tz
@@ -176,13 +177,14 @@ class Konfiguration(unittest.TestCase):
                 kalender.os.environ["KALENDER_ICS_URL"] = alt
 
     def test_adresse_taucht_in_keiner_meldung_auf(self):
-        kalender.os.environ["KALENDER_ICS_URL"] = "https://calendar.google.com/calendar/ical/geheim/private-xyz/basic.ics"
+        # 11.10.2026: kein echter Abruf mehr (Testschutz) - der Fehler enthält die Adresse, die Meldung nicht
+        url = "https://calendar.google.com/calendar/ical/geheim/private-xyz/basic.ics"
+        kalender.os.environ["KALENDER_ICS_URL"] = url
+        fehler = kalender.requests.ConnectionError(f"Max retries exceeded with url: {url}")
         try:
-            with self.assertRaises(kalender.KalenderFehler) as ctx:
+            with mock.patch.object(kalender.requests, "get", side_effect=fehler), \
+                    self.assertRaises(kalender.KalenderFehler) as ctx:
                 kalender.abrufen()
-        except AssertionError:
-            self.skipTest("Netzzugriff moeglich - Test nur ohne Netz aussagekraeftig")
-        else:
             self.assertNotIn("private-xyz", str(ctx.exception))
         finally:
             kalender.os.environ.pop("KALENDER_ICS_URL", None)

@@ -18,6 +18,12 @@ import tempfile
 import unittest
 from pathlib import Path
 
+# 11.10.2026: Testmodus und Netz-Wächter vor jedem App-Import (Vorfall: Test startete Sirs PC neu)
+try:
+    import testschutz  # noqa: F401
+except ImportError:  # Aufruf als Paket (python -m unittest tests.test_...)
+    from tests import testschutz  # noqa: F401
+
 _TMP = Path(tempfile.mkdtemp(prefix="jarvis_tests_"))
 atexit.register(shutil.rmtree, _TMP, ignore_errors=True)
 

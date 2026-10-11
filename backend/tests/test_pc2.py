@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import os
 import shutil
+import socket
 import sys
 import tempfile
 import threading
@@ -21,13 +22,18 @@ import httpx
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
+try:
+    import testschutz  # Testmodus und Netz-Wächter vor dem App-Import
+except ImportError:
+    from tests import testschutz
+
 AGENT_ORDNER = Path(__file__).resolve().parents[2] / "pc2_agent"
 if not (AGENT_ORDNER / "jarvis_agent.py").exists():
     raise unittest.SkipTest(f"{AGENT_ORDNER.name} fehlt (nur auf Sirs PC, nicht im Repo)")
 sys.path.insert(0, str(AGENT_ORDNER))
 import jarvis_agent  # noqa: E402
 
-from app import pc2  # noqa: E402
+from app import geraeteschutz, pc2  # noqa: E402
 
 TOKEN = "t" * 40
 
@@ -163,6 +169,7 @@ class AgentServerTest(unittest.TestCase):
         cls.port = cls.server.server_address[1]
         threading.Thread(target=cls.server.serve_forever, daemon=True).start()
         cls.url = f"http://127.0.0.1:{cls.port}"
+        geraeteschutz.testziel_erlauben(cls.port)  # nur dieser Test-Agent darf angesprochen werden
 
         from app import routes
         app = FastAPI()
@@ -171,6 +178,7 @@ class AgentServerTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        geraeteschutz.testziel_entfernen(cls.port)
         cls.sammler.stoppen()
         cls.server.shutdown()
         cls.server.server_close()
@@ -213,8 +221,14 @@ class AgentServerTest(unittest.TestCase):
         d = self.client.get("/api/pc2/konfig").json()
         self.assertTrue(d["eingerichtet"])
         self.assertTrue(d["wecken_moeglich"])
-        self.assertTrue(d["bildschirm_url"].startswith("http://127.0.0.1:6080/vnc.html?"))
+        # 11.10.2026: PC 2 auf diesem Rechner (127.0.0.1) -> Bild über Jarvis selbst (seit 27.09.2026).
+        # Der alte Erwartungswert http://127.0.0.1:6080 war veraltet und schlug auf Sirs PC fehl.
+        self.assertTrue(d["bildschirm_url"].startswith("/novnc/vnc.html?"))
+        self.assertIn("path=api/geraete/pc2/vnc", d["bildschirm_url"])
         self.assertNotIn(TOKEN, json.dumps(d))
+        with mock.patch.object(pc2, "ist_hier", return_value=False):  # PC 2 woanders im Netz
+            d = self.client.get("/api/pc2/konfig").json()
+        self.assertTrue(d["bildschirm_url"].startswith("http://127.0.0.1:6080/vnc.html?"))
 
     def test_stream_liefert_pakete(self):
         # Der TestClient von Starlette puffert Streams bis zum Ende - ein endloser
@@ -260,7 +274,13 @@ class AgentServerTest(unittest.TestCase):
         self.assertIn("Token", r.json()["detail"])
 
     def test_pc2_aus(self):
-        with mock.patch.dict(os.environ, {"PC2_URL": "http://127.0.0.1:1"}):
+        # 11.10.2026: freien Port selbst ermitteln statt Port 1 (Testschutz: nur eigene Ports)
+        frei = socket.socket()
+        frei.bind(("127.0.0.1", 0))
+        port = frei.getsockname()[1]
+        frei.close()
+        testschutz.stub_freigeben(self, port)
+        with mock.patch.dict(os.environ, {"PC2_URL": f"http://127.0.0.1:{port}"}):
             r = self.client.get("/api/pc2/status")
             self.assertEqual(r.status_code, 504)
             with self.client.stream("GET", "/api/pc2/stream") as s:
@@ -287,7 +307,7 @@ class WeckenTest(unittest.TestCase):
 
     def test_wecken_sendet(self):
         with mock.patch.dict(os.environ, {"PC2_MAC": "00-23-24-aa-bb-cc", "PC2_URL": "http://192.168.178.50:8765"}), \
-             mock.patch("socket.socket") as sock:
+             mock.patch("socket.socket") as sock, testschutz.sperre_aus_weil_gemockt():
             r = pc2.wecken()
         self.assertTrue(r["ok"])
         gesendet = sock.return_value.__enter__.return_value.sendto.call_args_list

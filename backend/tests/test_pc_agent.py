@@ -7,11 +7,18 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import shutil
+import tempfile
 import threading
 import unittest
 import urllib.request
 from pathlib import Path
 from unittest import mock
+
+try:
+    import testschutz  # noqa: F401  (Testmodus und Netz-Wächter)
+except ImportError:
+    from tests import testschutz  # noqa: F401
 
 _PFAD = Path(__file__).resolve().parents[2] / "pc_agent_windows" / "jarvis_pc_agent.py"
 if not _PFAD.exists():
@@ -112,6 +119,22 @@ class UeberHttp(unittest.TestCase):
     def test_ping_meldet_neue_version(self):
         with urllib.request.urlopen(self.url + "/ping", timeout=5) as r:
             self.assertEqual(json.loads(r.read())["agent_version"], "1.1.0")
+
+
+class Befehle(unittest.TestCase):
+    """11.10.2026 aus test_alltag_neu hierher verschoben - dort startet kein echter Agent mehr."""
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp(prefix="pcagent_"))
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        p = mock.patch.object(agent, "HIER", self.tmp)
+        p.start()
+        self.addCleanup(p.stop)
+
+    def test_agent_listen_nur_lokal(self):
+        (self.tmp / "befehle.json").write_text(json.dumps({"x": {"titel": "X", "datei": "C:/a.exe"},
+                                                           "y": {"titel": "Y", "datei": "C:/b.bat"}}), encoding="utf-8")
+        self.assertEqual(list(agent.befehle()), ["y"])
 
 
 if __name__ == "__main__":

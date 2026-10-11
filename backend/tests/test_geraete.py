@@ -16,6 +16,11 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+try:
+    import testschutz
+except ImportError:
+    from tests import testschutz
+
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -51,6 +56,10 @@ class Grundlage(unittest.TestCase):
             "JARVIS_VNC_HAUPTPC": "",
         }
         p = mock.patch.dict(os.environ, env)
+        p.start()
+        self.addCleanup(p.stop)
+        # 11.10.2026: nie echte Geräte im Heimnetz anklopfen (Testschutz) - Tests mit "offen" patchen selbst
+        p = mock.patch("app.geraete.port_offen", return_value=False)
         p.start()
         self.addCleanup(p.stop)
         geraete._zuletzt_geloggt.clear()
@@ -198,7 +207,7 @@ class Monitore(Grundlage):
     def test_ein_monitor_und_beide(self):
         lauf = mock.Mock(return_value=mock.Mock(returncode=0, stdout="", stderr=""))
         with mock.patch("app.geraete._tvnserver", return_value="C:/tvn/tvnserver.exe"), \
-                mock.patch("app.geraete.subprocess.run", lauf):
+                mock.patch("app.geraete.subprocess.run", lauf), testschutz.sperre_aus_weil_gemockt():
             self.assertTrue(geraete.anzeige_anwenden("2")["ok"])
             self.assertEqual(lauf.call_args.args[0], ["C:/tvn/tvnserver.exe", "-controlservice", "-sharedisplay", "2"])
             geraete.anzeige_anwenden("alle")
@@ -209,7 +218,8 @@ class Monitore(Grundlage):
         # Fehler 25.09. abends: "_hauptpc_anzeige" wurde als Gerät gelesen -> 500
         lauf = mock.Mock(return_value=mock.Mock(returncode=0, stdout="", stderr=""))
         geraete.gesehen("laptop", "192.168.68.50")
-        with mock.patch("app.geraete._tvnserver", return_value="x.exe"), mock.patch("app.geraete.subprocess.run", lauf):
+        with mock.patch("app.geraete._tvnserver", return_value="x.exe"), mock.patch("app.geraete.subprocess.run", lauf), \
+                testschutz.sperre_aus_weil_gemockt():
             geraete.anzeige_anwenden("2")
         with mock.patch("app.geraete.port_offen", return_value=False):
             liste = geraete.liste()
@@ -281,7 +291,7 @@ class Monitore(Grundlage):
                 return c.request(methode, url, headers=kw.get("headers"), json=kw.get("json"))
 
         with mock.patch("app.geraete._tvnserver", return_value=None), self._mit_agent(), \
-                mock.patch("app.hauptpc.httpx.request", side_effect=request):
+                mock.patch("app.hauptpc.httpx.request", side_effect=request), testschutz.sperre_aus_weil_gemockt():
             r = geraete.anzeige_anwenden("1")
         self.assertTrue(r["ok"])
         self.assertEqual(gesehen["pfad"], "/aktion")
@@ -330,6 +340,7 @@ class Bruecke(Grundlage):
         super().setUp()
         self.vnc = FalscherVnc()
         self.addCleanup(self.vnc.schliessen)
+        testschutz.stub_freigeben(self, self.vnc.port)
         p = mock.patch("app.geraete.VNC_PORT", self.vnc.port)
         p.start()
         self.addCleanup(p.stop)
@@ -368,6 +379,7 @@ class Bruecke(Grundlage):
         frei.bind(("127.0.0.1", 0))
         freier_port = frei.getsockname()[1]
         frei.close()  # auf diesem Port hört jetzt niemand
+        testschutz.stub_freigeben(self, freier_port)
         with mock.patch("app.geraete.VNC_PORT", freier_port), TestClient(_app(), client=("127.0.0.1", 5000)) as c:
             with self.assertRaises(WebSocketDisconnect) as fehler:
                 with c.websocket_connect("/api/geraete/laptop/vnc") as ws:
