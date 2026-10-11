@@ -62,6 +62,15 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .detail button:hover { border-color: var(--metall); }
 .leer { color: var(--leise); font-size: 13px; }
 .hinweis { color: var(--leise); font-size: 12.5px; margin-top: 12px; }
+/* 11.10.2026: Auron-Kern und Lichter. Ein aktiver Agent sendet ruhige Lichtpunkte als Welle zum Kern. */
+.mitte { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.kern { align-self: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.kern .kugel { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--rand);
+  background: radial-gradient(circle at 35% 30%, var(--text), var(--metall) 38%, var(--tiefe) 100%);
+  box-shadow: 0 0 14px rgba(0, 0, 0, .5); transition: box-shadow .8s; }
+.kern.aktiv .kugel { box-shadow: 0 0 22px color-mix(in srgb, var(--metall) 45%, transparent); }
+.kern .name { font-size: 11px; letter-spacing: .22em; color: var(--leise); }
+#lichter { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 2; }
 </style>
 </head>
 <body>
@@ -69,8 +78,12 @@ button { font: inherit; color: inherit; cursor: pointer; }
   <h1>AGENTEN</h1><span class="zeit" id="zeit">verbinde …</span>
   <div class="rechner" id="rechner" aria-label="Rechner"></div>
 </header>
+<canvas id="lichter" aria-hidden="true"></canvas>
 <div class="haupt">
-  <main class="gitter" id="gitter" aria-live="polite"></main>
+  <main class="mitte">
+    <div class="kern" id="kern" aria-hidden="true"><div class="kugel"></div><span class="name">AURON</span></div>
+    <div class="gitter" id="gitter" aria-live="polite"></div>
+  </main>
   <aside>
     <section class="seite detail" id="detail" hidden>
       <h2 id="dName"></h2>
@@ -116,7 +129,7 @@ function zeigen() {
   });
   const g = $("gitter"); g.textContent = "";
   daten.agenten.forEach((a) => {
-    const k = el("button", "karte " + a.zustand + (gewaehlt === a.id ? " gewaehlt" : "")); k.type = "button";
+    const k = el("button", "karte " + a.zustand + (gewaehlt === a.id ? " gewaehlt" : "")); k.type = "button"; k.dataset.id = a.id;
     k.setAttribute("aria-label", a.name + ", " + (ZUSTAND[a.zustand] || a.zustand));
     const z = el("div", "zeile"); z.appendChild(el("span", "licht " + a.zustand)); z.appendChild(el("b", "", a.name));
     z.appendChild(el("span", "zustand", ZUSTAND[a.zustand] || a.zustand)); k.appendChild(z);
@@ -139,6 +152,7 @@ function zeigen() {
     if (!a.letzte.length) l.appendChild(el("li", "leer", "Seit dem Start nichts gemeldet."));
     a.letzte.forEach((e) => l.appendChild(eintrag(e, false)));
   }
+  lichter.setzen(daten.agenten.filter((x) => x.zustand === "arbeitet").map((x) => x.id));
 }
 async function holen() {
   clearTimeout(uhr);
@@ -149,7 +163,10 @@ async function holen() {
   } catch (e) { $("zeit").textContent = "keine Verbindung (" + e.message + ")"; }
   if (document.visibilityState === "visible") uhr = setTimeout(holen, 3000);
 }
-document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") holen(); else clearTimeout(uhr); });
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") holen(); else clearTimeout(uhr);
+  lichter.pruefen();
+});
 $("dZu").addEventListener("click", () => { gewaehlt = null; zeigen(); });
 $("dBereich").addEventListener("click", (e) => {
   const seite = e.currentTarget.dataset.seite;
@@ -158,7 +175,88 @@ $("dBereich").addEventListener("click", (e) => {
 window.addEventListener("message", (e) => {   // Auron wechselt die Farbwelt
   if (e.origin !== location.origin || !e.data || e.data.auron !== "modul") return;
   if (e.data.farbe) { if (["graphit", "gold"].includes(e.data.farbe)) document.documentElement.dataset.farbe = e.data.farbe; else delete document.documentElement.dataset.farbe; }
+  lichter.farbenLesen();
 });
+/* ---------- Lichter (11.10.2026): nur bei aktiven Agenten, nur requestAnimationFrame, Pause bei unsichtbarer Seite ---------- */
+const lichter = (() => {
+  const lw = $("lichter"), ctx = lw.getContext("2d");
+  const ruhig = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const zustand = { laeuft: false, punkte: 0, aktiv: [] };   // für den Prüfstand lesbar
+  window.lichter = zustand;
+  let aktiv = [], strom = [], bild = 0, letzt = 0, farben = { a: [208, 213, 222], b: [184, 51, 58] };
+  const neben = {};   // je Agent: Zeit bis zum nächsten Lichtpunkt im Strom
+
+  function rgb(wert, ersatz) {
+    const s = String(wert || "").trim();
+    const h = s.match(/^#([0-9a-f]{6})$/i);
+    if (h) return [0, 2, 4].map((i) => parseInt(h[1].slice(i, i + 2), 16));
+    const m = s.match(/\d+(\.\d+)?/g);
+    return m && m.length >= 3 ? m.slice(0, 3).map(Number) : ersatz;
+  }
+  function farbenLesen() {
+    const st = getComputedStyle(document.documentElement);
+    farben = { a: rgb(st.getPropertyValue("--metall"), farben.a), b: rgb(st.getPropertyValue("--glut"), farben.b) };
+  }
+  function groesse() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    lw.width = Math.round(innerWidth * dpr); lw.height = Math.round(innerHeight * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function mitte(e) { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height }; }
+  function punkt(x, y, r, f, alpha) {
+    ctx.fillStyle = `rgba(${f[0]},${f[1]},${f[2]},${alpha * 0.22})`; ctx.beginPath(); ctx.arc(x, y, r * 2.6, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = `rgba(${f[0]},${f[1]},${f[2]},${alpha})`; ctx.beginPath(); ctx.arc(x, y, r, 0, 6.2832); ctx.fill();
+  }
+  function schritt(t) {
+    if (!zustand.laeuft) return;
+    const dt = Math.min(0.05, letzt ? (t - letzt) / 1000 : 0.016); letzt = t;
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    const kernEl = document.querySelector("#kern .kugel"); if (!kernEl) return;
+    const k = mitte(kernEl);
+    let anzahl = 0;
+    aktiv.forEach((id, n) => {
+      const karte = document.querySelector(`.karte[data-id="${CSS.escape(id)}"]`); if (!karte) return;
+      const c = mitte(karte);
+      // um die Karte schwirren: 7 Punkte auf einer langsam drehenden Ellipse
+      for (let i = 0; i < 7; i++) {
+        const w = t / 2600 * (i % 2 ? 1 : -0.8) + i * 0.8976 + n;
+        const x = c.x + Math.cos(w) * (c.w / 2 + 5), y = c.y + Math.sin(w) * (c.h / 2 + 5);
+        punkt(x, y, 1.4, i % 3 ? farben.a : farben.b, 0.35 + 0.25 * Math.sin(t / 700 + i)); anzahl++;
+      }
+      // neue Lichtpunkte für den Strom zum Kern
+      neben[id] = (neben[id] || 0) - dt;
+      if (neben[id] <= 0) { neben[id] = 0.16 + Math.random() * 0.12; strom.push({ id, s: 0, v: 0.45 + Math.random() * 0.15, ph: Math.random() * 6.28, f: Math.random() < 0.3 ? "b" : "a" }); }
+    });
+    strom = strom.filter((p) => aktiv.includes(p.id) && p.s < 1);
+    strom.forEach((p) => {
+      const karte = document.querySelector(`.karte[data-id="${CSS.escape(p.id)}"]`); if (!karte) { p.s = 1; return; }
+      const c = mitte(karte);
+      p.s += dt * p.v;
+      const s = p.s, mx = (c.x + k.x) / 2 + (k.y - c.y) * 0.18, my = (c.y + k.y) / 2 - (k.x - c.x) * 0.18;   // leicht gebogen
+      let x = (1 - s) * (1 - s) * c.x + 2 * (1 - s) * s * mx + s * s * k.x;
+      let y = (1 - s) * (1 - s) * c.y + 2 * (1 - s) * s * my + s * s * k.y;
+      const lang = Math.hypot(k.x - c.x, k.y - c.y) || 1, welle = Math.sin(s * 9 + p.ph + t / 500) * 4 * Math.sin(Math.PI * s);
+      x += (-(k.y - c.y) / lang) * welle; y += ((k.x - c.x) / lang) * welle;   // Welle quer zur Bahn
+      punkt(x, y, 1.6, farben[p.f], 0.6 * Math.sin(Math.PI * s)); anzahl++;
+    });
+    zustand.punkte = anzahl;
+    bild = requestAnimationFrame(schritt);
+  }
+  function pruefen() {
+    const soll = aktiv.length > 0 && !document.hidden && !ruhig.matches;
+    $("kern").classList.toggle("aktiv", aktiv.length > 0);
+    if (soll && !zustand.laeuft) { zustand.laeuft = true; letzt = 0; farbenLesen(); groesse(); bild = requestAnimationFrame(schritt); }
+    else if (!soll && zustand.laeuft) {
+      zustand.laeuft = false; cancelAnimationFrame(bild); strom = []; zustand.punkte = 0;
+      ctx.clearRect(0, 0, innerWidth, innerHeight);
+    }
+  }
+  function setzen(ids) { aktiv = ids; zustand.aktiv = ids.slice(); pruefen(); }
+  window.addEventListener("resize", () => { if (zustand.laeuft) groesse(); });
+  ruhig.addEventListener("change", pruefen);
+  return { setzen, pruefen, farbenLesen };
+})();
+
 holen().then(() => { if (window.parent !== window) window.parent.postMessage({ auron: "modul-bereit" }, location.origin); });
 </script>
 </body>

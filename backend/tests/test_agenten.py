@@ -69,13 +69,13 @@ class Uebersicht(unittest.TestCase):
         return next(a for a in u["agenten"] if a["id"] == aid)
 
     def test_start_und_ende(self):
-        agenten.melden("start", "fragt Haupt-PC", agent="gespraech", rechner="Haupt-PC", modell="qwen")
+        agenten.melden("start", "fragt Haupt-PC", agent="sucher", rechner="Haupt-PC", modell="qwen")
         u = agenten.uebersicht()
-        a = self._a(u, "gespraech")
+        a = self._a(u, "sucher")
         self.assertEqual(a["zustand"], "arbeitet")
         self.assertEqual(a["rechner"], "Haupt-PC")
-        agenten.melden("ende", "fertig", agent="gespraech")
-        a = self._a(agenten.uebersicht(), "gespraech")
+        agenten.melden("ende", "fertig", agent="sucher")
+        a = self._a(agenten.uebersicht(), "sucher")
         self.assertEqual(a["zustand"], "ruht")
         self.assertIn("fertig", a["text"])
         self.assertEqual(len(a["letzte"]), 2)
@@ -85,18 +85,18 @@ class Uebersicht(unittest.TestCase):
         self.assertEqual(self._a(u, "studium")["zustand"], "fehler")
         self.assertEqual(self._a(u, "vault")["zustand"], "arbeitet")
         self.assertEqual(self._a(u, "tiktok")["zustand"], "ruht")
-        self.assertEqual(len(u["agenten"]), len(agenten.ROLLEN))
+        self.assertEqual(len(u["agenten"]), len(agenten.ROLLEN) - len(agenten.AUSGEBLENDET))
 
     def test_haengender_start_zaehlt_nicht(self):
-        e = agenten.melden("start", "fragt", agent="alltag")
+        e = agenten.melden("start", "fragt", agent="kamera")
         with agenten._lock:  # noqa: SLF001
-            agenten._aktuell["alltag"]["t"] -= agenten.HAENGT_NACH_S + 1  # noqa: SLF001
-        self.assertEqual(self._a(agenten.uebersicht(), "alltag")["zustand"], "ruht")
+            agenten._aktuell["kamera"]["t"] -= agenten.HAENGT_NACH_S + 1  # noqa: SLF001
+        self.assertEqual(self._a(agenten.uebersicht(), "kamera")["zustand"], "ruht")
         self.assertTrue(e)
 
     def test_verlauf_begrenzt_und_ohne_t(self):
         for i in range(agenten.MAX_VERLAUF + 20):
-            agenten.melden("info", str(i), agent="alltag")
+            agenten.melden("info", str(i), agent="kamera")
         u = agenten.uebersicht(anzahl=5)
         self.assertEqual(len(u["verlauf"]), 5)
         self.assertEqual(u["verlauf"][0]["text"], str(agenten.MAX_VERLAUF + 19))
@@ -151,7 +151,7 @@ class RollenSucherSchreiber(unittest.TestCase):
         self.assertIn("sucher", ids)
         self.assertIn("schreiber", ids)
         self.assertEqual(len(ids), len(set(ids)))
-        self.assertEqual(set(agenten.ROLLEN_SYSTEM), {"sucher", "schreiber"})
+        self.assertEqual(set(agenten.ROLLEN_SYSTEM), {"sucher", "schreiber", "pruefer", "tester", "boss", "ingenieur", "dichter"})
 
     def test_systemtexte(self):
         self.assertIn("NUR Rohmaterial", agenten.SUCHER_SYSTEM)
@@ -252,6 +252,127 @@ class ChatBefehl(unittest.TestCase):
         with mock.patch.object(agenten, "sucher_und_schreiber", side_effect=ki_aufruf.KiFehler("Rahmen leer")):
             text = chat_ablauf._neue_art({"art": "sucher_schreiber", "frage": "Was kostet das?"})  # noqa: SLF001
         self.assertEqual(text, "Das ging nicht, Sir: Rahmen leer")
+
+
+SICHTBAR = ["kamera", "nachtarbeit", "nachtauftraege", "aufgaben_loop", "studium", "vault", "tiktok",
+            "sucher", "schreiber", "pruefer", "tester", "boss", "ingenieur", "dichter"]
+
+
+class StationAufgeraeumt(unittest.TestCase):
+    """11.10.2026: Gespräch, Alltag, Briefing, Prüfstand nicht mehr als Agent anzeigen."""
+
+    def setUp(self):
+        agenten.leeren()
+        self.p = [mock.patch.object(agenten, "_ampel", return_value={}),
+                  mock.patch.object(agenten, "_rechner", return_value=[])]
+        for p in self.p:
+            p.start()
+
+    def tearDown(self):
+        for p in self.p:
+            p.stop()
+
+    def test_neue_rollen_in_rollen(self):
+        ids = [r["id"] for r in agenten.ROLLEN]
+        for neu in ("pruefer", "tester", "boss", "ingenieur", "dichter"):
+            self.assertIn(neu, ids)
+            r = next(x for x in agenten.ROLLEN if x["id"] == neu)
+            self.assertTrue(r["name"] and r["rolle"])
+
+    def test_sichtbare_liste(self):
+        self.assertEqual([a["id"] for a in agenten.uebersicht()["agenten"]], SICHTBAR)
+
+    def test_ausgeblendete_melden_intern_weiter(self):
+        for aid in ("gespraech", "alltag", "briefing", "pruefstand"):
+            self.assertEqual(agenten.melden("start", "fragt", agent=aid)["agent"], aid)   # intern weiter erfasst
+        agenten.melden("info", "sichtbar", agent="kamera")
+        u = agenten.uebersicht()
+        self.assertFalse({"gespraech", "alltag", "briefing", "pruefstand"} & {a["id"] for a in u["agenten"]})
+        self.assertEqual([e["agent"] for e in u["verlauf"]], ["kamera"])
+
+    def test_api_agenten(self):
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+
+        from app import routes
+        app = FastAPI()
+        app.include_router(routes.router)
+        agenten.melden("start", "plaudert", agent="gespraech")
+        d = TestClient(app).get("/api/agenten").json()
+        self.assertEqual([a["id"] for a in d["agenten"]], SICHTBAR)
+        self.assertEqual(d["verlauf"], [])
+
+
+class NeueRollen(unittest.TestCase):
+    """Prüfer, Tester, Boss, Ingenieur, Dichter mit Stub-Client (ohne KI, ohne Netz)."""
+
+    def setUp(self):
+        agenten.leeren()
+        self.p = [mock.patch("app.ki_aufruf.chat_service.log_usage"),
+                  mock.patch("app.ki_aufruf._lokal", return_value=False)]
+        for p in self.p:
+            p.start()
+
+    def tearDown(self):
+        for p in self.p:
+            p.stop()
+
+    def test_systemtexte_grundregeln(self):
+        for rolle, text in agenten.ROLLEN_SYSTEM.items():
+            for pflicht in ("Auron", '"Sir"', "Nichts erfinden", "ungeprüft"):
+                self.assertIn(pflicht, text, f"{rolle}: {pflicht}")
+
+    def test_jede_neue_rolle(self):
+        from app import ki_aufruf
+        faelle = {
+            "pruefer": (dict(rohmaterial="Notiz A: 5 Euro"), ki_aufruf.HAIKU, ("<antwort>", "<rohmaterial>", "Notiz A: 5 Euro")),
+            "tester": ({}, ki_aufruf.HAIKU, ("<beschreibung>",)),
+            "boss": (dict(ergebnisse={"schreiber": "Sir, 5 Euro."}), ki_aufruf.SONNET,
+                     ("<auftrag>", '<ergebnis rolle="schreiber">', "Sir, 5 Euro.")),
+            "ingenieur": (dict(format="dot"), ki_aufruf.SONNET, ("<format>dot</format>", "<beschreibung>")),
+            "dichter": (dict(zweck="Begrüßung"), ki_aufruf.SONNET, ("<zweck>", "Begrüßung", "<text>")),
+        }
+        for rolle, (extra, modell, inhalt) in faelle.items():
+            with self.subTest(rolle=rolle):
+                agenten.leeren()
+                c = _Client(f"Antwort {rolle}")
+                e = agenten.rolle_aufrufen(rolle, "Eingabe für " + rolle, client=c, **extra)
+                kw = c.aufrufe[0]
+                self.assertEqual(e["text"], f"Antwort {rolle}")
+                self.assertEqual(kw["model"], modell)
+                self.assertNotIn("tools", kw)
+                self.assertIn("Eingabe für " + rolle, kw["messages"][0]["content"])
+                for teil in inhalt:
+                    self.assertIn(teil, kw["messages"][0]["content"])
+                self.assertIn(agenten.ROLLEN_SYSTEM[rolle].split("\n")[0][:40], str(kw["system"]))
+                self.assertEqual({x["agent"] for x in agenten._verlauf}, {rolle})  # noqa: SLF001 - meldet sich unter der Rolle
+
+    def test_ingenieur_nur_mermaid_oder_dot(self):
+        with self.assertRaises(ValueError):
+            agenten.rolle_aufrufen("ingenieur", "x", client=_Client("a"), format="png")
+
+    def test_urteil_lesen(self):
+        self.assertEqual(agenten.urteil_lesen("URTEIL: nachbessern\nBEGRÜNDUNG: Quelle fehlt.\nSTELLEN: keine"),
+                         {"urteil": "nachbessern", "begruendung": "Quelle fehlt."})
+        self.assertEqual(agenten.urteil_lesen("Sieht gut aus.")["urteil"], "fraglich")   # nicht lesbar: nicht raten
+
+    def test_codeblock(self):
+        self.assertEqual(agenten.codeblock("Hier:\n```mermaid\nflowchart TD\n  A-->B\n```\nZeigt A."), "flowchart TD\n  A-->B")
+        self.assertEqual(agenten.codeblock("kein Code"), "")
+
+    def test_boss_runden(self):
+        zurueck = "ENTSCHEIDUNG: zurück an Prüfer\nGRUND: Quelle fehlt.\nAUFTRAG AN ROLLE: Quelle prüfen."
+        e1 = agenten.boss_pruefen("Auftrag", {"schreiber": "x"}, runde=1, client=_Client(zurueck))
+        self.assertEqual((e1["entscheidung"], e1["rolle"], e1["auftrag_an_rolle"]), ("zurueck", "pruefer", "Quelle prüfen."))
+        e2 = agenten.boss_pruefen("Auftrag", {"schreiber": "x"}, runde=2, client=_Client(zurueck))
+        self.assertEqual((e2["entscheidung"], e2["rolle"]), ("an_sir", "pruefer"))
+        c3 = _Client("nie gefragt")
+        e3 = agenten.boss_pruefen("Auftrag", {}, runde=3, client=c3)
+        self.assertEqual((e3["entscheidung"], c3.aufrufe), ("an_sir", []))
+        fertig = agenten.boss_pruefen("A", {}, client=_Client("ENTSCHEIDUNG: fertig\nGRUND: Alles belegt."))
+        self.assertEqual((fertig["entscheidung"], fertig["grund"]), ("fertig", "Alles belegt."))
+        self.assertEqual(agenten.boss_pruefen("A", {}, client=_Client("weiß nicht"))["entscheidung"], "an_sir")
+        self.assertEqual(agenten.boss_pruefen("A", {}, client=_Client("ENTSCHEIDUNG: zurück an Koch"))["entscheidung"], "an_sir")
 
 
 if __name__ == "__main__":

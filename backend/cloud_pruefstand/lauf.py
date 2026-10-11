@@ -326,6 +326,7 @@ def pruefe_browser(basis: str, b: Bericht, ausgabe: Path) -> None:
             _seite_pruefen(browser, basis, name, adresse, b, bilder)
         _auron_chat_pruefen(browser, basis, b, bilder)
         _finanzen_kuendigen_pruefen(browser, basis, b, bilder)
+        _agenten_lichter_pruefen(browser, basis, b, bilder)
         browser.close()
 
 
@@ -401,6 +402,44 @@ def _finanzen_kuendigen_pruefen(browser, basis: str, b: Bericht, bilder: Path) -
         b.ok.append("Finanzen: Kündigungshilfe erscheint mit Text")
     except Exception as exc:  # noqa: BLE001
         b.f("Browser", f"Finanzen-Kündigungshilfe: {str(exc).splitlines()[0][:200]}")
+    kontext.close()
+
+
+def _agenten_lichter_pruefen(browser, basis: str, b: Bericht, bilder: Path) -> None:
+    """Agenten-Station: Lichter nur bei aktivem Agent, aus ohne Aktivität. Die Ersatz-KI antwortet zu schnell für
+    einen echten "arbeitet"-Zustand - deshalb wird /api/agenten im Browser durch eine Antwort mit aktivem Sucher ersetzt."""
+    try:
+        echt = requests.get(basis + "/api/agenten", timeout=20).json()
+    except (requests.RequestException, ValueError) as exc:
+        b.f("Agenten", f"/api/agenten antwortet nicht ({exc})")
+        return
+    ausgeblendet = {"gespraech", "alltag", "briefing", "pruefstand"} & {a["id"] for a in echt.get("agenten", [])}
+    if ausgeblendet:
+        b.f("Agenten", f"ausgeblendete Agenten noch sichtbar: {sorted(ausgeblendet)}")
+    aktiv = json.loads(json.dumps(echt))
+    for a in aktiv.get("agenten", []):
+        if a["id"] == "sucher":
+            a.update(zustand="arbeitet", text="fragt Ersatz-KI", seit_s=3)
+    antwort = {"daten": aktiv}
+    kontext = browser.new_context(viewport={"width": 1440, "height": 900}, locale="de-DE")
+    seite = kontext.new_page()
+    try:
+        seite.route("**/api/agenten*", lambda r: r.fulfill(json=antwort["daten"]))
+        seite.goto(basis + "/werkstatt/agenten/index.html?farbe=gold", wait_until="load", timeout=30000)
+        seite.wait_for_timeout(1500)
+        an = seite.evaluate("({...window.lichter})")
+        seite.screenshot(path=str(bilder / "agenten_lichter.png"), timeout=60000)
+        antwort["daten"] = echt
+        seite.wait_for_timeout(3600)   # nächste Abfrage nach 3 s: niemand aktiv
+        aus = seite.evaluate("({...window.lichter})")
+        if not (an.get("laeuft") and an.get("punkte", 0) > 0):
+            b.f("Agenten", f"keine Lichter bei aktivem Sucher ({an})")
+        elif aus.get("laeuft"):
+            b.f("Agenten", "Lichter laufen ohne aktiven Agenten weiter")
+        else:
+            b.ok.append("Agenten-Station: Lichter bei aktivem Agent, aus ohne Aktivität")
+    except Exception as exc:  # noqa: BLE001
+        b.f("Browser", f"Agenten-Lichter: {str(exc).splitlines()[0][:200]}")
     kontext.close()
 
 
