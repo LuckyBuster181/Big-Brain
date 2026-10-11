@@ -173,6 +173,8 @@ SEITEN = {
     "geraete": ("geräte", "geraete", "geräteseite", "bildschirme"),
     # 26.09.2026 abends: Nachtaufträge + Frage des Tages
     "nacht": ("nacht", "nachtaufträge", "nachtauftraege", "nachtauftrag", "nachtarbeit", "aufträge", "auftraege"),
+    # 11.10.2026: Bereich Finanzen (werkstatt/finanzen, app/finanzen.py)
+    "finanzen": ("finanzen", "finanzbereich", "konten", "kontoauszüge", "kontoauszuege", "kosten und abos"),
 }
 _NAV = re.compile(
     r"^\s*(?:(?:jarvis|auron)[,\s]+)?(?:bitte\s+)?(?:zeig(?:e)?|öffne|oeffne|geh(?:e)?|wechsel(?:e)?|wechsle|spring(?:e)?|mach)"

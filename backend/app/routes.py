@@ -606,6 +606,59 @@ async def ablage_hochladen(
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
+# ------------------------------------------------------- Finanzen (11.10.2026, app/finanzen.py, nur lesend)
+
+@router.get("/api/finanzen")
+def finanzen_uebersicht() -> dict:
+    """Monatskosten, Abos, Verlauf. Nur gelesen, 0 Kosten."""
+    from . import finanzen  # noqa: PLC0415
+
+    return finanzen.uebersicht()
+
+
+@router.post("/api/finanzen/einlesen")
+def finanzen_einlesen() -> dict:
+    """CSV-Exporte aus data/finanzen/eingang (und der Ablage) einlesen. 0 Kosten."""
+    from . import finanzen  # noqa: PLC0415
+
+    return finanzen.einlesen()
+
+
+@router.post("/api/finanzen/hochladen")
+async def finanzen_hochladen(
+    request: Request, name: str = Query(..., min_length=1, max_length=200, description="Dateiname (.csv)")
+) -> dict:
+    """CSV-Export ablegen (roher Inhalt im Anfrage-Körper wie bei /api/ablage) und gleich einlesen."""
+    from . import finanzen  # noqa: PLC0415
+
+    try:
+        gespeichert = finanzen.speichern_eingang(name, await request.body())
+    except finanzen.FinanzFehler as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"gespeichert": gespeichert, **finanzen.einlesen()}
+
+
+@router.get("/api/finanzen/umsaetze")
+def finanzen_umsaetze(monat: str | None = Query(None, description="JJJJ-MM")) -> list[dict]:
+    from . import finanzen  # noqa: PLC0415
+
+    try:
+        return finanzen.umsaetze_monat(monat)
+    except finanzen.FinanzFehler as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.get("/api/finanzen/kuendigung")
+def finanzen_kuendigung(abo: str = Query(..., min_length=1, max_length=40)) -> dict:
+    """Weg erklären und Kündigungstext entwerfen (Vorlage, 0 Kosten). Auron verschickt nichts."""
+    from . import finanzen  # noqa: PLC0415
+
+    try:
+        return finanzen.kuendigung(abo)
+    except finanzen.FinanzFehler as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
 @router.get("/api/ablage/datei")
 def ablage_datei(name: str = Query(..., min_length=1, max_length=200)) -> FileResponse:
     try:

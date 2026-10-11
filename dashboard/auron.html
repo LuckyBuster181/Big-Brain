@@ -813,11 +813,12 @@ const BEREICHE = [
   { name: "Heute", seite: "alltag", unter: [["Briefing", "Briefing", "frage"], ["Tagesplan", "Plan meinen Tag", "frage"], ["Karte", "karte"]] },
   { name: NAME, seite: "jarvis", unter: [["Agenten", "agenten"], ["Nachtaufträge", "nacht"], ["Denkblock", "denkblock"]] },
   { name: "Wissen", seite: "vault", unter: [["TikTok", "tiktok"], ["Labor", "labor"]] },
-  { name: "Markt", seite: "markt", unter: [] },
+  { name: "Markt", seite: "markt", unter: [["Finanzen", "finanzen"]] },
   { name: "System", seite: "geraete", unter: [["Geräte", "geraete"], ["Einstellungen", "settings"]] }
 ];
 const SEITENNAME = { alltag: "Heute", jarvis: NAME, vault: "Wissen", markt: "Markt", settings: "Einstellungen", nacht: "Nachtaufträge",
-  denkblock: "Denkblock", tiktok: "TikTok", labor: "Labor", karte: "Karte", geraete: "Geräte", pc2: "PC 2", agenten: "Agenten" };
+  denkblock: "Denkblock", tiktok: "TikTok", labor: "Labor", karte: "Karte", geraete: "Geräte", pc2: "PC 2", agenten: "Agenten",
+  finanzen: "Finanzen" };
 BEREICHE.forEach((b) => {
   const k = document.createElement("div"); k.className = "kachel";
   const h = document.createElement("button"); h.type = "button"; h.textContent = b.name; h.addEventListener("click", () => bereichOeffnen(b.seite)); k.appendChild(h);
@@ -837,10 +838,13 @@ const UNTERTITEL = { alltag: "Ihr Tag auf einen Blick", jarvis: "Vorschläge, Ve
   markt: "Kurse, Übersicht und Trading", settings: "Einstellungen und Kosten", nacht: "Aufträge für die Nacht und Frage des Tages",
   denkblock: "Gedanken sammeln und ordnen", tiktok: "Gelernte Videos und Ideen", labor: "Sandbox, Übungskonto und Prüfstand",
   karte: "Wie die Notizen zusammenhängen", geraete: "PCs, Laptop und Handy im Netz", pc2: "Mini-PC: Last und Dienste",
-  agenten: "Wer gerade arbeitet, woran und auf welchem Rechner" };
-/* 10.10.2026: Die Agenten-Station ist eine eigene Seite (werkstatt/agenten), kein Teil des alten HUDs. */
+  agenten: "Wer gerade arbeitet, woran und auf welchem Rechner",
+  finanzen: "Monatskosten, Abos und Verlauf - nur lesend" };
+/* 10.10.2026: Die Agenten-Station ist eine eigene Seite (werkstatt/agenten), kein Teil des alten HUDs.
+   11.10.2026: Finanzen ebenso (werkstatt/finanzen). */
+const EIGENE_SEITEN = { agenten: "/werkstatt/agenten/index.html", finanzen: "/werkstatt/finanzen/index.html" };
 function modulAdresse(seite, farbe) {
-  return seite === "agenten" ? "/werkstatt/agenten/index.html?farbe=" + encodeURIComponent(farbe)
+  return EIGENE_SEITEN[seite] ? EIGENE_SEITEN[seite] + "?farbe=" + encodeURIComponent(farbe)
     : "/?modul=" + encodeURIComponent(seite) + "&farbe=" + encodeURIComponent(farbe);
 }
 var modul = { rahmen: null, seite: null, uhr: null };   // var: farbeSetzen darf es vorher schon prüfen
@@ -869,7 +873,7 @@ function bereichOeffnen(seite) {
   stadtSenden({ auron: "pause" });   // Universum dahinter anhalten, solange der Bereich offen ist
   if (modul.rahmen && modul.seite !== seite) {
     modulLaedt(true, "Wechsle zu " + (SEITENNAME[seite] || "Bereich") + " …");
-    if (seite === "agenten" || modul.seite === "agenten") modul.rahmen.src = modulAdresse(seite, farbe);   // andere Seite: neu laden
+    if (EIGENE_SEITEN[seite] || EIGENE_SEITEN[modul.seite]) modul.rahmen.src = modulAdresse(seite, farbe);   // andere Seite: neu laden
     else try { modul.rahmen.contentWindow.postMessage({ auron: "modul", seite, farbe }, location.origin); }
     catch (e) { modul.rahmen.src = modulAdresse(seite, farbe); }
   } else if (!modul.rahmen) {

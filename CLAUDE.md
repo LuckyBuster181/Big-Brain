@@ -12,3 +12,4 @@
 - Kosten: Rahmen fuer Claude-Anfragen von Jarvis selbst ist 10 EUR im Monat. Tag laeuft lokal, Claude nur als Rueckfall. Nachtarbeit nie mit Claude.
 - Kleine Schritte, nichts Ungetestetes stapeln. Ungetestetes klar als ungetestet kennzeichnen. Nichts erfinden.
 - Jede Commit-Nachricht auf Deutsch: was geaendert, ob getestet, was Sir am PC tun muss. Aenderungen direkt ins Repo pushen. Sir holt sie selbst auf den PC.
+- Offene, zurueckgestellte Punkte stehen in OFFEN.md. Zu Beginn kurz pruefen und Sir fragen.

@@ -51,7 +51,8 @@ REPO = HIER.parents[1]
 MODULE = ["alltag", "jarvis", "vault", "markt", "settings", "nacht", "denkblock", "tiktok", "labor", "karte",
           "geraete", "pc2"]
 SEITEN = ([("auron", "/auron")] + [(f"modul_{m}", f"/?modul={m}&farbe=silber") for m in MODULE]
-          + [("agenten", "/werkstatt/agenten/index.html?farbe=silber"), ("hud_alt", "/"), ("handy", "/handy"),
+          + [("agenten", "/werkstatt/agenten/index.html?farbe=silber"),
+             ("finanzen", "/werkstatt/finanzen/index.html?farbe=silber"), ("hud_alt", "/"), ("handy", "/handy"),
              ("universum", "/werkstatt/universum/universum_3d.html?auron=1"), ("stadt_3d", "/werkstatt/stadt_3d.html")])
 
 # (Nachricht, Text, der in der Antwort stehen muss, Erklärung)
@@ -63,6 +64,7 @@ CHATS = [
     ("Merk dir: Prüfstand-Testeintrag", "Sir", "Diktat -> Vorschlag"),
     ("Recherchiere: beste Powerbank", "Sir", "braucht Claude: muss freundlich ablehnen, nicht abstürzen"),
     ("Zeig mir den Markt", "Sir", "Seitenwechsel-Befehl"),
+    ("Welche Abos habe ich?", "3 Abos", "Finanzen: Abo-Übersicht aus den Beispiel-CSVs"),
 ]
 
 # Meldungen, die nur die Cloud betreffen (kein Mikrofon, keine Lautsprecher, keine Grafikkarte, kein Netz nach außen)
@@ -126,6 +128,11 @@ def arbeitsordner_bauen(ziel: Path) -> dict[str, Path]:
     vault = ziel / "vault"
     shutil.copytree(HIER / "testvault", vault)
     (ziel / "data").mkdir()
+    # 11.10.2026: erfundene Beispiel-Exporte (Volksbank, Revolut) für den Bereich Finanzen
+    eingang = ziel / "data" / "finanzen" / "eingang"
+    eingang.mkdir(parents=True)
+    for csv_datei in (REPO / "backend" / "tests" / "daten" / "finanzen").glob("*.csv"):
+        shutil.copy(csv_datei, eingang / csv_datei.name)
     return {"backend": ziel / "backend", "vault": vault, "data": ziel / "data"}
 
 
@@ -260,6 +267,22 @@ def pruefe_chat(basis: str, b: Bericht) -> None:
         b.zeile("Chat-Antworten", f"- **{nachricht}** → {kurz or '(kein Text)'} · Ereignisse: {', '.join(t for t in typen if t)}")
 
 
+def pruefe_finanzen(basis: str, b: Bericht) -> None:
+    """Beispiel-CSVs einlesen und auswerten (Bereich Finanzen, nur lesend)."""
+    try:
+        e = requests.post(basis + "/api/finanzen/einlesen", timeout=30).json()
+        u = requests.get(basis + "/api/finanzen", timeout=30).json()
+    except (requests.RequestException, ValueError) as exc:
+        b.f("Finanzen", f"keine Antwort ({exc})")
+        return
+    if e.get("neu") != 25 or e.get("meldungen"):
+        b.f("Finanzen", f"Einlesen der Beispiel-CSVs: {e.get('text', e)!r}"[:300])
+    elif len(u.get("abos", [])) != 3:
+        b.f("Finanzen", f"3 Abos erwartet, gefunden: {[a.get('name') for a in u.get('abos', [])]}")
+    else:
+        b.ok.append("Finanzen: 25 Beispiel-Umsätze eingelesen, 3 Abos erkannt")
+
+
 def pruefe_fehlerbericht(basis: str, b: Bericht) -> None:
     """Sammelt das Backend seine Fehler? Die Start-Warnung zum fehlenden Schlüssel muss im Bericht stehen."""
     try:
@@ -302,6 +325,8 @@ def pruefe_browser(basis: str, b: Bericht, ausgabe: Path) -> None:
         for name, adresse in SEITEN:
             _seite_pruefen(browser, basis, name, adresse, b, bilder)
         _auron_chat_pruefen(browser, basis, b, bilder)
+        _finanzen_kuendigen_pruefen(browser, basis, b, bilder)
+        _agenten_lichter_pruefen(browser, basis, b, bilder)
         browser.close()
 
 
@@ -362,6 +387,59 @@ def _auron_chat_pruefen(browser, basis: str, b: Bericht, bilder: Path) -> None:
         except Exception:  # noqa: BLE001
             pass
         b.f("Browser", f"Auron-Chat: keine Antwort im Fenster ({str(exc)[:200]})")
+    kontext.close()
+
+
+def _finanzen_kuendigen_pruefen(browser, basis: str, b: Bericht, bilder: Path) -> None:
+    """Im Bereich Finanzen auf "Kündigen" klicken: Wege und Kündigungstext müssen erscheinen."""
+    kontext = browser.new_context(viewport={"width": 1440, "height": 900}, locale="de-DE")
+    seite = kontext.new_page()
+    try:
+        seite.goto(basis + "/werkstatt/finanzen/index.html?farbe=silber", wait_until="load", timeout=30000)
+        seite.get_by_role("button", name="Kündigen").first.click(timeout=15000)
+        seite.wait_for_function("document.getElementById('kText').value.includes('hiermit kündige ich')", timeout=15000)
+        seite.screenshot(path=str(bilder / "finanzen_kuendigen.png"), timeout=60000)
+        b.ok.append("Finanzen: Kündigungshilfe erscheint mit Text")
+    except Exception as exc:  # noqa: BLE001
+        b.f("Browser", f"Finanzen-Kündigungshilfe: {str(exc).splitlines()[0][:200]}")
+    kontext.close()
+
+
+def _agenten_lichter_pruefen(browser, basis: str, b: Bericht, bilder: Path) -> None:
+    """Agenten-Station: Lichter nur bei aktivem Agent, aus ohne Aktivität. Die Ersatz-KI antwortet zu schnell für
+    einen echten "arbeitet"-Zustand - deshalb wird /api/agenten im Browser durch eine Antwort mit aktivem Sucher ersetzt."""
+    try:
+        echt = requests.get(basis + "/api/agenten", timeout=20).json()
+    except (requests.RequestException, ValueError) as exc:
+        b.f("Agenten", f"/api/agenten antwortet nicht ({exc})")
+        return
+    ausgeblendet = {"gespraech", "alltag", "briefing", "pruefstand"} & {a["id"] for a in echt.get("agenten", [])}
+    if ausgeblendet:
+        b.f("Agenten", f"ausgeblendete Agenten noch sichtbar: {sorted(ausgeblendet)}")
+    aktiv = json.loads(json.dumps(echt))
+    for a in aktiv.get("agenten", []):
+        if a["id"] == "sucher":
+            a.update(zustand="arbeitet", text="fragt Ersatz-KI", seit_s=3)
+    antwort = {"daten": aktiv}
+    kontext = browser.new_context(viewport={"width": 1440, "height": 900}, locale="de-DE")
+    seite = kontext.new_page()
+    try:
+        seite.route("**/api/agenten*", lambda r: r.fulfill(json=antwort["daten"]))
+        seite.goto(basis + "/werkstatt/agenten/index.html?farbe=gold", wait_until="load", timeout=30000)
+        seite.wait_for_timeout(1500)
+        an = seite.evaluate("({...window.lichter})")
+        seite.screenshot(path=str(bilder / "agenten_lichter.png"), timeout=60000)
+        antwort["daten"] = echt
+        seite.wait_for_timeout(3600)   # nächste Abfrage nach 3 s: niemand aktiv
+        aus = seite.evaluate("({...window.lichter})")
+        if not (an.get("laeuft") and an.get("punkte", 0) > 0):
+            b.f("Agenten", f"keine Lichter bei aktivem Sucher ({an})")
+        elif aus.get("laeuft"):
+            b.f("Agenten", "Lichter laufen ohne aktiven Agenten weiter")
+        else:
+            b.ok.append("Agenten-Station: Lichter bei aktivem Agent, aus ohne Aktivität")
+    except Exception as exc:  # noqa: BLE001
+        b.f("Browser", f"Agenten-Lichter: {str(exc).splitlines()[0][:200]}")
     kontext.close()
 
 
@@ -444,6 +522,8 @@ def main(argv: list[str] | None = None) -> int:
                 pruefe_einlesen(basis, b)
             print("[Prüfstand] API ...", flush=True)
             pruefe_api(basis, b)
+            print("[Prüfstand] Finanzen ...", flush=True)
+            pruefe_finanzen(basis, b)
             print("[Prüfstand] Chat ...", flush=True)
             pruefe_chat(basis, b)
             pruefe_fehlerbericht(basis, b)
