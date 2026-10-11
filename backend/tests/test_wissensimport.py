@@ -283,9 +283,10 @@ class Nachtfenster(Umgebung):
                 mock.patch.object(wi.time, "sleep", side_effect=[None, None, KeyboardInterrupt]):
             with self.assertRaises(KeyboardInterrupt):
                 wi._schleife()  # noqa: SLF001
+            # 11.10.2026: im Block abfragen - außerhalb gilt die echte Uhrzeit, nachts (1-7 Uhr) schlug der Test fehl
+            self.assertTrue(wi.status()["wartet_auf_nacht"])
         schritt.assert_not_called()
         client.assert_not_called()
-        self.assertTrue(wi.status()["wartet_auf_nacht"])
 
 
 class Bausteine(unittest.TestCase):
