@@ -2,8 +2,10 @@
 Gesamtkarte im HUD (24.09.2026): alle Pläne, Phasen, Ideen und offenen Fragen
 als Mind Map - und Jarvis redet mit Sir darüber.
 
-- Die Karte selbst steht in app/gesamtkarte.json (pflegt Claude, kommt mit dem
-  Code). Jeder Punkt hat eine feste Kennung (id), einen Stand (ok, test, plan,
+- Die Karte selbst steht in data/gesamtkarte.json (seit 11.10.2026; pflegt Claude im
+  Projekt auf Sirs PC). Vorher lag sie in app/ und "REPO HOLEN.bat" hat sie mit dem
+  Stand aus dem Repo überschrieben. app/gesamtkarte.json ist jetzt nur noch der Startwert:
+  Fehlt data/gesamtkarte.json, wird er einmal dorthin kopiert. Jeder Punkt hat eine feste Kennung (id), einen Stand (ok, test, plan,
   idee, sir, nein), einen Text und optional eine Frage an Sir.
 - Sirs Antworten liegen in data/gesamtkarte_antworten.json. Zusätzlich legt
   Jarvis für jede Antwort einen VORSCHLAG an (app/vorschlaege.py): Ziel ist
@@ -30,7 +32,8 @@ from typing import Any
 
 from . import chat_service
 
-KARTE_DATEI = Path(__file__).with_name("gesamtkarte.json")
+STARTWERT_DATEI = Path(__file__).with_name("gesamtkarte.json")   # kommt mit dem Code, nur Startwert
+DEFAULT_KARTE = Path(__file__).resolve().parents[2] / "data" / "gesamtkarte.json"
 DEFAULT_ANTWORTEN = Path(__file__).resolve().parents[2] / "data" / "gesamtkarte_antworten.json"
 STAENDE = {
     "ok": "fertig",
@@ -83,9 +86,28 @@ def _jetzt() -> datetime.datetime:
     return datetime.datetime.now().astimezone()
 
 
+def karte_datei() -> Path:
+    """Ort der Karte (Umgebungsvariable GESAMTKARTE_PATH, sonst data/gesamtkarte.json).
+    Fehlt die Datei, wird der Startwert aus app/ einmal dorthin kopiert - danach nie wieder,
+    eine vorhandene Karte wird nie überschrieben."""
+    ziel = Path(os.getenv("GESAMTKARTE_PATH") or DEFAULT_KARTE)
+    if ziel.exists():
+        return ziel
+    with _lock:
+        if not ziel.exists():
+            try:
+                ziel.parent.mkdir(parents=True, exist_ok=True)
+                tmp = ziel.with_suffix(".tmp")
+                tmp.write_bytes(STARTWERT_DATEI.read_bytes())
+                tmp.replace(ziel)
+            except OSError:
+                return STARTWERT_DATEI  # z.B. data/ schreibgeschützt: dann wenigstens den Startwert zeigen
+    return ziel
+
+
 def _roh() -> dict:
     try:
-        return json.loads(KARTE_DATEI.read_text(encoding="utf-8"))
+        return json.loads(karte_datei().read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         raise KartenFehler(f"Gesamtkarte nicht lesbar: {exc}") from exc
 

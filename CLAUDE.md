@@ -12,4 +12,5 @@
 - Kosten: Rahmen fuer Claude-Anfragen von Jarvis selbst ist 10 EUR im Monat. Tag laeuft lokal, Claude nur als Rueckfall. Nachtarbeit nie mit Claude.
 - Kleine Schritte, nichts Ungetestetes stapeln. Ungetestetes klar als ungetestet kennzeichnen. Nichts erfinden.
 - Jede Commit-Nachricht auf Deutsch: was geaendert, ob getestet, was Sir am PC tun muss. Aenderungen direkt ins Repo pushen. Sir holt sie selbst auf den PC.
+- Gesamtkarte: massgeblich ist data\gesamtkarte.json auf Sirs PC (nicht im Repo, per Syncthing abgeglichen). backend\app\gesamtkarte.json ist nur der Startwert fuer den ersten Start; Aenderungen dort erreichen Sir nicht mehr. Karte aendert Claude im Projekt direkt in data.
 - Offene, zurueckgestellte Punkte stehen in OFFEN.md. Zu Beginn kurz pruefen und Sir fragen.
