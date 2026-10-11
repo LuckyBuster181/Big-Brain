@@ -20,6 +20,8 @@ Die Übersicht mit allen Dateien steht auch im Vault: `Wissen/11 - Jarvis Werkst
 | `8 Alt - nicht mehr benutzen` | überholte Einmal-Skripte (nur zum Nachsehen, nicht starten) |
 | `backend`, `dashboard`, `data`, `mql5`, `linux`, `pc2_agent`, `Ideen` | Programm und Daten – nicht verschieben, der Code verweist darauf |
 
+**Gesamtkarte (seit 11.10.2026):** Die Karte im HUD liegt in `data\gesamtkarte.json` (wird per Syncthing abgeglichen, nicht im Repo). `REPO HOLEN.bat` überschreibt sie deshalb nicht mehr. `backend\app\gesamtkarte.json` ist nur der Startwert: Fehlt die Datei in `data`, kopiert Jarvis ihn einmal dorthin. Sirs Antworten stehen wie bisher in `data\gesamtkarte_antworten.json`.
+
 Alle `.bat`-Dateien in den Ordnern 1–6 finden den Jarvis-Ordner selbst (eine Ebene darüber).
 
 ## Starten
@@ -73,7 +75,7 @@ backend/
     vault_pflege.py    Vault-Pflegebericht (liest nur, schreibt nur den Bericht)
   tests/               Selbsttest, Suchtest, schnelle Tests
 dashboard/             React + Vite (Chat, Quellen, Status, Einlesen)
-data/                  Chroma-Index, usage_log.jsonl (Token), wissensluecken.jsonl (nicht im Git)
+data/                  Chroma-Index, usage_log.jsonl (Token), wissensluecken.jsonl, gesamtkarte.json (nicht im Git)
 ```
 
 ## Einstellungen (`.env`)

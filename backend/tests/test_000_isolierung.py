@@ -44,6 +44,7 @@ UMLEITUNGEN = {
     "MARKT_DB_PATH": _TMP / "marktdaten.db",
     "DENKBLOCK_SICHERUNG_PATH": _TMP / "denkblock_sicherung",
     "GESAMTKARTE_ANTWORTEN_PATH": _TMP / "gesamtkarte_antworten.json",
+    "GESAMTKARTE_PATH": _TMP / "gesamtkarte.json",   # 11.10.2026: Karte liegt jetzt in data/
     "GERAETE_PATH": _TMP / "geraete.json",
     "ZUGRIFFE_PATH": _TMP / "zugriffe.jsonl",
     "TAGEBUCH_PATH": _TMP / "tagebuch.json",

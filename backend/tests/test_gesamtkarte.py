@@ -29,7 +29,7 @@ class KarteDatenTest(unittest.TestCase):
     """Die ausgelieferte gesamtkarte.json muss sauber sein."""
 
     def test_json_gueltig_ids_eindeutig_staende_bekannt(self):
-        roh = json.loads(gesamtkarte.KARTE_DATEI.read_text(encoding="utf-8"))
+        roh = json.loads(gesamtkarte.STARTWERT_DATEI.read_text(encoding="utf-8"))
         ids = [k["id"] for k, _ in gesamtkarte._durchlaufen(roh["karte"])]
         self.assertEqual(len(ids), len(set(ids)), "doppelte Kennungen")
         for k, _ in gesamtkarte._durchlaufen(roh["karte"]):
@@ -55,6 +55,7 @@ class KarteTest(unittest.TestCase):
         self.env = mock.patch.dict(os.environ, {
             "VAULT_PATH": str(self.vault),
             "GESAMTKARTE_ANTWORTEN_PATH": str(t / "antworten.json"),
+            "GESAMTKARTE_PATH": str(t / "data" / "gesamtkarte.json"),
             "VORSCHLAEGE_PATH": str(t / "vorschlaege.json"),
             "USAGE_LOG_PATH": str(t / "log.jsonl"),
         })
@@ -137,6 +138,61 @@ class KarteTest(unittest.TestCase):
         self.assertEqual([m["role"] for m in msgs], ["user", "assistant", "user"])
         self.assertEqual(msgs[-1]["content"].count("</punkt>"), 1)  # Nachricht kann den Block nicht schließen
         self.assertNotIn("böse", str(msgs))
+
+
+class KarteOrtTest(unittest.TestCase):
+    """11.10.2026 (P18): Karte liegt in data/, damit REPO HOLEN sie nicht überschreibt."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        t = Path(self.tmp.name)
+        self.ziel = t / "data" / "gesamtkarte.json"
+        p = mock.patch.dict(os.environ, {"GESAMTKARTE_PATH": str(self.ziel),
+                                         "GESAMTKARTE_ANTWORTEN_PATH": str(t / "data" / "antworten.json"),
+                                         "VORSCHLAEGE_PATH": str(t / "vorschlaege.json"), "VAULT_PATH": ""})
+        p.start()
+        self.addCleanup(p.stop)
+
+    def test_standard_ist_data_ordner(self):
+        self.assertEqual(gesamtkarte.DEFAULT_KARTE.parent.name, "data")
+        self.assertEqual(gesamtkarte.STARTWERT_DATEI.parent.name, "app")
+
+    def test_fehlt_die_datei_wird_der_startwert_einmal_kopiert(self):
+        self.assertFalse(self.ziel.exists())
+        gesamtkarte.karte()
+        self.assertEqual(self.ziel.read_bytes(), gesamtkarte.STARTWERT_DATEI.read_bytes())
+
+    def test_liest_aus_data_und_ueberschreibt_nie(self):
+        roh = json.loads(gesamtkarte.STARTWERT_DATEI.read_text(encoding="utf-8"))
+        roh["karte"]["titel"] = "Sirs eigene Karte"
+        roh["stand"] = "von Claude im Projekt geändert"
+        self.ziel.parent.mkdir(parents=True)
+        self.ziel.write_text(json.dumps(roh, ensure_ascii=False), encoding="utf-8")
+        vorher = self.ziel.read_bytes()
+        for _ in range(2):
+            k = gesamtkarte.karte()
+        self.assertEqual(k["karte"]["titel"], "Sirs eigene Karte")
+        self.assertEqual(k["stand"], "von Claude im Projekt geändert")
+        self.assertEqual(self.ziel.read_bytes(), vorher)
+
+    def test_antworten_werden_weiter_angehaengt(self):
+        f = gesamtkarte.naechste_frage()
+        gesamtkarte.antworten(f["id"], "erste Antwort", vorschlag_anlegen=False)
+        gesamtkarte.antworten(f["id"], "zweite Antwort", vorschlag_anlegen=False)
+        punkt = [k for k, _ in gesamtkarte._durchlaufen(gesamtkarte.karte()["karte"]) if k["id"] == f["id"]][0]
+        self.assertEqual(punkt["antwort"]["text"], "zweite Antwort")
+        self.assertEqual(punkt["antwort"]["frueher"][-1]["text"], "erste Antwort")
+        # Antworten stehen in einer eigenen Datei - die Karte selbst bleibt unverändert
+        self.assertEqual(self.ziel.read_bytes(), gesamtkarte.STARTWERT_DATEI.read_bytes())
+
+    def test_isolierung_lenkt_karte_um(self):
+        try:
+            from test_000_isolierung import UMLEITUNGEN
+        except ImportError:
+            from tests.test_000_isolierung import UMLEITUNGEN
+
+        self.assertIn("GESAMTKARTE_PATH", UMLEITUNGEN)
 
 
 if __name__ == "__main__":
