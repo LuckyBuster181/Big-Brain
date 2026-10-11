@@ -449,6 +449,8 @@ def _lauf(deckel_usd: float) -> None:
             ergebnis = _aufgabe_studium_pruefen(deckel_usd)
             # 26.09.2026: danach die Nachtaufträge mit dem Rest des Deckels
             rest = deckel_usd - ergebnis["ausgegeben_usd"]
+            # 11.10.2026: nacht_abarbeiten läuft bis zum Ende durch (Zeitbudget je Auftrag, Schluss 06:45).
+            # Eine Gesamtprüfung (P16) gehört HINTER diesen Aufruf - nie gleichzeitig, beide nutzen dieselben Rechner.
             try:
                 na = nachtauftraege.nacht_abarbeiten(rest, heute=heute)
             except Exception as exc:  # noqa: BLE001

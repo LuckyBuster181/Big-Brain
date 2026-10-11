@@ -131,17 +131,25 @@ class EinbauNachtauftrag(unittest.TestCase):
 
     def test_suchergebnisse_landen_im_auftrag(self):
         a = nachtauftraege.anlegen("Recherchiere, wie eine Wärmepumpe funktioniert", art="recherche", pruefen=False)
-        c = _LokalerClient(['{"suchen": ["wärmepumpe funktionsweise"]}', "TITEL: Wärmepumpe\nText [1]",
-                            '{"urteil": "gut", "punkte": [], "zusammenfassung": "ok"}'])
+        # 11.10.2026 (P15): Suchbegriffe -> Seite einzeln verdichten -> Lücken -> Ergebnis aus den Verdichtungen
+        c = _LokalerClient(['{"suchen": ["wärmepumpe funktionsweise"]}',
+                            '{"kernaussagen": ["Eine Wärmepumpe nutzt Umweltwärme."], "passt": true}',
+                            '{"luecken": [], "suchen": []}',
+                            "TITEL: Wärmepumpe\nText [1]",
+                            '{"aussagen": [{"aussage": "nutzt Umweltwärme", "quelle": 1, "ergebnis": "belegt", '
+                            '"pruefgrund": "steht in [1]"}], "urteil": "gut", "punkte": [], "zusammenfassung": "ok"}'])
+        treffer = [{"titel": "Quelle", "url": "https://example.org/waermepumpe", "auszug": "", "quelle": "x"}]
         with mock.patch.object(websuche_lokal, "verfuegbar", return_value=True), \
-                mock.patch.object(websuche_lokal, "recherche", return_value={"text": "[1] Quelle\nURL: https://example.org", "quellen": [{"nr": 1}], "fehler": None}) as rech:
+                mock.patch.object(websuche_lokal, "suchen", return_value=treffer) as such, \
+                mock.patch.object(websuche_lokal, "seite_lesen", return_value="Seitentext über Umweltwärme"):
             f = nachtauftraege.bearbeiten(a, 3.0, client=c, heute=datetime.date(2026, 10, 4))
         self.assertEqual(f["status"], "fertig")
-        rech.assert_called_once()
-        self.assertEqual(rech.call_args[0][0], ["wärmepumpe funktionsweise"])
-        arbeit = c.aufrufe[1]["messages"][0]["content"]
-        self.assertIn("<websuche>", arbeit)
-        self.assertIn("https://example.org", arbeit)
+        self.assertEqual(such.call_args[0][0], "wärmepumpe funktionsweise")
+        arbeit = c.aufrufe[3]["messages"][0]["content"]
+        self.assertIn("<quellen>", arbeit)
+        self.assertIn("https://example.org/waermepumpe", arbeit)
+        self.assertIn("nutzt Umweltwärme", arbeit)
+        self.assertNotIn("Seitentext", arbeit)  # nur Verdichtungen, nie ganze Seiten
         self.assertTrue(all("tools" not in kw for kw in c.aufrufe))
         self.assertEqual(f["ergebnis"]["kosten_usd"], 0.0)
 
