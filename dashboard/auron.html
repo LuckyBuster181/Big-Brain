@@ -393,6 +393,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--metall); ou
       <input id="frage" type="text" autocomplete="off" placeholder="Sagen Sie Auron, was Sie möchten …" aria-label="Nachricht an Auron">
       <button class="senden" id="senden" type="submit" aria-label="Senden" title="Senden">
         <svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
+      <button class="mikro" id="kameraKnopf" type="button" aria-label="Auron schaut" title="Auron schaut: Kamera an, Auron beschreibt, was er sieht">
+        <svg viewBox="0 0 24 24"><path d="M3 8h3l2-3h8l2 3h3v11H3z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
       <button class="mikro" id="mikro" type="button" aria-label="Sprechen" title="Sprechen">
         <svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
     </form>
@@ -665,7 +667,19 @@ const frei = { aktiv: false, rahmen: null };
 const tour = { laeuft: false, token: 0, liste: [], aktuell: null, weiterSignal: null, rahmen: null, bereit: null, universum: null };
 let ladeFertig = Promise.resolve();   // Ladebildschirm: die Tour beginnt erst, wenn er fertig ist
 let stadtFenster = null;
-function stadtSenden(n) { if (stadtFenster) { try { stadtFenster.postMessage(n, location.origin); } catch (e) {} } }
+/* 10.10.2026 (Fix 2): Ziel immer aus dem aktuellen Zustand bestimmen, nicht aus stadtFenster.
+   Gemessen: Tour -> Universum ließ stadtFenster auf das abgebaute Tour-Fenster zeigen (load-Ereignis von about:blank,
+   außerdem setzt tourEnde() es nach 900 ms auf null). Dann kamen "pause"/"weiter" nie im Universum an. */
+function stadtZiel() {
+  if (frei.aktiv && frei.rahmen) return frei.rahmen.contentWindow;
+  if (tour.laeuft && tour.rahmen) return tour.rahmen.contentWindow;
+  return null;
+}
+function stadtSenden(n) {
+  const z = stadtZiel();
+  try { if (n && n.auron !== "modulStatus") diagMerk("an Universum: " + n.auron + (z ? "" : " (KEIN ZIEL)")); } catch (e) {}
+  if (z) { try { z.postMessage(n, location.origin); } catch (e) {} }
+}
 const wartende = {};
 window.addEventListener("message", (e) => {
   if (e.origin !== location.origin || !e.data || !e.data.auron) return;
@@ -755,7 +769,7 @@ async function tourStarten() {
   $("tour").insertBefore(rahmen, $("tourKarte")); tour.rahmen = rahmen;
   const bereit = new Promise((ok) => { tour.bereit = ok; setTimeout(() => ok(false), 30000); });
   tour.universum = bereit;   // der Ladebildschirm zeigt, wann das Universum steht
-  rahmen.addEventListener("load", () => { stadtFenster = rahmen.contentWindow; });
+  rahmen.addEventListener("load", () => { if (tour.rahmen === rahmen) stadtFenster = rahmen.contentWindow; });
   const zustand = zustandHolen();
   zustand.then((liste) => { if (stimmeAn) tourVorrat(liste); });   // Tour-Sätze schon jetzt bei Fish erzeugen
   const [ok, liste] = await Promise.all([bereit, zustand, ladeFertig]);
@@ -847,7 +861,7 @@ function modulAdresse(seite, farbe) {
   return EIGENE_SEITEN[seite] ? EIGENE_SEITEN[seite] + "?farbe=" + encodeURIComponent(farbe)
     : "/?modul=" + encodeURIComponent(seite) + "&farbe=" + encodeURIComponent(farbe);
 }
-var modul = { rahmen: null, seite: null, uhr: null };   // var: farbeSetzen darf es vorher schon prüfen
+var modul = { rahmen: null, seite: null, uhr: null, weiterUhr: null };   // var: farbeSetzen darf es vorher schon prüfen
 function modulLaedt(an, text) {
   $("modulLaedt").hidden = !an;
   if (text) $("modulLaedtText").textContent = text;
@@ -870,6 +884,8 @@ function bereichOeffnen(seite) {
   $("modulUnter").textContent = UNTERTITEL[seite] || "";
   modulObenSetzen();
   $("modul").hidden = false;
+  diagSpur("Bereich öffnen: " + seite);
+  clearTimeout(modul.weiterUhr);   // Fix 3: ein noch ausstehendes "weiter" verfällt
   stadtSenden({ auron: "pause" });   // Universum dahinter anhalten, solange der Bereich offen ist
   if (modul.rahmen && modul.seite !== seite) {
     modulLaedt(true, "Wechsle zu " + (SEITENNAME[seite] || "Bereich") + " …");
@@ -890,15 +906,35 @@ function bereichOeffnen(seite) {
 function modulSchliessen() {
   if ($("modul").hidden) return;
   $("modul").hidden = true; modulLaedt(false);
-  if (modul.rahmen) { const r = modul.rahmen; modul.rahmen = null; r.style.visibility = "hidden"; setTimeout(() => { r.src = "about:blank"; r.remove(); }, 0); }   // ganz zu: keine Abfragen im Hintergrund
+  diagSpur("Zurück: Start (" + (modul.seite || "?") + ")");
+  /* 10.10.2026 (Fix 3): Zeitspur 23:34 zeigte: Entfernen des Labors war in 18 ms fertig, der Hänger kam direkt danach,
+     als das Universum gleichzeitig wieder zu zeichnen begann. Jetzt nacheinander mit Abstand:
+     ausblenden -> 400 ms -> about:blank -> 400 ms -> entfernen -> 1200 ms -> Universum weiter.
+     Hängt es weiter, zeigt die Zeitspur genau, bei welchem der drei Schritte. */
+  if (modul.rahmen) {
+    const r = modul.rahmen; modul.rahmen = null; r.style.visibility = "hidden";
+    setTimeout(() => {
+      diagSpur("Zurück: Bereich auf about:blank");
+      try { r.src = "about:blank"; } catch (e) {}
+      setTimeout(() => {
+        diagSpur("Zurück: Bereich entfernen");
+        r.remove();
+        diagSpur("Zurück: Bereich entfernt");
+      }, 400);
+    }, 400);
+  }   // ganz zu: keine Abfragen im Hintergrund
   modul.seite = null;
-  if (frei.aktiv) freiZuMachen();   // zurück zur normalen Startseite (Gespräch)
-  else stadtSenden({ auron: "weiter" });   // Tour-Universum läuft weiter
+  clearTimeout(modul.weiterUhr);
+  modul.weiterUhr = setTimeout(() => {
+    if (!$("modul").hidden) return;   // inzwischen wieder ein Bereich offen: Universum bleibt angehalten
+    stadtSenden({ auron: "weiter" });   // Universum läuft weiter (Tour oder freies Universum bleibt offen)
+    diagSpur("Zurück: weiter gesendet");
+  }, 2000);
   $("frage").focus({ preventScroll: true });
 }
 window.addEventListener("message", (e) => {
   if (e.origin !== location.origin || !e.data || !modul.rahmen || e.source !== modul.rahmen.contentWindow) return;
-  if (e.data.auron === "modul-bereit") modulLaedt(false);
+  if (e.data.auron === "modul-bereit") { modulLaedt(false); diagSpur("Bereich bereit: " + (modul.seite || "?")); }
   if (e.data.auron === "bereich" && typeof e.data.seite === "string") bereichOeffnen(e.data.seite);   // Agenten-Station: "Bereich öffnen"
   if (e.data.auron === "modul-fehlt") { modulLaedt(true, "Diesen Bereich gibt es nicht, Sir."); clearTimeout(modul.uhr); }
 });
@@ -1077,6 +1113,8 @@ async function kameraWeiche(text, warteAufStimme) {
   return true;
 }
 $("kameraZu").addEventListener("click", () => { kameraAus(); hinweis("Die Kamera ist aus."); });
+/* 11.10.2026 (Sir): Knopf "Auron schaut" - gleicher Weg wie der Sprachbefehl "Auron, schau mal hier". */
+$("kameraKnopf").addEventListener("click", () => { if (kamera.an) senden("Auron, beschreibe, was du siehst"); else senden("Auron, schau mal hier"); });
 window.addEventListener("pagehide", kameraAus);
 
 async function senden(text, warteAufStimme, optionen) {
@@ -1563,6 +1601,78 @@ async function ladeStart(mitTour) {
   setTimeout(() => { $("lade").hidden = true; }, 900);
   kiPruefen(true);
 }
+
+/* =========================== Diagnose (10.10.2026) ===========================
+   Strg+Alt+D schaltet eine kleine Messanzeige oben links an/aus (bleibt gespeichert).
+   Zeigt: Bilder pro Sekunde in Auron und im Universum, ob das Universum zeichnet, angehalten/beendet ist,
+   ob die Grafik verloren ging, längste Blockade der Seite, letzte Befehle und Fehler. Kostet nur etwas, solange sie an ist. */
+const diag = { an: false, el: null, uhr: null, uWin: null, bA: 0, bU: 0, block: 0, letzt: 0, f: -1, log: [] };
+function diagMerk(t) {
+  const d = new Date(); diag.log.push(String(d.getMinutes()).padStart(2, "0") + ":" + String(d.getSeconds()).padStart(2, "0") + " " + t);
+  if (diag.log.length > 8) diag.log.shift();
+}
+/* Zeitspur: wird sofort in den Browserspeicher geschrieben und überlebt so einen Hänger.
+   Beim nächsten Einschalten zeigt die Anzeige die Spur der vorigen Sitzung. */
+const diagVorher = (() => { try { return { spur: JSON.parse(speicher.lesen("diagspur", "[]")), takt: speicher.lesen("diagtakt", "") }; } catch (e) { return { spur: [], takt: "" }; } })();
+let diagSpurListe = [];
+function diagZeit() { const d = new Date(); return d.toTimeString().slice(0, 8) + "." + String(d.getMilliseconds()).padStart(3, "0"); }
+function diagSpur(t) {
+  try { if (!diag.an) return; diagSpurListe.push(diagZeit() + " " + t); if (diagSpurListe.length > 14) diagSpurListe.shift(); speicher.schreiben("diagspur", JSON.stringify(diagSpurListe)); } catch (e) {}
+}
+function diagSchleifeA() { if (!diag.an) return; diag.bA++; const t = performance.now(); if (diag.letzt && t - diag.letzt > diag.block) diag.block = t - diag.letzt; diag.letzt = t; requestAnimationFrame(diagSchleifeA); }
+function diagSchleifeU(w) { if (!diag.an || diag.uWin !== w) return; diag.bU++; try { w.requestAnimationFrame(() => diagSchleifeU(w)); } catch (e) {} }
+function diagTick() {
+  const w = stadtZiel();
+  if (w !== diag.uWin) {
+    diag.uWin = w; diag.bU = 0; diag.f = -1;
+    if (w) {
+      diagMerk("Universum-Fenster gewechselt");
+      try { w.addEventListener("error", (e) => diagMerk("Fehler Universum: " + e.message)); } catch (e) {}
+      try { w.eval("renderer").domElement.addEventListener("webglcontextlost", () => diagMerk("GRAFIK VERLOREN (Universum)")); } catch (e) {}
+      diagSchleifeU(w);
+    }
+  }
+  let st = "kein Universum offen", zeichnet = "-";
+  if (w) {
+    try {
+      const z = w.eval("({a: angehalten, l: bildLaeuft, b: beendetFlag, v: renderer.getContext().isContextLost(), f: renderer.info.render.frame})");
+      zeichnet = diag.f >= 0 ? String(z.f - diag.f) : "-"; diag.f = z.f;
+      st = "angehalten " + (z.a ? "JA" : "nein") + " · läuft " + (z.l ? "ja" : "NEIN") + " · beendet " + (z.b ? "JA" : "nein") + " · Grafik verloren " + (z.v ? "JA" : "nein");
+    } catch (e) { st = "Universum lädt noch (" + e.message.slice(0, 40) + ")"; }
+  }
+  diag.el.textContent =
+    "DIAGNOSE (Strg+Alt+D)\n" +
+    "Auron: " + diag.bA + " B/s · längste Blockade " + Math.round(diag.block) + " ms\n" +
+    "Universum: " + (w ? diag.bU : "-") + " B/s · Zeichenaufrufe " + zeichnet + "/s\n" +
+    st + "\n" +
+    "Bereich offen: " + ($("modul").hidden ? "nein" : (modul.seite || "?")) + " · Fenster (iframes): " + document.querySelectorAll("iframe").length + "\n" +
+    diag.log.join("\n") +
+    (diagVorher.spur.length ? "\n--- Vorige Sitzung (letzter Takt " + (diagVorher.takt || "?") + ") ---\n" + diagVorher.spur.slice(-8).join("\n") : "");
+  speicher.schreiben("diagtakt", diagZeit() + " Bereich " + ($("modul").hidden ? "zu" : (modul.seite || "?")) + ", iframes " + document.querySelectorAll("iframe").length);
+  diag.bA = 0; diag.bU = 0; diag.block = 0;
+}
+function diagSchalten(an) {
+  diag.an = an; speicher.schreiben("diag", an ? "1" : "0");
+  if (an) {
+    if (!diag.el) {
+      diag.el = document.createElement("pre");
+      diag.el.style.cssText = "position:fixed;left:8px;top:8px;z-index:2147483647;margin:0;padding:8px 10px;max-width:46vw;white-space:pre-wrap;" +
+        "font:12px/1.35 Consolas,monospace;color:#e8e8e8;background:rgba(0,0,0,.82);border:1px solid #c33;border-radius:6px;pointer-events:none";
+      document.body.appendChild(diag.el);
+    }
+    diag.el.hidden = false; diag.letzt = 0; diag.uWin = null;
+    requestAnimationFrame(diagSchleifeA);
+    diag.uhr = setInterval(diagTick, 1000);
+  } else {
+    clearInterval(diag.uhr); if (diag.el) diag.el.hidden = true; diag.uWin = null;
+  }
+}
+function diagTaste(e) { if (e.ctrlKey && e.altKey && (e.key === "d" || e.key === "D")) { e.preventDefault(); diagSchalten(!diag.an); } }
+document.addEventListener("keydown", diagTaste);
+window.addEventListener("error", (e) => diagMerk("Fehler Auron: " + e.message));
+// Taste auch im Universum-Fenster abfangen (dort liegt nach einem Klick der Fokus)
+setInterval(() => { const w = stadtZiel(); if (w && !w.__diagTaste) { try { w.addEventListener("keydown", diagTaste); w.__diagTaste = true; } catch (e) {} } }, 2000);
+if (speicher.lesen("diag", "0") === "1") diagSchalten(true);
 
 /* =========================== Start =========================== */
 $("begruessungTitel").textContent = gruss() + ", Sir. Was darf ich für Sie tun?";

@@ -1,29 +1,29 @@
 {
- "stand": "2026-09-24",
+ "stand": "2026-10-11",
  "ziel_antworten": "Wissen/03 - KI und Technik/12 - Jarvis Gesamtidee Plan und Fragen an Sir.md",
  "karte": {
   "id": "root",
-  "titel": "Jarvis + Big Brain",
+  "titel": "Auron + Big Brain",
   "stand": "ok",
-  "text": "Digitaler Mitarbeiter auf Basis des Obsidian-Vaults „Big Brain“. Backend FastAPI, HUD im Browser, Claude als Sprachmodell. Stand 24.09.2026.",
+  "text": "Persönlicher Assistent „Auron“ (früher Jarvis) auf Basis des Obsidian-Vaults „Big Brain“. Läuft auf dem Mini-PC, tagsüber lokale KI, Claude als Rückfall. Stand 11.10.2026.",
   "kinder": [
    {
     "id": "idee",
     "titel": "Idee und Regeln",
     "stand": "ok",
-    "text": "So ist die Idee bisher verstanden (Notiz 12). Korrekturen gehen direkt in die Notiz.",
+    "text": "So ist die Idee verstanden (Notiz 12 und Entscheidungen bis 11.10.2026).",
     "kinder": [
      {
       "id": "idee.mitarbeiter-statt-chatbot",
-      "titel": "Mitarbeiter statt Chatbot",
+      "titel": "Assistent, Agenten wie eine Firma",
       "stand": "ok",
-      "text": "Jarvis soll Wissen aufnehmen, ordnen, wiederfinden und Aufgaben möglichst selbst erledigen."
+      "text": "Sir 11.10.: Auron ist Assistent für Sir, die Agenten arbeiten für ihn wie Mitarbeiter einer Firma. Eine echte Firma gibt es (noch) nicht."
      },
      {
       "id": "idee.das-gehirn-ist-der-vault",
       "titel": "Das Gehirn ist der Vault",
       "stand": "ok",
-      "text": "Fragen zu Sir, seinen Projekten und Notizen nur aus dem Vault, mit Quelle. Findet sich nichts, sagt Jarvis das."
+      "text": "Fragen zu Sir, seinen Projekten und Notizen nur aus dem Vault, mit Quelle. Findet sich nichts, sagt Auron das."
      },
      {
       "id": "idee.jeden-tag-35-besser",
@@ -33,27 +33,39 @@
      },
      {
       "id": "idee.anrede-sir-iron-man-stil",
-      "titel": "Anrede „Sir“, Iron-Man-Stil",
+      "titel": "Anrede „Sir“",
       "stand": "ok",
-      "text": "Sprache, HUD, Anrede „Sir“. Fehlt „Sir“, schlägt der Kanarienvogel an."
+      "text": "Auron und Claude sprechen Sir immer mit „Sir“ an und siezen ihn."
+     },
+     {
+      "id": "idee.name-auron",
+      "titel": "Name Auron (früher Jarvis)",
+      "stand": "ok",
+      "text": "Entscheidung 04.10.2026. „Jarvis“ bleibt als Alias, damit alte Befehle weiter funktionieren."
      },
      {
       "id": "idee.guenstig-20-im-monat",
-      "titel": "Günstig: 20 $ im Monat",
+      "titel": "Günstig: Tag lokal, Claude nur als Rückfall",
       "stand": "ok",
-      "text": "Rahmen für Claude-Anfragen von Jarvis seit 22.09.2026. Arbeit ohne Claude wird bevorzugt."
+      "text": "Seit 05.10. antwortet tagsüber ein lokales Modell (Haupt-PC, dann Test-PC). Claude nur, wenn lokal klar versagt, oder per Knopf „Claude fragen“. Rahmen 20 $ im Monat (11.10.)."
      },
      {
       "id": "idee.nachts-allein-weiterarbeiten",
-      "titel": "Nachts allein weiterarbeiten",
+      "titel": "Nachts allein, aber nie mit Claude",
       "stand": "ok",
-      "text": "Seit 23.09. Ziel. Deckel: 3 $ pro Nacht, höchstens 4 Nächte im Monat, Stopp vor 20 $."
+      "text": "Nachtarbeit 03:00–07:00 auf dem Mini-PC, nur lokales Modell, Recherche über eigene Suchmaschine (SearXNG). 0 €."
      },
      {
       "id": "idee.harte-grenzen",
       "titel": "Harte Grenzen",
       "stand": "ok",
-      "text": "Nichts löschen, nur nach Freigabe schreiben, jede Änderung ankündigen, keine echten Trades, Web-Suche nur auf Nachfrage."
+      "text": "Nichts löschen, jede Änderung ankündigen, Web-Suche nur auf Nachfrage. Sir 24.09.: Auron darf fast alles, aber beim Traden nie zu stark ins Minus und das Konto nie ins Minus; Menschen respektieren, niemanden verletzen, nichts ruinieren oder kaputt machen."
+     },
+     {
+      "id": "idee.ausfuehrungszugriff",
+      "titel": "Ausführungszugriff",
+      "stand": "ok",
+      "text": "Entscheidung 10.10.: Grundregel nur .bat, die Sir startet. Ausnahmen: Nachtarbeit darf geprüfte .bat-Testläufe starten; Tagesautorisation für einen von Sir genannten Tag, „Auron, Stopp“ beendet sie. Technisch noch nicht umgesetzt."
      }
     ]
    },
@@ -103,13 +115,13 @@
       "id": "p1.hud",
       "titel": "HUD",
       "stand": "ok",
-      "text": "Seiten Markt, Alltag, Jarvis, Vault, Einstellungen. Wetter, Kalender, Briefing-Knopf."
+      "text": "Altes HUD unter „/“ bleibt erreichbar. Neue Oberfläche ist Auron (Phase 7)."
      },
      {
       "id": "p1.git-sicherung",
       "titel": "Git-Sicherung",
       "stand": "ok",
-      "text": "Erster Commit am 20.09.: 68 Dateien, .env nicht dabei."
+      "text": "Erster Commit 20.09. Seit 10.10. zusätzlich privates GitHub-Repo LuckyBuster181/Big-Brain (nur Code, ohne Vault, data und .env)."
      }
     ]
    },
@@ -117,7 +129,7 @@
     "id": "p2",
     "titel": "Phase 2 · Fragen und Aufgaben",
     "stand": "test",
-    "text": "Als Code fertig. 493/493 Tests am PC grün (24.09.), im Browser noch nicht durchgeklickt. Details: Notiz 10.",
+    "text": "Als Code fertig, Tests grün (24.09.). Einiges läuft im Alltag, vieles wurde nie einzeln durchgeklickt.",
     "kinder": [
      {
       "id": "p2.absicht-ohne-claude",
@@ -176,15 +188,15 @@
      {
       "id": "p2.kalender-und-briefing",
       "titel": "Kalender und Briefing",
-      "stand": "test",
-      "text": "Termine aus Google (nur lesen), Feiertage, Tagesbriefing mit einem Claude-Aufruf. Browsertest steht aus."
+      "stand": "ok",
+      "text": "Kalender lesen per iCal, Briefing seit 05.10. lokal (ohne Claude), Gmail im Briefing per IMAP seit 25.09."
      },
      {
       "id": "p2.termine-anlegen",
       "titel": "Termine anlegen",
-      "stand": "sir",
-      "text": "Offen: eigener Google-Zugang mit Schreibrecht oder eigene Terminliste ohne Rückweg zu Google. Google-Zugang (OAuth) fehlt noch.",
-      "wer": "Sir entscheidet",
+      "stand": "plan",
+      "text": "Sir 24.09. und 11.10.: auch in Google eintragen, wenn es geht. Eigene Termine in Auron gibt es seit 05.10. Hürde: Google-Anmeldung (OAuth) verfällt im Testmodus nach 7 Tagen – Weg muss noch geklärt werden.",
+      "wer": "Claude",
       "frage": "Termine im HUD anlegen: eigener Google-Zugang mit Schreibrecht, oder eine eigene Terminliste ohne Rückweg zu Google?"
      },
      {
@@ -196,8 +208,14 @@
      {
       "id": "p2.gesamtkarte-im-hud",
       "titel": "Gesamtkarte im HUD",
+      "stand": "ok",
+      "text": "Seite „Karte“ im alten HUD. Sir hat am 24.09. alle 16 Fragen dort beantwortet. Seit 11.10. wieder aktuell."
+     },
+     {
+      "id": "p2.mind-maps",
+      "titel": "Mind Maps und Dateien umwandeln",
       "stand": "test",
-      "text": "Seite \"Karte\" mit Fragen-Runde und Gespräch mit Jarvis über jeden Punkt. Gebaut 24.09., braucht NEUSTART."
+      "text": "Wunsch 27.09. (z. B. PDF in PNG). Code vorhanden (mindmap.py, umwandeln.py). Im Alltag ungetestet."
      }
     ]
    },
@@ -205,7 +223,7 @@
     "id": "p3",
     "titel": "Phase 3 · Sprache",
     "stand": "test",
-    "text": "Als Code fertig, Tests am PC grün (24.09.), im Alltag noch nicht ausprobiert.",
+    "text": "Sprache läuft über Fish Audio. Lokale Stimme und Erkennung fehlen noch.",
     "kinder": [
      {
       "id": "p3.sprache-im-browser",
@@ -222,28 +240,34 @@
      {
       "id": "p3.fish-audio-stimme",
       "titel": "Fish-Audio-Stimme",
+      "stand": "ok",
+      "text": "Läuft. Kostenlos nur bis 30.11.2026. Sir 11.10.: danach Piper, wenn sie zuverlässig läuft – vorher prüfen (P05)."
+     },
+     {
+      "id": "p3.schneller-unterbrechen",
+      "titel": "Satzweise sprechen, Unterbrechen",
       "stand": "test",
-      "text": "Kostenlos bis 30.11.2026, danach Rückfall auf Windows-Stimme. Schlüssel liegt in .env."
+      "text": "Gebaut 10.10.: „Auron, …“ bricht ab, „Stopp/Halt/Ruhe“ macht still. Mit Kopfhörern am besten."
      },
      {
       "id": "p3.piper-lokale-stimme",
       "titel": "Piper (lokale Stimme)",
-      "stand": "sir",
-      "text": "Optional, kostenlos. Einrichten mit PIPER_EINRICHTEN.bat.",
-      "wer": "Sir am PC"
+      "stand": "plan",
+      "text": "Frist 30.11.2026. Ursache des Fehlers geklärt (Windows-piper.exe per Syncthing auf dem Mini-PC). Plan: piper-tts als Python-Paket auf Linux, Stimme einmal laden, high gegen medium messen. Prompt P05 überarbeitet 11.10.",
+      "wer": "Sir → Claude Code"
      },
      {
       "id": "p3.whisper-lokale-erkennung",
       "titel": "Whisper (lokale Erkennung)",
-      "stand": "sir",
-      "text": "Optional, 2 Threads, schont den PC. Einrichten mit WHISPER_EINRICHTEN.bat.",
-      "wer": "Sir am PC"
+      "stand": "plan",
+      "text": "Spracherkennung lokal auf dem Mini-PC. Prompt P04 liegt bereit.",
+      "wer": "Claude Code, dann Sir am PC"
      },
      {
       "id": "p3.weckwort-jarvis",
-      "titel": "Weckwort „Jarvis“",
+      "titel": "Sprachaktivierung „Auron“",
       "stand": "idee",
-      "text": "Z. B. openWakeWord. Noch nicht geplant."
+      "text": "Wunsch Sir 04.10. Noch nicht geplant."
      },
      {
       "id": "p3.spotify",
@@ -257,7 +281,7 @@
     "id": "p4",
     "titel": "Phase 4 · Trading",
     "stand": "test",
-    "text": "Nur Simulation, keine Anlageberatung. Tests am PC grün (24.09.). Echtes Geld ist nicht Teil des Plans.",
+    "text": "Nur Simulation. Ziel Sir 24.09.: Bots laufen irgendwann mit echtem Geld, vorher Paper-Trading mit MT5. Keine Anlageberatung.",
     "kinder": [
      {
       "id": "p4.20-maerkte-mit-datenpruefung",
@@ -284,6 +308,19 @@
       "text": "Stopp Pflicht, höchstens 1 % Risiko, 3 Positionen, Tagesverlust 3 %."
      },
      {
+      "id": "p4.mql5",
+      "titel": "Bots auf MQL5 umstellen",
+      "stand": "plan",
+      "text": "Entscheidung 24.09.: Haupt-Bot, David-V2, Divergenz als Expert Advisor in MetaTrader 5 (MetaQuotes-Demokonto). Prompt P10.",
+      "wer": "Claude Code"
+     },
+     {
+      "id": "p4.reihenfolge",
+      "titel": "Reihenfolge im Labor",
+      "stand": "ok",
+      "text": "Sir 24.09.: erst Regeln (Uhrzeit, London-Breakout, Sweep), dann die 3 Bots mit MT5-Historie."
+     },
+     {
       "id": "p4.mt5-export",
       "titel": "MT5-Export",
       "stand": "sir",
@@ -301,7 +338,7 @@
       "id": "p4.uhrzeit-filter",
       "titel": "Uhrzeit-Filter",
       "stand": "plan",
-      "text": "Nur zu bestimmten Zeiten handeln, z. B. 15:30–17:30. Aus TikTok „Anfänger vs Profi“.",
+      "text": "Sir 24.09.: ab 17 Uhr geht immer. Filter entsprechend anpassen.",
       "wer": "Claude"
      },
      {
@@ -339,88 +376,80 @@
      },
      {
       "id": "p4.echtes-geld",
-      "titel": "Echtes Geld",
-      "stand": "nein",
-      "text": "Nicht Teil des Plans. Frage 11 an Sir ist noch offen."
+      "titel": "Echtes Geld (später)",
+      "stand": "idee",
+      "text": "Sir 24.09.: „Bots sollen irgendwann auf echt Geld laufen, vorher Paper-Trading mit MT5.“ Bedingungen dafür sind offen (siehe Fragen)."
      }
     ]
    },
    {
     "id": "p5",
     "titel": "Phase 5 · Selbstständig und Server",
-    "stand": "test",
-    "text": "Vorschlag für eine neue Phase. Alles, was Jarvis ohne Sir tut, und der Umzug auf den Mini-PC.",
+    "stand": "ok",
+    "text": "Mini-PC läuft als Server, Nachtarbeit läuft lokal, Handy-Zugang steht.",
     "kinder": [
      {
       "id": "p5.nachtarbeit",
       "titel": "Nachtarbeit",
       "stand": "ok",
-      "text": "Läuft: Testlauf 24.09. 13:11, 62 Studium-Entwürfe in 97 Sekunden geprüft (25 in Ordnung, 36 lückenhaft, 1 unklar), 0,12 $. Nachts allein noch nie gelaufen.",
+      "text": "Timer 03:00 auf dem Mini-PC, nur lokales Modell (nacht_ki), 0 €.",
       "kinder": [
-       {
-        "id": "p5.nachtarbeit.deckel",
-        "titel": "Deckel",
-        "stand": "ok",
-        "text": "3 $ pro Nacht, höchstens 4 Nächte im Monat, Stopp 0,50 $ vor dem 20-$-Rahmen. Steht im Code."
-       },
        {
         "id": "p5.nachtarbeit.zeitfenster-03-0007-00",
         "titel": "Zeitfenster 03:00–07:00",
         "stand": "ok",
-        "text": "Entscheidung Sir, 24.09."
+        "text": "Entscheidung Sir 24.09."
+       },
+       {
+        "id": "p5.nachtarbeit.lokal",
+        "titel": "Nur lokal, nie Claude",
+        "stand": "ok",
+        "text": "Entscheidung 04.10. Morgens prüfen: 03:00–07:00 kein claude-* im Nutzungslog."
+       },
+       {
+        "id": "p5.nachtarbeit.searxng",
+        "titel": "Eigene Suchmaschine (SearXNG)",
+        "stand": "ok",
+        "text": "Recherche nachts über SearXNG auf dem Mini-PC (Weg A, 04.10.)."
+       },
+       {
+        "id": "p5.nachtarbeit.auftraege",
+        "titel": "Nachtaufträge",
+        "stand": "ok",
+        "text": "Aufträge per Chat, Sprache oder Liste. Höchstens 8 pro Nacht. Aufträge 10–15 am 11.10. angelegt."
        },
        {
         "id": "p5.nachtarbeit.claude-auftrag-03-00",
         "titel": "Claude-Auftrag 03:00",
-        "stand": "test",
-        "text": "Eingerichtet 24.09., erster Lauf 25.09. ca. 03:04. Startet NACHTARBEIT.bat und schreibt den Bericht in die Tagesnotiz. Ob der Ordnerzugriff nachts trägt, zeigt erst dieser Lauf."
+        "stand": "nein",
+        "text": "Ersetzt durch den lokalen Timer auf dem Mini-PC (04.10.)."
        },
        {
         "id": "p5.nachtarbeit.nachtbericht-uebernehmen",
-        "titel": "Nachtbericht übernehmen",
+        "titel": "Nachtberichte übernehmen",
         "stand": "sir",
-        "wer": "Sir",
-        "text": "Vorschlag \"Nachtbericht 2026-09-24\" im HUD (Jarvis-Seite, Vorschläge) übernehmen, dann steht er in der Tagesnotiz."
+        "text": "6 offene Vorschläge im HUD: übernehmen oder verwerfen.",
+        "wer": "Sir am PC"
        },
        {
         "id": "p5.nachtarbeit.datum-in-der-pruefanweisung",
         "titel": "Datum in der Prüfanweisung",
-        "stand": "sir",
-        "wer": "Sir entscheidet",
-        "text": "Haiku hält Quellen von 2026 für \"aus der Zukunft\" (5 Urteile). Lösung: heutiges Datum mitgeben, kostet nichts, danach NEUSTART.",
-        "frage": "Soll Claude den Datums-Fehler der Nachtarbeit beheben? Haiku hält sonst Quellen von 2026 für verdächtig."
-       },
-       {
-        "id": "p5.nachtarbeit.protokoll-fuer-die-bat",
-        "titel": "Protokoll für NACHTARBEIT.bat",
-        "stand": "idee",
-        "text": "Das Fenster schließt sofort. Eine kleine Protokolldatei würde zeigen, was passiert ist."
-       },
-       {
-        "id": "p5.nachtarbeit.test-bei-tageslicht",
-        "titel": "Test bei Tageslicht",
-        "stand": "ok",
-        "text": "Erledigt 24.09. 13:11. Ergebnis siehe Nachtarbeit."
-       },
-       {
-        "id": "p5.nachtarbeit.windows-aufgabenplanung",
-        "titel": "Windows-Aufgabenplanung",
-        "stand": "sir",
-        "text": "Erst nach einem erfolgreichen Testlauf einrichten.",
-        "wer": "Sir am PC"
-       },
-       {
-        "id": "p5.nachtarbeit.weitere-nacht-aufgaben",
-        "titel": "Weitere Nacht-Aufgaben",
         "stand": "plan",
-        "text": "TikTok-Links abrufen, Whisper für Videos, Backtests, Vault neu einlesen. Alle 0 $.",
-        "wer": "Claude"
+        "text": "Sir 24.09.: ja, fixen. Ob es umgesetzt wurde, ist nicht festgehalten. Seit 04.10. prüft nachts das lokale Modell, nicht mehr Haiku.",
+        "wer": "Claude (prüfen)"
+       },
+       {
+        "id": "p5.nachtarbeit.selbst-testen",
+        "titel": "Nachts selbst testen",
+        "stand": "plan",
+        "text": "Erlaubt seit 10.10. (nur geprüfte .bat). Technisch noch nicht umgesetzt. Prompt P08, niedrige Priorität.",
+        "wer": "Claude Code"
        },
        {
         "id": "p5.nachtarbeit.morgens-nachhaken",
         "titel": "Morgens nachhaken",
         "stand": "plan",
-        "text": "Was gestern liegen blieb, im Briefing nennen. Aus TikTok „Jarvis is the MVP“.",
+        "text": "Was gestern liegen blieb, im Briefing nennen.",
         "wer": "Claude"
        }
       ]
@@ -429,50 +458,55 @@
       "id": "p5.studium-und-aufgaben-loop",
       "titel": "Studium und Aufgaben-Loop",
       "stand": "test",
-      "text": "Studium lief zweimal (62 Entwürfe). Aufgaben-Loop gebaut, nicht eingerichtet. Ca. 8,6 Cent je Aufgabe.",
+      "text": "Studium lief zweimal (62 Entwürfe). Deckel 1 $ pro Lauf (Sir 24.09.).",
       "kinder": [
-       {
-        "id": "p5.studium-und-aufgaben-loop.studium-deckel",
-        "titel": "Studium-Deckel",
-        "stand": "sir",
-        "text": "„Risiko-Berechnung“ kostete 2,86 $ statt 1 $. Frage 8.",
-        "wer": "Sir"
-       },
        {
         "id": "p5.studium-und-aufgaben-loop.62-entwuerfe",
         "titel": "62 Entwürfe",
-        "stand": "sir",
-        "text": "So lassen, prüfen und übernehmen, oder nur Trading? Frage 9.",
-        "wer": "Sir"
+        "stand": "plan",
+        "text": "Sir 24.09.: alles prüfen und sortieren. Nachtprüfung 24.09.: 25 in Ordnung, 36 lückenhaft, 1 unklar. Sortieren steht aus.",
+        "wer": "Nachtarbeit"
        }
       ]
      },
      {
       "id": "p5.mini-pc-als-server",
       "titel": "Mini-PC als Server",
-      "stand": "plan",
-      "text": "Lenovo ThinkCentre M93p Tiny, per Kabel. Läuft nachts, braucht wenig Strom. Erst Windows 10, später Linux.",
+      "stand": "ok",
+      "text": "Lenovo M93p Tiny, Ubuntu 24.04, IP 192.168.68.139, Dienst „jarvis“. Seit 26.09. läuft Auron dort. Haupt-PC darf nachts aus.",
       "kinder": [
        {
         "id": "p5.mini-pc-als-server.syncthing-aufraeumen",
-        "titel": "Syncthing aufräumen",
-        "stand": "sir",
-        "text": "Ordner in SyncTrayzor entfernen, AUFRAEUMEN_SYNC.bat, dann neu nach Notiz 13 „Zweiter Versuch“. Nur Jarvis und Brain teilen.",
-        "wer": "Sir am PC"
-       },
-       {
-        "id": "p5.mini-pc-als-server.mini-pc-einrichten",
-        "titel": "Mini-PC einrichten",
-        "stand": "sir",
-        "text": "JARVIS_MINIPC_EINRICHTEN.bat am Mini-PC, dann JARVIS_MINIPC_OEFFNEN.bat am großen PC.",
-        "wer": "Sir am PC"
+        "titel": "Syncthing",
+        "stand": "ok",
+        "text": "Ordner „jarvis“ und „brain-vault“. Nach dem Schreiben 20–60 s bis zum Mini-PC."
        },
        {
         "id": "p5.mini-pc-als-server.linux",
         "titel": "Linux",
+        "stand": "ok",
+        "text": "Ubuntu 24.04 seit 25./26.09."
+       },
+       {
+        "id": "p5.startdatei",
+        "titel": "Eine Startdatei",
+        "stand": "ok",
+        "text": "1 Starten\\JARVIS STARTEN.bat ist die einzige Startdatei."
+       }
+      ]
+     },
+     {
+      "id": "p5.lokale-ki",
+      "titel": "Lokale KI (Ollama)",
+      "stand": "test",
+      "text": "Entscheidung 29.09., Tag lokal seit 05.10.: Haupt-PC → Test-PC → Claude. Nachts Test-PC, Haupt-PC, Mini-PC. Einstellungen in data\\ki_lokal.json.",
+      "kinder": [
+       {
+        "id": "p5.lokale-ki.test-pc",
+        "titel": "Test-PC wieder einbinden",
         "stand": "sir",
-        "text": "Später. USB-Stick mit mindestens 8 GB fehlt.",
-        "wer": "Sir"
+        "text": "Neue WLAN-IP nennen (ipconfig), Ollama starten. Claude trägt die IP dann ein.",
+        "wer": "Sir am PC"
        }
       ]
      },
@@ -480,45 +514,33 @@
       "id": "p5.pc-2-hub",
       "titel": "PC-2-Hub",
       "stand": "test",
-      "text": "Linux-Agent für den Mini-PC (Livewerte, Steuerung, Bildschirm, Wake-on-LAN). Aus dem Claude-Code-Chat. Braucht Linux."
+      "text": "Linux-Agent für den Mini-PC (Livewerte, Steuerung). Stand seit 30.09. (Version 1.1.0) nicht neu geprüft."
      },
      {
       "id": "p5.handy-zugang",
-      "titel": "Handy-Zugang",
-      "stand": "idee",
-      "text": "HUD über privates Netz (Tailscale) mit Zugangsschutz. Backend bleibt auf 127.0.0.1."
+      "titel": "Handy unterwegs",
+      "stand": "ok",
+      "text": "Seit 05.10. über Tailscale: https://auron.tailc68142.ts.net/auron"
      },
      {
       "id": "p5.git-backup-online",
       "titel": "Git-Backup online",
-      "stand": "idee",
-      "text": "Privates Repository, .env ausgeschlossen. Noch nicht entschieden."
+      "stand": "ok",
+      "text": "Seit 10.10. privates Repo auf GitHub. Claude Code arbeitet dort über das Anthropic-Guthaben."
      }
     ]
    },
    {
     "id": "p6",
-    "titel": "Phase 6 · Ausbau",
+    "titel": "Phase 6 · Ausbau Wissen und Lernen",
     "stand": "idee",
-    "text": "Vorschlag für eine neue Phase. Nichts davon ist beschlossen.",
+    "text": "Lernen, Lesen, Mitschreiben. Steuern ist nach Phase 9 umgezogen.",
     "kinder": [
-     {
-      "id": "p6.windows-steuern",
-      "titel": "Windows steuern",
-      "stand": "idee",
-      "text": "Lautstärke, Programme. Großer Aufwand, Sicherheit zuerst. Frage 15."
-     },
-     {
-      "id": "p6.zuhause-steuern",
-      "titel": "Zuhause steuern",
-      "stand": "idee",
-      "text": "Licht und Ähnliches. Frage 15."
-     },
      {
       "id": "p6.englisch-coach",
       "titel": "Englisch-Coach",
-      "stand": "idee",
-      "text": "Merkt sich Sirs Fehler, ca. 0,5 Cent je Übung. Frage 14."
+      "stand": "plan",
+      "text": "Sir 24.09.: Ja. Merkt sich Sirs Fehler, ca. 0,5 Cent je Übung (Claude) oder 0 € lokal. Noch kein Prompt."
      },
      {
       "id": "p6.lokale-mitschrift",
@@ -543,18 +565,444 @@
       "titel": "Denkblock erweitern",
       "stand": "idee",
       "text": "Chat liest die offene Denk-Notiz mit, Diktat direkt in den Denkblock."
+     }
+    ]
+   },
+   {
+    "id": "p7",
+    "titel": "Phase 7 · Auron-Oberfläche",
+    "stand": "ok",
+    "text": "Neue Oberfläche seit 04.10.: Universum mit Raumstation als Mitte, Module = Bereiche. Desktop-App.",
+    "kinder": [
+     {
+      "id": "p7.universum",
+      "titel": "Universum (Three.js)",
+      "stand": "ok",
+      "text": "werkstatt/universum/. Am 04.10. flüssig."
      },
      {
-      "id": "p6.offline-mit-ollama",
-      "titel": "Offline mit Ollama",
-      "stand": "idee",
-      "text": "Lokales Modell statt Claude. Deutlich schwächer, erst nach Klärung der Abstürze."
+      "id": "p7.start-tour",
+      "titel": "Start-Tour bei jedem Start",
+      "stand": "ok",
+      "text": "Nur Stationen, die gerade laufen (Sir 04.10.)."
      },
      {
-      "id": "p6.mails-einbeziehen",
-      "titel": "Mails einbeziehen",
+      "id": "p7.desktop-app",
+      "titel": "Desktop-Symbol",
+      "stand": "ok",
+      "text": "AURON.vbs → auron_app.ps1 (Chrome im App-Modus)."
+     },
+     {
+      "id": "p7.modulfenster",
+      "titel": "Modulfenster und „Zurück“",
+      "stand": "ok",
+      "text": "Fix 21:13 am 10.10., Sir: funktioniert."
+     },
+     {
+      "id": "p7.kalender",
+      "titel": "Kalender im Universum",
+      "stand": "ok",
+      "text": "Termin-Lichter, ohne KI (05.10.)."
+     },
+     {
+      "id": "p7.einfrieren",
+      "titel": "Einfrieren behoben",
+      "stand": "test",
+      "text": "Fix 3 vom 10.10. 23:42, Sir: „Geht wieder“. Über längere Zeit ungetestet. Messanzeige Strg+Alt+D."
+     },
+     {
+      "id": "p7.kamera",
+      "titel": "Kamera-Modus",
+      "stand": "ok",
+      "text": "„Auron, schau zu“. Ein Standbild pro Frage an Claude Haiku, ca. 0,2–0,5 Cent, nichts gespeichert. Sir 10.10.: funktioniert."
+     },
+     {
+      "id": "p7.kamera-knopf",
+      "titel": "Kamera-Knopf",
+      "stand": "test",
+      "text": "Gebaut 11.10. in auron.html. Ungetestet."
+     },
+     {
+      "id": "p7.farben",
+      "titel": "Farben Silber, Rot, Schwarz",
+      "stand": "ok",
+      "text": "Sir 04.10.: kein Gold, Farbe selbst einstellbar."
+     },
+     {
+      "id": "p7.auron-html-repo",
+      "titel": "auron.html ins Repo",
+      "stand": "sir",
+      "text": "Vorher git pull, damit Claude-Code-Änderungen nicht verloren gehen (P09).",
+      "wer": "Sir am PC"
+     },
+     {
+      "id": "p7.universe-sandbox",
+      "titel": "Universe Sandbox anbinden",
+      "stand": "nein",
+      "text": "Sir 11.10.: Das eigene Universum bleibt. Anbindung an Universe Sandbox vorerst nicht."
+     }
+    ]
+   },
+   {
+    "id": "p8",
+    "titel": "Phase 8 · Agenten",
+    "stand": "test",
+    "text": "Viele kleine Agenten mit eigenen Rollen, sichtbar an der Raumstation.",
+    "kinder": [
+     {
+      "id": "p8.station",
+      "titel": "Agenten-Station",
+      "stand": "ok",
+      "text": "Seite werkstatt/agenten, GET /api/agenten. Sir 10.10. 18:05: am PC getestet."
+     },
+     {
+      "id": "p8.rollen",
+      "titel": "Rollen beschlossen",
+      "stand": "ok",
+      "text": "Sucher, Schreiber, Prüfer, Tester, Broker (Finanzen, gesondert), Boss, Ingenieur, Dichter (Sir 10.10.)."
+     },
+     {
+      "id": "p8.p01",
+      "titel": "Sucher und Schreiber",
+      "stand": "ok",
+      "text": "Claude Code 10.10. (PR #1 und #2, gemergt): Rollen Sucher und Schreiber, Chat-Befehl „Such und schreib: …“, REPO HOLEN.bat. Auf dem PC identisch mit GitHub (geprüft 11.10.).",
+      "wer": ""
+     },
+     {
+      "id": "p8.pr3",
+      "titel": "Prüfstand, Tests auf GitHub, Fehlerbericht",
+      "stand": "test",
+      "text": "Claude Code 10./11.10. (PR #3, gemergt): Cloud-Prüfstand, GitHub Actions bei jedem Push, FEHLERBERICHT SENDEN.bat (unter Windows noch nicht benutzt), 3 Fehler behoben (Chat stumm ohne Claude, Tests auf echten Daten, Gespräche am falschen Tag). Auf dem PC."
+     },
+     {
+      "id": "p8.weitere-rollen",
+      "titel": "Prüfer, Tester, Boss, Ingenieur, Dichter (P01)",
+      "stand": "test",
+      "text": "Gebaut von Claude Code 11.10. (PR #4): Prüfer, Tester, Boss, Ingenieur, Dichter als Rollen-Vorgaben; Station aufgeräumt; Lichter bei aktiven Agenten. Rollen noch nirgends im Chat angeschlossen. Am PC noch nicht geholt.",
+      "wer": ""
+     },
+     {
+      "id": "p8.nachts-programmieren",
+      "titel": "Auron programmiert nachts selbst",
       "stand": "idee",
-      "text": "„Was steht morgen an?“ mit Mails. Großer Aufwand."
+      "text": "P08. Sir 10.10.: gerade nicht wichtig."
+     },
+     {
+      "id": "p8.claude-code",
+      "titel": "Claude Code als Werkstatt",
+      "stand": "ok",
+      "text": "Austausch über GitHub: Claude Code pusht, Sir holt mit REPO HOLEN.bat, lädt mit REPO HOCHLADEN.bat hoch; Fehler gehen per FEHLERBERICHT SENDEN.bat nach berichte/fehlerbericht.md. Claude im Projekt liest das Repo seit 11.10. direkt mit (nur lesen)."
+     }
+    ]
+   },
+   {
+    "id": "p9",
+    "titel": "Phase 9 · Zuhause und Geräte",
+    "stand": "plan",
+    "text": "Sir 24.09.: Auron soll Licht, Alexa, Sonos, PC, Handy und 2–3 PCs steuern. Am liebsten über Alexa.",
+    "kinder": [
+     {
+      "id": "p9.home-assistant",
+      "titel": "Home Assistant (P06)",
+      "stand": "sir",
+      "text": "Wartet auf Sirs Geräteliste.",
+      "wer": "Sir"
+     },
+     {
+      "id": "p9.alexa",
+      "titel": "Alexa Echo Dot (2. Gen)",
+      "stand": "idee",
+      "text": "Sir 11.10.: Auron soll über Alexa sprechen, mit der schon eingerichteten Licht- und Musiksteuerung. Ob der Echo Dot 2. Gen das technisch zulässt (z. B. über einen eigenen Alexa-Skill), ist ungeprüft – Claude klärt das."
+     },
+     {
+      "id": "p9.sonos-spotify",
+      "titel": "Sonos und Spotify",
+      "stand": "ok",
+      "text": "Läuft. Lautstärke lokal an Sonos, Suche über Spotify."
+     },
+     {
+      "id": "p6.windows-steuern",
+      "titel": "PC und Windows steuern",
+      "stand": "idee",
+      "text": "Lautstärke, Programme. Sicherheit zuerst."
+     },
+     {
+      "id": "p9.handtracking",
+      "titel": "Handtracking (P07)",
+      "stand": "plan",
+      "text": "Sir: im näheren Verlauf.",
+      "wer": "Claude Code"
+     },
+     {
+      "id": "p9.zimmerscan",
+      "titel": "3D-Zimmerscan (P12)",
+      "stand": "idee",
+      "text": "Geparkt."
+     }
+    ]
+   },
+   {
+    "id": "p10",
+    "titel": "Phase 10 · Finanzen, Firma, Weitergabe",
+    "stand": "idee",
+    "text": "Was über Sir allein hinausgeht.",
+    "kinder": [
+     {
+      "id": "p10.finanzen",
+      "titel": "Finanz-Überblick (P03)",
+      "stand": "test",
+      "text": "Gebaut von Claude Code 11.10. (PR #4, gemergt 12:32, Tests auf GitHub grün): CSV-Import Volksbank und Revolut, Abo-Erkennung, Bereich Finanzen unter Markt, Kündigungshilfe, Monats-Abo-Übersicht im Briefing, Chat-Befehle. Nur lesend, keine IBANs gespeichert. Am PC noch nicht geholt; mit echten Auszügen ungetestet.",
+      "wer": "Sir am PC"
+     },
+     {
+      "id": "p10.content",
+      "titel": "Content erstellen",
+      "stand": "idee",
+      "text": "Ziel Sir in 6 Monaten: Auron hilft, Content zu verbessern, zu analysieren, hochzuladen und zu schneiden und bringt Ideen für neuen Content. Noch kein Prompt."
+     },
+     {
+      "id": "p10.firma",
+      "titel": "Agenten als „Firma“",
+      "stand": "idee",
+      "text": "Sir 11.10.: Es gibt keine Firma. Die Agenten sollen für Sir arbeiten, als hätte er eine. Vielleicht später eine echte Firma, wenn das hier gut klappt."
+     },
+     {
+      "id": "p10.profile",
+      "titel": "Benutzerprofile (P11)",
+      "stand": "idee",
+      "text": "Eigenes Profil für Papa, Schwester usw., eigenes Kosten-Limit. Wartet, bis Sir es anstößt."
+     },
+     {
+      "id": "p10.handbuch",
+      "titel": "Handbuch zum Verkaufen (P14)",
+      "stand": "idee",
+      "text": "Wunsch Sir 11.10.: Anleitung „Auron nachbauen“, irgendwann."
+     }
+    ]
+   },
+   {
+    "id": "entsch",
+    "titel": "Entscheidungen",
+    "stand": "ok",
+    "text": "Was Sir festgelegt hat, neueste zuerst. Verworfenes steht unten.",
+    "kinder": [
+     {
+      "id": "entsch.1110-pr4",
+      "titel": "11.10. P01 und P03 gebaut",
+      "stand": "ok",
+      "text": "Claude Code hat Finanz-Modul und 5 Agenten-Rollen gebaut (PR #4)."
+     },
+     {
+      "id": "entsch.1110-bank",
+      "titel": "11.10. Banken per CSV",
+      "stand": "ok",
+      "text": "Finanz-Überblick zuerst über CSV-Export (kein Bank-Login in Auron), FinTS später."
+     },
+     {
+      "id": "entsch.1110-bilder",
+      "titel": "11.10. Bild-Auswertung",
+      "stand": "ok",
+      "text": "Bis 10 Bilder je Video (je nach Länge), höchstens 4 $ im Monat."
+     },
+     {
+      "id": "entsch.1110-stimme",
+      "titel": "11.10. Stimme ab Dezember",
+      "stand": "ok",
+      "text": "Piper, wenn sie zuverlässig läuft. Vorher prüfen."
+     },
+     {
+      "id": "entsch.1110-phasen",
+      "titel": "11.10. Zehn Phasen",
+      "stand": "ok",
+      "text": "Einteilung passt, mehr Phasen sind erlaubt."
+     },
+     {
+      "id": "entsch.1110-termine",
+      "titel": "11.10. Termine auch in Google",
+      "stand": "ok",
+      "text": "Wenn technisch machbar."
+     },
+     {
+      "id": "entsch.1110-firma",
+      "titel": "11.10. Keine Firma",
+      "stand": "ok",
+      "text": "Agenten arbeiten für Sir wie eine Firma, echte Firma vielleicht später."
+     },
+     {
+      "id": "entsch.1110-content",
+      "titel": "11.10. Ziel Content",
+      "stand": "ok",
+      "text": "Auron soll beim Content helfen: verbessern, analysieren, hochladen, schneiden, Ideen."
+     },
+     {
+      "id": "entsch.1110-universum",
+      "titel": "11.10. Universum bleibt",
+      "stand": "ok",
+      "text": "Keine Universe-Sandbox-Anbindung vorerst."
+     },
+     {
+      "id": "entsch.1110-alexa",
+      "titel": "11.10. Auron über Alexa",
+      "stand": "ok",
+      "text": "Sprechen über Alexa mit Licht- und Musiksteuerung. Machbarkeit offen."
+     },
+     {
+      "id": "entsch.1110-rahmen",
+      "titel": "11.10. Kostenrahmen 20 $",
+      "stand": "ok",
+      "text": "20 $ im Monat für Claude-Anfragen von Auron. Löst den Widerspruch 10 € / 20 $ / 30 $."
+     },
+     {
+      "id": "entsch.1110-sprache",
+      "titel": "11.10. Gehobene Sprache",
+      "stand": "ok",
+      "text": "Claude im Projekt: gehobene, genaue Sprache mit Fachbegriffen, wo sie passen; englische Begriffe kurz auf Deutsch erklären."
+     },
+     {
+      "id": "entsch.1110-karte",
+      "titel": "11.10. Gesamtkarte pflegen",
+      "stand": "ok",
+      "text": "Vor jeder Aufgabe Karte prüfen (Stand, Phase), am Ende jeder Sitzung aktualisieren."
+     },
+     {
+      "id": "entsch.1110-tiktok",
+      "titel": "11.10. TikToks nur tagsüber",
+      "stand": "ok",
+      "text": "Keine nächtliche TikTok-Auswertung. Bild-Auswertung tagsüber mit Obergrenze."
+     },
+     {
+      "id": "entsch.1110-kosten",
+      "titel": "11.10. Kosten okay, aber mit Limit",
+      "stand": "ok",
+      "text": "Höhe des Rahmens weiter offen."
+     },
+     {
+      "id": "entsch.1110-prompts",
+      "titel": "11.10. Projekt-Aufgaben als Prompts",
+      "stand": "ok",
+      "text": "Jede größere Aufgabe für Claude Code sofort als Pnn-Notiz in Wissen/14."
+     },
+     {
+      "id": "entsch.1010-zugriff",
+      "titel": "10.10. Ausführungszugriff",
+      "stand": "ok",
+      "text": "Nur .bat; Ausnahmen Nachtarbeit-Tests und Tagesautorisation."
+     },
+     {
+      "id": "entsch.1010-repo",
+      "titel": "10.10. GitHub-Repo und Claude Code",
+      "stand": "ok",
+      "text": "Code-Kopie auf GitHub, PC-Dateien bleiben Originale."
+     },
+     {
+      "id": "entsch.1010-agenten",
+      "titel": "10.10. Kleine Agenten mit Rollen",
+      "stand": "ok",
+      "text": "Zuerst Sucher und Schreiber."
+     },
+     {
+      "id": "entsch.1010-kamera",
+      "titel": "10.10. Kamera-Modus dauerhaft",
+      "stand": "ok",
+      "text": "Zimmerscan und Handtracking später."
+     },
+     {
+      "id": "entsch.0510-lokal",
+      "titel": "05.10. Tag lokal, Handy per Tailscale",
+      "stand": "ok",
+      "text": "Haupt-PC → Test-PC → Claude."
+     },
+     {
+      "id": "entsch.0410-auron",
+      "titel": "04.10. Name Auron, neue Oberfläche",
+      "stand": "ok",
+      "text": "Universum statt Stadt; Farben Silber, Rot, Schwarz; Tour bei jedem Start."
+     },
+     {
+      "id": "entsch.0410-nacht",
+      "titel": "04.10. Nachtarbeit ohne Claude",
+      "stand": "ok",
+      "text": "Eigene Suchmaschine auf dem Mini-PC."
+     },
+     {
+      "id": "entsch.0310-hauptpc",
+      "titel": "03.10. Haupt-PC bleibt Windows",
+      "stand": "ok",
+      "text": "Lokale KI auf Haupt-PC, Mini-PC und Test-PC."
+     },
+     {
+      "id": "entsch.2909-lokal",
+      "titel": "29.09. Lokale KI",
+      "stand": "ok",
+      "text": "Fast kostenlose Version als Ziel."
+     },
+     {
+      "id": "entsch.2709-rahmen",
+      "titel": "27.09. API-Rahmen bis 30 $",
+      "stand": "ok",
+      "text": "Für mehr Alltagsnutzung. Widerspricht 10 € in der Projektanweisung."
+     },
+     {
+      "id": "entsch.2609-nacht",
+      "titel": "26.09. Regeln Nachtarbeit",
+      "stand": "ok",
+      "text": "Recherche, Pläne, Entwürfe; Ergebnisse im Briefing; 0-€-Aufgaben jede Nacht."
+     },
+     {
+      "id": "entsch.2509-ubuntu",
+      "titel": "25.09. Mini-PC mit Ubuntu",
+      "stand": "ok",
+      "text": "Windows darauf gelöscht."
+     },
+     {
+      "id": "entsch.2409-mt5",
+      "titel": "24.09. MetaTrader 5 und MQL5",
+      "stand": "ok",
+      "text": "MetaQuotes-Demokonto, Bots als Expert Advisor."
+     },
+     {
+      "id": "entsch.2409-fragen",
+      "titel": "24.09. 16 Fragen beantwortet",
+      "stand": "ok",
+      "text": "Siehe Ast „Beantwortete Fragen“."
+     },
+     {
+      "id": "entsch.verworfen",
+      "titel": "Verworfen oder geparkt",
+      "stand": "nein",
+      "text": "Mit Grund.",
+      "kinder": [
+       {
+        "id": "entsch.verworfen.gebaeude",
+        "titel": "3D-Gebäude sammeln oder bauen",
+        "stand": "nein",
+        "text": "04.10.: zu aufwendig, ersetzt durch das Universum."
+       },
+       {
+        "id": "entsch.verworfen.kopf",
+        "titel": "KI-Frau oder Kopf als Körper",
+        "stand": "nein",
+        "text": "Gefällt Sir nicht, vertagt."
+       },
+       {
+        "id": "entsch.verworfen.darksouls",
+        "titel": "Dark-Souls-Schrein als Übersicht",
+        "stand": "nein",
+        "text": "Nebenidee, geparkt."
+       },
+       {
+        "id": "entsch.verworfen.linux-hauptpc",
+        "titel": "Linux auf dem Haupt-PC",
+        "stand": "nein",
+        "text": "03.10."
+       },
+       {
+        "id": "entsch.verworfen.claude-nachts",
+        "titel": "Claude in der Nachtarbeit",
+        "stand": "nein",
+        "text": "04.10."
+       }
+      ]
      }
     ]
    },
@@ -632,6 +1080,13 @@
       "stand": "plan",
       "text": "Stehen im Plan (Notiz 12).",
       "kinder": [
+       {
+        "id": "tiktok.geplant.seher",
+        "titel": "Bild-Auswertung von TikToks (P02)",
+        "stand": "plan",
+        "text": "Entscheidung 03.10.: Standbilder mit Claude Haiku. Nur tagsüber (11.10.). Sir 11.10.: bis 10 Bilder je Video, je nach Länge; höchstens 4 $ im Monat. Prompt P02 angepasst.",
+        "wer": "Claude Code"
+       },
        {
         "id": "tiktok.geplant.routinen-nachtarbeit",
         "titel": "Routinen = Nachtarbeit",
@@ -743,6 +1198,12 @@
         "titel": "Viele Agenten gleichzeitig",
         "stand": "nein",
         "text": "Mehr Kosten und mehr Last für den PC (Ruflow und ähnliche)."
+       },
+       {
+        "id": "tiktok.bewusst-nicht.nachts",
+        "titel": "TikToks nachts mit Claude",
+        "stand": "nein",
+        "text": "Sir 11.10."
        }
       ]
      }
@@ -757,8 +1218,8 @@
      {
       "id": "vorschlag.kosten-senken",
       "titel": "Kosten senken",
-      "stand": "test",
-      "text": "Prompt-Caching, top_k 3, max_tokens 800. Eingebaut, Bestätigung am PC steht aus."
+      "stand": "ok",
+      "text": "Prompt-Caching, top_k 3, max_tokens 800. Größter Hebel inzwischen: Tag lokal."
      },
      {
       "id": "vorschlag.priming-sets",
@@ -769,8 +1230,8 @@
      {
       "id": "vorschlag.studium-mit-deckel-nicht-taeglich",
       "titel": "Studium mit Deckel, nicht täglich",
-      "stand": "plan",
-      "text": "Größter Kostenposten im September (ca. 88 %)."
+      "stand": "ok",
+      "text": "Deckel 1 $ pro Lauf (Sir 24.09.)."
      },
      {
       "id": "vorschlag.opus-nur-fuer-schwere-fragen",
@@ -781,8 +1242,8 @@
      {
       "id": "vorschlag.entwuerfe-pruefen-statt-neue-schreib",
       "titel": "Entwürfe prüfen statt neue schreiben",
-      "stand": "test",
-      "text": "Erste Nachtarbeits-Aufgabe."
+      "stand": "ok",
+      "text": "Erste Nachtprüfung 24.09."
      },
      {
       "id": "vorschlag.notizen-verlinken",
@@ -801,7 +1262,7 @@
       "id": "vorschlag.dubletten-aufraeumen",
       "titel": "Dubletten aufräumen",
       "stand": "sir",
-      "text": "3 doppelte Notizen, 3 TikTok-Dubletten, 8 Physik-Paare. Selbst löschen, per .bat verschieben oder zusammenlegen? Frage 10.",
+      "text": "Sir 24.09.: ins Archiv. Paare 2–4 noch offen: welche Fassung bleibt.",
       "wer": "Sir"
      },
      {
@@ -819,15 +1280,21 @@
      {
       "id": "vorschlag.liste-jarvis-darf-nie",
       "titel": "Liste „Jarvis darf nie“",
-      "stand": "sir",
-      "text": "Vorschlag: Mails senden, Käufe, echte Trades, Termine löschen, Notizen löschen. Frage 16.",
-      "wer": "Sir"
+      "stand": "ok",
+      "text": "Sir 24.09.: darf fast alles, außer beim Traden stark ins Minus oder das Konto ins Minus; Menschen respektieren, niemanden verletzen, nichts kaputt machen.",
+      "wer": ""
      },
      {
       "id": "vorschlag.erst-suchen-dann-bauen",
       "titel": "Erst suchen, dann bauen",
       "stand": "ok",
       "text": "Arbeitsregel: nichts doppelt bauen."
+     },
+     {
+      "id": "vorschlag.karte-pflegen",
+      "titel": "Gesamtkarte am Sitzungsende pflegen",
+      "stand": "ok",
+      "text": "Wunsch Sir 11.10. Fester Schritt am Ende jeder Arbeitssitzung."
      }
     ]
    },
@@ -835,84 +1302,176 @@
     "id": "offen",
     "titel": "Offen · Sir am PC",
     "stand": "sir",
-    "text": "Alles, was nur am PC geht. Reihenfolge von oben nach unten.",
+    "text": "Nur am PC möglich. Reihenfolge von oben nach unten.",
     "kinder": [
      {
-      "id": "offen.1-neustart-bat",
-      "titel": "1 · NEUSTART.bat",
-      "stand": "ok",
-      "text": "Erledigt 24.09. mittags. Code wurde geändert, danach im Browser Strg+F5.",
-      "wer": "Sir am PC"
+      "id": "offen2.pr4",
+      "titel": "PR #4 holen und testen",
+      "stand": "sir",
+      "wer": "Sir am PC",
+      "text": "REPO HOLEN.bat, JARVIS STARTEN.bat, Strg+F5. Dann Kontoauszüge als Original-CSV unter Markt → Finanzen hochladen oder in die Ablage legen und „Kontoauszüge einlesen“ sagen. Agenten-Seite: Lichter prüfen."
      },
      {
-      "id": "offen.2-tests-ausfuehren-bat",
-      "titel": "2 · TESTS_AUSFUEHREN.bat",
-      "stand": "ok",
-      "text": "Erledigt 24.09. mittags. „fertig“ melden, Claude wertet backend\\tests_log.txt aus.",
-      "wer": "Sir am PC"
-     },
-     {
-      "id": "offen.3-nachtarbeit-testen",
-      "titel": "3 · Nachtarbeit testen",
-      "stand": "ok",
-      "text": "Erledigt 24.09. mittags. /api/nachtarbeit/start einmal bei Tageslicht.",
-      "wer": "Sir am PC"
-     },
-     {
-      "id": "offen.nachtbericht-uebernehmen",
-      "titel": "4 · Nachtbericht übernehmen",
+      "id": "offen2.sprache-auron",
+      "titel": "Sprache von Auron",
       "stand": "sir",
       "wer": "Sir",
-      "text": "Im HUD auf der Jarvis-Seite unter Vorschläge."
+      "text": "Claude spricht jetzt gehoben. Soll Auron selbst auch gehobene Sprache nutzen oder einfach bleiben?"
      },
      {
-      "id": "offen.4-alle-maerkte-laden",
-      "titel": "5 · Alle Märkte laden",
+      "id": "offen2.p05",
+      "titel": "P05 an Claude Code geben (Frist 30.11.)",
       "stand": "sir",
-      "text": "Markt-Seite, ca. 1–2 Minuten, gedrosselt.",
+      "wer": "Sir",
+      "text": "Nach P03 und P01, aber vor Ende November. Danach Klangprobe anhören."
+     },
+     {
+      "id": "offen2.csv",
+      "titel": "Beispiel-CSV beider Banken",
+      "stand": "ok",
+      "wer": "Sir",
+      "text": "Erledigt 11.10.: Formate von Volksbank und Revolut in P03 erfasst."
+     },
+     {
+      "id": "offen2.revolut",
+      "titel": "Revolut-Recherche an Auron",
+      "stand": "ok",
+      "wer": "Sir",
+      "text": "„Auron, heute Nacht: recherchiere, welche Wege es gibt, als Privatkunde an die eigenen Revolut-Umsätze zu kommen (Export, Open Banking, API).“"
+     },
+     {
+      "id": "offen2.testpc",
+      "titel": "Test-PC: IP nennen, Ollama starten",
+      "stand": "sir",
+      "text": "LAN-Kabel kommt wieder an den Test-PC. Danach IP nennen (ipconfig), Ollama starten. Bis dahin rechnet nachts der Haupt-PC.",
       "wer": "Sir am PC"
      },
      {
-      "id": "offen.5-syncthing-aufraeumen",
-      "titel": "6 · Syncthing aufräumen",
+      "id": "offen2.nachtberichte",
+      "titel": "6 Nachtberichte",
       "stand": "sir",
-      "text": "Siehe Mini-PC. Notiz 13, „Zweiter Versuch“.",
+      "text": "Im HUD übernehmen oder verwerfen.",
       "wer": "Sir am PC"
      },
      {
-      "id": "offen.6-mini-pc-einrichten",
-      "titel": "7 · Mini-PC einrichten",
+      "id": "offen2.dubletten",
+      "titel": "Dubletten-Paare 2–4",
       "stand": "sir",
-      "text": "JARVIS_MINIPC_EINRICHTEN.bat, dann JARVIS_MINIPC_OEFFNEN.bat.",
-      "wer": "Sir am PC"
-     },
-     {
-      "id": "offen.7-aufgabenplanung",
-      "titel": "8 · Aufgabenplanung",
-      "stand": "sir",
-      "text": "NACHTARBEIT.bat, erst nach erfolgreichem Test.",
-      "wer": "Sir am PC"
-     },
-     {
-      "id": "offen.8-optionale-bat",
-      "titel": "9 · Optionale .bat",
-      "stand": "sir",
-      "text": "WHISPER_EINRICHTEN, PIPER_EINRICHTEN, MT5_DATEN_EXPORT.",
-      "wer": "Sir am PC"
-     },
-     {
-      "id": "offen.9-google-kalender-zugang",
-      "titel": "10 · Google-Kalender-Zugang",
-      "stand": "sir",
-      "text": "Nur nötig, wenn Jarvis Termine anlegen soll.",
+      "text": "Welche Fassung bleibt.",
       "wer": "Sir"
      },
      {
-      "id": "offen.10-nas-fehlerbild",
-      "titel": "11 · NAS-Fehlerbild",
+      "id": "offen2.auron-repo",
+      "titel": "auron.html ins Repo (P09)",
       "stand": "sir",
-      "text": "Noch offen, Details fehlen.",
+      "text": "Vorher git pull.",
+      "wer": "Sir am PC"
+     },
+     {
+      "id": "offen2.linklearn",
+      "titel": "Link-and-Learn-Passwort",
+      "stand": "sir",
+      "text": "Fällig ca. 11.10.",
       "wer": "Sir"
+     },
+     {
+      "id": "offen2.geraete",
+      "titel": "Geräteliste Home Assistant (P06)",
+      "stand": "sir",
+      "text": "Welche Geräte zuerst.",
+      "wer": "Sir"
+     },
+     {
+      "id": "offen2.mt5",
+      "titel": "MT5-Export",
+      "stand": "sir",
+      "text": "MT5_DATEN_EXPORT.bat, Voraussetzung für die Bots auf voller Historie.",
+      "wer": "Sir am PC"
+     },
+     {
+      "id": "offen2.discord",
+      "titel": "Discord-Prognose-Bot",
+      "stand": "idee",
+      "text": "Irgendwann gemeinsam ansehen.",
+      "wer": "Sir"
+     }
+    ]
+   },
+   {
+    "id": "offenc",
+    "titel": "Offen · Claude",
+    "stand": "plan",
+    "text": "Was Claude als Nächstes erledigt.",
+    "kinder": [
+     {
+      "id": "offenc.offen-md",
+      "titel": "Zwei Punkte aus OFFEN.md (Claude Code)",
+      "stand": "sir",
+      "wer": "Sir",
+      "text": "1) pc_agent_windows und pc2_agent ins Repo aufnehmen. 2) Claude Code direkt auf main pushen statt Pull Request (spart den Merge, Sir sieht Änderungen aber nicht mehr vorher). Liegt auf Branch claude/sleepy-allen-bpaxnv."
+     },
+     {
+      "id": "offenc.alexa",
+      "titel": "Alexa-Machbarkeit klären",
+      "stand": "plan",
+      "wer": "Claude",
+      "text": "Kann Auron über den Echo Dot 2. Gen sprechen? Wege, Aufwand, Kosten."
+     },
+     {
+      "id": "offenc.piper",
+      "titel": "Piper vor 30.11. prüfen",
+      "stand": "ok",
+      "wer": "Claude",
+      "text": "Erledigt 11.10.: Ursache gefunden, P05 neu geschrieben, Priorität hoch. Jetzt Sir → Claude Code."
+     },
+     {
+      "id": "offenc.google-termine",
+      "titel": "Weg für Google-Termine",
+      "stand": "plan",
+      "wer": "Claude",
+      "text": "Wie Auron dauerhaft in Google eintragen kann, ohne dass der Zugang nach 7 Tagen verfällt."
+     },
+     {
+      "id": "offenc.nacht-tiefer",
+      "titel": "Nachtarbeit gründlicher (P15?)",
+      "stand": "idee",
+      "wer": "Claude",
+      "text": "Nacht dauert nur ca. 7 Minuten. Mehr Webseiten, zwei Überarbeitungen, Prüfgrund Pflicht. Wartet auf Sirs Ja."
+     },
+     {
+      "id": "offenc.rahmen-code",
+      "titel": "Rahmen 20 $ im Code prüfen",
+      "stand": "plan",
+      "wer": "Claude",
+      "text": "Kosten-Karte, Deckel und CLAUDE.md im Repo (nennt noch 10 EUR) angleichen. Nur nach Sirs Ja ändern."
+     },
+     {
+      "id": "offenc.ip",
+      "titel": "Test-PC-IP eintragen",
+      "stand": "plan",
+      "text": "Sobald Sir sie nennt, in data\\ki_lokal.json.",
+      "wer": "Claude"
+     },
+     {
+      "id": "offenc.pmelden",
+      "titel": "P-Aufgaben nachhalten",
+      "stand": "plan",
+      "text": "Ergebnisse melden, Status in der Übersicht ändern.",
+      "wer": "Claude"
+     },
+     {
+      "id": "offenc.datum",
+      "titel": "Datum in der Nachtprüfung prüfen",
+      "stand": "plan",
+      "text": "Antwort Sir 24.09.: ja. Umsetzung bestätigen.",
+      "wer": "Claude"
+     },
+     {
+      "id": "offenc.karte",
+      "titel": "Gesamtkarte pflegen",
+      "stand": "plan",
+      "text": "Am Ende jeder Sitzung: JSON im Backend und Artifact.",
+      "wer": "Claude"
      }
     ]
    },
@@ -920,12 +1479,108 @@
     "id": "fragen",
     "titel": "Offene Fragen an Sir",
     "stand": "sir",
-    "text": "Aus Notiz 12. Beantwortet sind 4, 5 und 6. Antworten reichen kurz, auch am Handy.",
+    "text": "Neu seit 11.10. Jede Frage mit kurzer Erklärung, warum sie wichtig ist. Antworten reichen kurz, auch am Handy (HUD: Seite „Karte“, Fragen-Runde).",
+    "kinder": [
+     {
+      "id": "fragen.17-kostenrahmen",
+      "titel": "17 · Kostenrahmen",
+      "stand": "ok",
+      "text": "Drei Zahlen stehen in verschiedenen Dokumenten: 10 € (Projektanweisung), 20 $ (22.09.), 30 $ (27.09.). Deckel, Warnungen und die Kosten-Karte brauchen eine Zahl. Verbrauch laut Protokoll (eigene Schätzung): September ca. 8,20 $, Oktober bis 11.10. ca. 2,00 $, davon 1,62 $ am 03.10. (TikTok). Seit Tag lokal reichen 10 € wahrscheinlich, wenn die Bild-Auswertung ihre eigene Obergrenze bekommt. Entschieden 11.10.: 20 $.",
+      "frage": "Welcher Monatsrahmen gilt für Claude-Anfragen von Auron: 10 €, 20 $ oder 30 $?",
+      "nr": 17
+     },
+     {
+      "id": "fragen.18-bildlimit",
+      "titel": "18 · Obergrenze Bild-Auswertung",
+      "stand": "ok",
+      "text": "Bilder kann nur Claude auswerten, das lokale Modell nicht. Ohne Grenze kann ein Stapel Videos schnell mehr kosten als der ganze Rahmen. Erst mit dieser Zahl kann Claude Code P02 fertig bauen.",
+      "frage": "Passt die Obergrenze für die TikTok-Bild-Auswertung (P02): 5 Bilder je Video und höchstens 3 $ im Monat?",
+      "nr": 18
+     },
+     {
+      "id": "fragen.19-fish",
+      "titel": "19 · Stimme nach dem 30.11.",
+      "stand": "ok",
+      "text": "Ab Dezember würde jede gesprochene Antwort Geld kosten oder automatisch auf die Windows-Stimme fallen. Piper ist kostenlos und lokal, klingt aber schlechter und muss erst auf dem Mini-PC repariert werden. Wenn Piper gewollt ist, sollte P05 vor Ende November laufen.",
+      "frage": "Fish Audio ist nur bis 30.11.2026 kostenlos. Was danach: bezahlen, lokale Piper-Stimme reparieren (P05) oder Windows-Stimme?",
+      "nr": 19
+     },
+     {
+      "id": "fragen.20-phasen",
+      "titel": "20 · Zehn Phasen",
+      "stand": "ok",
+      "text": "Sie haben am 24.09. „10 Phasen, immer weiter ausbauen“ geantwortet. Die Phasen 7 bis 10 sind Claudes Vorschlag aus dem, was seitdem dazugekommen ist. Eine feste Einteilung hilft, Prioritäten zu setzen und das Handbuch (P14) zu gliedern. Sir 11.10.: passt, es dürfen auch mehr Phasen werden.",
+      "frage": "Passt die neue Einteilung in 10 Phasen (7 Auron-Oberfläche, 8 Agenten, 9 Zuhause und Geräte, 10 Finanzen, Firma, Weitergabe)?",
+      "nr": 20
+     },
+     {
+      "id": "fragen.21-termine",
+      "titel": "21 · Termine anlegen",
+      "stand": "ok",
+      "text": "Sie wollten am 24.09. Google mit Schreibrecht. Seit 05.10. gibt es eigene Termine in Auron ohne KI. Google-Schreibzugang braucht eine Google-Anmeldung (OAuth), die ohne eigene Domain im Testmodus nach 7 Tagen verfällt, wie schon bei Gmail. Die eigene Liste ist einfacher, taucht aber nicht im Google-Kalender am Handy auf.",
+      "frage": "Reichen die eigenen Termine in Auron, oder soll Auron weiterhin auch in Google eintragen können?",
+      "nr": 21
+     },
+     {
+      "id": "fragen.22-firma",
+      "titel": "22 · Welche Firma?",
+      "stand": "ok",
+      "text": "Sie haben am 24.09. geschrieben: Assistent für Sie, Mitarbeiter für Ihre Firma. Ohne zu wissen, was die Firma macht, lässt sich Phase 10 nicht planen. Wenn es die Firma noch nicht gibt, reicht ein Satz zur Idee.",
+      "frage": "Für welche Firma soll Auron „Mitarbeiter“ sein, und welche zwei oder drei Aufgaben soll er dort zuerst übernehmen?",
+      "nr": 22
+     },
+     {
+      "id": "fragen.23-ziel",
+      "titel": "23 · Ziel in 6 Monaten",
+      "stand": "ok",
+      "text": "Die Antwort ist durch Tippfehler nicht eindeutig. Wenn Auron Inhalte für Sie erstellen soll, wäre das ein eigener Ast mit eigenem Aufwand und eigenen Kosten.",
+      "frage": "Ihre Antwort vom 24.09. lautet „Aktiv Konent erstellt“. Ist „Content erstellen“ gemeint, also z. B. TikTok-Videos, und soll Auron dabei helfen?",
+      "nr": 23
+     },
+     {
+      "id": "fragen.24-echtgeld",
+      "titel": "24 · Bedingungen für echtes Geld",
+      "stand": "sir",
+      "text": "Ihre Regel lautet: nie stark ins Minus, Konto nie ins Minus. Damit der Risiko-Wächter das durchsetzen kann, braucht er feste Zahlen. Die Beispielwerte sind nur ein Vorschlag, keine Anlageberatung. Echte Trades kann Auron heute technisch nicht ausführen.",
+      "frage": "Ab wann dürfen die Bots mit echtem Geld laufen? Zum Beispiel: mindestens 3 Monate Paper-Trading, Ergebnis im Plus, höchstens 1 % Risiko pro Trade, fester Monatsverlust, bei dem alles stoppt.",
+      "nr": 24
+     },
+     {
+      "id": "fragen.25-universe",
+      "titel": "25 · Universe Sandbox",
+      "stand": "ok",
+      "text": "Am 04.10. war geplant, Ihre Simulationen aus Universe Sandbox einzulesen. Seitdem läuft das eigene Universum (Three.js) und gefällt. Die Anbindung wäre viel Aufwand (31-MB-Dateien mit 7.500 Objekten) für wenig zusätzlichen Nutzen. Claudes Einschätzung: streichen, außer Sie wollen ein bestimmtes Szenario sehen.",
+      "frage": "Soll die Anbindung an Universe Sandbox noch kommen, oder bleibt das eigene Universum in Auron?",
+      "nr": 25
+     },
+     {
+      "id": "fragen.26-alexa",
+      "titel": "26 · Alexa",
+      "stand": "ok",
+      "text": "Sie haben am 24.09. geschrieben, am liebsten über Ihr Alexa-System. Gerätesteuerung über Home Assistant ist machbar. Auron als Stimme in der Alexa ist deutlich schwieriger und braucht vermutlich einen Alexa-Skill über Amazons Server (ungeprüft). Die Antwort entscheidet, wie P06 gebaut wird.",
+      "frage": "Soll der Echo Dot nur Geräte schalten (Licht usw. über Home Assistant), oder wollen Sie Auron wirklich über Alexa sprechen?",
+      "nr": 26
+     },
+     {
+      "id": "fragen.27-zugangsweg",
+      "titel": "27 · Zugangsweg Banken",
+      "stand": "ok",
+      "nr": 27,
+      "frage": "Welcher Weg für den Finanz-Überblick (P03): A) zuerst CSV-Export aus Volksbank und Revolut, den Auron einliest, später FinTS; B) gleich FinTS für die Volksbank; C) ein Dienst, der Konten bündelt?",
+      "text": "Die Nachtrecherche (Aufträge 10, 12–15) ist dünn, reicht aber für die Richtung. A ist sofort machbar, sicher (keine Zugangsdaten in Auron) und kostet 0 €, braucht aber Handarbeit einmal im Monat. B ruft die Volksbank automatisch ab, braucht aber PIN/TAN-Freigaben und vermutlich eine Produkt-Registrierung bei der Deutschen Kreditwirtschaft (ungeprüft). Revolut kann kein FinTS. C gibt einem fremden Dienst Lesezugriff auf alle Konten und kostet meist Geld. Claudes Empfehlung: A, danach B."
+     }
+    ]
+   },
+   {
+    "id": "fragen-alt",
+    "titel": "Beantwortete Fragen (24.09.)",
+    "stand": "ok",
+    "text": "Alle 16 Fragen hat Sir am 24.09. in der HUD-Karte beantwortet. Antworten stehen an den Punkten.",
     "kinder": [
      {
       "id": "fragen.wie-viele-phasen",
       "titel": "Wie viele Phasen?",
-      "stand": "sir",
+      "stand": "ok",
       "text": "Neu: Phase 5 und 6 wie in den Phasen-Ästen vorgeschlagen, oder bei 4 bleiben?",
       "frage": "Wie viele Phasen soll Jarvis haben? Vorschlag: 1 bis 4 wie bisher, dazu Phase 5 \"Selbstständig und Server\" und Phase 6 \"Ausbau\". Oder bei 4 bleiben?",
       "nr": ""
@@ -933,7 +1588,7 @@
      {
       "id": "fragen.1-wichtigstes-ziel-in-6-monaten",
       "titel": "1 · Wichtigstes Ziel in 6 Monaten",
-      "stand": "sir",
+      "stand": "ok",
       "text": "Reihenfolge: Wissen, Trading, Alltag, Schule, Bundeswehr, Geld verdienen.",
       "frage": "Wofür soll Jarvis in 6 Monaten am meisten da sein? Bitte in Reihenfolge: Wissen und Vault, Trading, Alltag, Schule und Ausbildung, Bundeswehr, Geld verdienen.",
       "nr": "1"
@@ -941,7 +1596,7 @@
      {
       "id": "fragen.2-assistent-oder-mitarbeiter",
       "titel": "2 · Assistent oder Mitarbeiter?",
-      "stand": "sir",
+      "stand": "ok",
       "text": "Wenn Mitarbeiter: welche drei Aufgaben zuerst?",
       "frage": "Soll Jarvis vor allem antworten, also Assistent sein, oder selbst Aufgaben erledigen, also Mitarbeiter? Wenn Mitarbeiter: welche drei Aufgaben zuerst?",
       "nr": "2"
@@ -949,7 +1604,7 @@
      {
       "id": "fragen.3-wo-nutzen-sie-jarvis",
       "titel": "3 · Wo nutzen Sie Jarvis?",
-      "stand": "sir",
+      "stand": "ok",
       "text": "Am PC, am Handy oder per Sprache im Raum.",
       "frage": "Wo nutzen Sie Jarvis am meisten: am PC, am Handy oder per Sprache im Raum?",
       "nr": "3"
@@ -957,7 +1612,7 @@
      {
       "id": "fragen.7-pro-limit-nachts",
       "titel": "7 · Pro-Limit nachts",
-      "stand": "sir",
+      "stand": "ok",
       "text": "Wie viel vom Wochenlimit darf Claude nachts verbrauchen?",
       "frage": "Wie viel vom Pro-Wochenlimit darf Claude nachts verbrauchen: nur wenn noch viel übrig ist, bis zu einem Drittel, oder egal?",
       "nr": "7"
@@ -965,7 +1620,7 @@
      {
       "id": "fragen.8-studium-deckel",
       "titel": "8 · Studium-Deckel",
-      "stand": "sir",
+      "stand": "ok",
       "text": "Warum 2,86 $ statt 1 $? Wie oft soll das Studium laufen?",
       "frage": "Das Studium \"Risiko-Berechnung\" hat 2,86 Dollar gekostet statt 1 Dollar. War der Deckel absichtlich höher? Und wie oft soll das Studium laufen?",
       "nr": "8"
@@ -973,7 +1628,7 @@
      {
       "id": "fragen.9-62-studium-entwuerfe",
       "titel": "9 · 62 Studium-Entwürfe",
-      "stand": "sir",
+      "stand": "ok",
       "text": "Lassen, prüfen und übernehmen, oder nur Trading?",
       "frage": "Die 62 Studium-Entwürfe: so lassen, nach und nach prüfen und in die Grundlagen übernehmen, oder nur die fürs Trading wichtigen?",
       "nr": "9"
@@ -981,7 +1636,7 @@
      {
       "id": "fragen.10-dubletten",
       "titel": "10 · Dubletten",
-      "stand": "sir",
+      "stand": "ok",
       "text": "Selbst löschen, per .bat verschieben oder zusammenlegen?",
       "frage": "Doppelte Notizen: löschen Sie selbst, soll eine bat-Datei sie in einen Ordner \"Zum Löschen\" verschieben, oder sollen Physik-Paare zusammengelegt werden?",
       "nr": "10"
@@ -989,7 +1644,7 @@
      {
       "id": "fragen.11-trading-ziel",
       "titel": "11 · Trading-Ziel",
-      "stand": "sir",
+      "stand": "ok",
       "text": "Nur lernen, später kleines echtes Konto, oder eigene Bots echt laufen lassen?",
       "frage": "Trading-Ziel: nur lernen und simulieren, später ein kleines echtes Konto, oder die eigenen Bots irgendwann echt laufen lassen?",
       "nr": "11"
@@ -997,7 +1652,7 @@
      {
       "id": "fragen.12-zeit-fuer-die-maerkte",
       "titel": "12 · Zeit für die Märkte",
-      "stand": "sir",
+      "stand": "ok",
       "text": "Passt 15:30–17:30 zum Dienst?",
       "frage": "Wann haben Sie Zeit für die Märkte? Passt das Zeitfenster 15:30 bis 17:30 zum Dienst?",
       "nr": "12"
@@ -1005,7 +1660,7 @@
      {
       "id": "fragen.13-was-zuerst-ins-labor",
       "titel": "13 · Was zuerst ins Labor?",
-      "stand": "sir",
+      "stand": "ok",
       "text": "Eigene Bots auf MT5-Historie, London-Breakout oder Sweep-Regel?",
       "frage": "Was zuerst ins Labor: Ihre drei Bots auf voller MT5-Historie, London-Breakout oder die Sweep-Regel?",
       "nr": "13"
@@ -1013,7 +1668,7 @@
      {
       "id": "fragen.14-englisch-coach",
       "titel": "14 · Englisch-Coach?",
-      "stand": "sir",
+      "stand": "ok",
       "text": "Ja oder nein.",
       "frage": "Soll Jarvis ein Englisch-Coach werden, der sich Ihre Fehler merkt? Ja oder nein?",
       "nr": "14"
@@ -1021,7 +1676,7 @@
      {
       "id": "fragen.15-was-soll-jarvis-steuern",
       "titel": "15 · Was soll Jarvis steuern?",
-      "stand": "sir",
+      "stand": "ok",
       "text": "Licht, Windows, Programme, anderes?",
       "frage": "Was soll Jarvis am PC oder zu Hause noch steuern können: Licht, Windows, Programme oder anderes?",
       "nr": "15"
@@ -1029,7 +1684,7 @@
      {
       "id": "fragen.16-was-darf-jarvis-nie",
       "titel": "16 · Was darf Jarvis nie?",
-      "stand": "sir",
+      "stand": "ok",
       "text": "Vorschlag: Mails senden, Käufe, echte Trades, Termine löschen, Notizen löschen.",
       "frage": "Was darf Jarvis nie, auch nicht mit Freigabe? Vorschlag: Mails senden, Käufe, echte Trades, Termine löschen, Notizen löschen.",
       "nr": "16"
@@ -1044,40 +1699,45 @@
     "kinder": [
      {
       "id": "technik.kostenrahmen-20",
-      "titel": "Kostenrahmen 20 $",
+      "titel": "Kostenrahmen",
       "stand": "ok",
-      "text": "September bis 23.09. ca. 7,32 $ (Schätzung aus dem Protokoll). Studium war der größte Posten."
+      "text": "20 $ im Monat für Claude-Anfragen von Auron (Entscheidung Sir 11.10.2026)."
+     },
+     {
+      "id": "technik.verbrauch",
+      "titel": "Verbrauch (Schätzung)",
+      "stand": "ok",
+      "text": "Aus data/usage_log.jsonl: September ca. 8,20 $, Oktober bis 11.10. ca. 2,00 $. Seit 05.10. fast 0 €, weil tagsüber lokal."
      },
      {
       "id": "technik.preise-je-mio-tokens",
       "titel": "Preise je Mio. Tokens",
       "stand": "ok",
-      "text": "Haiku 4.5: 1/5 $, Sonnet 5: 2/10 $, Opus 5.5: 4/20 $ (Eingabe/Ausgabe)."
-     },
-     {
-      "id": "technik.pc-abstuerze",
-      "titel": "PC-Abstürze",
-      "stand": "sir",
-      "text": "RAM auf 32 GB umgebaut, BIOS angepasst. Weiter beobachten, schwere Läufe gedrosselt (2 Threads).",
-      "wer": "Sir"
-     },
-     {
-      "id": "technik.zwei-chats-am-selben-ordner",
-      "titel": "Zwei Chats am selben Ordner",
-      "stand": "ok",
-      "text": "Cowork und Claude Code. Regel: vor jedem Schreiben die PC-Fassung neu lesen und vergleichen."
+      "text": "Haiku 4.5: 1/5 $, Sonnet 5: 2/10 $, Opus 5.5: 4/20 $ (Eingabe/Ausgabe). Cache-Lesen 10 %."
      },
      {
       "id": "technik.claude-arbeit-kostet-das-pro-limit",
       "titel": "Claude-Arbeit kostet das Pro-Limit",
       "stand": "ok",
-      "text": "Nicht die 20 $ von Jarvis. Limit wird freitags zurückgesetzt."
+      "text": "Nicht den Auron-Rahmen. Limit wird freitags zurückgesetzt. Claude Code über das Anthropic-Guthaben."
      },
      {
-      "id": "technik.hud-in-chrome",
-      "titel": "HUD öffnet in Chrome",
+      "id": "technik.geraete",
+      "titel": "Geräte",
+      "stand": "ok",
+      "text": "Haupt-PC 5700X3D/32 GB/RTX 2070 Super; Test-PC Ryzen 5 4500/32 GB/RX 580; Mini-PC i5 4. Gen/15 GB; Laptop i5-1135G7/16 GB."
+     },
+     {
+      "id": "technik.pc-abstuerze",
+      "titel": "PC-Abstürze",
       "stand": "test",
-      "text": "NEUSTART.bat, start_jarvis.bat und JARVIS_MINIPC_OEFFNEN.bat öffnen das HUD in Chrome (gibt es Chrome nicht, im Standard-Browser)."
+      "text": "RAM auf 32 GB umgebaut, BIOS angepasst (21.09.). Schwere Läufe weiter gedrosselt (2 Threads). Seitdem nichts Neues festgehalten."
+     },
+     {
+      "id": "technik.zwei-chats-am-selben-ordner",
+      "titel": "Mehrere Claude-Sitzungen am selben Ordner",
+      "stand": "ok",
+      "text": "Vor jedem Schreiben die PC-Fassung neu lesen."
      }
     ]
    }
