@@ -504,9 +504,9 @@
        {
         "id": "p5.lokale-ki.test-pc",
         "titel": "Test-PC wieder einbinden",
-        "stand": "sir",
-        "text": "Neue WLAN-IP nennen (ipconfig), Ollama starten. Claude trägt die IP dann ein.",
-        "wer": "Sir am PC"
+        "stand": "ok",
+        "text": "Erledigt 11.10.: Test-PC per LAN unter 192.168.68.100, in data\\ki_lokal.json eingetragen, Auron meldet „erreichbar“. Offen nur noch: Adresse in der Deco reservieren (Sir).",
+        "wer": ""
        }
       ]
      },
@@ -527,6 +527,33 @@
       "titel": "Git-Backup online",
       "stand": "ok",
       "text": "Seit 10.10. privates Repo auf GitHub. Claude Code arbeitet dort über das Anthropic-Guthaben."
+     },
+     {
+      "id": "p5.gesamtpruefung",
+      "titel": "Gesamtprüfung (ALLES_PRUEFEN, P16)",
+      "stand": "test",
+      "text": "Gebaut 11.10. von Claude: 2 Testen und Pruefen\\ALLES_PRUEFEN.bat, inhalt_pruefen.py, INHALT_PRUEFEN_HINTERGRUND.bat. Erster Lauf 17:34: Reindex (468 Notizen, 4.506 Abschnitte), Vault-Pflege (467 aktive Notizen, 0 Links ins Leere, 10 Dubletten-Gruppen, 22 ohne eingehende Links, Bericht in Wissen/06 - Quellen und Pflege/Vault-Pflegebericht.md). Testschritt seit 17:52 entfernt (Regel 12). P16: Claude Code soll das alle 2 Wochen als Nachtarbeit laufen lassen (Abstand: Frage 28).",
+      "kinder": [
+       {
+        "id": "p5.gesamtpruefung.inhalt",
+        "titel": "Inhaltsprüfung aller Notizen",
+        "stand": "test",
+        "text": "Lokales Modell auf dem Test-PC prüft jede Notiz auf Widersprüche, Fehler und Abbrüche. Ändert nichts, schreibt nur data\\inhaltspruefung.json. 0 €. Stand 17:59: 31 von 467 geprüft – 16 ok, 13 „prüfen“, 2 „fehler“ (zwei Notizen in 01 - Mensch und Alltag brechen mitten im Satz ab). Ca. 15 s je Notiz, fertig etwa gegen 20 Uhr (hochgerechnet)."
+       },
+       {
+        "id": "p5.gesamtpruefung.neustart",
+        "titel": "PC-Neustart durch Test (17:35)",
+        "stand": "ok",
+        "text": "Ursache: test_herunterfahren_braucht_ja erreichte den echten PC-Agenten (Port 8766) und löste „Startet neu in 60 Sekunden“ aus; test_aktionen_und_token öffnete echtes Chrome. Fehler von Claude (Tests auf dem Haupt-PC gestartet). Sofort-Maßnahme 17:52: Testschritt entfernt, TESTS_AUSFUEHREN.bat gesperrt. Dauerhafte Lösung: P17."
+       },
+       {
+        "id": "p5.gesamtpruefung.port8000",
+        "titel": "Suchtest: Port 8000 belegt",
+        "stand": "plan",
+        "text": "Suchtest brach ab („Auf Port 8000 läuft noch das Backend“ auf dem Haupt-PC). Klären, was dort läuft.",
+        "wer": "Claude"
+       }
+      ]
      }
     ]
    },
@@ -607,8 +634,8 @@
      {
       "id": "p7.einfrieren",
       "titel": "Einfrieren behoben",
-      "stand": "test",
-      "text": "Fix 3 vom 10.10. 23:42, Sir: „Geht wieder“. Über längere Zeit ungetestet. Messanzeige Strg+Alt+D."
+      "stand": "ok",
+      "text": "Fix 3 vom 10.10. war durch REPO HOLEN (11.10. 00:01) verloren und ist seit 11.10. 14:13 wieder drin und auf GitHub. Sir 17:28: beim letzten Test hat alles geklappt. Langzeit weiter beobachten."
      },
      {
       "id": "p7.kamera",
@@ -620,7 +647,7 @@
       "id": "p7.kamera-knopf",
       "titel": "Kamera-Knopf",
       "stand": "test",
-      "text": "Gebaut 11.10. in auron.html. Ungetestet."
+      "text": "Gebaut 10./11.10., durch REPO HOLEN verloren, seit 11.10. 14:13 wieder drin und auf GitHub. Einzeltest steht aus."
      },
      {
       "id": "p7.farben",
@@ -630,10 +657,10 @@
      },
      {
       "id": "p7.auron-html-repo",
-      "titel": "auron.html ins Repo",
-      "stand": "sir",
-      "text": "Vorher git pull, damit Claude-Code-Änderungen nicht verloren gehen (P09).",
-      "wer": "Sir am PC"
+      "titel": "auron.html im Repo (P09)",
+      "stand": "ok",
+      "text": "Erledigt 11.10. 14:13 mit ZWEI_DATEIEN_HOCHLADEN.bat. Lehre: REPO HOLEN überschreibt alles, was nur auf dem PC geändert wurde – Änderungen am PC immer sofort hochladen.",
+      "wer": ""
      },
      {
       "id": "p7.universe-sandbox",
@@ -678,7 +705,7 @@
       "id": "p8.weitere-rollen",
       "titel": "Prüfer, Tester, Boss, Ingenieur, Dichter (P01)",
       "stand": "test",
-      "text": "Gebaut von Claude Code 11.10. (PR #4): Prüfer, Tester, Boss, Ingenieur, Dichter als Rollen-Vorgaben; Station aufgeräumt; Lichter bei aktiven Agenten. Rollen noch nirgends im Chat angeschlossen. Am PC noch nicht geholt.",
+      "text": "Gebaut von Claude Code 11.10. (PR #4): Prüfer, Tester, Boss, Ingenieur, Dichter als Rollen-Vorgaben; Station aufgeräumt; Lichter bei aktiven Agenten. Auf dem PC geholt (Sir 17:28: Test ok). Rollen noch nirgends im Chat angeschlossen.",
       "wer": ""
      },
      {
@@ -692,6 +719,13 @@
       "titel": "Claude Code als Werkstatt",
       "stand": "ok",
       "text": "Austausch über GitHub: Claude Code pusht, Sir holt mit REPO HOLEN.bat, lädt mit REPO HOCHLADEN.bat hoch; Fehler gehen per FEHLERBERICHT SENDEN.bat nach berichte/fehlerbericht.md. Claude im Projekt liest das Repo seit 11.10. direkt mit (nur lesen)."
+     },
+     {
+      "id": "p8.p17",
+      "titel": "Tests vom echten PC-Agenten abschotten (P17)",
+      "stand": "plan",
+      "text": "Nach dem PC-Neustart vom 11.10.: Kein Test darf den echten PC-Agenten, Chrome oder Herunterfahren aufrufen; ein eigener Test prüft das. Danach dürfen Tests wieder lokal laufen.",
+      "wer": "Claude (Notiz) → Claude Code"
      }
     ]
    },
@@ -751,7 +785,7 @@
       "id": "p10.finanzen",
       "titel": "Finanz-Überblick (P03)",
       "stand": "test",
-      "text": "Gebaut von Claude Code 11.10. (PR #4, gemergt 12:32, Tests auf GitHub grün): CSV-Import Volksbank und Revolut, Abo-Erkennung, Bereich Finanzen unter Markt, Kündigungshilfe, Monats-Abo-Übersicht im Briefing, Chat-Befehle. Nur lesend, keine IBANs gespeichert. Am PC noch nicht geholt; mit echten Auszügen ungetestet.",
+      "text": "Gebaut von Claude Code 11.10. (PR #4, gemergt 12:32, Tests auf GitHub grün): CSV-Import Volksbank und Revolut, Abo-Erkennung, Bereich Finanzen unter Markt, Kündigungshilfe, Monats-Abo-Übersicht im Briefing, Chat-Befehle. Nur lesend, keine IBANs gespeichert. Auf dem PC geholt. Mit echten Auszügen ungetestet. Achtung: Die Dateien in data\\ablage\\Konto sind .xlsx, der Import erwartet CSV – für den Test eine CSV exportieren.",
       "wer": "Sir am PC"
      },
      {
@@ -786,6 +820,18 @@
     "stand": "ok",
     "text": "Was Sir festgelegt hat, neueste zuerst. Verworfenes steht unten.",
     "kinder": [
+     {
+      "id": "entsch.1110-tests",
+      "titel": "11.10. Tests nie auf dem Haupt-PC (Regel 12)",
+      "stand": "ok",
+      "text": "Dort läuft der echte PC-Agent; ein Test hat den PC neu gestartet. Tests nur in der Cloud (Stubs) oder auf GitHub, bis P17 umgesetzt ist."
+     },
+     {
+      "id": "entsch.1110-repoweg",
+      "titel": "11.10. PC-Änderungen sofort hochladen (Regel 11)",
+      "stand": "ok",
+      "text": "REPO HOLEN hat zweimal PC-Änderungen überschrieben. Ab jetzt: was Claude im Projekt am Code auf dem PC ändert, geht sofort per Hochlade-.bat ins Repo."
+     },
      {
       "id": "entsch.1110-pr4",
       "titel": "11.10. P01 und P03 gebaut",
@@ -1305,11 +1351,53 @@
     "text": "Nur am PC möglich. Reihenfolge von oben nach unten.",
     "kinder": [
      {
-      "id": "offen2.pr4",
-      "titel": "PR #4 holen und testen",
+      "id": "offen2.karte-hochladen",
+      "titel": "Gesamtkarte hochladen",
       "stand": "sir",
       "wer": "Sir am PC",
-      "text": "REPO HOLEN.bat, JARVIS STARTEN.bat, Strg+F5. Dann Kontoauszüge als Original-CSV unter Markt → Finanzen hochladen oder in die Ablage legen und „Kontoauszüge einlesen“ sagen. Agenten-Seite: Lichter prüfen."
+      "text": "Nach der Aktualisierung 18:05: 3 Einrichten\\ZWEI_DATEIEN_HOCHLADEN.bat starten. Sonst setzt REPO HOLEN die Karte auf den Stand von 14:13 zurück (Regel 11)."
+     },
+     {
+      "id": "offen2.frage24",
+      "titel": "Frage 24 beantworten",
+      "stand": "sir",
+      "wer": "Sir",
+      "text": "Bedingungen für echtes Geld. Dazu die neuen Fragen 28–30."
+     },
+     {
+      "id": "offen2.finanzen-test",
+      "titel": "Finanzen mit echter CSV testen",
+      "stand": "sir",
+      "wer": "Sir am PC",
+      "text": "Markt → Finanzen. CSV aus Volksbank und Revolut exportieren (die Dateien in ablage\\Konto sind .xlsx)."
+     },
+     {
+      "id": "offen2.kamera-test",
+      "titel": "Kamera-Knopf einzeln testen",
+      "stand": "sir",
+      "wer": "Sir am PC",
+      "text": "Knopf in auron.html, seit 14:13 wieder drin."
+     },
+     {
+      "id": "offen2.deco",
+      "titel": "Test-PC-Adresse reservieren",
+      "stand": "sir",
+      "wer": "Sir",
+      "text": "192.168.68.100 in der Deco-App fest dem Test-PC zuweisen, sonst kann sie sich ändern."
+     },
+     {
+      "id": "offen2.konto",
+      "titel": "Kontodateien wegräumen",
+      "stand": "sir",
+      "wer": "Sir am PC",
+      "text": "Nach dem Finanzen-Test die Auszüge aus data\\ablage\\Konto entfernen (enthalten IBANs und Namen)."
+     },
+     {
+      "id": "offen2.pr4",
+      "titel": "PR #4 holen und testen",
+      "stand": "ok",
+      "wer": "Sir am PC",
+      "text": "Erledigt 11.10.: geholt, Finanzen und Agenten auf dem PC, Sir 17:28: Test hat geklappt."
      },
      {
       "id": "offen2.sprache-auron",
@@ -1342,8 +1430,8 @@
      {
       "id": "offen2.testpc",
       "titel": "Test-PC: IP nennen, Ollama starten",
-      "stand": "sir",
-      "text": "LAN-Kabel kommt wieder an den Test-PC. Danach IP nennen (ipconfig), Ollama starten. Bis dahin rechnet nachts der Haupt-PC.",
+      "stand": "ok",
+      "text": "Erledigt 11.10.: per LAN unter 192.168.68.100, Ollama läuft (Inhaltsprüfung rechnet dort).",
       "wer": "Sir am PC"
      },
      {
@@ -1363,8 +1451,8 @@
      {
       "id": "offen2.auron-repo",
       "titel": "auron.html ins Repo (P09)",
-      "stand": "sir",
-      "text": "Vorher git pull.",
+      "stand": "ok",
+      "text": "Erledigt 11.10. 14:13 mit ZWEI_DATEIEN_HOCHLADEN.bat (Commit c3bce39).",
       "wer": "Sir am PC"
      },
      {
@@ -1404,6 +1492,34 @@
     "text": "Was Claude als Nächstes erledigt.",
     "kinder": [
      {
+      "id": "offenc.p17",
+      "titel": "P17 als Notiz anlegen",
+      "stand": "plan",
+      "wer": "Claude",
+      "text": "Wissen/14 - Projekt-Aufgaben, Eintrag in der Übersicht."
+     },
+     {
+      "id": "offenc.regeln",
+      "titel": "Regeln 11 und 12 in die lange Anweisung",
+      "stand": "plan",
+      "wer": "Claude",
+      "text": "claude/anweisung-jarvis-claude.md, Teil A."
+     },
+     {
+      "id": "offenc.port8000",
+      "titel": "Port 8000 auf dem Haupt-PC klären",
+      "stand": "plan",
+      "wer": "Claude",
+      "text": "Voraussetzung für den Suchtest in ALLES_PRUEFEN."
+     },
+     {
+      "id": "offenc.inhalt-auswerten",
+      "titel": "Inhaltsprüfung auswerten",
+      "stand": "plan",
+      "wer": "Claude",
+      "text": "Wenn der Lauf fertig ist: „fehler“ und „prüfen“ zusammenfassen, Korrekturen vorschlagen. Geändert wird nur nach Sirs Ja."
+     },
+     {
       "id": "offenc.offen-md",
       "titel": "Zwei Punkte aus OFFEN.md (Claude Code)",
       "stand": "sir",
@@ -1436,7 +1552,7 @@
       "titel": "Nachtarbeit gründlicher (P15?)",
       "stand": "idee",
       "wer": "Claude",
-      "text": "Nacht dauert nur ca. 7 Minuten. Mehr Webseiten, zwei Überarbeitungen, Prüfgrund Pflicht. Wartet auf Sirs Ja."
+      "text": "Nacht dauert nur ca. 7 Minuten, Qualität am 11.10. „fraglich“. Mehr Webseiten, zwei Überarbeitungen, Prüfgrund Pflicht. Wartet auf Sirs Ja (Frage 29)."
      },
      {
       "id": "offenc.rahmen-code",
@@ -1448,8 +1564,8 @@
      {
       "id": "offenc.ip",
       "titel": "Test-PC-IP eintragen",
-      "stand": "plan",
-      "text": "Sobald Sir sie nennt, in data\\ki_lokal.json.",
+      "stand": "ok",
+      "text": "Erledigt 11.10.: 192.168.68.100 in data\\ki_lokal.json (Nacht und Tag).",
       "wer": "Claude"
      },
      {
@@ -1568,6 +1684,30 @@
       "nr": 27,
       "frage": "Welcher Weg für den Finanz-Überblick (P03): A) zuerst CSV-Export aus Volksbank und Revolut, den Auron einliest, später FinTS; B) gleich FinTS für die Volksbank; C) ein Dienst, der Konten bündelt?",
       "text": "Die Nachtrecherche (Aufträge 10, 12–15) ist dünn, reicht aber für die Richtung. A ist sofort machbar, sicher (keine Zugangsdaten in Auron) und kostet 0 €, braucht aber Handarbeit einmal im Monat. B ruft die Volksbank automatisch ab, braucht aber PIN/TAN-Freigaben und vermutlich eine Produkt-Registrierung bei der Deutschen Kreditwirtschaft (ungeprüft). Revolut kann kein FinTS. C gibt einem fremden Dienst Lesezugriff auf alle Konten und kostet meist Geld. Claudes Empfehlung: A, danach B."
+     },
+     {
+      "id": "fragen.28-abstand-p16",
+      "titel": "28 · Abstand der Gesamtprüfung",
+      "stand": "sir",
+      "nr": 28,
+      "frage": "Soll die Gesamtprüfung (P16) alle 14 Tage oder einmal im Monat laufen?",
+      "text": "Die Prüfung kostet 0 €, belegt aber den Test-PC etwa 2 Stunden und erzeugt jedes Mal einen Bericht, den Sie durchsehen müssten. 14 Tage findet Fehler früher, monatlich macht weniger Arbeit. Der Vault ändert sich derzeit fast täglich."
+     },
+     {
+      "id": "fragen.29-p15",
+      "titel": "29 · Nachtarbeit gründlicher (P15)",
+      "stand": "sir",
+      "nr": 29,
+      "frage": "Soll Claude Code P15 bekommen: mehr Webseiten je Auftrag, zwei Überarbeitungen, Prüfgrund Pflicht?",
+      "text": "Die Nacht dauert nur ca. 7 Minuten, die Ergebnisse vom 11.10. waren „fraglich“. P15 macht die Nacht länger und gründlicher. Kosten bleiben 0 € (nur lokal), aber Test-PC oder Haupt-PC rechnen länger."
+     },
+     {
+      "id": "fragen.30-karte-data",
+      "titel": "30 · Gesamtkarte nach data\\ umziehen",
+      "stand": "sir",
+      "nr": 30,
+      "frage": "Soll die Karte aus dem Code-Ordner (backend\\app) nach data\\ umziehen?",
+      "text": "Im Code-Ordner setzt REPO HOLEN die Karte jedes Mal auf den GitHub-Stand zurück; deshalb muss sie nach jeder Pflege hochgeladen werden. In data\\ wäre sie vor dem Überschreiben sicher. Kleine Aufgabe für Claude Code (Pfad in gesamtkarte.py ändern)."
      }
     ]
    },
