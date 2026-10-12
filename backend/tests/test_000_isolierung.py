@@ -49,6 +49,9 @@ UMLEITUNGEN = {
     "ZUGRIFFE_PATH": _TMP / "zugriffe.jsonl",
     "TAGEBUCH_PATH": _TMP / "tagebuch.json",
     "NACHTAUFTRAEGE_PATH": _TMP / "nachtauftraege.json",
+    # 12.10.2026: Alexa-Skill (P19)
+    "ALEXA_LOG_PATH": _TMP / "alexa_log.jsonl",
+    "ALEXA_LETZTE_PATH": _TMP / "alexa_letzte_antwort.json",
     "TAGESFRAGEN_PATH": _TMP / "tagesfragen.json",
     "WERKSTATT_PATH": _TMP / "werkstatt",
     # 27.09.2026: Sicherungen von Mind Maps und Projekten

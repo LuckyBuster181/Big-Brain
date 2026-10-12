@@ -147,6 +147,8 @@ def umgebung(pfade: dict[str, Path], ollama_url: str, suchmodell: str | None) ->
         "EMBEDDING_PAUSE_MS": "0", "EMBEDDING_THREADS": "2",
         "JARVIS_ENV_PATH": str(pfade["data"] / ".env"),
         "PYTHONUTF8": "1", "PYTHONUNBUFFERED": "1", "TZ": "Europe/Berlin",
+        # 12.10.2026 (P19): Alexa-Endpunkt eingeschaltet, damit seine Ablehnung geprüft wird
+        "ALEXA_AKTIV": "1", "ALEXA_SKILL_ID": "amzn1.ask.skill.pruefstand",
     })
     if suchmodell:
         env["EMBEDDING_MODEL"] = suchmodell
@@ -281,6 +283,19 @@ def pruefe_finanzen(basis: str, b: Bericht) -> None:
         b.f("Finanzen", f"3 Abos erwartet, gefunden: {[a.get('name') for a in u.get('abos', [])]}")
     else:
         b.ok.append("Finanzen: 25 Beispiel-Umsätze eingelesen, 3 Abos erkannt")
+
+
+def pruefe_alexa(basis: str, b: Bericht) -> None:
+    """Alexa-Endpunkt (P19): ohne Amazon-Signatur muss er mit 400 ablehnen, ohne Netz-Zugriff."""
+    try:
+        r = requests.post(basis + "/api/alexa", json={"request": {"type": "LaunchRequest"}}, timeout=30)
+    except requests.RequestException as exc:
+        b.f("Alexa", f"/api/alexa antwortet nicht ({exc})")
+        return
+    if r.status_code != 400:
+        b.f("Alexa", f"Anfrage ohne Signatur: {r.status_code} statt 400 ({r.text[:120]!r})")
+    else:
+        b.ok.append("Alexa: Anfrage ohne Amazon-Signatur wird abgelehnt (400)")
 
 
 def pruefe_fehlerbericht(basis: str, b: Bericht) -> None:
@@ -526,6 +541,7 @@ def main(argv: list[str] | None = None) -> int:
             pruefe_finanzen(basis, b)
             print("[Prüfstand] Chat ...", flush=True)
             pruefe_chat(basis, b)
+            pruefe_alexa(basis, b)
             pruefe_fehlerbericht(basis, b)
             if not a.ohne_browser:
                 print("[Prüfstand] Browser ...", flush=True)

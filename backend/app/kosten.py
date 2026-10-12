@@ -51,6 +51,7 @@ FUNKTIONEN = {
     "denkblock": "Denkblock (Mitdenken)",
     "tiktok-slides": "TikTok-Slides lesen",
     "smalltalk": "Smalltalk",
+    "alexa": "Alexa (frag Auron)",  # 12.10.2026, P19
     # 27.09.2026: Alltagsfunktionen
     "schreiben-text": "Texte schreiben",
     "schreiben-prompt": "Prompts schreiben",
