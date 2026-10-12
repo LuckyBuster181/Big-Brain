@@ -1,7 +1,8 @@
 """
 Alexa-Skill "frag Auron" (P19, 12.10.2026, Claude Code, Entscheidung Sir 12.10.).
 
-"Computer, frag Auron ..." am Echo Dot -> Amazon -> POST /api/alexa (Prüfung in
+"Computer, frag Agent Auron ..." am Echo Dot (Aufrufname "agent auron": Amazon verlangt
+zwei Wörter, Wahl Sir 12.10.) -> Amazon -> POST /api/alexa (Prüfung in
 app/alexa_pruefung.py) -> verarbeiten() hier -> bestehende Auron-Funktionen.
 
 Fähigkeiten (Intents, Modell in backend/alexa/interaktionsmodell_de.json):
@@ -185,7 +186,7 @@ def _fehler_melden(intent: str, exc: BaseException) -> None:
 
 
 FEHLER_SATZ = "Da ist etwas schiefgegangen, Sir. Der Fehler steht im Fehlerbericht."
-DAUERT_SATZ = ("Das dauert etwas länger, Sir. Fragen Sie gleich: Computer, frag Auron nach der letzten Antwort.")
+DAUERT_SATZ = ("Das dauert etwas länger, Sir. Fragen Sie gleich: Computer, frag Agent Auron nach der letzten Antwort.")
 
 
 def _mit_zeitbudget(intent: str, arbeit: Callable[[], dict]) -> dict:
@@ -394,8 +395,8 @@ def aktion_ausfuehren(aid: str) -> str:
     return eintrag["antwort"] if gestartet else f"{eintrag['name']} läuft bereits, Sir."
 
 
-HILFE = ("Sie können zum Beispiel sagen: frag Auron nach dem Gartenhaus, frag Auron was morgen ansteht, "
-         "oder sag Auron merk dir einen Gedanken.")
+HILFE = ("Sie können zum Beispiel sagen: frag Agent Auron nach dem Gartenhaus, frag Agent Auron was morgen ansteht, "
+         "oder sag Agent Auron merk dir einen Gedanken.")
 
 
 # ------------------------------------------------------------------ Einstieg
