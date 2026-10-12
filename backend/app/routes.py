@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import time
 from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, Query, Request
@@ -144,6 +145,7 @@ async def alexa_anfrage(request: Request) -> Response:
     rohtext = await request.body()
     if len(rohtext) > ALEXA_MAX_BYTES:
         return JSONResponse({"detail": "Bad Request"}, status_code=400)
+    start = time.time()
     try:
         await run_in_threadpool(alexa_pruefung.signatur_pruefen, dict(request.headers), rohtext)
         anfrage = json.loads(rohtext)
@@ -151,8 +153,11 @@ async def alexa_anfrage(request: Request) -> Response:
     except (alexa_pruefung.AlexaAbgelehnt, ValueError) as exc:
         # Nur ins Konsolen-Log: Der Endpunkt ist öffentlich, Fremdanfragen sollen den Fehlerbericht nicht füllen.
         print(f"[Alexa] Anfrage abgelehnt: {exc}", flush=True)
+        if request.headers.get("signaturecertchainurl"):   # sah aus wie Alexa: fürs Alexa-Protokoll (Diagnose)
+            alexa.ablehnung_protokollieren(str(exc), int((time.time() - start) * 1000))
         return JSONResponse({"detail": "Bad Request"}, status_code=400)
-    return JSONResponse(await run_in_threadpool(alexa.verarbeiten, anfrage))
+    pruef_ms = int((time.time() - start) * 1000)
+    return JSONResponse(await run_in_threadpool(alexa.verarbeiten, anfrage, pruef_ms))
 
 
 def _sse(event: dict) -> str:

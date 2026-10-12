@@ -68,6 +68,7 @@ MEHR_HINWEIS = "Mehr steht in der Alexa-App."
 _JARVIS = Path(__file__).resolve().parents[2]
 
 _pool = concurrent.futures.ThreadPoolExecutor(max_workers=2, thread_name_prefix="alexa")
+_lauf = threading.local()   # merkt je Anfrage, ob das Zeitbudget überschritten wurde (Protokoll)
 _datei_sperre = threading.Lock()
 
 
@@ -142,17 +143,40 @@ def _sprechen(text: str, karte: str | None = None, ende: bool = True) -> dict:
 
 # ------------------------------------------------------------------ Protokoll, letzte Antwort
 
-def _protokoll(intent: str, ergebnis: str, start: float, claude: bool = False) -> None:
-    """Eine Zeile je Anfrage - ohne Inhalte (keine Fragen, keine Notizen)."""
+def _protokoll(intent: str, ergebnis: str, start: float, claude: bool = False, **mehr: Any) -> None:
+    """Eine Zeile je Anfrage - ohne Inhalte (keine Fragen, keine Notizen).
+    mehr (12.10.2026, Diagnose Echo): Anfrage-Art, Prüfdauer, Gerät mit/ohne Bildschirm,
+    Platzhalter leer, Zeitbudget überschritten."""
     try:
         zeile = {"zeit": datetime.datetime.now().isoformat(timespec="seconds"), "intent": intent,
-                 "ergebnis": ergebnis, "dauer_ms": int((time.time() - start) * 1000), "claude": claude}
+                 "ergebnis": ergebnis, "dauer_ms": int((time.time() - start) * 1000), "claude": claude, **mehr}
         pfad = _log_pfad()
         pfad.parent.mkdir(parents=True, exist_ok=True)
         with _datei_sperre, pfad.open("a", encoding="utf-8") as fh:
             fh.write(json.dumps(zeile, ensure_ascii=False) + "\n")
     except OSError:
         pass
+
+
+def ablehnung_protokollieren(grund: str, pruef_ms: int) -> None:
+    """Abgelehnte Anfrage, die wie Alexa aussah (Signatur-Kopfzeile vorhanden). Hilft, wenn ein
+    Gerät nichts bekommt: Kam die Anfrage an und scheiterte an der Prüfung?"""
+    _protokoll("-", "abgelehnt", time.time(), grund=str(grund)[:120], pruef_ms=pruef_ms)
+
+
+def zeilen(anzahl: int = 25) -> list[dict]:
+    """Die letzten Protokollzeilen (für den Fehlerbericht)."""
+    try:
+        roh = _log_pfad().read_text(encoding="utf-8").splitlines()[-anzahl:]
+    except OSError:
+        return []
+    ergebnis = []
+    for z in roh:
+        try:
+            ergebnis.append(json.loads(z))
+        except ValueError:
+            continue
+    return ergebnis
 
 
 def _letzte_speichern(intent: str, ergebnis: dict) -> None:
@@ -204,6 +228,7 @@ def _mit_zeitbudget(intent: str, arbeit: Callable[[], dict]) -> dict:
     try:
         return zukunft.result(timeout=ZEITBUDGET_S)
     except concurrent.futures.TimeoutError:
+        _lauf.dauert = True
         return {"sprache": DAUERT_SATZ, "karte": None, "dauert": True}
 
 
@@ -401,9 +426,22 @@ HILFE = ("Sie können zum Beispiel sagen: frag Agent Auron nach dem Gartenhaus, 
 
 # ------------------------------------------------------------------ Einstieg
 
-def verarbeiten(anfrage: dict) -> dict:
+def _diagnose(anfrage: dict, typ: str, pruef_ms: int) -> dict:
+    """Protokoll-Zusatz ohne Inhalte: Anfrage-Art, Prüfdauer, Gerät mit Bildschirm (App, Echo Show)
+    oder ohne (Echo Dot), welche Platzhalter leer ankamen, Zeitbudget überschritten."""
+    ctx = anfrage.get("context") or {}
+    slots = _intent(anfrage).get("slots") or {}
+    return {"typ": typ, "pruef_ms": pruef_ms,
+            "bildschirm": bool(ctx.get("Viewport") or ctx.get("Viewports")),
+            "slots_leer": sorted(k for k, v in slots.items() if not str((v or {}).get("value") or "").strip()),
+            "dialog": (anfrage.get("request") or {}).get("dialogState") or "",
+            "dauert": bool(getattr(_lauf, "dauert", False))}
+
+
+def verarbeiten(anfrage: dict, pruef_ms: int = 0) -> dict:
     """Geprüfte Alexa-Anfrage -> Alexa-Antwort. Wirft nie (Fehler -> gesprochene Meldung)."""
     start = time.time()
+    _lauf.dauert = False
     req = anfrage.get("request") or {}
     typ = str(req.get("type") or "")
     name = str(_intent(anfrage).get("name") or typ)
@@ -417,11 +455,11 @@ def verarbeiten(anfrage: dict) -> dict:
             ergebnis = antwort("Das kann ich per Sprache nicht, Sir.")
         else:
             ergebnis, claude = _intent_verarbeiten(anfrage, name)
-        _protokoll(name, "ok", start, claude)
+        _protokoll(name, "ok", start, claude, **_diagnose(anfrage, typ, pruef_ms))
         return ergebnis
     except Exception as exc:  # noqa: BLE001 - Alexa braucht immer eine Antwort
         _fehler_melden(name, exc)
-        _protokoll(name, "fehler", start, claude)
+        _protokoll(name, "fehler", start, claude, **_diagnose(anfrage, typ, pruef_ms))
         return antwort(FEHLER_SATZ)
 
 

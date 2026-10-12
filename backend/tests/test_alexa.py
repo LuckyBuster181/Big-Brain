@@ -556,5 +556,62 @@ class EchteAmazonKette(unittest.TestCase):
             ap.kette_pruefen(certs, JETZT)      # heute abgelaufen
 
 
+
+class Diagnose(_Basis):
+    """12.10.2026: Protokoll-Zusatz für die Fehlersuche am Echo (ohne Inhalte)."""
+
+    def _letzte_zeile(self) -> dict:
+        return json.loads(Path(os.environ["ALEXA_LOG_PATH"]).read_text(encoding="utf-8").splitlines()[-1])
+
+    def test_diagnose_felder(self):
+        anfrage = _intent("VaultFrageIntent", {"frage": {}})
+        anfrage["context"]["Viewport"] = {"shape": "RECTANGLE"}
+        alexa.verarbeiten(anfrage, pruef_ms=42)
+        z = self._letzte_zeile()
+        self.assertEqual(z["typ"], "IntentRequest")
+        self.assertEqual(z["pruef_ms"], 42)
+        self.assertTrue(z["bildschirm"])
+        self.assertEqual(z["slots_leer"], ["frage"])
+        self.assertFalse(z["dauert"])
+
+    def test_zeitbudget_im_protokoll(self):
+        def langsam(*a, **k):
+            time.sleep(0.3)
+            return SimpleNamespace(answer="x, Sir.", used_vault=True, sources=[], ki={})
+        with mock.patch.object(alexa, "ZEITBUDGET_S", 0.05), mock.patch("app.chat_service.ask", side_effect=langsam):
+            alexa.verarbeiten(_intent("VaultFrageIntent", {"frage": {"value": "geheim"}}))
+        z = self._letzte_zeile()
+        self.assertTrue(z["dauert"])
+        self.assertFalse(z["bildschirm"])
+        self.assertNotIn("geheim", json.dumps(z))
+        time.sleep(0.4)  # Hintergrund-Arbeit fertig werden lassen
+
+    def test_ablehnung_nur_mit_alexa_kopfzeile(self):
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+
+        from app.routes import router
+
+        app = FastAPI()
+        app.include_router(router)
+        c = TestClient(app)
+        pfad = Path(os.environ["ALEXA_LOG_PATH"])
+        vorher = len(pfad.read_text(encoding="utf-8").splitlines()) if pfad.exists() else 0
+        c.post("/api/alexa", content=b"{}")                                          # Fremder ohne Kopfzeile
+        self.assertEqual(len(pfad.read_text(encoding="utf-8").splitlines()) if pfad.exists() else 0, vorher)
+        c.post("/api/alexa", content=b"{}", headers={"SignatureCertChainUrl": KETTE_URL})  # sieht aus wie Alexa
+        z = self._letzte_zeile()
+        self.assertEqual(z["ergebnis"], "abgelehnt")
+        self.assertIn("Signature-256", z["grund"])
+
+    def test_fehlerbericht_abschnitt(self):
+        from app import fehlerbericht
+
+        alexa.verarbeiten(_intent("AMAZON.StopIntent"))
+        text = "\n".join(fehlerbericht._alexa())
+        self.assertIn("AMAZON.StopIntent", text)
+        self.assertIn("| Zeit | Intent |", text)
+
+
 if __name__ == "__main__":
     unittest.main()
