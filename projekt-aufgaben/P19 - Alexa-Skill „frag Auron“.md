@@ -19,6 +19,10 @@ kosten: laufend 0 €, Ausnahme Vault-Antworten, bei denen Claude einspringt
 > Abweichung: Bei Claude-Antworten steht in der Karte „Antwort von Claude (Rückfall),
 > Kosten im Kostenrahmen erfasst“ statt eines Cent-Betrags; der Betrag steht in der
 > Kosten-Karte unter „Alexa (frag Auron)“.
+>
+> **Aufrufname (12.10.2026, Wahl Sir):** `agent auron`. Amazon lehnt einwortige Namen ab
+> („mindestens zwei Wörter“). Aufruf daher: „Computer, frag Agent Auron …“,
+> „Computer, öffne Agent Auron“.
 
 ## Ziel
 
@@ -200,7 +204,7 @@ versioniert ist. Grundgerüst (vollständig, Claude Code darf Beispielsätze erg
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "auron",
+      "invocationName": "agent auron",
       "intents": [
         {"name": "VaultFrageIntent",
          "slots": [{"name": "frage", "type": "AMAZON.SearchQuery"}],

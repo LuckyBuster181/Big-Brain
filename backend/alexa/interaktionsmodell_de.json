@@ -1,7 +1,7 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "auron",
+      "invocationName": "agent auron",
       "intents": [
         {
           "name": "VaultFrageIntent",
