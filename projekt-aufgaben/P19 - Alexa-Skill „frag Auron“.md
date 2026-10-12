@@ -23,6 +23,12 @@ kosten: laufend 0 €, Ausnahme Vault-Antworten, bei denen Claude einspringt
 > **Aufrufname (12.10.2026, Wahl Sir):** `agent auron`. Amazon lehnt einwortige Namen ab
 > („mindestens zwei Wörter“). Aufruf daher: „Computer, frag Agent Auron …“,
 > „Computer, öffne Agent Auron“.
+>
+> **Beispielsätze (12.10.2026, nach Simulator-Test):** Bei „frag Agent Auron nach dem
+> Fahrradladen“ schneidet Alexa das Verbindungswort „nach“ ab, an Auron kommt nur „dem
+> Fahrradladen“. Deshalb zusätzliche Trägerwörter (dem, der, den, die, das, meinem, meiner,
+> meinen, über, wegen). Maßgeblich ist `backend/alexa/interaktionsmodell_de.json`, die Kopie
+> in Teil C1 unten ist der ursprüngliche Stand.
 
 ## Ziel
 
