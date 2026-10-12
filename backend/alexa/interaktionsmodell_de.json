@@ -21,7 +21,17 @@
             "warum {frage}",
             "welche {frage}",
             "ob {frage}",
-            "zu {frage}"
+            "zu {frage}",
+            "dem {frage}",
+            "der {frage}",
+            "den {frage}",
+            "die {frage}",
+            "das {frage}",
+            "meinem {frage}",
+            "meiner {frage}",
+            "meinen {frage}",
+            "über {frage}",
+            "wegen {frage}"
           ]
         },
         {
