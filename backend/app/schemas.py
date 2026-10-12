@@ -70,6 +70,7 @@ class ChatResponse(BaseModel):
     sources: list[Source]
     used_vault: bool  # False, wenn keine relevanten Chunks gefunden wurden
     ereignisse: list[dict] = Field(default_factory=list)  # Plan/Vorschlag aus dem Werkzeug-Modus
+    ki: dict = Field(default_factory=dict)  # wer geantwortet hat (lokal/claude), 12.10.2026 für Alexa (P19)
 
 
 class HealthResponse(BaseModel):

@@ -26,6 +26,9 @@ import hmac
 import os
 
 COOKIE = "jarvis_zugang"
+# 12.10.2026 (P19): Alexa-Skill "frag Auron". Amazon hat weder Tailnet noch Zugangscode; der
+# Endpunkt prüft jede Anfrage selbst (Signatur, Zeitstempel, Skill-ID: app/alexa_pruefung.py).
+ALEXA_PFAD = "/api/alexa"
 LOOPBACK = {"127.0.0.1", "::1", "localhost"}
 
 # (Methode, Pfad-Anfang) - Pfad muss genau passen oder mit "Anfang/" weitergehen
@@ -125,6 +128,10 @@ def pruefen(host: str | None, methode: str, pfad: str, cookie: str | None, query
     """
     from . import geraete
 
+    if methode.upper() == "POST" and pfad == ALEXA_PFAD:
+        # Nur genau POST /api/alexa. Kein Geräteschlüssel: keine IP merken, kein Handy-Recht.
+        return {"erlaubt": True, "status": 200, "grund": "alexa", "cookie_setzen": False,
+                "geraet": "Alexa", "geraet_schluessel": ""}
     if ist_lokal(host):
         return {"erlaubt": True, "status": 200, "grund": "lokal", "cookie_setzen": False,
                 "geraet": geraete.anzeigename(geraete.HAUPTPC), "geraet_schluessel": geraete.HAUPTPC}

@@ -4,13 +4,21 @@ nummer: P19
 titel: Alexa-Skill „frag Auron“
 phase: 9 (Zuhause und Geräte)
 fuer: Claude Code
-status: offen
+status: gebaut 12.10.2026 (Claude Code), am Echo ungetestet
 erstellt: 2026-10-12
 quelle: Gespräch mit Sir am 12.10.2026 (Frage 31 der Gesamtkarte: ja)
 kosten: laufend 0 €, Ausnahme Vault-Antworten, bei denen Claude einspringt
 ---
 
 # P19 – Alexa-Skill „frag Auron“
+
+> **Stand 12.10.2026 abends:** Von Claude Code gebaut (Teil C bis F1, Tunnel-Skript).
+> Tests und Cloud-Prüfstand grün. Offen: Teil B (Console) und F2/F3 (Simulator, Echo) bei Sir.
+> Geklärt beim Bau: Die Prüfung mit `cryptography.x509.verification` erkennt echte
+> Amazon-Ketten an (getestet mit einer älteren Kette von `s3.amazonaws.com/echo.api/`).
+> Abweichung: Bei Claude-Antworten steht in der Karte „Antwort von Claude (Rückfall),
+> Kosten im Kostenrahmen erfasst“ statt eines Cent-Betrags; der Betrag steht in der
+> Kosten-Karte unter „Alexa (frag Auron)“.
 
 ## Ziel
 

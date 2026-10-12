@@ -6,7 +6,8 @@ import json
 from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, Query, Request
-from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Response, StreamingResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, Response, StreamingResponse
+from starlette.concurrency import run_in_threadpool
 
 from rag.embedder import get_preset
 from rag.embeddings import get_client, get_collection
@@ -126,6 +127,32 @@ def chat(request: ChatRequest) -> ChatResponse:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
     except Exception as exc:  # Anthropic-API-Fehler, Netzwerk, etc.
         raise HTTPException(status_code=502, detail=f"Fehler bei der Anfrage an Claude: {exc}") from exc
+
+
+ALEXA_MAX_BYTES = 64 * 1024
+
+
+@router.post("/api/alexa")
+async def alexa_anfrage(request: Request) -> Response:
+    """Alexa-Skill "frag Auron" (P19, 12.10.2026). Über den Funnel-Knoten "auron-alexa" aus dem
+    Internet erreichbar - Schutz ist allein die Prüfung in app/alexa_pruefung.py (Signatur,
+    Zeitstempel, Skill-ID). Ohne ALEXA_AKTIV=1 in der .env gibt es den Endpunkt nicht (404)."""
+    from . import alexa, alexa_pruefung
+
+    if not alexa_pruefung.ist_aktiv():
+        raise HTTPException(status_code=404, detail="Not Found")
+    rohtext = await request.body()
+    if len(rohtext) > ALEXA_MAX_BYTES:
+        return JSONResponse({"detail": "Bad Request"}, status_code=400)
+    try:
+        await run_in_threadpool(alexa_pruefung.signatur_pruefen, dict(request.headers), rohtext)
+        anfrage = json.loads(rohtext)
+        alexa_pruefung.inhalt_pruefen(anfrage)
+    except (alexa_pruefung.AlexaAbgelehnt, ValueError) as exc:
+        # Nur ins Konsolen-Log: Der Endpunkt ist öffentlich, Fremdanfragen sollen den Fehlerbericht nicht füllen.
+        print(f"[Alexa] Anfrage abgelehnt: {exc}", flush=True)
+        return JSONResponse({"detail": "Bad Request"}, status_code=400)
+    return JSONResponse(await run_in_threadpool(alexa.verarbeiten, anfrage))
 
 
 def _sse(event: dict) -> str:

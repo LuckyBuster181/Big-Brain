@@ -57,8 +57,11 @@ MAX_ANSWER_TOKENS = int(os.getenv("MAX_ANSWER_TOKENS", "800"))
 LAENGE_HINWEIS = {
     "kurz": "\n\n(Antwortlänge: sehr kurz - höchstens zwei bis drei Sätze.)",
     "ausfuehrlich": "\n\n(Antwortlänge: ausführlich - mit Details, Begründung und einem Beispiel.)",
+    # 12.10.2026 (P19): Alexa liest die Antwort vor - nur intern, nicht im HUD wählbar
+    "sprache": ("\n\n(Die Antwort wird über Alexa vorgelesen: höchstens zwei bis drei kurze Sätze, "
+                "keine Listen, kein Markdown, keine Quellennummern.)"),
 }
-LAENGE_MAX_TOKENS = {"kurz": 300, "ausfuehrlich": 1600}
+LAENGE_MAX_TOKENS = {"kurz": 300, "ausfuehrlich": 1600, "sprache": 250}
 
 # 03.10.2026: Lokale Modelle (Qwen 9b) vergessen bei dem langen System-Prompt die Regeln
 # (keine "Sir"-Anrede, erfundene Antworten statt "steht nicht im Vault"). Kleine Modelle
@@ -512,7 +515,9 @@ def ask(
     mode: str | None = None,
     modell: str | None = None,
     laenge: str | None = None,
+    log_modus: str | None = None,
 ) -> ChatResponse:
+    """log_modus (12.10.2026, P19): eigener Eintrag in der Kosten-Karte, z. B. "alexa"."""
     if resolve_mode(mode) == "werkzeug":
         from . import agent_service  # erst hier: agent_service nutzt Bausteine aus diesem Modul
 
@@ -546,6 +551,7 @@ def ask(
     )
     info = ki_info(client, model_label)
     log_usage(info["modell"], getattr(response, "usage", None), time.time() - start, len(hits), len(history_messages),
+              mode=log_modus or "klassisch",
               extra={"rueckfall_grund": info.get("grund") if info.get("rueckfall") else None})
     answer_text = "".join(
         block.text for block in response.content if getattr(block, "type", None) == "text"
@@ -556,7 +562,7 @@ def ask(
         Source(file_path=h.file_path, heading_path=h.heading_path, score=round(h.score, 3))
         for h in hits
     ]
-    return ChatResponse(answer=answer_text, sources=sources, used_vault=bool(hits))
+    return ChatResponse(answer=answer_text, sources=sources, used_vault=bool(hits), ki=info)
 
 
 # ------------------------------------------------------------------ Smalltalk (26.09.2026)

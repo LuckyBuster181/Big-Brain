@@ -1,0 +1,297 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "auron",
+      "intents": [
+        {
+          "name": "VaultFrageIntent",
+          "slots": [
+            {
+              "name": "frage",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "nach {frage}",
+            "was {frage}",
+            "wie {frage}",
+            "wann {frage}",
+            "wo {frage}",
+            "wer {frage}",
+            "warum {frage}",
+            "welche {frage}",
+            "ob {frage}",
+            "zu {frage}"
+          ]
+        },
+        {
+          "name": "BriefingIntent",
+          "slots": [],
+          "samples": [
+            "das briefing",
+            "lies mir das briefing vor",
+            "was steht im briefing",
+            "was ist heute wichtig",
+            "was gibt es neues"
+          ]
+        },
+        {
+          "name": "MerkenIntent",
+          "slots": [
+            {
+              "name": "notiz",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "merk dir {notiz}",
+            "merke dir {notiz}",
+            "notiere {notiz}",
+            "schreib auf {notiz}"
+          ]
+        },
+        {
+          "name": "StatusIntent",
+          "slots": [],
+          "samples": [
+            "status",
+            "wie ist der status",
+            "läuft die nachtarbeit",
+            "was hat die nacht gebracht",
+            "wie viel ist vom rahmen verbraucht",
+            "wie stehen die kosten"
+          ]
+        },
+        {
+          "name": "TermineIntent",
+          "slots": [
+            {
+              "name": "tag",
+              "type": "AMAZON.DATE"
+            }
+          ],
+          "samples": [
+            "was steht {tag} an",
+            "welche termine habe ich {tag}",
+            "termine {tag}",
+            "was habe ich {tag}",
+            "was steht an",
+            "welche termine habe ich"
+          ]
+        },
+        {
+          "name": "NachtauftragIntent",
+          "slots": [
+            {
+              "name": "auftrag",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "nimm {auftrag} in die nachtarbeit auf",
+            "nachtauftrag {auftrag}",
+            "für die nachtarbeit {auftrag}"
+          ]
+        },
+        {
+          "name": "AktionIntent",
+          "slots": [
+            {
+              "name": "aktion",
+              "type": "AURON_AKTION"
+            }
+          ],
+          "samples": [
+            "starte {aktion}",
+            "{aktion} starten",
+            "führe {aktion} aus",
+            "{aktion}"
+          ]
+        },
+        {
+          "name": "LetzteAntwortIntent",
+          "slots": [],
+          "samples": [
+            "nach der letzten antwort",
+            "die letzte antwort",
+            "ist die antwort fertig"
+          ]
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        }
+      ],
+      "types": [
+        {
+          "name": "AURON_AKTION",
+          "values": [
+            {
+              "id": "nachtarbeit_starten",
+              "name": {
+                "value": "nachtarbeit",
+                "synonyms": [
+                  "die nachtarbeit",
+                  "nachtschicht"
+                ]
+              }
+            },
+            {
+              "id": "vault_einlesen",
+              "name": {
+                "value": "vault neu einlesen",
+                "synonyms": [
+                  "vault einlesen",
+                  "den vault neu einlesen",
+                  "neu einlesen"
+                ]
+              }
+            },
+            {
+              "id": "pruefen_hintergrund",
+              "name": {
+                "value": "prüflauf",
+                "synonyms": [
+                  "den prüflauf",
+                  "inhaltsprüfung",
+                  "die inhaltsprüfung"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "dialog": {
+      "delegationStrategy": "ALWAYS",
+      "intents": [
+        {
+          "name": "MerkenIntent",
+          "confirmationRequired": true,
+          "prompts": {
+            "confirmation": "Confirm.Intent.Merken"
+          },
+          "slots": [
+            {
+              "name": "notiz",
+              "type": "AMAZON.SearchQuery",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.Merken.notiz"
+              }
+            }
+          ]
+        },
+        {
+          "name": "NachtauftragIntent",
+          "confirmationRequired": true,
+          "prompts": {
+            "confirmation": "Confirm.Intent.Nachtauftrag"
+          },
+          "slots": [
+            {
+              "name": "auftrag",
+              "type": "AMAZON.SearchQuery",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.Nachtauftrag.auftrag"
+              }
+            }
+          ]
+        },
+        {
+          "name": "AktionIntent",
+          "confirmationRequired": true,
+          "prompts": {
+            "confirmation": "Confirm.Intent.Aktion"
+          },
+          "slots": [
+            {
+              "name": "aktion",
+              "type": "AURON_AKTION",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.Aktion.aktion"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "prompts": [
+      {
+        "id": "Confirm.Intent.Merken",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Soll ich mir merken: {notiz}?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.Merken.notiz",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Was soll ich mir merken, Sir?"
+          }
+        ]
+      },
+      {
+        "id": "Confirm.Intent.Nachtauftrag",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Für die Nachtarbeit: {auftrag}. Richtig?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.Nachtauftrag.auftrag",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Welcher Auftrag für die Nacht, Sir?"
+          }
+        ]
+      },
+      {
+        "id": "Confirm.Intent.Aktion",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "{aktion} jetzt starten?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.Aktion.aktion",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Welche Aktion, Sir?"
+          }
+        ]
+      }
+    ]
+  }
+}
