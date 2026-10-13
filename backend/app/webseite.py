@@ -124,7 +124,7 @@ def als_vorschlag(url: str, roh_html: str | None = None) -> dict:
     gekuerzt = len(text) > MAX_TEXT
     heute = datetime.date.today().isoformat()
     inhalt = (
-        f"Quelle: {url}\nAbgerufen: {heute} (automatisch von Jarvis, ungeprüft)\n\n"
+        f"Quelle: {url}\nAbgerufen: {heute} (automatisch von Auron, ungeprüft)\n\n"
         + text[:MAX_TEXT]
         + ("\n\n*[... gekürzt]*" if gekuerzt else "")
     )

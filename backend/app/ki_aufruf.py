@@ -21,7 +21,7 @@ from typing import Any
 
 from llm import provider as llm_provider
 
-from . import aufgaben_loop, chat_service
+from . import aufgaben_loop, chat_service, claude_fehler
 
 SONNET = chat_service.DEFAULT_MODEL
 HAIKU = os.getenv("ALLTAG_HAIKU_MODELL", "claude-haiku-4-5-20251001")
@@ -110,7 +110,7 @@ def aufrufen(system: str, inhalt: str | list[dict], *, modus: str, modell: str |
     except Exception as exc:  # noqa: BLE001
         if not lokal:
             agenten.melden("fehler", f"Claude-Anfrage fehlgeschlagen: {exc}", rechner="Claude", modell=str(modell))
-        raise KiFehler(f"Anfrage an die KI fehlgeschlagen: {exc}") from exc
+        raise KiFehler(claude_fehler.oder(exc, f"Anfrage an die KI fehlgeschlagen: {exc}", anrede=None)) from exc
     if not lokal:
         agenten.melden("ende", f"fertig auf Claude · {time.time() - start:.1f} s", rechner="Claude", modell=str(modell))
     if lokal:

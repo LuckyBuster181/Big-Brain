@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Jarvis – Agenten-Stadt (2D-Entwurf)</title>
+<title>Auron – Agenten-Stadt (2D-Entwurf)</title>
 <!--
-  Jarvis Agenten-Stadt, 2D-Entwurf (04.10.2026).
+  Auron Agenten-Stadt, 2D-Entwurf (04.10.2026).
   Eine einzige Datei, keine Bibliotheken, kein Internet, nichts wird gespeichert.
 
   TESTPLAN (Sir):
    1. Datei per Doppelklick im Browser öffnen (Chrome oder Edge). Es muss eine dunkle Stadt erscheinen:
-      in der Mitte das goldene Hauptgebäude "Jarvis", rundherum 12 Gebäude mit Namen und Statuslicht.
+      in der Mitte das goldene Hauptgebäude "Auron", rundherum 12 Gebäude mit Namen und Statuslicht.
    2. Auf ein Gebäude klicken: Ein Feld zeigt Name, Status, Kennzahlen und einen Satz. Mit "x" oder Esc schließen.
    3. "Rundgang" drücken: Die Ansicht fährt nacheinander über alle 13 Gebäude (je 3 Sekunden) und blendet
       oben einen Satz ein. "Stopp" bricht ab, "Übersicht" zeigt wieder die ganze Stadt.
@@ -96,7 +96,7 @@
 </head>
 <body>
 <header>
-  <h1>Jarvis – Agenten-Stadt</h1>
+  <h1>Auron – Agenten-Stadt</h1>
   <div class="knoepfe">
     <button id="knopfRundgang" class="haupt" type="button">Rundgang</button>
     <button id="knopfStopp" type="button" disabled>Stopp</button>
@@ -105,7 +105,7 @@
 </header>
 <div class="zeile" id="zusammenfassung" aria-live="polite"></div>
 <main>
-  <svg id="stadt" role="group" aria-label="Agenten-Stadt: Übersicht aller Jarvis-Bereiche" xmlns="http://www.w3.org/2000/svg">
+  <svg id="stadt" role="group" aria-label="Agenten-Stadt: Übersicht aller Auron-Bereiche" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <filter id="leuchten" x="-100%" y="-100%" width="300%" height="300%">
         <feGaussianBlur stdDeviation="5"/>
@@ -134,7 +134,7 @@
 const DATEN_BEISPIEL = {
   stand: "Beispieldaten von Hand eingetragen (04.10.2026), nicht live",
   gebaeude: [
-    { id: "jarvis", name: "Jarvis", status: "laeuft",
+    { id: "jarvis", name: "Auron", status: "laeuft",
       kennzahlen: [["KI-Anbieter", "lokal (Ollama)"], ["Antwortzeit Notizfragen", "2,5 bis 8,5 s"], ["Anrede", "Sir"]],
       text: "Die Zentrale: beantwortet Fragen aus dem Vault mit Quellenangabe und steuert alle anderen Bereiche." },
     { id: "testpc", name: "Test-PC", status: "laeuft",
@@ -144,8 +144,8 @@ const DATEN_BEISPIEL = {
       kennzahlen: [["Modell", "qwen3.5:9b"], ["Tempo", "49,5 Token/s"], ["Grafikkarte", "RTX 2070 Super, 100 %"]],
       text: "Der schnellste KI-Rechner, antwortet im Chat zuerst. Darf nicht in den Ruhezustand." },
     { id: "minipc", name: "Mini-PC", status: "laeuft",
-      kennzahlen: [["Modell", "qwen3.5:4b"], ["Tempo", "4,6 Token/s"], ["Jarvis-Dienst", "läuft"]],
-      text: "Das Zuhause von Jarvis: Dienst, Nacht-Timer und Syncthing laufen hier. Letzte Reserve für die KI." },
+      kennzahlen: [["Modell", "qwen3.5:4b"], ["Tempo", "4,6 Token/s"], ["Auron-Dienst", "läuft"]],
+      text: "Das Zuhause von Auron: Dienst, Nacht-Timer und Syncthing laufen hier. Letzte Reserve für die KI." },
     { id: "nachtarbeit", name: "Nachtarbeit", status: "wartet",
       kennzahlen: [["Nächster Lauf", "03:00 Uhr"], ["Letzte Nacht", "1 fertig, 2 Fehler"], ["KI", "nur lokal (neu)"]],
       text: "Arbeitet nachts Aufträge ab. Seit dem 04.10. ohne Claude-Anbindung, kostet nichts." },
@@ -154,7 +154,7 @@ const DATEN_BEISPIEL = {
       text: "Macht aus Wissenslücken Notiz-Entwürfe. Wartet auf Ihre Freigabe im HUD." },
     { id: "vault", name: "Vault", status: "laeuft",
       kennzahlen: [["Suchtest", "26/28 auf Platz 1"], ["Index", "aktuell"], ["Änderungen", "werden überwacht"]],
-      text: "Big Brain: Ihre Notizen in Obsidian, durchsucht von Jarvis." },
+      text: "Big Brain: Ihre Notizen in Obsidian, durchsucht von Auron." },
     { id: "briefing", name: "Briefing & Gmail", status: "laeuft",
       kennzahlen: [["Mails (2 Tage)", "15"], ["Wichtig", "2"], ["Quelle", "Gmail per IMAP"]],
       text: "Fasst Mails, Termine und Stand des Vortags zu einem Tagesbriefing zusammen." },

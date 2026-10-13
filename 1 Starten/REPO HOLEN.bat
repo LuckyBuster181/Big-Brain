@@ -71,7 +71,7 @@ echo.
 echo [4/4] Fertig. Letzte Aenderungen im Repo:
 git -C "%REPOORDNER%" log --oneline -5
 echo.
-echo  Python geaendert = Jarvis NEU STARTEN. Nur HTML oder JS = Strg+F5.
+echo  Python geaendert = Auron NEU STARTEN. Nur HTML oder JS = Strg+F5.
 echo  Alte Sicherungen in %SICHERUNGEN% duerfen Sie loeschen.
 echo.
 pause

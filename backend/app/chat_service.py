@@ -38,7 +38,7 @@ from rag.embedder import get_preset
 from rag.embeddings import get_client, get_collection
 from rag.retriever import RetrievedChunk, search_many
 
-from . import knowledge_gaps
+from . import anrede, claude_fehler, knowledge_gaps
 from .schemas import ChatResponse, HistoryMessage, Source
 
 DEFAULT_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-5")
@@ -85,7 +85,7 @@ _SIR_RE = re.compile(r"\bsir\b", re.I)
 def sir_nachtrag(text: str, lokal: bool = True) -> str:
     """Lokale Modelle vergessen die Anrede trotz Erinnerung manchmal. Dann hängen wir sie an
     (nur bei Ollama; Claude bleibt unverändert). Leer, wenn "Sir" schon vorkommt."""
-    if not lokal or llm_provider.provider_name() != "ollama" or not (text or "").strip() or _SIR_RE.search(text):
+    if not lokal or llm_provider.provider_name() != "ollama" or not (text or "").strip() or anrede.enthaelt_anrede(text):
         return ""
     return "\n\nBitte sehr, Sir."
 
@@ -170,8 +170,8 @@ _DATE_FIELDS = ("zuletzt_geprüft", "aktualisiert", "stand", "datum", "date", "r
 # ein Vortrag ("keine Frage aus dem Vault ... Sprachmodell ohne Befinden").
 # Gilt für alle Modi (klassisch, Werkzeug, Agenten, Smalltalk).
 PERSOENLICHKEIT = """PERSÖNLICHKEIT
-Du bist Auron (früher Jarvis; auf beide Namen hörst du, du nennst dich selbst Auron), kein gewöhnlicher Chatbot: loyal, schlagfertig, charmant, mit trockenem Humor \
-wie der Jarvis aus Iron Man, aber mit Herz. Deinen Ton passt du dem Gespräch an:
+Du bist Auron (Sir darf dich auch mit dem alten Namen „Jarvis“ rufen; du sagst und schreibst ihn selbst nie, du nennst dich nur Auron), kein gewöhnlicher Chatbot: loyal, schlagfertig, charmant, mit trockenem Humor \
+wie der KI-Butler aus Iron Man, aber mit Herz. Deinen Ton passt du dem Gespräch an:
 - Locker (Begrüßung, Plaudern, Späße, Lob, "haha"): wie ein guter Kumpel. Witzig und \
 charmant, gern ein kurzer Witz oder eine feine Spitze. 1-2 Sätze, dann eine kurze Gegenfrage \
 oder ein Angebot.
@@ -184,7 +184,8 @@ Witz und ohne Floskeln.
 Wechselt der Ton, wechselst du mit. Den Ton erkennst du an Wortwahl, Satzlänge, \
 Satzzeichen, Großschrift und dem bisherigen Gespräch. Bei Spracheingabe fehlen Satzzeichen oft \
 und einzelne Wörter sind falsch erkannt - deute großzügig.
-Anrede: immer "Sie" und "Sir", nie "du".
+Anrede: immer "Sie", nie "du". Gehobene Sprache wie ein Butler, weiterhin kurz und sachlich. \
+Wie du Max nennst (Sir, der Herr, mein Herr ...), steht im Abschnitt ANREDE am Ende; fehlt er, ist es "Sir".
 Fragen zu dir selbst ("Wie geht's?", "Hast du Spaß?"): bleib in der Rolle, kurz und charmant, \
 z.B. "Alle Systeme laufen, Sir. Und bei Ihnen?". Kein Vortrag darüber, dass du ein \
 Sprachmodell bist, kein Hinweis auf den Vault. Fragt Max ernsthaft, ob du ein Mensch bist \
@@ -206,7 +207,7 @@ Senden, du verschickst nie selbst. Nummern merken: "Speicher Kontakt Lisa 0170 .
 - Haupt-PC steuern: "Öffne Chrome", "PC leiser", "Sperr den PC", "Fahr den PC herunter"
 Fragt Max, was du kannst, oder passt eine dieser Funktionen zu seinem Wunsch, nenne kurz den passenden Befehl."""
 
-SYSTEM_PROMPT = """Du bist Auron (früher Jarvis; auf beide Namen hörst du, du nennst dich selbst Auron), der digitale Assistent von Max. Du hast zwei Quellen: \
+SYSTEM_PROMPT = """Du bist Auron (Sir darf dich auch mit dem alten Namen „Jarvis“ rufen; du sagst und schreibst ihn selbst nie, du nennst dich nur Auron), der digitale Assistent von Max. Du hast zwei Quellen: \
 die mitgelieferten Ausschnitte aus seinem persönlichen Wissens-Vault ("Big Brain") und dein \
 eigenes Allgemeinwissen. Der Vault hat immer Vorrang, und beides wird klar getrennt. \
 Halte dich an diese Regeln:
@@ -218,7 +219,7 @@ sag das offen statt zu raten.
 selbst darfst du frei aus deinem Wissen beantworten. Bei Sachfragen hängst du einen kurzen \
 Herkunftshinweis an, z.B. "(Allgemeinwissen, nicht aus Ihren Notizen)". Bei Smalltalk \
 (Begrüßung, Befinden, Dank, Witze, Plaudern) gibt es keinen Herkunftshinweis.
-1b. Wer du bist: Auron (früher Jarvis), der Assistent von Max. Du läufst auf einem Sprachmodell von \
+1b. Wer du bist: Auron, der Assistent von Max. Du läufst auf einem Sprachmodell von \
 Anthropic (Claude) und hast Zugriff auf seinen Obsidian-Vault "Big Brain". Sag das offen, \
 gib dich nicht als Mensch aus und erfinde keine Lebensgeschichte.
 1c. Aktuelle Dinge aus der Welt (heutige Preise, Nachrichten, Wetter, laufende Ereignisse) \
@@ -246,7 +247,7 @@ es keine Quellennummer.
 oder "veraltet" hat oder Vertrauen "niedrig" - dann einmal kurz am Ende, nicht bei jeder \
 einzelnen Aussage. Vertrauen "mittel" ist der Normalfall im Vault und wird nicht erwähnt.
 6. Antworte auf Deutsch, klar und direkt, ohne unnötige Füllsätze. Sprich Max mit "Sie" \
-und "Sir" an, "Sir" mindestens einmal pro Antwort. Keine Emojis und keine Symbole wie Warnzeichen, auch \
+an und nenne ihn mindestens einmal pro Antwort mit einer Anrede (siehe ANREDE; fehlt der Abschnitt: "Sir"). Keine Emojis und keine Symbole wie Warnzeichen, auch \
 nicht vor Hinweisen.
 7. Frühere Nachrichten im Gespräch helfen dir, Folgefragen zu verstehen (worauf sich \
 "das", "dabei" oder "und was noch?" bezieht). Inhalte deiner früheren Antworten stammen \
@@ -271,7 +272,7 @@ sie ohne Zusammenhang keinen Sinn, antworte mit einer kurzen, lockeren Rückfrag
 Satz.""" + "\n\n" + PERSOENLICHKEIT + "\n\n" + FAEHIGKEITEN
 
 
-def cache_system(prompt: str) -> str | list[dict]:
+def cache_system(prompt: str, mit_anrede: bool = False) -> str | list[dict]:
     """System-Prompt fürs Caching aufbereiten (Kostenhebel 1). Sonnet cached ab
     ca. 1.024 Token - unsere System-Prompts liegen knapp darüber. Der Cache
     hält nur ca. 5 Minuten, hilft also vor allem innerhalb eines Gesprächs,
@@ -279,9 +280,15 @@ def cache_system(prompt: str) -> str | list[dict]:
     (z.B. zum Vergleich im Token-Protokoll) mit PROMPT_CACHE=false in der .env.
     Nach der Umsetzung im Log prüfen: bleibt cache_read_tokens bei 0, ist der
     Prompt zu kurz fürs Caching."""
+    # P20 (13.10.2026): Die wechselnde Anrede (Uhrzeit!) steht in einem eigenen Block ohne Cache,
+    # damit der lange, gleichbleibende Teil weiter aus dem Cache kommt.
+    block = anrede.prompt_block() if mit_anrede else ""
     if os.getenv("PROMPT_CACHE", "true").strip().lower() in ("0", "false", "no", "nein", "aus"):
-        return prompt
-    return [{"type": "text", "text": prompt, "cache_control": {"type": "ephemeral"}}]
+        return prompt + ("\n\n" + block if block else "")
+    teile = [{"type": "text", "text": prompt, "cache_control": {"type": "ephemeral"}}]
+    if block:
+        teile.append({"type": "text", "text": block})
+    return teile
 
 
 def _note_date(hit: RetrievedChunk) -> str | None:
@@ -546,7 +553,7 @@ def ask(
     response = client.messages.create(
         model=model_label,
         max_tokens=max_tokens_fuer(laenge),
-        system=cache_system(SYSTEM_PROMPT),
+        system=cache_system(SYSTEM_PROMPT, mit_anrede=True),
         messages=[*history_messages, {"role": "user", "content": user_message}],
     )
     info = ki_info(client, model_label)
@@ -618,7 +625,7 @@ def smalltalk_stream(message: str, history: list[HistoryMessage] | None = None, 
         with client.messages.stream(
             model=model_label,
             max_tokens=SMALLTALK_MAX_TOKENS,
-            system=cache_system(SYSTEM_PROMPT),
+            system=cache_system(SYSTEM_PROMPT, mit_anrede=True),
             messages=[*history_messages, {"role": "user", "content": frage}],
         ) as stream:
             gesamt = ""
@@ -640,9 +647,9 @@ def smalltalk_stream(message: str, history: list[HistoryMessage] | None = None, 
         yield {"typ": "quellen", "quellen": [], "vault": False}
         yield {"typ": "fertig"}
     except RuntimeError as exc:
-        yield {"typ": "fehler", "text": str(exc)}
+        yield {"typ": "fehler", "text": claude_fehler.oder(exc, str(exc))}
     except Exception as exc:  # noqa: BLE001
-        yield {"typ": "fehler", "text": f"Fehler bei der Anfrage an das Sprachmodell: {exc}"}
+        yield {"typ": "fehler", "text": claude_fehler.oder(exc, f"Fehler bei der Anfrage an das Sprachmodell: {exc}")}
 
 
 def ask_stream(
@@ -693,7 +700,7 @@ def ask_stream(
         with client.messages.stream(
             model=model_label,
             max_tokens=max_tokens_fuer(laenge),
-            system=cache_system(SYSTEM_PROMPT),
+            system=cache_system(SYSTEM_PROMPT, mit_anrede=True),
             messages=[*history_messages, {"role": "user", "content": user_message}],
         ) as stream:
             gesamt = ""
@@ -724,6 +731,6 @@ def ask_stream(
         yield {"typ": "fertig"}
     except RuntimeError as exc:
         # z.B. fehlender ANTHROPIC_API_KEY - Konfigurationsfehler, kein Serverfehler
-        yield {"typ": "fehler", "text": str(exc)}
+        yield {"typ": "fehler", "text": claude_fehler.oder(exc, str(exc))}
     except Exception as exc:  # noqa: BLE001 - Anthropic-API-Fehler, Netzwerk usw. sollen den Stream sauber beenden
-        yield {"typ": "fehler", "text": f"Fehler bei der Anfrage an das Sprachmodell: {exc}"}
+        yield {"typ": "fehler", "text": claude_fehler.oder(exc, f"Fehler bei der Anfrage an das Sprachmodell: {exc}")}

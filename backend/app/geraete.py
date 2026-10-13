@@ -207,7 +207,7 @@ def _aktion_lesbar(methode: str, pfad: str) -> str:
     if pfad in ("/", "/handy"):
         return "HUD geöffnet" if pfad == "/" else "Handy-Seite geöffnet"
     if pfad.startswith("/api/chat"):
-        return "Frage an Jarvis"
+        return "Frage an Auron"
     if pfad.startswith("/api/briefing"):
         return "Briefing"
     if pfad.startswith("/api/geraete/anmelden"):

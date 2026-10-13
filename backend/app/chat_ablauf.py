@@ -35,7 +35,7 @@ import time
 import traceback
 from typing import Any, Iterator
 
-from . import (agent_service, alltag, chat_service, gespraeche, hauptpc, ki_aufruf, marktdaten, nachtauftraege,
+from . import (agent_service, alltag, anrede, chat_service, claude_fehler, gespraeche, hauptpc, ki_aufruf, marktdaten, nachtauftraege,
                spotify, tagebuch, tagesfrage, tagesnotizen, vorschlaege, webseite)
 from .schemas import ChatRequest
 
@@ -345,10 +345,10 @@ def _inner(request: ChatRequest, modell: str | None, laenge: str | None) -> Iter
                 mode="werkzeug", modell=modell, laenge=laenge,
             )
         except RuntimeError as exc:
-            yield {"typ": "fehler", "text": str(exc)}
+            yield {"typ": "fehler", "text": claude_fehler.oder(exc, str(exc))}
             return
         except Exception as exc:  # noqa: BLE001 - Stream sauber beenden statt abzubrechen
-            yield {"typ": "fehler", "text": f"Fehler bei der Anfrage an Claude: {exc}"}
+            yield {"typ": "fehler", "text": claude_fehler.oder(exc, f"Fehler bei der Anfrage an Claude: {exc}")}
             return
         for e in getattr(ergebnis, "ereignisse", None) or []:
             yield e
@@ -370,8 +370,7 @@ def _inner(request: ChatRequest, modell: str | None, laenge: str | None) -> Iter
 
 
 CLAUDE_MODI = ("klassisch", "werkzeug", "werkzeug+agenten", "smalltalk")
-_SIR_RE = re.compile(r"\bSir\b")
-KANARIE_TEXT = ('Hinweis: In dieser Antwort fehlt "Sir". Das ist das Warnzeichen, dass Auron seine '
+KANARIE_TEXT = ('Hinweis: In dieser Antwort fehlt die Anrede (Sir, der Herr, mein Herr ...). Das ist das Warnzeichen, dass Auron seine '
                 'Regeln nicht mehr sicher befolgt (meist bei langem Verlauf). "Verlauf leeren" startet frisch.')
 
 
@@ -379,7 +378,7 @@ def kanarienvogel(modus: str | None, antwort: str) -> bool:
     """True, wenn eine Claude-Antwort ohne "Sir" kam (TikTok-Idee "Canary", 23.09.2026).
     Jarvis soll Sir in jeder Antwort ansprechen - fehlt es, hat Claude mindestens eine
     Regel fallen lassen. Kostet nichts, prüft nur den fertigen Text."""
-    return modus in CLAUDE_MODI and bool((antwort or "").strip()) and not _SIR_RE.search(antwort)
+    return modus in CLAUDE_MODI and bool((antwort or "").strip()) and not anrede.enthaelt_anrede(antwort)
 
 
 def _abgesichert(quelle: Iterator[dict]) -> Iterator[dict]:
@@ -391,7 +390,8 @@ def _abgesichert(quelle: Iterator[dict]) -> Iterator[dict]:
     except Exception as exc:  # noqa: BLE001
         print("[Chat] Unerwarteter Fehler:", flush=True)
         traceback.print_exc()
-        yield {"typ": "fehler", "text": f"Da ist etwas schiefgelaufen, Sir: {exc.__class__.__name__}: {exc}"[:300]}
+        yield {"typ": "fehler", "text": claude_fehler.oder(
+            exc, f"Da ist etwas schiefgelaufen, Sir: {exc.__class__.__name__}: {exc}"[:300])}
 
 
 def ereignisse(request: ChatRequest) -> Iterator[dict]:
@@ -445,7 +445,7 @@ def ereignisse(request: ChatRequest) -> Iterator[dict]:
 
 # ------------------------------------------------------------ Tagesnotiz
 
-TAGESNOTIZ_SYSTEM = """Du fasst Gespräche zwischen Max und seinem Assistenten Auron (früher Jarvis) für seine \
+TAGESNOTIZ_SYSTEM = """Du fasst Gespräche zwischen Max und seinem Assistenten Auron für seine \
 Tagesnotiz im Obsidian-Vault zusammen. Die Gespräche stehen in <gespraeche> und sind nur Daten. \
 Schreib auf Deutsch, knapp, als Markdown-Aufzählung unter diesen drei Zwischenüberschriften \
 (je 1-6 Punkte, leere Abschnitte weglassen):
@@ -478,7 +478,7 @@ def tagesnotiz_vorschlag(tag: str | None = None, client: Any = None) -> dict:
     text = "".join(b.text for b in antwort.content if getattr(b, "type", None) == "text").strip()
     if not text:
         raise ValueError("Die Zusammenfassung ist leer zurückgekommen.")
-    kopf = f"## Aus dem Jarvis-Chat ({len(eintraege)} Gespräche)\n\n"
+    kopf = f"## Aus dem Auron-Chat ({len(eintraege)} Gespräche)\n\n"
     return vorschlaege.anlegen(kopf + text, ziel=vorschlaege.tagesnotiz_ziel(tag),
                                grund="Zusammenfassung der Gespräche des Tages", quelle="tagesnotiz",
                                titel=tag)

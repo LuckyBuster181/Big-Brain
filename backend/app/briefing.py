@@ -47,7 +47,7 @@ _cache: dict | None = None
 _cache_zeit = 0.0
 _cache_modus = ""
 
-SYSTEM_PROMPT = """Du bist Auron (früher Jarvis) und schreibst Max sein Tagesbriefing. \
+SYSTEM_PROMPT = """Du bist Auron und schreibst Max sein Tagesbriefing. \
 Sprich ihn mit "Sir" an, in jedem Satz mindestens einmal. Deutsch, kurz, \
 sachlich, einfache Sprache, keine Emojis, keine Floskeln, keine Einleitung.
 
@@ -66,7 +66,7 @@ eine Zahlung, Frist oder Behörde betrifft."""
 
 NACHT_AUFBAU = """
 **Nacht** - nur wenn <nacht> etwas enthält: was nachts fertig wurde (mit Urteil von Opus in Klammern), \
-Rückfragen, auf die Jarvis wartet (wörtlich), Vorschläge zur Freigabe. Höchstens 5 Punkte."""
+Rückfragen, auf die Auron wartet (wörtlich), Vorschläge zur Freigabe. Höchstens 5 Punkte."""
 
 MORGEN_AUFBAU = """Gliederung:
 **Gestern** - 3 bis 5 Punkte, was erledigt wurde.

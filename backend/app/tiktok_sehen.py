@@ -101,7 +101,7 @@ SYSTEM = (
     f'- "thema": eines von {json.dumps(THEMEN, ensure_ascii=False)}\n'
     '- "vertrauen": "niedrig", "mittel" oder "hoch"\n'
     '- "vertrauen_grund": ein Satz (z. B. Werbung, unbelegte Gewinnversprechen, nachvollziehbare Anleitung)\n'
-    '- "fuer_jarvis": 0-3 konkrete Ideen, wie Max das für seinen Assistenten Jarvis, seinen Obsidian-Vault '
+    '- "fuer_jarvis": 0-3 konkrete Ideen, wie Max das für seinen Assistenten Auron, seinen Obsidian-Vault '
     "oder seine Projekte nutzen kann; leere Liste, wenn nichts passt\n"
     '- "suchbegriffe": 3-6 Stichwörter'
 )
@@ -349,7 +349,7 @@ def block_bauen(daten: dict, links: list[tuple[str, str]], bildnamen: list[str],
     punkte = lambda xs: "\n".join(f"- {x}" for x in xs) if xs else "- (nichts erkannt)"  # noqa: E731
     teile = [
         ANFANG,
-        f"> [!info] Von Jarvis ausgewertet am {heute}: Bild und Text, Modell {MODELL}, ungeprüft.",
+        f"> [!info] Von Auron ausgewertet am {heute}: Bild und Text, Modell {MODELL}, ungeprüft.",
         "",
         "## Kurz",
         "",
@@ -367,7 +367,7 @@ def block_bauen(daten: dict, links: list[tuple[str, str]], bildnamen: list[str],
     if daten.get("text_im_bild"):
         teile += ["## Text im Bild", "", "```text", daten["text_im_bild"].replace("```", "'''"), "```", ""]
     if daten.get("fuer_jarvis"):
-        teile += ["## Für Jarvis", "", punkte(daten["fuer_jarvis"]), ""]
+        teile += ["## Für Auron", "", punkte(daten["fuer_jarvis"]), ""]
     grund = f" – {daten['vertrauen_grund']}" if daten.get("vertrauen_grund") else ""
     teile += ["## Einschätzung", "", f"Art: {daten['art']} · Vertrauen: {daten['vertrauen']}{grund}", ""]
     uebersicht = f"{tiktok.ENTWURF_ORDNER}/{UEBERSICHT_NAME[:-3]}"
@@ -445,7 +445,7 @@ def uebersicht_schreiben(vault_path: str | None = None) -> str | None:
         "---", "typ: uebersicht", "status: aktiv", "niveau: einstieg", f"aktualisiert: {heute}",
         "tags:", "  - tiktok", "---", "",
         "# TikTok nach Themen", "",
-        f"Von Jarvis erzeugt am {heute}: {len(gesehen)} ausgewertete Videos. "
+        f"Von Auron erzeugt am {heute}: {len(gesehen)} ausgewertete Videos. "
         "Diese Liste wird bei jedem Lauf neu geschrieben, eigene Notizen bitte unter „Notizen von Sir“.", "",
     ]
     for thema in THEMEN:

@@ -18,6 +18,12 @@ Chat (0 Cent, ohne Claude) - app/alltag.py ruft absicht() auf:
     "Sperr den PC" / "Bildschirm aus"
     "Fahr den PC herunter" / "Starte den PC neu"  -> Rückfrage, "ja" innerhalb 2 Min.
     "Herunterfahren abbrechen"
+
+Freigabe-Stufen (P22, 13.10.2026) - der Agent setzt sie ebenfalls durch, hier ist die erste Sperre:
+    Stufe 0 frei, Stufe 1 feste Befehlsliste (sechs Befehle), Stufe 2 nur nach "ja" (2 Minuten),
+    Stufe 3 verboten (freie Befehle, endgültig löschen, Käufe, Überweisungen, Passwörter, Trades, Sicherheit).
+    Befehle ohne Claude (0 Cent): "Prüflauf starten", "Backup starten", "Index neu einlesen", "Suche testen",
+    "Updates prüfen", "Vault pflegen"; Bericht: "Wie war der Prüflauf?"
 """
 
 from __future__ import annotations
@@ -29,10 +35,39 @@ from typing import Any
 
 import httpx
 
+from . import anrede as _anrede
 from . import geraeteschutz
 
-GEFAEHRLICH = {"herunterfahren", "neustart"}
+# Stufe je Aktion - muss zur Tabelle im Agenten passen (pc_agent_windows/agent_stufen.py)
+STUFEN: dict[str, int] = {
+    "programm": 0, "ordner": 0, "url": 0, "lauter": 0, "leiser": 0, "stumm": 0, "medien": 0, "anzeige": 0,
+    "abbrechen": 0,
+    "befehl": 1,
+    "sperren": 2, "bildschirm_aus": 2, "herunterfahren": 2, "neustart": 2,
+}
+STUFE_2 = frozenset(a for a, s in STUFEN.items() if s == 2)
+GEFAEHRLICH = STUFE_2  # alter Name
 BESTAETIGUNG_S = 120
+
+# Stufe 1: genau diese sechs, mehr nicht (Name -> Wörter für Antworten)
+BEFEHLE: dict[str, str] = {
+    "pruefen": "Prüflauf",
+    "vault_pflege": "Vault-Pflege",
+    "reindex": "Index neu einlesen",
+    "suchtest": "Suchtest",
+    "backup": "Backup",
+    "updates_pruefen": "Updates prüfen",
+}
+
+
+def _a(situation: str = "normal") -> str:
+    """Anrede für feste Antworten (siehe app/anrede.py): Fehler und Rückfragen immer "Sir"."""
+    return _anrede.anrede(situation)
+
+
+def stufe(name: str) -> int | None:
+    """0, 1, 2 oder None (unbekannt/verboten = Stufe 3)."""
+    return STUFEN.get(name)
 
 # Schlüssel wie in pc_agent_windows/programme.json -> Wörter, an denen Jarvis sie erkennt
 PROGRAMM_NAMEN: dict[str, tuple[str, ...]] = {
@@ -103,6 +138,37 @@ _RUNTER = re.compile(_VOR + r"(?:fahr(?:e)?\s+(?:" + _PC + r")\s+(?:herunter|run
                      r"ausschalten|aus)|schalte?\s+(?:" + _PC + r")\s+aus)\s*[.!]?\s*$", re.I)
 _NEU = re.compile(_VOR + r"(?:start(?:e)?\s+(?:" + _PC + r")\s+neu|(?:" + _PC + r")\s+neu\s*starten|neustart\s+(?:" + _PC + r"))\s*[.!]?\s*$", re.I)
 _ABBRECHEN = re.compile(_VOR + r"(?:herunterfahren|neustart|shutdown)\s+abbrechen\s*[.!]?\s*$", re.I)
+# Stufe 1 (P22): feste Befehle ohne Claude. Genau diese sechs.
+_BEF_WORTE = {
+    "pruefen": r"pr(?:ü|ue|u)f-?lauf",
+    "backup": r"backup|sicherung",
+    "reindex": r"index\s+neu\s+(?:einlesen|aufbauen)|reindex",
+    "suchtest": r"suche\s+testen|such-?test",
+    "updates_pruefen": r"updates?\s+pr(?:ü|ue|u)fen|nach\s+updates?\s+suchen",
+    "vault_pflege": r"vault-?\s*pflege|vault\s+pflegen",
+}
+_BEF_START = {
+    n: re.compile(_VOR + r"(?:(?:starte?|mach|führe?|fuehre?|lass)\s+)?(?:(?:mal|bitte)\s+)?(?:(?:den|die|das|einen|eine|ein)\s+)?"
+                  r"(?:" + w + r")(?:\s+(?:starten|laufen|durchführen|durchfuehren|durch|an))?(?:\s+am\s+pc)?\s*[.!]?\s*$", re.I)
+    for n, w in _BEF_WORTE.items()
+}
+_BEF_NOMEN = {
+    "pruefen": r"pr(?:ü|ue|u)f-?lauf",
+    "backup": r"backup|sicherung",
+    "reindex": r"re-?index|index(?:lauf)?|einlesen",
+    "suchtest": r"such-?test",
+    "updates_pruefen": r"update-?\s*(?:pr(?:ü|ue|u)fung|check)",
+    "vault_pflege": r"vault-?\s*pflege",
+}
+BERICHT_FRAGE = {"pruefen": "Wie war der Prüflauf?", "backup": "Wie war das Backup?", "reindex": "Wie war der Index?",
+                 "suchtest": "Wie war der Suchtest?", "updates_pruefen": "Wie war der Updatecheck?",
+                 "vault_pflege": "Wie war die Vault-Pflege?"}
+_BEF_BERICHT = {
+    n: re.compile(_VOR + r"(?:wie\s+(?:war|lief|ist)\s+(?:der|die|das)\s+(?:" + w + r")(?:\s+gelaufen)?|"
+                  r"was\s+hat\s+(?:der|die|das)\s+(?:" + w + r")\s+(?:ergeben|gebracht)|"
+                  r"(?:zeig|lies)\s+(?:mir\s+)?(?:den|die|das)\s+(?:bericht|ergebnis)\s+(?:vom|von|des|der)\s+(?:" + w + r"))\s*[?.!]?\s*$", re.I)
+    for n, w in _BEF_NOMEN.items()
+}
 _URL = re.compile(r"^(?:https?://)?(?:[a-z0-9-]+\.)+[a-z]{2,}(?:/\S*)?$", re.I)
 _JA = re.compile(r"^\s*(?:ja|jawohl|mach(?:\s*das)?|ok(?:ay)?|bestätigt|bestaetigt|genau)\b[\s.!]*$", re.I)
 _NEIN = re.compile(r"^\s*(?:nein|nee|abbrechen|lass(?:\s*es)?|doch\s*nicht|stopp)\b[\s.!]*$", re.I)
@@ -112,6 +178,10 @@ _wartend: dict[str, Any] = {}
 
 class HauptPcFehler(Exception):
     pass
+
+
+NICHT_EINGERICHTET = ("Die PC-Steuerung ist noch nicht eingerichtet: am Haupt-PC einmal "
+                      "\"3 Einrichten\\PC_STEUERUNG_EINRICHTEN.bat\" starten, danach \"JARVIS STARTEN.bat\".")
 
 
 def konfig() -> dict[str, str]:
@@ -127,8 +197,7 @@ def ist_eingerichtet() -> bool:
 def _anfrage(methode: str, pfad: str, json_daten: dict | None = None, timeout: float = 8) -> dict:
     k = konfig()
     if not (k["url"] and k["token"]):
-        raise HauptPcFehler("Die PC-Steuerung ist noch nicht eingerichtet: am Haupt-PC einmal "
-                            "\"3 Einrichten\\PC_STEUERUNG_EINRICHTEN.bat\" starten, danach \"JARVIS STARTEN.bat\".")
+        raise HauptPcFehler(NICHT_EINGERICHTET)
     geraeteschutz.netz_pruefen(k["url"] + pfad, "Haupt-PC")
     try:
         r = httpx.request(methode, k["url"] + pfad, headers={"Authorization": f"Bearer {k['token']}"},
@@ -159,9 +228,24 @@ def aktionen() -> dict:
 
 
 def aktion(name: str, ziel: Any = None, bestaetigt: bool = False) -> dict:
-    if name in GEFAEHRLICH and not bestaetigt:
+    s = stufe(name)
+    if s is None:
+        raise HauptPcFehler(f"Die Aktion \"{name}\" gibt es nicht (Stufe 3, verboten).")
+    if s == 2 and not bestaetigt:
         raise HauptPcFehler("Diese Aktion braucht eine Bestätigung.")
-    return _anfrage("POST", "/aktion", {"aktion": name, "ziel": ziel}, timeout=15)
+    if s == 1 and name == "befehl" and ziel not in BEFEHLE:
+        raise HauptPcFehler("Dieser Befehl steht nicht auf der festen Liste.")
+    daten: dict[str, Any] = {"aktion": name, "ziel": ziel}
+    if s == 2:
+        daten["bestaetigt"] = True
+    return _anfrage("POST", "/aktion", daten, timeout=15)
+
+
+def befehl_bericht(name: str) -> dict:
+    """Letzte Zeilen des jüngsten Laufs eines Befehls (Stufe 0, nur lesen)."""
+    if name not in BEFEHLE:
+        raise HauptPcFehler("Dieser Befehl steht nicht auf der festen Liste.")
+    return _anfrage("GET", f"/befehl_bericht?name={name}", timeout=6)
 
 
 # ------------------------------------------------------------------ Absichten
@@ -187,6 +271,12 @@ def absicht(text: str) -> dict | None:
         return None
     if _ABBRECHEN.match(t):
         return {"art": "pc", "aktion": "abbrechen"}
+    for n, muster in _BEF_BERICHT.items():
+        if muster.match(t):
+            return {"art": "pc", "aktion": "bericht", "ziel": n}
+    for n, muster in _BEF_START.items():
+        if muster.match(t):
+            return {"art": "pc", "aktion": "befehl", "ziel": n}
     if _RUNTER.match(t):
         return {"art": "pc", "aktion": "herunterfahren"}
     if _NEU.match(t):
@@ -242,28 +332,54 @@ def absicht(text: str) -> dict | None:
 SAETZE = {
     "herunterfahren": "den Haupt-PC herunterfahren",
     "neustart": "den Haupt-PC neu starten",
+    "sperren": "den Haupt-PC sperren",
+    "bildschirm_aus": "den Bildschirm des Haupt-PCs ausschalten",
 }
+MIT_ABBRUCH = {"herunterfahren", "neustart"}
+
+
+def _bericht_text(name: str) -> str:
+    try:
+        e = befehl_bericht(name)
+    except HauptPcFehler as exc:
+        return f"Das ging nicht, {_a('fehler')}: {exc}"
+    if not e.get("ok"):
+        return f"{e.get('meldung') or 'Kein Bericht vorhanden'}, {_a('fehler')}."
+    zeilen = [z for z in (e.get("zeilen") or []) if str(z).strip()][-15:]
+    stand = "läuft noch" if e.get("laeuft") else ("fertig" if e.get("fertig") else "Stand unklar")
+    kopf = f"{BEFEHLE[name]}: {stand} ({e.get('datei', '')}), {_a()}. Letzte Zeilen:"
+    return kopf + "\n\n```\n" + "\n".join(str(z) for z in zeilen) + "\n```"
 
 
 def ausfuehren(a: dict) -> str:
     """Chat-Antwort für eine erkannte PC-Absicht."""
     name = a["aktion"]
-    if name in GEFAEHRLICH:
+    if name == "bericht":
+        return _bericht_text(a["ziel"]) if ist_eingerichtet() else \
+            f"Die PC-Steuerung ist noch nicht eingerichtet, {_a('fehler')}."
+    if name in STUFE_2:
+        if not ist_eingerichtet():
+            return f"Das ging nicht, {_a('fehler')}: {NICHT_EINGERICHTET}"
         _wartend.clear()
         _wartend.update({"aktion": name, "zeit": time.time()})
-        return (f"Soll ich wirklich {SAETZE[name]}, Sir? Sagen Sie \"ja\" (gilt 2 Minuten). "
-                f"Danach bleiben noch 60 Sekunden, in denen \"Herunterfahren abbrechen\" es stoppt.")
+        text = f"Soll ich wirklich {SAETZE[name]}, {_a('stufe2')}? Sagen Sie \"ja\" (gilt 2 Minuten)."
+        if name in MIT_ABBRUCH:
+            text += " Danach bleiben noch 60 Sekunden, in denen \"Herunterfahren abbrechen\" es stoppt."
+        return text
     try:
         e = aktion(name, a.get("ziel"))
     except HauptPcFehler as exc:
-        return f"Das ging nicht, Sir: {exc}"
+        return f"Das ging nicht, {_a('fehler')}: {exc}"
+    if e.get("ok") and name == "befehl":
+        n = BEFEHLE.get(a.get("ziel"), a.get("ziel"))
+        return f"{n} läuft jetzt am Haupt-PC, {_a('erfolg')}. Später: \"{BERICHT_FRAGE[a.get('ziel')]}\""
     if e.get("ok"):
-        return f"{e.get('meldung') or 'Erledigt'}, Sir."
-    return f"Das hat der Haupt-PC abgelehnt, Sir: {e.get('meldung') or e.get('fehler') or 'unbekannter Grund'}."
+        return f"{e.get('meldung') or 'Erledigt'}, {_a('erfolg')}."
+    return f"Das hat der Haupt-PC abgelehnt, {_a('fehler')}: {e.get('meldung') or e.get('fehler') or 'unbekannter Grund'}."
 
 
 def bestaetigung(text: str) -> str | None:
-    """Antwort auf eine offene Rückfrage (Herunterfahren/Neustart). None = keine offene Rückfrage."""
+    """Antwort auf eine offene Rückfrage (Stufe 2). None = keine offene Rückfrage."""
     if not _wartend:
         return None
     if time.time() - _wartend.get("zeit", 0) > BESTAETIGUNG_S:
@@ -275,10 +391,14 @@ def bestaetigung(text: str) -> str | None:
         try:
             e = aktion(name, bestaetigt=True)
         except HauptPcFehler as exc:
-            return f"Das ging nicht, Sir: {exc}"
-        return f"{e.get('meldung') or 'Erledigt'}, Sir. \"Herunterfahren abbrechen\" stoppt es noch." if e.get("ok") \
-            else f"Das hat der Haupt-PC abgelehnt, Sir: {e.get('meldung')}."
+            return f"Das ging nicht, {_a('fehler')}: {exc}"
+        if not e.get("ok"):
+            return f"Das hat der Haupt-PC abgelehnt, {_a('fehler')}: {e.get('meldung')}."
+        zusatz = " \"Herunterfahren abbrechen\" stoppt es noch." if name in MIT_ABBRUCH else ""
+        return f"{e.get('meldung') or 'Erledigt'}, {_a('erfolg')}.{zusatz}"
     if _NEIN.match(text or ""):
+        name = _wartend.get("aktion")
         _wartend.clear()
-        return "In Ordnung, Sir, der PC bleibt an."
+        a = _a("normal")
+        return f"In Ordnung, {a}, der PC bleibt an." if name in MIT_ABBRUCH else f"In Ordnung, {a}, nichts wird ausgeführt."
     return None

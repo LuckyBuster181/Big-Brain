@@ -209,7 +209,7 @@ class VorschlagRequest(BaseModel):
     """Vorschlag von Hand anlegen (Phase 2.3) - geschrieben wird erst nach "Übernehmen"."""
 
     text: str = Field(..., min_length=1, max_length=30_000)
-    ziel: str | None = Field(None, max_length=300, description="Pfad im Vault, leer = 'Gemerkt von Jarvis'")
+    ziel: str | None = Field(None, max_length=300, description="Pfad im Vault, leer = 'Gemerkt von Auron'")
     grund: str = Field("", max_length=500)
 
 

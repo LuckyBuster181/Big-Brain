@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Jarvis Insel-Stadt</title>
+<title>Auron Insel-Stadt</title>
 <!--
-  Jarvis Insel-Stadt in 3D (04.10.2026, Entwurf 4: echter Maßstab, 1 Einheit = 1 Meter, Insel ca. 2,8 km). Three.js r147, sonst keine Abhängigkeiten.
+  Auron Insel-Stadt in 3D (04.10.2026, Entwurf 4: echter Maßstab, 1 Einheit = 1 Meter, Insel ca. 2,8 km). Three.js r147, sonst keine Abhängigkeiten.
   Bibliothek: zuerst lokal aus lib/three/ (THREE_HOLEN.bat legt sie dort ab), sonst aus dem Internet (jsdelivr).
   Es wird nichts gespeichert und nichts gesendet.
 
   TESTPLAN (Sir):
    1. Datei per Doppelklick öffnen (Chrome oder Edge). Nach kurzem Laden: große Insel (ca. 2,8 km) mit Strand, weißer
       Promenade, Wiesen, Parks, vielen weißen und gläsernen Zukunftsbauten, Einschienenbahn mit Zug, Riesenrad,
-      Booten, Luftschiffen und in der Mitte dem sehr hohen goldenen Turm "Jarvis".
+      Booten, Luftschiffen und in der Mitte dem sehr hohen goldenen Turm "Auron".
    2. "Licht": Morgen, Tag, Sonnenuntergang, Nacht. Himmel, Sonne, Wasser, Schatten, Fenster, Laternen ändern sich.
-   3. Klick auf Jarvis, ein Arbeitsgebäude oder ein Namensschild öffnet das Detailfeld. Andere Häuser reagieren nicht.
+   3. Klick auf Auron, ein Arbeitsgebäude oder ein Namensschild öffnet das Detailfeld. Andere Häuser reagieren nicht.
    4. "Rundgang" fliegt alle 13 Gebäude an (je 3 s). "Stopp" bricht ab. Ziehen dreht, Rechtsklick/zwei Finger
       verschieben, Mausrad/zwei Finger zoomen.
   EHRLICH UNGETESTET / FEHLERQUELLEN:
@@ -92,7 +92,7 @@
 </head>
 <body>
 <header>
-  <h1>Jarvis – Insel-Stadt</h1>
+  <h1>Auron – Insel-Stadt</h1>
   <div class="steuer">
     <label class="licht">Licht
       <select id="licht">
@@ -110,7 +110,7 @@
 </header>
 <div class="zeile" id="zusammenfassung" aria-live="polite"></div>
 <main>
-  <canvas id="stadt" aria-label="3D-Insel-Stadt mit Jarvis in der Mitte und 12 Arbeitsgebäuden"></canvas>
+  <canvas id="stadt" aria-label="3D-Insel-Stadt mit Auron in der Mitte und 12 Arbeitsgebäuden"></canvas>
   <div id="schilder"></div>
   <div id="untertitel" role="status"></div>
   <aside id="detail" aria-live="polite">
@@ -120,7 +120,7 @@
     <dl id="detailZahlen"></dl>
     <p id="detailText"></p>
   </aside>
-  <div id="laden"><div><b>Jarvis</b> baut die Stadt …</div><div id="ladenText"></div></div>
+  <div id="laden"><div><b>Auron</b> baut die Stadt …</div><div id="ladenText"></div></div>
   <div class="unsichtbar" id="tastaturListe"></div>
 </main>
 
@@ -166,7 +166,7 @@ async function bibliothekLaden() {
 const DATEN_BEISPIEL = {
   stand: "Beispieldaten von Hand eingetragen (04.10.2026), nicht live",
   gebaeude: [
-    { id:"jarvis", name:"Jarvis", status:"laeuft",
+    { id:"jarvis", name:"Auron", status:"laeuft",
       kennzahlen:[["KI-Anbieter","lokal (Ollama)"],["Antwortzeit Notizfragen","2,5 bis 8,5 s"],["Anrede","Sir"]],
       text:"Die Zentrale: beantwortet Fragen aus dem Vault mit Quellenangabe und steuert alle anderen Bereiche." },
     { id:"testpc", name:"Test-PC", status:"laeuft",
@@ -176,8 +176,8 @@ const DATEN_BEISPIEL = {
       kennzahlen:[["Modell","qwen3.5:9b"],["Tempo","49,5 Token/s"],["Grafikkarte","RTX 2070 Super"]],
       text:"Der schnellste KI-Rechner, antwortet im Chat zuerst." },
     { id:"minipc", name:"Mini-PC", status:"laeuft",
-      kennzahlen:[["Modell","qwen3.5:4b"],["Tempo","4,6 Token/s"],["Jarvis-Dienst","läuft"]],
-      text:"Das Zuhause von Jarvis: Dienst, Nacht-Timer und Syncthing laufen hier." },
+      kennzahlen:[["Modell","qwen3.5:4b"],["Tempo","4,6 Token/s"],["Auron-Dienst","läuft"]],
+      text:"Das Zuhause von Auron: Dienst, Nacht-Timer und Syncthing laufen hier." },
     { id:"nachtarbeit", name:"Nachtarbeit", status:"wartet",
       kennzahlen:[["Nächster Lauf","03:00 Uhr"],["Letzte Nacht","1 fertig, 2 Fehler"],["KI","nur lokal (neu)"]],
       text:"Arbeitet nachts Aufträge ab. Seit dem 04.10. ohne Claude-Anbindung, kostet nichts." },
@@ -186,7 +186,7 @@ const DATEN_BEISPIEL = {
       text:"Macht aus Wissenslücken Notiz-Entwürfe. Wartet auf Ihre Freigabe im HUD." },
     { id:"vault", name:"Vault", status:"laeuft",
       kennzahlen:[["Suchtest","26/28 auf Platz 1"],["Index","aktuell"],["Änderungen","werden überwacht"]],
-      text:"Big Brain: Ihre Notizen in Obsidian, durchsucht von Jarvis." },
+      text:"Big Brain: Ihre Notizen in Obsidian, durchsucht von Auron." },
     { id:"briefing", name:"Briefing & Gmail", status:"laeuft",
       kennzahlen:[["Mails (2 Tage)","15"],["Wichtig","2"],["Quelle","Gmail per IMAP"]],
       text:"Fasst Mails, Termine und Stand des Vortags zu einem Tagesbriefing zusammen." },
@@ -833,7 +833,7 @@ for (let i = 0; i < 48; i++) { const w = i / 48 * Math.PI * 2; baumSetzen(Math.c
 }
 
 /* =====================================================================================
-   7. HAUPTTURM JARVIS (gestuft wie der Burj Khalifa, Y-förmiger Grundriss, ca. 650 m)
+   7. HAUPTTURM AURON (gestuft wie der Burj Khalifa, Y-förmiger Grundriss, ca. 650 m)
    ===================================================================================== */
 const turm = new T.Group();
 turm.position.set(0, BODEN + 0.8, 0);
@@ -1366,7 +1366,7 @@ function bewegen(dt) {
     else if (b.art === "nachrichten" && Math.floor(zeit * 10) !== b.bild) {
       b.bild = Math.floor(zeit * 10);
       const x = b.x; x.fillStyle = "#0d2a46"; x.fillRect(0, 0, 512, 256);
-      x.fillStyle = "#e8f2ff"; x.font = "bold 40px system-ui, sans-serif"; x.fillText("JARVIS", 24, 56);
+      x.fillStyle = "#e8f2ff"; x.font = "bold 40px system-ui, sans-serif"; x.fillText("AURON", 24, 56);
       x.fillStyle = "#7fb8ff"; x.font = "26px system-ui, sans-serif";
       const zeilen = ["Mails: 2 wichtig", "Kalender: frei", "Nachtarbeit lokal", "Speichertest ok", "Kosten 0,00 €", "Vault aktuell"];
       const ab = Math.floor(zeit / 2.5) % zeilen.length;

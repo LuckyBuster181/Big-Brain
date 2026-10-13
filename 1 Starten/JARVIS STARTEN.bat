@@ -15,17 +15,17 @@ rem ======================================================================
 setlocal EnableExtensions
 for %%I in ("%~dp0..") do set "J=%%~fI"
 chcp 65001 >nul
-title Jarvis starten
+title Auron starten
 cd /d "%~dp0"
 
 set "IP=192.168.68.139"
 set "ZIEL=max1@%IP%"
 set "SSHO=-o StrictHostKeyChecking=accept-new -o ConnectTimeout=10"
 set "BERICHT=%J%\data\jarvis_starten_bericht.txt"
-> "%BERICHT%" echo ===== Jarvis starten %date% %time% =====
+> "%BERICHT%" echo ===== Auron starten %date% %time% =====
 
 echo.
-echo  [1/6] Alten Jarvis auf diesem PC beenden ...
+echo  [1/6] Alten Auron auf diesem PC beenden ...
 rem nur Prozesse, die auf diesem PC an Port 8000/5173 LAUSCHEN (Gegenstelle :0) - nie Chrome o.ae.
 for /f "tokens=5" %%P in ('netstat -ano ^| findstr /r /c:"TCP *[^ ]*:8000 " ^| findstr /c:":0 "') do taskkill /f /pid %%P >nul 2>&1
 for /f "tokens=5" %%P in ('netstat -ano ^| findstr /r /c:"TCP *[^ ]*:5173 " ^| findstr /c:":0 "') do taskkill /f /pid %%P >nul 2>&1
@@ -58,7 +58,7 @@ ssh %SSHO% -o BatchMode=yes %ZIEL% "bash ~/jarvis-umzug/jarvis_mini.sh sync" >> 
 rem 27.09.2026: fehlende Pakete (PyMuPDF fuer "Dateien umwandeln") einmalig nachinstallieren
 ssh %SSHO% -o BatchMode=yes %ZIEL% "bash ~/jarvis-umzug/jarvis_mini.sh pakete" >> "%BERICHT%" 2>&1
 
-echo  [5/6] Jarvis auf dem Mini-PC neu starten ...
+echo  [5/6] Auron auf dem Mini-PC neu starten ...
 ssh %SSHO% -o BatchMode=yes %ZIEL% "bash ~/jarvis-umzug/jarvis_mini.sh neustart" >> "%BERICHT%" 2>&1
 if errorlevel 3 (
   echo.
@@ -70,7 +70,7 @@ rem 26.09.2026: Laptop und Handy brauchen Jarvis im Heimnetz - einmalig umstelle
 findstr /c:"HOST=127.0.0.1" "%TEMP%\jarvis_status.txt" >nul
 if not errorlevel 1 (
   echo.
-  echo  Einmalig: Jarvis fuer Laptop und Handy freigeben. Bitte das Passwort des Mini-PCs eingeben.
+  echo  Einmalig: Auron fuer Laptop und Handy freigeben. Bitte das Passwort des Mini-PCs eingeben.
   ssh -t %SSHO% %ZIEL% "bash ~/jarvis-umzug/jarvis_mini.sh netz"
   scp %SSHO% -o BatchMode=yes %ZIEL%:jarvis-umzug/netz.log "%J%\data\jarvis_netz_bericht.txt" >nul 2>&1
   ssh %SSHO% -o BatchMode=yes %ZIEL% "bash ~/jarvis-umzug/jarvis_mini.sh status" > "%TEMP%\jarvis_status.txt" 2>&1
@@ -108,7 +108,7 @@ if defined HPURL (
 )
 curl -s -o nul -m 3 http://127.0.0.1:8001/api/health
 if not errorlevel 1 goto tunnel_da
-start "Jarvis Tunnel (offen lassen)" /min ssh %SSHO% -o BatchMode=yes -o ServerAliveInterval=30 -o ExitOnForwardFailure=yes -N -L 8001:127.0.0.1:8000 %ZIEL%
+start "Auron Tunnel (offen lassen)" /min ssh %SSHO% -o BatchMode=yes -o ServerAliveInterval=30 -o ExitOnForwardFailure=yes -N -L 8001:127.0.0.1:8000 %ZIEL%
 set /a N=0
 :tunnel_warten
 timeout /t 1 /nobreak >nul
@@ -121,13 +121,13 @@ goto ende
 :tunnel_da
 rem 05.10.2026: Auron als App-Fenster (eigenes Profil, Stimme ohne Klick) statt normalem Chrome-Tab
 if exist "%~dp0AURON.vbs" (start "" wscript.exe "%~dp0AURON.vbs") else (call "%~dp0CHROME_OEFFNEN.bat" http://127.0.0.1:8001/auron)
->> "%BERICHT%" echo ===== Jarvis laeuft, HUD offen %date% %time% =====
+>> "%BERICHT%" echo ===== Auron laeuft, HUD offen %date% %time% =====
 echo.
 type "%TEMP%\jarvis_status.txt"
 echo.
-echo  Jarvis laeuft auf dem Mini-PC. Auron: http://127.0.0.1:8001/auron
+echo  Auron laeuft auf dem Mini-PC. Auron: http://127.0.0.1:8001/auron
 echo  Laptop und Handy: Adresse %IP%:8000 (statt frueher 192.168.68.119).
-echo  Das minimierte Fenster "Jarvis Tunnel" offen lassen, solange Sie das HUD nutzen.
+echo  Das minimierte Fenster "Auron Tunnel" offen lassen, solange Sie das HUD nutzen.
 timeout /t 8 /nobreak >nul
 exit /b 0
 

@@ -111,7 +111,7 @@ class Protokoll(Grundlage):
             geraete.anfrage_protokollieren("Laptop", "192.168.68.50", "GET", "/api/kurse")
             geraete.anfrage_protokollieren("Laptop", "192.168.68.50", "POST", "/api/chat/stream")
         eintraege = self.zugriffe()
-        self.assertEqual(sum(e["aktion"] == "Frage an Jarvis" for e in eintraege), 3)
+        self.assertEqual(sum(e["aktion"] == "Frage an Auron" for e in eintraege), 3)
         self.assertEqual(sum(e["aktion"] == "GET /api/kurse" for e in eintraege), 0)  # Hintergrund-Abfragen nie
         self.assertTrue(all(e["zeit"] and e["geraet"] == "Laptop" for e in eintraege))
 

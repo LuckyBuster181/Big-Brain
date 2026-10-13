@@ -166,7 +166,7 @@ class MindMaps(unittest.TestCase):
         c["nodes"].append({"id": "lose1", "type": "text", "text": "Fahrgemeinschaft", "x": 2000, "y": 0, "width": 200, "height": 60})
         canvas_p.write_text(json.dumps(c), encoding="utf-8")
         md_p.write_text(md_p.read_text(encoding="utf-8").replace(
-            "_Hier dürfen Sie frei schreiben, Sir - Jarvis lässt diesen Teil stehen._", "Meine eigene Idee"), encoding="utf-8")
+            "_Hier dürfen Sie frei schreiben, Sir - Auron lässt diesen Teil stehen._", "Meine eigene Idee"), encoding="utf-8")
         client = ErsatzClient(json.dumps({"titel": "Neuer Job", "zentrum": "Neuer Job", "aeste": [
             "Einarbeitung", "Gehalt verhandeln", "Fahrgemeinschaft", "Weiterbildung beim Arbeitgeber"], "satz": "Ergänzt, Sir."}))
         info2 = mindmap.ergaenzen("neuer job", "Weiterbildung beim Arbeitgeber", client=client)
@@ -213,10 +213,10 @@ class Projekte(unittest.TestCase):
         self.assertTrue((self.vault / mindmap.ORDNER / "Umzug Köln.canvas").exists())
         self.assertIn("Wie hoch ist das Budget?", projekte.antwort_text(info))
         self.assertEqual([s["text"] for s in projekte.offene_schritte()], ["Wohnungen suchen (Sir, ca. 60 Min., 03.10. 10:00)",
-                                                                           "Mietpreise recherchieren (Jarvis, ca. 20 Min.)"])
+                                                                           "Mietpreise recherchieren (Auron, ca. 20 Min.)"])
         # Sir hakt ab und schreibt eigene Notizen
         roh = roh.replace("- [ ] Wohnungen suchen", "- [x] Wohnungen suchen").replace(
-            "_Hier dürfen Sie frei schreiben, Sir - Jarvis lässt diesen Teil stehen._", "Papa hilft beim Tragen")
+            "_Hier dürfen Sie frei schreiben, Sir - Auron lässt diesen Teil stehen._", "Papa hilft beim Tragen")
         p.write_text(roh, encoding="utf-8")
         neu = json.loads(PROJEKT_JSON)
         neu["schritte"][0]["erledigt"] = True
@@ -421,7 +421,7 @@ class HauptPc(unittest.TestCase):
             self.assertIn("Teststub", text)
         self.assertEqual(_PcAgentStub.auftraege, [{"aktion": "programm", "ziel": "chrome"}])
         with self.env("falsch" * 5):
-            self.assertIn("lehnt den Schlüssel ab", hauptpc.ausfuehren({"aktion": "sperren"}))
+            self.assertIn("lehnt den Schlüssel ab", hauptpc.ausfuehren({"aktion": "lauter"}))
 
     def test_herunterfahren_braucht_ja(self):
         with self.env():
@@ -435,7 +435,7 @@ class HauptPc(unittest.TestCase):
             self.assertIn("abgelehnt", hauptpc.bestaetigung("ja"))  # Stub lehnt ab
             with self.assertRaises(hauptpc.HauptPcFehler):
                 hauptpc.aktion("herunterfahren")
-        self.assertEqual(_PcAgentStub.auftraege, [{"aktion": "neustart", "ziel": None}])
+        self.assertEqual(_PcAgentStub.auftraege, [{"aktion": "neustart", "ziel": None, "bestaetigt": True}])
 
     def test_ohne_freigabe_kein_aufruf(self):
         """Zentrale Sperre: ein Ziel ohne Freigabe (z.B. Sirs echter Agent) wird nie angesprochen."""

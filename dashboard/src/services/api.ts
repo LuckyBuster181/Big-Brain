@@ -1,4 +1,4 @@
-/** HTTP-Zugriff auf das Jarvis-Backend. */
+/** HTTP-Zugriff auf das Auron-Backend. */
 
 import axios, { type AxiosError } from 'axios'
 import type { ChatRequest, ChatResponse, HealthResponse, ReindexStatus } from '../types/chat'
@@ -58,7 +58,7 @@ function toReadableError(error: unknown): Error {
   return error instanceof Error ? error : new Error('Unbekannter Fehler')
 }
 
-/** Stellt eine Frage an Jarvis (RAG-Suche im Vault + Claude-Antwort). */
+/** Stellt eine Frage an Auron (RAG-Suche im Vault + Claude-Antwort). */
 export async function askJarvis(request: ChatRequest): Promise<ChatResponse> {
   try {
     const { data } = await client.post<ChatResponse>('/api/chat', {

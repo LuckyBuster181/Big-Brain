@@ -14,6 +14,7 @@ from rag.embedder import get_preset
 from rag.embeddings import get_client, get_collection
 
 from . import (
+    claude_fehler,
     ablage,
     agenten,
     ampel,
@@ -127,7 +128,7 @@ def chat(request: ChatRequest) -> ChatResponse:
         # z.B. fehlender ANTHROPIC_API_KEY - Konfigurationsfehler, kein Serverfehler
         raise HTTPException(status_code=500, detail=str(exc)) from exc
     except Exception as exc:  # Anthropic-API-Fehler, Netzwerk, etc.
-        raise HTTPException(status_code=502, detail=f"Fehler bei der Anfrage an Claude: {exc}") from exc
+        raise HTTPException(status_code=502, detail=claude_fehler.oder(exc, f"Fehler bei der Anfrage an Claude: {exc}")) from exc
 
 
 ALEXA_MAX_BYTES = 64 * 1024
@@ -267,7 +268,7 @@ def briefing_holen(
     except RuntimeError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
     except Exception as exc:  # noqa: BLE001
-        raise HTTPException(status_code=502, detail=f"Briefing fehlgeschlagen: {exc}") from exc
+        raise HTTPException(status_code=502, detail=claude_fehler.oder(exc, f"Briefing fehlgeschlagen: {exc}")) from exc
 
 
 @router.get("/api/kalender")
@@ -774,7 +775,7 @@ def denkblock_mitdenken(name: str, request: DenkblockMitdenkenRequest | None = N
     except RuntimeError as exc:  # z.B. API-Schlüssel fehlt
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except Exception as exc:  # noqa: BLE001
-        raise HTTPException(status_code=502, detail=f"Fehler bei der Anfrage an Claude: {exc}") from exc
+        raise HTTPException(status_code=502, detail=claude_fehler.oder(exc, f"Fehler bei der Anfrage an Claude: {exc}")) from exc
 
 
 @router.post("/api/denkblock/{name}/uebernehmen")
@@ -819,7 +820,7 @@ def gesamtkarte_besprechen(kid: str, request: KarteBesprechenRequest | None = No
     except RuntimeError as exc:  # z.B. API-Schlüssel fehlt
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except Exception as exc:  # noqa: BLE001
-        raise HTTPException(status_code=502, detail=f"Fehler bei der Anfrage an Claude: {exc}") from exc
+        raise HTTPException(status_code=502, detail=claude_fehler.oder(exc, f"Fehler bei der Anfrage an Claude: {exc}")) from exc
 
 
 @router.get("/api/tiktok")
@@ -898,7 +899,7 @@ def tiktok_bilder_lesen(vid: str) -> dict:
     except RuntimeError as exc:  # z.B. API-Schlüssel fehlt
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except Exception as exc:  # noqa: BLE001
-        raise HTTPException(status_code=502, detail=f"Fehler bei der Anfrage an Claude: {exc}") from exc
+        raise HTTPException(status_code=502, detail=claude_fehler.oder(exc, f"Fehler bei der Anfrage an Claude: {exc}")) from exc
 
 
 # ------------------------------------------------ Trading-Sandbox (23.09.2026)
@@ -1528,6 +1529,13 @@ def hauptpc_aktionen() -> dict:
     from . import hauptpc
 
     return _alltag_neu(hauptpc.aktionen)
+
+
+@router.get("/api/hauptpc/befehl_bericht")
+def hauptpc_befehl_bericht(name: str) -> dict:
+    from . import hauptpc
+
+    return _alltag_neu(lambda: hauptpc.befehl_bericht(name))
 
 
 @router.post("/api/hauptpc/aktion")

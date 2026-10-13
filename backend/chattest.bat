@@ -8,8 +8,8 @@ set "LOG=%~dp0chattest_log.txt"
 set PYTHONIOENCODING=utf-8
 set HF_HUB_DISABLE_PROGRESS_BARS=1
 set HF_HUB_DISABLE_SYMLINKS_WARNING=1
-echo Jarvis-Chattest laeuft ...
-echo ==== Jarvis Chattest %DATE% %TIME% ==== > "%LOG%"
+echo Auron-Chattest laeuft ...
+echo ==== Auron Chattest %DATE% %TIME% ==== > "%LOG%"
 call venv\Scripts\activate.bat
 python -m tests.chat_smoketest >> "%LOG%" 2>&1
 echo ==== FERTIG %DATE% %TIME% ==== >> "%LOG%"

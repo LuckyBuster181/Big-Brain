@@ -156,7 +156,7 @@ def main() -> int:
     token = daten.get("refresh_token")
     if not token:
         print("Google lieferte keinen Refresh-Token. Unter myaccount.google.com/permissions")
-        print("den Zugriff für die Jarvis-App entfernen und dieses Skript neu starten.")
+        print("den Zugriff für die Auron-App entfernen und dieses Skript neu starten.")
         return 1
     env_setzen("GOOGLE_GMAIL_REFRESH_TOKEN", token)
     print("Eingetragen: GOOGLE_GMAIL_REFRESH_TOKEN in der .env (Sicherung: data\\env_sicherung_gmail.txt).")

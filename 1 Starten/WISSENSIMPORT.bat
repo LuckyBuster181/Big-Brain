@@ -10,7 +10,7 @@ rem ======================================================================
 setlocal EnableExtensions
 for %%I in ("%~dp0..") do set "J=%%~fI"
 chcp 65001 >nul
-title Jarvis Wissensimport
+title Auron Wissensimport
 set "IP=192.168.68.139"
 set "ZIEL=max1@%IP%"
 set "SSHO=-o StrictHostKeyChecking=accept-new -o ConnectTimeout=10 -o BatchMode=yes"
@@ -24,7 +24,7 @@ scp %SSHO% "%J%\linux\jarvis_mini.sh" %ZIEL%:jarvis-umzug/jarvis_mini.sh >nul 2>
 
 :menue
 echo.
-echo  ===== Jarvis Wissensimport =====
+echo  ===== Auron Wissensimport =====
 ssh %SSHO% %ZIEL% "bash ~/jarvis-umzug/jarvis_mini.sh wissen_status"
 echo.
 echo   1 = Probelauf mit 20 Notizen

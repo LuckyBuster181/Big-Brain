@@ -8,8 +8,8 @@ set "LOG=%~dp0suchtest_log.txt"
 set PYTHONIOENCODING=utf-8
 set HF_HUB_DISABLE_PROGRESS_BARS=1
 set HF_HUB_DISABLE_SYMLINKS_WARNING=1
-echo Jarvis-Suchtest laeuft (ca. 1 Minute) ...
-echo ==== Jarvis Suchtest %DATE% %TIME% ==== > "%LOG%"
+echo Auron-Suchtest laeuft (ca. 1 Minute) ...
+echo ==== Auron Suchtest %DATE% %TIME% ==== > "%LOG%"
 call venv\Scripts\activate.bat
 echo. >> "%LOG%"
 echo ==== 1. Schnelle Tests ==== >> "%LOG%"

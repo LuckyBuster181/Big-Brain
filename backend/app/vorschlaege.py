@@ -173,7 +173,7 @@ def _neue_notiz(v: dict) -> str:
         "status: zu-prüfen\n"
         f"erstellt: {heute}\n"
         f"aktualisiert: {heute}\n"
-        f"quelle: Jarvis ({v.get('quelle', 'chat')}), von Sir freigegeben\n"
+        f"quelle: Auron ({v.get('quelle', 'chat')}), von Sir freigegeben\n"
         "vertrauen: mittel\n"
         "niveau: einstieg\n"
         "tags:\n  - jarvis\n"
@@ -186,7 +186,7 @@ def _neue_notiz(v: dict) -> str:
 def _anhang(v: dict, vorhandener_text: str) -> str:
     stempel = _jetzt().strftime("%d.%m.%Y %H:%M")
     trenner = "" if vorhandener_text.endswith("\n\n") else ("\n" if vorhandener_text.endswith("\n") else "\n\n")
-    kopf = f"### Von Jarvis ergänzt ({stempel})"
+    kopf = f"### Von Auron ergänzt ({stempel})"
     if v.get("grund"):
         kopf += f"\n\n*{v['grund']}*"
     return f"{trenner}{kopf}\n\n{v['text'].rstrip()}\n"
@@ -214,7 +214,7 @@ def uebernehmen(vid: str) -> dict:
         v["status"] = "uebernommen"
         v["erledigt"] = _jetzt().isoformat(timespec="seconds")
         _speichern(alle)
-    v["git"] = _git_commit_versuchen(f"Jarvis: Vorschlag {vid} übernommen ({rel})")
+    v["git"] = _git_commit_versuchen(f"Auron: Vorschlag {vid} übernommen ({rel})")
     return v
 
 

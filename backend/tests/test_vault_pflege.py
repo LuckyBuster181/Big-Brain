@@ -100,7 +100,7 @@ class PlatzhalterTest(unittest.TestCase):
 
     def test_keine_ausgenommen(self):
         text = self._bericht(0)
-        self.assertIn("Die Jarvis-Suche findet sie derzeit noch.", text)
+        self.assertIn("Die Auron-Suche findet sie derzeit noch.", text)
 
 
 if __name__ == "__main__":
