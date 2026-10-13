@@ -1530,6 +1530,13 @@ def hauptpc_aktionen() -> dict:
     return _alltag_neu(hauptpc.aktionen)
 
 
+@router.get("/api/hauptpc/befehl_bericht")
+def hauptpc_befehl_bericht(name: str) -> dict:
+    from . import hauptpc
+
+    return _alltag_neu(lambda: hauptpc.befehl_bericht(name))
+
+
 @router.post("/api/hauptpc/aktion")
 def hauptpc_aktion(werte: dict) -> dict:
     from . import hauptpc

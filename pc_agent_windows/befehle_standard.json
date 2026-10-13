@@ -1,0 +1,8 @@
+{
+  "pruefen":        {"titel": "Prüflauf (Vault-Pflege und Suchtest, ohne Claude)", "datei": "pc_befehle/pruefen.bat",        "zeitlimit_s": 1800},
+  "vault_pflege":   {"titel": "Vault-Pflege",                                      "datei": "pc_befehle/vault_pflege.bat",   "zeitlimit_s": 600},
+  "reindex":        {"titel": "Index neu einlesen (gedrosselt)",                   "datei": "pc_befehle/reindex.bat",        "zeitlimit_s": 3600},
+  "suchtest":       {"titel": "Suchtest (gedrosselt)",                             "datei": "pc_befehle/suchtest.bat",       "zeitlimit_s": 1200},
+  "backup":         {"titel": "Backup (Vault per Git, data\\*.json kopieren)",     "datei": "pc_befehle/backup.bat",         "zeitlimit_s": 900},
+  "updates_pruefen": {"titel": "Updates prüfen (nur auflisten)",                   "datei": "pc_befehle/updates_pruefen.bat", "zeitlimit_s": 600}
+}

@@ -421,7 +421,7 @@ class HauptPc(unittest.TestCase):
             self.assertIn("Teststub", text)
         self.assertEqual(_PcAgentStub.auftraege, [{"aktion": "programm", "ziel": "chrome"}])
         with self.env("falsch" * 5):
-            self.assertIn("lehnt den Schlüssel ab", hauptpc.ausfuehren({"aktion": "sperren"}))
+            self.assertIn("lehnt den Schlüssel ab", hauptpc.ausfuehren({"aktion": "lauter"}))
 
     def test_herunterfahren_braucht_ja(self):
         with self.env():
@@ -435,7 +435,7 @@ class HauptPc(unittest.TestCase):
             self.assertIn("abgelehnt", hauptpc.bestaetigung("ja"))  # Stub lehnt ab
             with self.assertRaises(hauptpc.HauptPcFehler):
                 hauptpc.aktion("herunterfahren")
-        self.assertEqual(_PcAgentStub.auftraege, [{"aktion": "neustart", "ziel": None}])
+        self.assertEqual(_PcAgentStub.auftraege, [{"aktion": "neustart", "ziel": None, "bestaetigt": True}])
 
     def test_ohne_freigabe_kein_aufruf(self):
         """Zentrale Sperre: ein Ziel ohne Freigabe (z.B. Sirs echter Agent) wird nie angesprochen."""

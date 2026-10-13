@@ -353,8 +353,8 @@ def pc_steuern(eingabe: dict, k: Kontext) -> str:
     from . import hauptpc
 
     aktion = str(eingabe.get("aktion", "")).strip().lower()
-    if aktion in hauptpc.GEFAEHRLICH:
-        return "Herunterfahren/Neustart nur per direktem Befehl von Max ('Fahr den PC herunter') mit Rückfrage."
+    if hauptpc.stufe(aktion) != 0:
+        return "Diese Aktion (Herunterfahren, Neustart, Sperren, feste Befehle) läuft nur per direktem Befehl von Sir, bei Stufe 2 mit Rückfrage."
     return hauptpc.ausfuehren({"aktion": aktion, "ziel": eingabe.get("ziel")})
 
 
