@@ -448,7 +448,7 @@ def _rest_reicht(topf: str = "normal") -> bool:
         try:
             from app import kosten  # noqa: PLC0415
 
-            return kosten.code_rest() >= CODE_MIN_REST_USD
+            return not kosten.ist_nacht() and kosten.code_rest() >= CODE_MIN_REST_USD
         except Exception:  # noqa: BLE001
             return False
     try:

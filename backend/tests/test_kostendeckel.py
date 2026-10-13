@@ -113,6 +113,9 @@ class Zaehlung(unittest.TestCase):
 class Sperre(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp(prefix="kosten_")
+        p = mock.patch.object(kosten, "ist_nacht", return_value=False)  # Tests laufen zu jeder Uhrzeit
+        p.start()
+        self.addCleanup(p.stop)
         self.log = Path(self.tmp) / "usage_log.jsonl"
         p = mock.patch.dict(os.environ, {"USAGE_LOG_PATH": str(self.log)})
         p.start()
@@ -197,9 +200,35 @@ class Sperre(unittest.TestCase):
                 ki_aufruf.code_rest_pruefen()
 
 
+class NachtSperre(unittest.TestCase):
+    def test_nachtfenster(self):
+        p1 = mock.patch.object(kosten, "NACHT_VON_STUNDE", 23)
+        p2 = mock.patch.object(kosten, "NACHT_BIS_STUNDE", 6)
+        p1.start(); p2.start()
+        self.addCleanup(p1.stop); self.addCleanup(p2.stop)
+        for stunde, nacht in ((22, False), (23, True), (0, True), (3, True), (5, True), (6, False), (12, False)):
+            self.assertEqual(kosten.ist_nacht(datetime.datetime(2026, 10, 13, stunde, 30)), nacht, stunde)
+
+    def test_code_claude_nachts_gesperrt_tagsueber_frei(self):
+        with mock.patch.object(kosten, "ist_nacht", return_value=True):
+            client = ErsatzClient()
+            with self.assertRaises(ki_aufruf.KiFehler) as ctx:
+                ki_aufruf.aufrufen("system", "frage", modus="code-nacht", client=client)
+            self.assertIn("nachts kein Claude", str(ctx.exception))
+            self.assertEqual(client.aufrufe, [])
+            self.assertFalse(provider._rest_reicht("code"))        # auch kein Rückfall
+            # normale Funktionen und lokale KI bleiben unberührt
+            self.assertEqual(ki_aufruf.aufrufen("system", "frage", modus="klassisch", client=ErsatzClient())["text"], "ok")
+        with mock.patch.object(kosten, "ist_nacht", return_value=False):
+            self.assertEqual(ki_aufruf.aufrufen("system", "frage", modus="code-tag", client=ErsatzClient())["text"], "ok")
+
+
 class LokaleKiNieGesperrt(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp(prefix="kosten_")
+        p = mock.patch.object(kosten, "ist_nacht", return_value=False)  # Tests laufen zu jeder Uhrzeit
+        p.start()
+        self.addCleanup(p.stop)
         self.log = Path(self.tmp) / "usage_log.jsonl"
         e = eintrag("code-x", kosten.CODE_RAHMEN_USD)
         e["zeit"] = datetime.date.today().isoformat() + "T10:00:00"

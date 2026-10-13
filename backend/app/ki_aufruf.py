@@ -70,6 +70,9 @@ def code_rest_pruefen() -> None:
     keinen Aufruf und keinen Rückfall auf den normalen Topf. Lässt sich der Stand nicht lesen, gilt: gesperrt."""
     from . import kosten
 
+    if kosten.ist_nacht():
+        raise KiFehler("Code-Aufgaben nutzen nachts kein Claude (23 bis 6 Uhr). Tagsüber läuft die lokale KI "
+                       "oder Claude nach Rückfrage wieder.")
     try:
         rest = kosten.code_rest()
     except Exception as exc:  # noqa: BLE001 - harte Grenze: im Zweifel nicht ausgeben

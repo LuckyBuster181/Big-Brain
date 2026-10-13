@@ -93,6 +93,23 @@ FUNKTIONEN = {
 }
 
 
+# Entscheidung Sir 13.10.2026: Code-Aufgaben nutzen nachts nie Claude (Regel "Nachtarbeit nie mit Claude").
+NACHT_VON_STUNDE = int(betrag_aus_env("KOSTEN_CODE_NACHT_VON", 23))
+NACHT_BIS_STUNDE = int(betrag_aus_env("KOSTEN_CODE_NACHT_BIS", 6))
+
+
+def ist_nacht(jetzt: datetime.datetime | None = None) -> bool:
+    """True zwischen 23 und 6 Uhr (Ortszeit; per KOSTEN_CODE_NACHT_VON/BIS änderbar)."""
+    if jetzt is None:
+        from . import alltag
+
+        jetzt = alltag.jetzt()
+    h = jetzt.hour
+    if NACHT_VON_STUNDE > NACHT_BIS_STUNDE:
+        return h >= NACHT_VON_STUNDE or h < NACHT_BIS_STUNDE
+    return NACHT_VON_STUNDE <= h < NACHT_BIS_STUNDE
+
+
 def ist_code_modus(modus: Any) -> bool:
     """True für Aufrufe, die in den Code-Topf zählen (Modus mit Präfix "code-")."""
     return str(modus or "").startswith(CODE_PREFIX)
