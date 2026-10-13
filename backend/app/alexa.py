@@ -11,6 +11,7 @@ Fähigkeiten (Intents, Modell in backend/alexa/interaktionsmodell_de.json):
   MerkenIntent        vorschlaege.anlegen/uebernehmen 0 €, erst nach "Ja" am Echo
   StatusIntent        nachtarbeit, kosten            0 €
   TermineIntent       termine.antwort_zeitraum()     0 €
+  TagesnotizIntent    tagesnotizen (Dateiname)       0 €, nur lesen (P21)
   NachtauftragIntent  nachtauftraege.anlegen()       0 €, erst nach "Ja"
   AktionIntent        nur ALEXA_AKTIONEN (Whitelist) 0 €, erst nach "Ja"
   LetzteAntwortIntent liest data/alexa_letzte_antwort.json
@@ -376,6 +377,57 @@ def _termine(wert: str) -> dict:
     return {"sprache": kurz + (f" {MEHR_HINWEIS}" if gekuerzt else ""), "karte": text}
 
 
+def _tagesnotiz(wert: str) -> dict:
+    """TagesnotizIntent (P21, 13.10.2026): neueste oder bestimmte Tagesnotiz, ohne KI (0 €).
+    wert = Slot "datum" (AMAZON.DATE, z. B. 2026-10-12). Leer = die neueste. Gesprochen höchstens
+    SPRACH_MAX_ZEICHEN, gekürzt an Satzgrenzen; der volle Text steht als Karte in der Alexa-App."""
+    from . import tagesnotizen
+
+    wert = (wert or "").strip()
+    if wert:
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", wert):
+            return {"sprache": "Das kann ich nur für einen einzelnen Tag, Sir. Sagen Sie zum Beispiel: "
+                               "die Tagesnotiz von gestern.", "karte": None}
+        try:
+            tag = datetime.date.fromisoformat(wert)
+        except ValueError:
+            return {"sprache": "Dieses Datum gibt es nicht, Sir.", "karte": None}
+    else:
+        tag = tagesnotizen.neueste()
+        if tag is None:
+            return {"sprache": "Im Vault liegt keine Tagesnotiz, Sir.", "karte": None}
+    i = tagesnotizen.inhalt(tag)
+    if i is None:
+        jung = tagesnotizen.neueste()
+        text = f"Für den {tag:%d.%m.%Y} gibt es keine Tagesnotiz, Sir."
+        if jung:
+            text += f" Die jüngste ist vom {jung:%d.%m.%Y}. Fragen Sie nach der neuesten Tagesnotiz."
+        return {"sprache": text, "karte": None}
+    karte = f"Tagesnotiz vom {tagesnotizen._datum_text(tag)}\n\n{i['text']}\n\nQuelle: {i['quelle']}"  # noqa: SLF001
+    kopf = f"Tagesnotiz vom {tag:%d.%m.%Y}, Sir."
+    if not i["text"]:
+        return {"sprache": f"{kopf} Sie ist leer.", "karte": karte}
+    kurz, gekuerzt = fuer_sprache(i["text"], SPRACH_MAX_ZEICHEN - len(kopf) - 1)
+    sprache = f"{kopf} {kurz}" + (f" {MEHR_HINWEIS}" if gekuerzt or i["gekuerzt"] else "")
+    if len(sprache) > SPRACH_MAX_ZEICHEN:   # schon der erste Satz war zu lang: am letzten Wort kappen
+        teil = sprache[:SPRACH_MAX_ZEICHEN - len(MEHR_HINWEIS) - 2].rsplit(" ", 1)[0].rstrip(",;:.")
+        sprache = f"{teil}. {MEHR_HINWEIS}"
+    return {"sprache": sprache, "karte": karte}
+
+
+def _tagesnotiz_aus_frage(frage: str) -> dict | None:
+    """Alexa verwechselt "die Tagesnotiz" gern mit der freien Vault-Frage ("die {frage}"). Erkennt die
+    Frage einen Tagesnotiz-Wunsch, geht sie den Tagesnotiz-Weg (Dateiname statt Ähnlichkeitssuche)."""
+    from . import tagesnotizen
+
+    a = tagesnotizen.absicht(frage) or tagesnotizen.absicht(f"die {frage}")
+    if not a:
+        return None
+    if a["wunsch"] == "ungueltig":
+        return {"sprache": "Dieses Datum gibt es nicht, Sir.", "karte": None}
+    return _tagesnotiz(a.get("tag", "") if a["wunsch"] == "tag" else "")
+
+
 def _nachtauftrag(text: str) -> dict:
     from . import nachtauftraege
 
@@ -471,8 +523,15 @@ def _intent_verarbeiten(anfrage: dict, name: str) -> tuple[dict, bool]:
         frage = _slot(anfrage, "frage")
         if not frage:
             return antwort("Was möchten Sie wissen, Sir?", ende=False, nachfrage="Was möchten Sie wissen, Sir?"), False
+        tn = _tagesnotiz_aus_frage(frage)   # P21: Tagesnotiz-Wunsch nie über die Vault-Suche beantworten
+        if tn:
+            return antwort(tn["sprache"], tn.get("karte")), False
         e = _mit_zeitbudget(name, lambda: _vault_frage(frage))
         return antwort(e["sprache"], e.get("karte")), bool(e.get("claude"))
+
+    if name == "TagesnotizIntent":
+        e = _tagesnotiz(_slot(anfrage, "datum"))
+        return antwort(e["sprache"], e.get("karte")), False
 
     if name == "BriefingIntent":
         e = _mit_zeitbudget(name, _briefing)
