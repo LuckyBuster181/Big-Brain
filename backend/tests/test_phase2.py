@@ -140,7 +140,7 @@ class Vorschlaege(MitVault):
         nachher = (self.vault / ziel).read_text(encoding="utf-8")
         self.assertTrue(nachher.startswith(vorher))
         self.assertIn("Neu: Tageslimit 3 %", nachher)
-        self.assertIn("Von Jarvis ergänzt", nachher)
+        self.assertIn("Von Auron ergänzt", nachher)
         self.assertEqual(Path(erg["sicherung"]).read_text(encoding="utf-8"), vorher)
         self.assertEqual(erg["git"], "kein Git im Vault")
 

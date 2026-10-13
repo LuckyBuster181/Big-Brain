@@ -37,7 +37,7 @@ ERSATZ_FRAGEN = [
     "Welches Thema soll ich nachts als Nächstes für Sie recherchieren, Sir?",
 ]
 
-SYSTEM = """Du bist Auron (früher Jarvis), der Assistent von Max ("Sir"). Stelle ihm EINE kurze Frage, \
+SYSTEM = """Du bist Auron, der Assistent von Max ("Sir"). Stelle ihm EINE kurze Frage, \
 um ihn besser kennenzulernen, damit du ihm künftig besser helfen kannst: Ziele, Vorlieben, \
 Arbeitsweise, Tagesablauf, Projekte (Auron, Trading, Vault, TikTok), Lernen, was ihn nervt. \
 Regeln: Deutsch, Sie-Form mit "Sir", höchstens 20 Wörter, konkret und leicht zu beantworten. \
@@ -168,8 +168,8 @@ def _in_vault(e: dict) -> str | None:
     ziel.parent.mkdir(parents=True, exist_ok=True)
     if not ziel.exists():
         ziel.write_text(
-            "---\ntyp: persoenlich\nstatus: aktiv\nniveau: einstieg\nquelle: Jarvis (Frage des Tages)\n---\n\n"
-            "# Jarvis fragt – Antworten von Sir\n\nJeden Tag eine Frage von Jarvis, damit er Sir besser kennt. "
+            "---\ntyp: persoenlich\nstatus: aktiv\nniveau: einstieg\nquelle: Auron (Frage des Tages)\n---\n\n"
+            "# Auron fragt – Antworten von Sir\n\nJeden Tag eine Frage von Auron, damit er Sir besser kennt. "
             "Nur Sirs eigene Antworten, wörtlich.\n", encoding="utf-8")
     datum = datetime.date.fromisoformat(e["datum"]).strftime("%d.%m.%Y")
     antwort = re.sub(r"\n+", " ", e["antwort"]).strip()

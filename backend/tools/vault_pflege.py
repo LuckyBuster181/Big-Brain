@@ -535,7 +535,7 @@ def render(result: dict, today: str, skipped_note: str | None = None) -> str:
             if len(open_rels) < len(group):
                 text += " Noch nicht ausgenommen: " + ", ".join(Path(r).stem for r in open_rels) + "."
             else:
-                text += " Die Jarvis-Suche findet sie derzeit noch."
+                text += " Die Auron-Suche findet sie derzeit noch."
             todo.append(text)
     pairs = [g for g in result["duplicate_groups"] if len(g) == 2]
     if pairs:
@@ -545,7 +545,7 @@ def render(result: dict, today: str, skipped_note: str | None = None) -> str:
                     "die andere darauf verlinken (Regel 5 im Entwicklungsplan).")
     if meta_missing["status"] or meta_missing["vertrauen"]:
         todo.append(f"**Metadaten ergänzen**: {meta_missing['vertrauen']} von {n_active} Notizen ohne `vertrauen`, "
-                    f"{meta_missing['status']} ohne `status`. Jarvis warnt nur bei Notizen, die diese Felder haben.")
+                    f"{meta_missing['status']} ohne `status`. Auron warnt nur bei Notizen, die diese Felder haben.")
     if result["nonstandard_status"]:
         values = ", ".join(f"`{s}` ({c}×)" for s, c in result["nonstandard_status"].most_common())
         todo.append(f"**Status-Werte vereinheitlichen**: Standard ist bestätigt / aktiv / entwurf / zu-prüfen / veraltet, im Vault stehen auch {values}.")

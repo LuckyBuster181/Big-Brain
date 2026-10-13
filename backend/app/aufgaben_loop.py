@@ -213,7 +213,7 @@ def offene_luecken(limit: int = 30, mindestens: int | None = None) -> list[dict]
     return gefiltert
 
 
-RECHERCHEUR_SYSTEM = """Du recherchierst für Auron (früher Jarvis), den digitalen Assistenten von Max, eine \
+RECHERCHEUR_SYSTEM = """Du recherchierst für Auron, den digitalen Assistenten von Max, eine \
 Wissenslücke aus seinem Vault "Big Brain". Nutze die Websuche, um eine kurze, sachlich \
 korrekte Antwort mit Quellenangaben zu finden. Erfinde nichts - findest du nichts \
 Verlässliches, sag das offen statt zu raten. Antworte auf Deutsch, höchstens 250 Wörter, mit \
@@ -301,7 +301,7 @@ def rechercheur(frage: str) -> dict[str, Any]:
     return {"text": text, "kosten_usd": kosten, "dauer_s": dauer, "usage": usage, "suchen": suchen}
 
 
-SCHREIBER_SYSTEM = """Du bist der Schreiber im Aufgaben-Loop von Auron (früher Jarvis, Max' Assistent). Aus \
+SCHREIBER_SYSTEM = """Du bist der Schreiber im Aufgaben-Loop von Auron (Max' Assistent). Aus \
 einer recherchierten Antwort machst du einen kurzen Entwurf für eine neue Notiz in Max' \
 Obsidian-Vault "Big Brain". Halte dich GENAU an dieses Format, ohne zusätzlichen Text davor \
 oder danach:

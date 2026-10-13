@@ -43,7 +43,7 @@ ENDE = "<!-- jarvis:ende -->"
 NOTIZ_MARKE = "## Notizen von Sir"
 MAX_TOKENS = int(os.getenv("PROJEKT_MAX_TOKENS", "3000"))
 
-SYSTEM = """Du bist Jarvis, der Assistent von Max, und planst mit ihm ein Projekt - so wie ein \
+SYSTEM = """Du bist Auron, der Assistent von Max, und planst mit ihm ein Projekt - so wie ein \
 guter Projektpartner: mitdenken, ehrlich sagen, wenn etwas unrealistisch ist, gezielt nachfragen. \
 Max beschreibt Ideen oft knapp und mag Rückfragen.
 
@@ -54,7 +54,7 @@ Antworte NUR mit JSON:
 {{"titel": "kurz, max. 50 Zeichen, ohne : / ? *",
  "ziel": "ein Satz: woran man merkt, dass das Projekt fertig ist",
  "warum": "ein Satz",
- "schritte": [{{"text": "konkreter Schritt", "wer": "Sir|Jarvis", "dauer_min": 30,
+ "schritte": [{{"text": "konkreter Schritt", "wer": "Sir|Auron", "dauer_min": 30,
                "termin": "JJJJ-MM-TTTHH:MM oder leer", "erledigt": false}}],
  "risiken": ["höchstens 4"],
  "fragen": ["höchstens 4 Rückfragen an Max, die den Plan wirklich besser machen"],
@@ -62,8 +62,8 @@ Antworte NUR mit JSON:
  "satz": "1-2 Sätze an Max mit 'Sir': Einschätzung und was als Nächstes dran ist"}}
 
 Regeln:
-- 4 bis 12 Schritte, in sinnvoller Reihenfolge, jeder in 15-120 Minuten machbar. "wer": Jarvis nur für \
-Dinge, die Jarvis wirklich kann (recherchieren, Texte/Prompts schreiben, Mind Maps, Pläne, Notizen, \
+- 4 bis 12 Schritte, in sinnvoller Reihenfolge, jeder in 15-120 Minuten machbar. "wer": Auron nur für \
+Dinge, die Auron wirklich kann (recherchieren, Texte/Prompts schreiben, Mind Maps, Pläne, Notizen, \
 Dateien umwandeln, Termine vorbereiten). Alles andere macht Sir.
 - Termine nur, wenn Max einen Zeitraum nennt oder er sich klar ergibt; sonst leer.
 - Mind Map: 4-6 Äste (z.B. Ziel, Schritte, Kosten, Risiken, Offene Punkte), je 2-5 Unterpunkte.
@@ -149,7 +149,7 @@ def _saeubern(d: dict) -> dict:
             dauer = int(s.get("dauer_min") or 0)
         except (TypeError, ValueError):
             dauer = 0
-        wer = "Jarvis" if str(s.get("wer", "")).strip().lower() == "jarvis" else "Sir"
+        wer = "Auron" if str(s.get("wer", "")).strip().lower() in ("auron", "jarvis") else "Sir"
         schritte.append({"text": re.sub(r"\s+", " ", str(s["text"])).strip()[:200], "wer": wer,
                          "dauer_min": max(0, min(dauer, 600)), "termin": str(s.get("termin") or "").strip(),
                          "erledigt": bool(s.get("erledigt"))})
@@ -172,7 +172,7 @@ def _jarvis_block(p: dict, mm: dict | None) -> str:
         zeilen += ["## Offene Fragen an Sir", "", *[f"- {f}" for f in p["fragen"]], ""]
     if mm:
         zeilen += ["## Mind Map", "", f"[[{mm['canvas']}|Mind Map öffnen]] · [[{mm['notiz']}|Gliederung]]", ""]
-    zeilen += [f"*Plan zuletzt überarbeitet von Jarvis: {alltag.jetzt():%d.%m.%Y %H:%M}*", ENDE]
+    zeilen += [f"*Plan zuletzt überarbeitet von Auron: {alltag.jetzt():%d.%m.%Y %H:%M}*", ENDE]
     return "\n".join(zeilen)
 
 
@@ -205,9 +205,9 @@ def _schreiben(p: dict, verlauf_eintrag: str, pfad: Path | None = None) -> dict:
     else:
         text = "\n".join([
             "---", "typ: projekt", "status: aktiv", "niveau: einstieg", f"erstellt: {heute}", f"aktualisiert: {heute}",
-            'quelle: "Jarvis, Projektplan mit Sir"', "vertrauen: mittel", "tags:", "  - projekt", "---", "",
+            'quelle: "Auron, Projektplan mit Sir"', "vertrauen: mittel", "tags:", "  - projekt", "---", "",
             f"# {p['titel']}", "", block, "", "## Verlauf", "", verlauf_eintrag, "", NOTIZ_MARKE, "",
-            "_Hier dürfen Sie frei schreiben, Sir - Jarvis lässt diesen Teil stehen._", "", "---",
+            "_Hier dürfen Sie frei schreiben, Sir - Auron lässt diesen Teil stehen._", "", "---",
             f"Projekte · [[{ORDNER}/{UEBERSICHT}|Alle Projekte]] · [[Wissen/00 - Übersicht|Gesamtübersicht]]", ""])
         neu = True
     pfad.write_text(text, encoding="utf-8")
@@ -302,8 +302,8 @@ def offene_schritte(limit: int = 15) -> list[dict]:
 
 def _uebersicht_schreiben() -> None:
     zeilen = ["---", "typ: übersicht", "status: aktiv", "niveau: einstieg",
-              f"aktualisiert: {alltag.jetzt().date().isoformat()}", 'quelle: "Jarvis, automatisch"', "tags:", "  - projekt",
-              "  - übersicht", "---", "", "# Projekte", "", "Alle Projekte, die Jarvis mit Sir plant.", "",
+              f"aktualisiert: {alltag.jetzt().date().isoformat()}", 'quelle: "Auron, automatisch"', "tags:", "  - projekt",
+              "  - übersicht", "---", "", "# Projekte", "", "Alle Projekte, die Auron mit Sir plant.", "",
               "| Projekt | Status | Offen | Erledigt |", "|---|---|---|---|"]
     for e in liste():
         zeilen.append(f"| [[{e['notiz'][:-3]}\\|{e['titel']}]] | {e['status']} | {e['offen']} | {e['erledigt']} |")

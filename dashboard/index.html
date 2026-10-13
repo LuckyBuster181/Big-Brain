@@ -768,7 +768,7 @@
 </style>
 <style>
   /* ================================================================ Oberfläche 2.0 (26.09.2026)
-     Seitenleiste links, Vollbild-Jarvis (Schwarzes Loch + Galaxie oder Hologramm-Kopf),
+     Seitenleiste links, Vollbild-Auron (Schwarzes Loch + Galaxie oder Hologramm-Kopf),
      Status-Kacheln, neue Einstellungsseite. Wünsche und Entscheidungen von Sir. */
   :root { --leiste: 216px; --kopf-h: 58px; }
   body.leiste-zu { --leiste: 66px; }
@@ -820,7 +820,7 @@
     #seitenleiste nav button { justify-content: center; padding: 10px 0; } }
   body.retro #seitenleiste { background: #1a1107; border-right: 3px double var(--accent); }
 
-  /* ---------------------------------------------------------------- Vollbild-Jarvis */
+  /* ---------------------------------------------------------------- Vollbild-Auron */
   .jv-voll { position: fixed; left: var(--leiste); top: var(--kopf-h); right: 0; bottom: 0; z-index: 30; display: none;
     background: #010306; overflow: hidden; transition: left .22s ease; }
   body.jv-voll-an .jv-voll { display: block; }
@@ -898,7 +898,7 @@
   .set-zeile select { width: auto; min-width: 150px; }
   @media (max-width: 900px) { #page-settings .set-layout { grid-template-columns: 1fr; } .set-menue { position: static; flex-direction: row; flex-wrap: wrap; } }
 
-  /* ---------------------------------------------------------------- Klassische Jarvis-Seite (Option) */
+  /* ---------------------------------------------------------------- Klassische Auron-Seite (Option) */
   body.jv-klassisch #jvStatusKarte, body.jv-klassisch #jvJetzt { display: none; }
 
   /* ---------------------------------------------------------------- Stil: Weltraum-Glas */
@@ -1048,9 +1048,9 @@
     <div class="orb-status" id="orbStatus">Bereit, Sir.</div>
     <div class="orb-du" id="orbDu"></div>
     <div class="orb-antwort" id="orbAntwort"></div>
-    <div class="orb-hinweis" id="orbHinweis">Klick auf die Kugel und sprechen - oder "Jarvis, …" sagen, wenn "Immer ansprechbar" an ist.</div>
+    <div class="orb-hinweis" id="orbHinweis">Klick auf die Kugel und sprechen - oder "Auron, …" sagen, wenn "Immer ansprechbar" an ist.</div>
   </div>
-  <button class="orb" id="orb" title="Mit Jarvis sprechen">
+  <button class="orb" id="orb" title="Mit Auron sprechen">
     <i class="orb-ring a"></i><i class="orb-ring b"></i><i class="orb-ring c"></i><i class="orb-kern"></i>
     <span class="orb-ohr" id="orbOhr" title="Hört auf das Weckwort">●</span>
   </button>
@@ -1072,7 +1072,7 @@
   <button class="go" id="bootStart" tabindex="0">System starten</button>
 </div>
 <header>
-  <div class="brand">JARVIS<small>BIG BRAIN SYSTEM</small></div>
+  <div class="brand">AURON<small>BIG BRAIN SYSTEM</small></div>
   <div class="spacer"></div>
   <div class="stilwahl" id="stilWahl" title="Stil umschalten">
     <button data-stil="zukunft" class="active">Zukunft</button><button data-stil="retro">Retro 80/90</button>
@@ -1086,7 +1086,7 @@
   <nav>
     <button data-page="markt" class="active" title="Markt"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8"/><path d="M15 6h4v4"/></svg><span>Markt</span></button>
     <button data-page="alltag" title="Alltag"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span>Alltag</span></button>
-    <button data-page="jarvis" title="Jarvis"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4"/><path d="M12 2a10 10 0 0 1 0 20"/></svg><span>Jarvis</span></button>
+    <button data-page="jarvis" title="Auron"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4"/><path d="M12 2a10 10 0 0 1 0 20"/></svg><span>Auron</span></button>
     <button data-page="vault" title="Gedächtnis"><svg viewBox="0 0 24 24"><circle cx="6" cy="7" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="12" cy="17" r="2.5"/><circle cx="19" cy="16" r="1.5"/><path d="M7.7 8.2l3.2 7M16.4 7.3l-3.3 7.8M8 7l8-.8M14.5 16.8l3-.6"/></svg><span>Gedächtnis</span></button>
     <button data-page="labor" title="Labor"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5.5 9.5A2 2 0 0 0 6.2 21h11.6a2 2 0 0 0 1.7-2.5L14 9V3"/><path d="M7.5 15h9"/></svg><span>Labor</span></button>
     <button data-page="tiktok" title="TikTok"><svg viewBox="0 0 24 24"><path d="M14 3v11.5a3.5 3.5 0 1 1-3-3.46"/><path d="M14 3c.5 2.5 2.3 4 5 4"/></svg><span>TikTok</span></button>
@@ -1144,7 +1144,7 @@
         <div id="zustandBox" style="display:none; margin-top:10px">
           <div class="hint" id="zustandQual"></div>
           <div class="row" style="gap:6px; margin:10px 0">
-            <span class="chip" id="zustandFragen" title="Stellt Jarvis eine Frage zu diesem Markt - Vault zuerst, Kosten wie eine normale Frage">Jarvis erklärt</span>
+            <span class="chip" id="zustandFragen" title="Stellt Auron eine Frage zu diesem Markt - Vault zuerst, Kosten wie eine normale Frage">Auron erklärt</span>
             <span class="chip" id="zustandPaper" title="Paper-Order mit diesem Markt vorbereiten">Paper-Trade</span>
             <span class="chip" id="zustandBacktest" title="Diese Kerzen in der Trading-Sandbox durchrechnen">Backtest</span>
           </div>
@@ -1199,15 +1199,15 @@
     </div>
   </section>
 
-  <!-- ------------------------------------------------ JARVIS -->
+  <!-- ------------------------------------------------ AURON -->
   <section class="page" id="page-jarvis">
-    <!-- Vollbild-Jarvis (26.09.2026): Schwarzes Loch + Galaxie oder Hologramm-Kopf, hört dauerhaft zu -->
-    <div id="jvVoll" class="jv-voll" aria-label="Jarvis Vollbild">
+    <!-- Vollbild-Auron (26.09.2026): Schwarzes Loch + Galaxie oder Hologramm-Kopf, hört dauerhaft zu -->
+    <div id="jvVoll" class="jv-voll" aria-label="Auron Vollbild">
       <canvas id="jvCanvas"></canvas>
       <div class="jv-karten" id="jvKarten"></div>
-      <div class="jv-fehlt" id="jvKeinGL" hidden>3D ist in diesem Browser nicht verfügbar (WebGL aus).<br>Jarvis hört trotzdem zu.</div>
+      <div class="jv-fehlt" id="jvKeinGL" hidden>3D ist in diesem Browser nicht verfügbar (WebGL aus).<br>Auron hört trotzdem zu.</div>
       <div class="jv-oben">
-        <div><div class="jv-name" id="jvName">JARVIS</div><div class="jv-status" id="jvStatus">Bereit</div></div>
+        <div><div class="jv-name" id="jvName">AURON</div><div class="jv-status" id="jvStatus">Bereit</div></div>
         <div class="jv-knoepfe">
           <button class="jv-k" id="jvKoerper" type="button" title="Zwischen Universum und Kopf wechseln">Universum</button>
           <button class="jv-k" id="jvTon" type="button" title="Weltraum-Ton an oder aus">Ton an</button>
@@ -1232,7 +1232,7 @@
           <div class="row">
             <span class="hint">Modus</span>
             <span class="chip" id="modusKlassisch" title="Eine feste Vault-Suche vor der Antwort. Guenstiger, rund 0,7 Cent pro Frage.">Klassisch</span>
-            <span class="chip" id="modusWerkzeug" title="Jarvis sucht selbst, bis zu drei Mal. Besser bei Fragen mit mehreren Themen, rund doppelte Kosten.">Werkzeug</span>
+            <span class="chip" id="modusWerkzeug" title="Auron sucht selbst, bis zu drei Mal. Besser bei Fragen mit mehreren Themen, rund doppelte Kosten.">Werkzeug</span>
             <span class="chip" id="modusAgenten" title="Nur im Werkzeug-Modus: Suchen laufen ueber ein guenstigeres Modell (Sucher), nur die fertige Antwort ueber das Hauptmodell (Antworter). Zeigt Agentenstatus und Tokens live.">Agenten</span>
             <span class="hint">Ausschnitte</span>
             <select id="topK" style="width:auto">
@@ -1245,7 +1245,7 @@
             </select>
             <span class="chip" id="laengeKurz" title="Kurze Antworten: höchstens 2-3 Sätze, weniger Kosten.">Kurz</span>
             <span class="chip" id="laengeLang" title="Ausführliche Antworten mit Beispiel.">Ausführlich</span>
-            <span class="chip" id="stimmeChip" title="Jarvis liest seine Antworten laut vor (Einstellung: Antworten vorlesen). Fish Audio oder Windows-Stimme, siehe Einstellungen.">Stimme</span>
+            <span class="chip" id="stimmeChip" title="Auron liest seine Antworten laut vor (Einstellung: Antworten vorlesen). Fish Audio oder Windows-Stimme, siehe Einstellungen.">Stimme</span>
             <span class="chip" id="briefingBtn" title="Tagesbriefing: Stand, Termine und Verbrauch. Kostet einen Claude-Aufruf, gilt danach 10 Minuten.">Briefing</span>
             <span class="chip" id="reindexBtn" title="Geänderte Notizen einlesen. Mit Shift: Index komplett neu.">Vault einlesen</span>
           </div>
@@ -1258,7 +1258,7 @@
           <span class="chip" data-senden="Plan meinen Tag" title="Tagesplan aus Kalender und offenen Projektschritten (ca. 1-2 Cent)">Tag planen</span>
           <span class="chip" data-einfuegen="Mind Map: " title="Neue Mind Map zu einem Thema (ca. 2-4 Cent)">Mind Map</span>
           <span class="chip" data-einfuegen="Neues Projekt: " title="Projekt mit Plan, Rückfragen und Mind Map (ca. 3-5 Cent)">Projekt</span>
-          <span class="chip" data-einfuegen="Schreib eine WhatsApp an " title="Jarvis formuliert, ein Tipp öffnet WhatsApp mit dem Text (ca. 1 Cent)">WhatsApp</span>
+          <span class="chip" data-einfuegen="Schreib eine WhatsApp an " title="Auron formuliert, ein Tipp öffnet WhatsApp mit dem Text (ca. 1 Cent)">WhatsApp</span>
           <span class="chip" data-einfuegen="Recherchiere: " title="Suche im Internet, höchstens 3 Suchen (ca. 5-10 Cent)">Recherche</span>
           <span class="chip" data-einfuegen="Wandle die letzte Datei in PNG um" title="Datei aus der Ablage umwandeln - Format am Ende anpassen (0 Cent)">Umwandeln</span>
           <span class="chip" data-senden="PC leiser" title="Haupt-PC leiser (0 Cent)">PC leiser</span>
@@ -1268,7 +1268,7 @@
         </div>
         <div id="befehleListe" hidden style="margin-top:8px; padding:10px; border:1px solid var(--line); border-radius:10px; max-height:260px; overflow:auto; font-size:13px;"></div>
         <div class="row" style="margin-top:10px;">
-          <textarea id="chatInput" rows="2" placeholder="Frage an Jarvis. Enter sendet, Shift+Enter macht eine neue Zeile."></textarea>
+          <textarea id="chatInput" rows="2" placeholder="Frage an Auron. Enter sendet, Shift+Enter macht eine neue Zeile."></textarea>
         </div>
         <div class="row" style="margin-top:8px; justify-content: space-between;">
           <span class="hint" id="chatHint">Vault zuerst, Allgemeinwissen wird gekennzeichnet.</span>
@@ -1302,7 +1302,7 @@
         </div>
         <div class="card" style="margin-bottom:14px;">
           <div class="row" style="justify-content: space-between;"><h2 style="margin:0;">Vorschläge</h2><span class="hint" id="vorschlagAnzahl"></span></div>
-          <div class="hint">Jarvis kündigt jede Änderung am Vault hier an. Erst "Übernehmen" schreibt - angehängt oder neu, nie überschrieben, nie gelöscht.</div>
+          <div class="hint">Auron kündigt jede Änderung am Vault hier an. Erst "Übernehmen" schreibt - angehängt oder neu, nie überschrieben, nie gelöscht.</div>
           <div class="liste-klein" id="vorschlagListe" style="margin-top:8px"></div>
           <div class="row" style="margin-top:8px; gap:6px;">
             <input type="text" id="webseiteUrl" placeholder="Webseite speichern: https://..." style="flex:1">
@@ -1324,7 +1324,7 @@
         </div>
         <div class="card" style="margin-bottom:14px;">
           <h2>Studium</h2>
-          <div class="hint">Thema eingeben (z.B. "Physik") - Jarvis zerlegt es in Unterthemen und arbeitet sie ab wie der Aufgaben-Loop (Rechercheur, Schreiber, Git-Commit), bis der Deckel ausgeschöpft ist. Läuft über mehrere Starts hinweg weiter, ohne Unterthemen doppelt zu bearbeiten.</div>
+          <div class="hint">Thema eingeben (z.B. "Physik") - Auron zerlegt es in Unterthemen und arbeitet sie ab wie der Aufgaben-Loop (Rechercheur, Schreiber, Git-Commit), bis der Deckel ausgeschöpft ist. Läuft über mehrere Starts hinweg weiter, ohne Unterthemen doppelt zu bearbeiten.</div>
           <input type="text" id="studiumThema" placeholder="Thema, z.B. Physik" style="margin-top:8px;">
           <select id="studiumStufe" style="margin-top:6px;" title="Grundlagen: Lehrbuchwissen. Vertiefung: Formeln und Beispielrechnung. Forschung: aktueller Forschungsstand mit Jahreszahlen. Praxis: Experimente, Messwerte, Fehlerquellen.">
             <option value="grundlagen">Stufe: Grundlagen</option>
@@ -1430,7 +1430,7 @@
         <label class="hint">Startseite</label>
         <select id="setStart" style="margin:4px 0 10px">
           <option value="markt">Markt</option><option value="alltag">Alltag</option>
-          <option value="jarvis">Jarvis</option><option value="vault">Vault</option>
+          <option value="jarvis">Auron</option><option value="vault">Vault</option>
           <option value="labor">Labor</option>
           <option value="tiktok">TikTok</option>
           <option value="denkblock">Denkblock</option>
@@ -1479,10 +1479,10 @@
         <label class="row" style="margin:6px 0"><input type="checkbox" id="setMikro" style="width:auto" /> <span>Mikrofon-Knopf im Chat anzeigen</span></label>
         <label class="row" style="margin:6px 0"><input type="checkbox" id="setAutoSend" style="width:auto" /> <span>Gesprochene Frage sofort abschicken</span></label>
         <label class="row" style="margin:6px 0"><input type="checkbox" id="setVorlesen" style="width:auto" /> <span>Antworten vorlesen</span></label>
-        <label class="row" style="margin:6px 0"><input type="checkbox" id="setWach" style="width:auto" /> <span>Immer ansprechbar: auf "Jarvis …" hören, solange das HUD offen ist (Chrome/Edge; die Spracherkennung läuft dabei über den Dienst des Browsers)</span></label>
+        <label class="row" style="margin:6px 0"><input type="checkbox" id="setWach" style="width:auto" /> <span>Immer ansprechbar: auf "Auron …" hören, solange das HUD offen ist (Chrome/Edge; die Spracherkennung läuft dabei über den Dienst des Browsers)</span></label>
         <label class="row" style="margin:6px 0"><input type="checkbox" id="setBoot" style="width:auto" /> <span>Ladebildschirm beim Start</span></label>
         <label class="row" style="margin:6px 0"><input type="checkbox" id="setEffekte" style="width:auto" /> <span>Bewegte Effekte (Hintergrund, Leuchten) - aus spart Rechenleistung</span></label>
-        <label class="row" style="margin:6px 0"><input type="checkbox" id="setBegruessung" style="width:auto" /> <span>Jarvis begrüßt beim Start mit Stimme</span></label>
+        <label class="row" style="margin:6px 0"><input type="checkbox" id="setBegruessung" style="width:auto" /> <span>Auron begrüßt beim Start mit Stimme</span></label>
         <label class="row" style="margin:6px 0"><input type="checkbox" id="setVorlesenKurz" style="width:auto" /> <span>Nur die Kurzfassung vorlesen (erste zwei Sätze, der Rest steht im Chat)</span></label>
         <label class="hint">Spracherkennung</label>
         <select id="setStt" style="margin:4px 0 4px">
@@ -1511,14 +1511,14 @@
       </div>
 
       <div class="card">
-        <h2>Jarvis und Ordner</h2>
-        <div class="hint" style="margin-bottom:10px">Diese Werte liegen beim Backend. Änderungen wirken nach einem Neustart von start_jarvis.bat.</div>
+        <h2>Auron und Ordner</h2>
+        <div class="hint" style="margin-bottom:10px">Diese Werte liegen beim Backend. Änderungen wirken nach einem Neustart von JARVIS STARTEN.bat.</div>
         <label class="hint">Vault-Ordner</label>
         <input type="text" id="setVault" style="margin:4px 0 10px" />
         <label class="hint">Antwortmodus</label>
         <select id="setModus" style="margin:4px 0 10px">
           <option value="klassisch">klassisch (eine feste Suche)</option>
-          <option value="werkzeug">werkzeug (Jarvis sucht selbst, teurer)</option>
+          <option value="werkzeug">werkzeug (Auron sucht selbst, teurer)</option>
         </select>
         <label class="row" style="margin:6px 0"><input type="checkbox" id="setStartEinlesen" style="width:auto" /> <span>Beim Start geänderte Notizen einlesen</span></label>
         <label class="row" style="margin:6px 0"><input type="checkbox" id="setWatch" style="width:auto" /> <span>Vault während des Betriebs überwachen</span></label>
@@ -1581,7 +1581,7 @@
       </div>
       <div class="card">
         <h2>Video</h2>
-        <div id="ttDetail" class="hint">Links ein Video wählen. "Abrufen" holt Titel, Beschreibung und Untertitel (kein Video, keine Claude-Kosten). "In den Vault" legt eine Entwurfs-Notiz an, die Jarvis danach findet.</div>
+        <div id="ttDetail" class="hint">Links ein Video wählen. "Abrufen" holt Titel, Beschreibung und Untertitel (kein Video, keine Claude-Kosten). "In den Vault" legt eine Entwurfs-Notiz an, die Auron danach findet.</div>
       </div>
     </div>
   </section>
@@ -1591,7 +1591,7 @@
     <div class="held">
       <div>
         <div class="held-titel">Denkblock</div>
-        <div class="held-unter">Gedanken und Pläne aufschreiben. Jede Notiz liegt im Vault unter "Wissen/10 - Denkblock" &ndash; Jarvis liest sie bei jeder Frage mit. "Mitdenken" kostet ca. 1 Cent.</div>
+        <div class="held-unter">Gedanken und Pläne aufschreiben. Jede Notiz liegt im Vault unter "Wissen/10 - Denkblock" &ndash; Auron liest sie bei jeder Frage mit. "Mitdenken" kostet ca. 1 Cent.</div>
       </div>
     </div>
     <div class="grid denkgrid">
@@ -1616,7 +1616,7 @@
         </div>
       </div>
       <div class="card">
-        <h2>Jarvis denkt mit</h2>
+        <h2>Auron denkt mit</h2>
         <div class="row">
           <select id="dbModell" style="width:auto" title="Welches Modell mitdenkt">
             <option value="claude-sonnet-5">Sonnet 5 (ca. 1 ct)</option>
@@ -1625,7 +1625,7 @@
           </select>
           <button class="go" id="dbMitdenken" disabled>Mitdenken</button>
         </div>
-        <div id="dbGedanken" class="hint" style="margin-top:10px">Jarvis liest die Notiz und passende Stellen aus dem Vault. Er sagt, was er verstanden hat, fragt nach, nennt Lücken und nächste Schritte. In die Notiz kommt das erst, wenn Sie auf "Übernehmen" klicken.</div>
+        <div id="dbGedanken" class="hint" style="margin-top:10px">Auron liest die Notiz und passende Stellen aus dem Vault. Er sagt, was er verstanden hat, fragt nach, nennt Lücken und nächste Schritte. In die Notiz kommt das erst, wenn Sie auf "Übernehmen" klicken.</div>
         <div id="dbQuellen" class="hint" style="margin-top:8px"></div>
         <div class="row" style="margin-top:8px"><button class="go" id="dbUebernehmen" style="display:none">In die Notiz übernehmen</button></div>
       </div>
@@ -1652,7 +1652,7 @@
     <div class="held">
       <div>
         <div class="held-titel">Gesamtkarte</div>
-        <div class="held-unter">Alle Pläne, Phasen, Ideen und offenen Fragen. Punkt anklicken und mit Jarvis darüber reden. Fragen-Runde kostet nichts, Besprechen ca. 0,5&ndash;1 Cent.</div>
+        <div class="held-unter">Alle Pläne, Phasen, Ideen und offenen Fragen. Punkt anklicken und mit Auron darüber reden. Fragen-Runde kostet nichts, Besprechen ca. 0,5&ndash;1 Cent.</div>
       </div>
       <div class="row">
         <button class="go" id="gkRunde">Fragen-Runde starten</button>
@@ -1693,7 +1693,7 @@
           </div>
         </div>
         <div class="card">
-          <h2>Mit Jarvis reden</h2>
+          <h2>Mit Auron reden</h2>
           <div class="row">
             <select id="gkModell" style="width:auto" title="Welches Modell antwortet">
               <option value="claude-sonnet-5">Sonnet 5 (ca. 0,5&ndash;1 ct)</option>
@@ -1702,14 +1702,14 @@
             </select>
             <label class="hint" style="display:flex; align-items:center; gap:5px"><input type="checkbox" id="gkVorlesen" /> vorlesen</label>
           </div>
-          <div class="gkverlauf" id="gkVerlauf"><div class="hint">Jarvis kennt den gewählten Punkt, seine Nachbarn und passende Stellen aus dem Vault. „Jarvis fragt" lässt ihn eine Frage stellen, die den Punkt weiterbringt.</div></div>
+          <div class="gkverlauf" id="gkVerlauf"><div class="hint">Auron kennt den gewählten Punkt, seine Nachbarn und passende Stellen aus dem Vault. „Auron fragt" lässt ihn eine Frage stellen, die den Punkt weiterbringt.</div></div>
           <div class="row">
             <input type="text" id="gkEingabe" placeholder="Frage oder Gedanke zu diesem Punkt …" style="flex:1; min-width:0" disabled />
             <button class="gkmini" id="gkMic" title="Einsprechen" disabled>Mikro</button>
           </div>
           <div class="row" style="margin-top:6px">
             <button class="go" id="gkSenden" disabled>Senden</button>
-            <button class="gkmini" id="gkFragt" disabled>Jarvis fragt</button>
+            <button class="gkmini" id="gkFragt" disabled>Auron fragt</button>
             <span class="hint" id="gkKosten"></span>
           </div>
         </div>
@@ -1722,14 +1722,14 @@
     <div class="held">
       <div>
         <div class="held-titel">Labor</div>
-        <div class="held-unter">Testplätze für Trading-Bots und Jarvis-Modelle. Nichts hier handelt mit echtem Geld.</div>
+        <div class="held-unter">Testplätze für Trading-Bots und Auron-Modelle. Nichts hier handelt mit echtem Geld.</div>
       </div>
       <div class="tabs" id="laborTabs">
         <button class="tab active" data-tab="trading"><span class="tab-ico">◈</span><span><b>Trading-Sandbox</b><small>Backtest, 0 Kosten</small></span></button>
         <button class="tab" data-tab="pruefstand"><span class="tab-ico">◎</span><span><b>Modell-Prüfstand</b><small>Sonnet, Haiku, Opus</small></span></button>
         <button class="tab" data-tab="paper"><span class="tab-ico">◇</span><span><b>Paper-Trading</b><small>Übungskonto, Risiko-Wächter</small></span></button>
         <button class="tab" data-tab="tagebuch"><span class="tab-ico">✎</span><span><b>Trading-Tagebuch</b><small>Ihre eigenen Trades</small></span></button>
-        <button class="tab" data-tab="ablage"><span class="tab-ico">⬒</span><span><b>Datei-Ablage</b><small id="ablageAnzahl">Dateien für Jarvis</small></span></button>
+        <button class="tab" data-tab="ablage"><span class="tab-ico">⬒</span><span><b>Datei-Ablage</b><small id="ablageAnzahl">Dateien für Auron</small></span></button>
       </div>
     </div>
 
@@ -1868,7 +1868,7 @@
         <div>
           <div class="card leuchtend">
             <h2>Trade eintragen</h2>
-            <div class="hint">Was Sie in MetaTrader gehandelt haben. Jarvis handelt nie. Geht auch im Chat oder per Sprache: „Gold Long bei 3740, Stopp 3720, Ziel 3780, Grund Ausbruch“.</div>
+            <div class="hint">Was Sie in MetaTrader gehandelt haben. Auron handelt nie. Geht auch im Chat oder per Sprache: „Gold Long bei 3740, Stopp 3720, Ziel 3780, Grund Ausbruch“.</div>
             <label class="feld-titel" style="margin-top:8px">Markt</label>
             <select id="tbSymbol"></select>
             <div class="row" style="margin-top:8px; gap:6px;">
@@ -2109,7 +2109,7 @@
             </select>
             <button class="go" id="naAnlegen">Für heute Nacht</button>
           </div>
-          <div id="naMeldung" class="hint" style="margin-top:6px">Jarvis prüft kurz, ob der Auftrag klar ist (ca. 0,1 Cent), und fragt sonst nach. Recherche ca. 10–30 Cent, Prüfung durch Opus ca. 3–5 Cent.</div>
+          <div id="naMeldung" class="hint" style="margin-top:6px">Auron prüft kurz, ob der Auftrag klar ist (ca. 0,1 Cent), und fragt sonst nach. Recherche ca. 10–30 Cent, Prüfung durch Opus ca. 3–5 Cent.</div>
         </div>
         <div class="card" style="margin-top:12px">
           <h2>Frage des Tages</h2>
@@ -2149,7 +2149,7 @@ const THEMES = {
 };
 const STD = {
   theme: THEMES["Türkis"],
-  assistent: "Jarvis", nutzer: "Sir", start: "markt", kursIntervall: 20,
+  assistent: "Auron", nutzer: "Sir", start: "markt", kursIntervall: 20,
   ort: "Kevelaer", lat: 51.5847, lon: 6.2453,
   ort2: "", lat2: "", lon2: "", ortAktiv: 1,   /* zweiter Ort zum Umschalten */
   krypto: "BTCUSDT, ETHUSDT, BNBUSDT, SOLUSDT, XRPUSDT, ADAUSDT, DOGEUSDT, AVAXUSDT, LINKUSDT, DOTUSDT, TRXUSDT, LTCUSDT, BCHUSDT, NEARUSDT, ATOMUSDT, ETCUSDT, XLMUSDT, FILUSDT, APTUSDT, ARBUSDT, OPUSDT, INJUSDT, SUIUSDT, SEIUSDT, UNIUSDT, AAVEUSDT, ALGOUSDT, VETUSDT, ICPUSDT, HBARUSDT, RENDERUSDT, TIAUSDT",
@@ -2161,7 +2161,7 @@ const STD = {
   boot: true, begruessung: true,  /* Ladebildschirm und gesprochene Begrüßung (23.09.2026) */
   effekte: true,                  /* bewegter Hintergrund und Leuchten (23.09.2026) */
   stil: "zukunft",                /* "zukunft" oder "retro" (80/90er, Wunsch von Sir 23.09.2026) */
-  wach: false,                    /* Weckwort "Jarvis" - immer ansprechbar (23.09.2026) */
+  wach: false,                    /* Weckwort "Auron" - immer ansprechbar (23.09.2026) */
   /* Phase 2-4 (23.09.2026) */
   vorlesenKurz: true,             /* nur die ersten zwei Sätze vorlesen */
   sttModus: "browser",            /* "browser" oder "lokal" (Whisper) */
@@ -2172,6 +2172,7 @@ const STD = {
 };
 let S = Object.assign({}, STD);
 try { S = Object.assign(S, JSON.parse(localStorage.getItem("hud.einstellungen") || "{}")); } catch (e) {}
+if (/^\s*jarvis\s*$/i.test(S.assistent || "")) S.assistent = "Auron";  /* P20: alter gespeicherter Name */
 S.theme = Object.assign({}, STD.theme, S.theme || {});
 
 function themeAnwenden() {
@@ -2802,7 +2803,7 @@ $("calNext").addEventListener("click", () => {
 });
 loadCalendar();
 
-/* ============================================================ Jarvis */
+/* ============================================================ Auron */
 let history = [];
 async function jarvisStatus() {
   try {
@@ -2830,7 +2831,7 @@ async function jarvisStatus() {
   } catch (e) {
     $("statusDot").className = "dot bad";
     $("statusText").textContent = "Backend nicht erreichbar";
-    $("jobState").innerHTML = '<span class="err">Backend nicht erreichbar. start_jarvis.bat starten.</span>';
+    $("jobState").innerHTML = '<span class="err">Backend nicht erreichbar. JARVIS STARTEN.bat starten.</span>';
     setCore("bad", "offline");
   }
 }
@@ -2858,7 +2859,7 @@ async function loadSystem() {
       balken("Prozessor", s.cpu_prozent, s.cpu_prozent === null ? "wird gemessen …" : "Auslastung jetzt") +
       (m ? balken("Arbeitsspeicher", m.prozent, `${fmtNum(m.benutzt_gb, 1)} von ${fmtNum(m.gesamt_gb, 1)} GB`) : "") +
       (d ? balken("Festplatte " + (d.laufwerk || ""), d.prozent, `${fmtNum(d.benutzt_gb, 0)} von ${fmtNum(d.gesamt_gb, 0)} GB belegt`) : "") +
-      `<div class="stat" style="margin-top:10px"><span class="hint">Jarvis läuft seit</span><span class="hint">${std} h ${min} min</span></div>`;
+      `<div class="stat" style="margin-top:10px"><span class="hint">Auron läuft seit</span><span class="hint">${std} h ${min} min</span></div>`;
   } catch (e) { $("sysBody").innerHTML = '<span class="hint">Systemwerte erst nach einem Neustart des Backends.</span>'; }
 }
 loadSystem();
@@ -3135,7 +3136,7 @@ async function briefingHolen() {
     if (S.vorlesen) sprich(d.text || "");
   } catch (e) {
     msgTextSetzen(blase, "Briefing nicht möglich: " + e.message);
-    $("chatHint").textContent = "Läuft das Backend? start_jarvis.bat";
+    $("chatHint").textContent = "Läuft das Backend? JARVIS STARTEN.bat";
   } finally {
     $("briefingBtn").classList.remove("active");
   }
@@ -3156,7 +3157,7 @@ function modusAnzeigen() {
   $("modusWerkzeug").classList.toggle("active", m === "werkzeug");
   const zusatz = S.chatModus ? "" : " (Standard aus den Einstellungen)";
   $("modusKlassisch").title = "Eine feste Vault-Suche vor der Antwort. Guenstiger, rund 0,7 Cent pro Frage." + zusatz;
-  $("modusWerkzeug").title = "Jarvis sucht selbst, bis zu drei Mal. Besser bei Fragen mit mehreren Themen, rund doppelte Kosten." + zusatz;
+  $("modusWerkzeug").title = "Auron sucht selbst, bis zu drei Mal. Besser bei Fragen mit mehreren Themen, rund doppelte Kosten." + zusatz;
   agentenAnzeigen();
 }
 
@@ -3166,7 +3167,7 @@ function modusSetzen(m) {
   modusAnzeigen();
   const jetzt = modusAktiv();
   $("chatHint").textContent = jetzt === "werkzeug"
-    ? "Werkzeug-Modus: Jarvis sucht selbst, das kostet etwa doppelt."
+    ? "Werkzeug-Modus: Auron sucht selbst, das kostet etwa doppelt."
     : "Klassischer Modus: eine Suche vor der Antwort.";
 }
 
@@ -3203,7 +3204,7 @@ async function ask(opt) {
   if (!text) return "";
   /* "Briefing" oder "Tagesbriefing" im Eingabefeld ruft das Briefing auf,
      statt die Frage an den Vault zu schicken. */
-  if (/^\s*(tages)?briefing( jarvis)?\s*$/i.test(text)) {
+  if (/^\s*(tages)?briefing( jarvis| auron)?\s*$/i.test(text)) {
     $("chatInput").value = "";
     addMsg("user", text);
     briefingHolen();
@@ -3213,7 +3214,7 @@ async function ask(opt) {
   addMsg("user", text);
   $("chatSend").disabled = true;
   const agentenAktiv = modusAktiv() === "werkzeug" && !!S.agentenModus;
-  $("chatHint").textContent = modusAktiv() === "werkzeug" ? "Jarvis sucht selbst …" : "Jarvis denkt nach …";
+  $("chatHint").textContent = modusAktiv() === "werkzeug" ? "Auron sucht selbst …" : "Auron denkt nach …";
   $("agentStatus").textContent = "";
   const blase = addMsg("assistant", "");
   let antwort = "";
@@ -3268,7 +3269,7 @@ async function ask(opt) {
     return antwort;
   } catch (e) {
     msgTextSetzen(blase, antwort || ("Fehler: " + e.message));
-    $("chatHint").textContent = "Läuft das Backend? start_jarvis.bat";
+    $("chatHint").textContent = "Läuft das Backend? JARVIS STARTEN.bat";
     if (opt.sprechen) sprich("Entschuldigung, Sir. Das Backend antwortet gerade nicht.");
     return antwort || "Fehler: " + e.message;
   } finally { $("chatSend").disabled = false; }
@@ -3811,16 +3812,16 @@ async function fishStatusLaden() {
     const d = await r.json();
     $("fishHinweis").textContent = d.verfuegbar
       ? "Bereit. Modell " + d.modell + ". " + d.hinweis
-      : "Kein Schlüssel hinterlegt: FISH_API_KEY in Jarvis\\.env eintragen und start_jarvis.bat neu starten.";
+      : "Kein Schlüssel hinterlegt: FISH_API_KEY in Jarvis\\.env eintragen und JARVIS STARTEN.bat neu starten.";
   } catch (e) {
-    $("fishHinweis").textContent = "Backend nicht erreichbar - läuft start_jarvis.bat?";
+    $("fishHinweis").textContent = "Backend nicht erreichbar - läuft JARVIS STARTEN.bat?";
   }
 }
 
 function namenAnwenden() {
-  document.querySelector(".brand").innerHTML = (S.assistent || "Jarvis").toUpperCase() + "<small>BIG BRAIN SYSTEM</small>";
-  document.title = (S.assistent || "Jarvis") + " HUD";
-  $("chatInput").placeholder = `Frage an ${S.assistent || "Jarvis"}. Enter sendet, Shift+Enter macht eine neue Zeile.`;
+  document.querySelector(".brand").innerHTML = (S.assistent || "Auron").toUpperCase() + "<small>BIG BRAIN SYSTEM</small>";
+  document.title = (S.assistent || "Auron") + " HUD";
+  $("chatInput").placeholder = `Frage an ${S.assistent || "Auron"}. Enter sendet, Shift+Enter macht eine neue Zeile.`;
 }
 
 /* ---------- Backend-Einstellungen (Ordner, Modus) ---------- */
@@ -3854,7 +3855,7 @@ $("setSpeichern").addEventListener("click", async () => {
     const d = await r.json();
     if (r.ok) { modusStandard = $("setModus").value; S.chatModus = ""; einstellungenSpeichernLokal(); modusAnzeigen(); }
     $("setStatus").textContent = r.ok
-      ? "Gespeichert. Der Ordner wirkt nach einem Neustart von start_jarvis.bat."
+      ? "Gespeichert. Der Ordner wirkt nach einem Neustart von JARVIS STARTEN.bat."
       : "Fehler: " + (d.detail || r.status);
   } catch (e) { $("setStatus").textContent = "Fehler: " + e.message; }
 });
@@ -3863,7 +3864,7 @@ $("setSpeichern").addEventListener("click", async () => {
    Eingabe über die Spracherkennung des Browsers (Chrome/Edge), Ausgabe über die
    Windows-Stimmen. Beides kostenlos und ohne Konto, Qualität ist Browser-Niveau. */
 let erkennung = null, hoert = false;
-/* Sprechpause, nach der Jarvis die Frage abschickt (27.09.2026). Einstellbar über S.stilleMs. */
+/* Sprechpause, nach der Auron die Frage abschickt (27.09.2026). Einstellbar über S.stilleMs. */
 function stilleMs() { const v = Number(S && S.stilleMs); return v >= 800 && v <= 6000 ? v : 2000; }
 function spracheVorbereiten() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -3872,7 +3873,7 @@ function spracheVorbereiten() {
   erkennung.lang = "de-DE";
   erkennung.interimResults = true;
   /* 27.09.2026 abends ("er unterbricht mich"): continuous=false beendete die Erkennung schon bei
-     der ersten kurzen Pause - Jarvis bekam halbe Sätze. Jetzt hört er weiter, bis Sir ca. 2 s still ist. */
+     der ersten kurzen Pause - Auron bekam halbe Sätze. Jetzt hört er weiter, bis Sir ca. 2 s still ist. */
   erkennung.continuous = true;
   let mikroText = "", mikroStille = null;
   erkennung.onstart = () => { mikroText = ""; };
@@ -3899,7 +3900,7 @@ function stimmenFuellen() {
 }
 if (window.speechSynthesis) { speechSynthesis.onvoiceschanged = stimmenFuellen; stimmenFuellen(); }
 $("setStimme").addEventListener("change", () => { S.stimme = $("setStimme").value; einstellungenSpeichernLokal(); });
-$("testStimme").addEventListener("click", () => sprich(`Hallo ${S.nutzer || ""}, hier ist ${S.assistent || "Jarvis"}.`));
+$("testStimme").addEventListener("click", () => sprich(`Hallo ${S.nutzer || ""}, hier ist ${S.assistent || "Auron"}.`));
 let fishAudio = null;
 function windowsSprich(text) {
   if (!window.speechSynthesis) return;
@@ -3939,7 +3940,7 @@ async function sprich(text) {
     sprichtAnzeige(true);
   } catch (e) {
     const meldung = "Fish Audio: " + e.message + " - die Windows-Stimme übernimmt.";
-    // chatHint sitzt auf der Jarvis-Seite und ist unsichtbar, wenn man z.B.
+    // chatHint sitzt auf der Auron-Seite und ist unsichtbar, wenn man z.B.
     // von den Einstellungen aus "Stimme testen" klickt - deshalb zusaetzlich
     // in fishHinweis schreiben, das direkt neben dem Testen-Knopf steht.
     $("chatHint").textContent = meldung;
@@ -4371,7 +4372,7 @@ $("ttDetail").addEventListener("click", async (ev) => {
     }
     if (lesen) {
       const id = lesen.dataset.ttSlideLesen;
-      lesen.disabled = true; meldung("Jarvis liest die Slides, ca. 5 Sekunden je Bild …");
+      lesen.disabled = true; meldung("Auron liest die Slides, ca. 5 Sekunden je Bild …");
       const e = await ttPost("/api/tiktok/" + encodeURIComponent(id) + "/bilder/lesen");
       await ttLaden(); await ttDetail(id);
       meldung("Gelesen: " + (e.bilder || 0) + " Slides, " + ((e.slides_kosten_usd || 0) * 100).toFixed(2).replace(".", ",") + " US-Cent. Jetzt „In den Vault“.");
@@ -4465,7 +4466,7 @@ async function dbOeffnen(name) {
     $("dbSpeichern").disabled = false; $("dbMitdenken").disabled = false;
     $("dbUebernehmen").style.display = "none"; $("dbQuellen").textContent = "";
     $("dbGedanken").className = "hint";
-    $("dbGedanken").textContent = "Bereit. \"Mitdenken\" klicken, wenn Jarvis seine Gedanken dazu sagen soll.";
+    $("dbGedanken").textContent = "Bereit. \"Mitdenken\" klicken, wenn Auron seine Gedanken dazu sagen soll.";
     dbStand(d.aktualisiert ? "gespeichert (" + d.aktualisiert + ")" : "");
     dbListe(); $("dbText").focus();
   } catch (e) { dbStand(e.message, true); }
@@ -4507,7 +4508,7 @@ $("dbMitdenken").addEventListener("click", async () => {
   await dbSpeichern();
   const knopf = $("dbMitdenken");
   knopf.disabled = true; knopf.textContent = "denkt …";
-  $("dbGedanken").className = "hint"; $("dbGedanken").textContent = "Jarvis liest die Notiz und sucht im Vault …";
+  $("dbGedanken").className = "hint"; $("dbGedanken").textContent = "Auron liest die Notiz und sucht im Vault …";
   $("dbUebernehmen").style.display = "none"; $("dbQuellen").textContent = "";
   try {
     const d = await jsonSenden("/api/denkblock/" + encodeURIComponent(DB.name) + "/mitdenken", "POST", { modell: $("dbModell").value });
@@ -4535,7 +4536,7 @@ document.querySelector('nav button[data-page="denkblock"]').addEventListener("cl
 /* ============================================================ Gesamtkarte (24.09.2026)
    Mind Map aller Pläne aus data/gesamtkarte.json (seit 11.10.2026; app/gesamtkarte.json ist nur Startwert). Fragen-Runde ohne Claude (0 Cent),
    Antworten werden Vorschläge für Notiz 12 (geschrieben erst nach "Übernehmen"),
-   "Mit Jarvis reden" ist ein Claude-Aufruf je Nachricht. */
+   "Mit Auron reden" ist ein Claude-Aufruf je Nachricht. */
 const GK_STAND = { ok: "fertig", test: "gebaut, ungetestet", plan: "geplant", idee: "Idee", sir: "wartet auf Sir", nein: "bewusst nicht" };
 const GK_FARBE = { ok: "var(--up)", test: "var(--warn)", plan: "var(--accent)", idee: "var(--muted)", sir: "#ff9a3d", nein: "var(--down)" };
 const GK_NS = "http://www.w3.org/2000/svg";
@@ -4736,7 +4737,7 @@ $("gkSpeichern").addEventListener("click", async () => {
     const v = d.vorschlag;
     gkDetail(n);
     $("gkVorschlag").innerHTML = v
-      ? `<div class="gkvorschlag">Gespeichert. Jarvis möchte das in <b>Notiz 12</b> eintragen (anhängen, nichts wird überschrieben).
+      ? `<div class="gkvorschlag">Gespeichert. Auron möchte das in <b>Notiz 12</b> eintragen (anhängen, nichts wird überschrieben).
          <div class="row" style="margin-top:6px"><button class="go" data-gkv="uebernehmen" data-id="${gkEsc(v.id)}">Übernehmen</button>
          <button class="gkmini" data-gkv="verwerfen" data-id="${gkEsc(v.id)}">Nur hier behalten</button></div></div>`
       : `<div class="gkvorschlag">Gespeichert, aber nicht im Vault vorgeschlagen: ${gkEsc(d.hinweis || "")}</div>`;
@@ -4775,11 +4776,11 @@ $("gkRunde").addEventListener("click", () => {
 });
 $("gkWeiter").addEventListener("click", () => gkNaechsteFrage(GK.sel && GK.sel.id));
 
-/* ---------- Mit Jarvis reden (ein Claude-Aufruf je Nachricht) ---------- */
+/* ---------- Mit Auron reden (ein Claude-Aufruf je Nachricht) ---------- */
 function gkVerlaufZeigen() {
   const n = GK.sel, v = (n && GK.verlauf[n.id]) || [];
   $("gkVerlauf").innerHTML = v.length ? v.map((m) => `<div class="gkmsg ${m.rolle === "user" ? "sir" : "jarvis"}">${m.rolle === "user" ? gkEsc(m.text) : md(m.text)}</div>`).join("")
-    : `<div class="hint">Zu „${gkEsc(n ? n.t : "")}" noch kein Gespräch. Frage eintippen oder „Jarvis fragt".</div>`;
+    : `<div class="hint">Zu „${gkEsc(n ? n.t : "")}" noch kein Gespräch. Frage eintippen oder „Auron fragt".</div>`;
   $("gkVerlauf").scrollTop = $("gkVerlauf").scrollHeight;
 }
 async function gkReden(nachricht) {
@@ -4789,7 +4790,7 @@ async function gkReden(nachricht) {
   const bisher = v.slice(-6);
   if (nachricht) v.push({ rolle: "user", text: nachricht });
   gkVerlaufZeigen();
-  $("gkVerlauf").insertAdjacentHTML("beforeend", '<div class="gkmsg jarvis hint" id="gkDenkt">Jarvis denkt …</div>');
+  $("gkVerlauf").insertAdjacentHTML("beforeend", '<div class="gkmsg jarvis hint" id="gkDenkt">Auron denkt …</div>');
   $("gkSenden").disabled = $("gkFragt").disabled = true;
   try {
     const d = await jsonSenden("/api/gesamtkarte/" + encodeURIComponent(n.id) + "/besprechen", "POST",
@@ -4871,7 +4872,7 @@ function bootSchliessen() {
 async function bootStarten() {
   const boot = $("boot");
   if (S.boot === false || window.MODUL) { boot.remove(); return; }
-  const name = (S.assistent || "Jarvis").toUpperCase();
+  const name = (S.assistent || "Auron").toUpperCase();
   $("bootTitel").textContent = name.split("").join(".");
   $("bootPunkte").innerHTML = BOOT_SCHRITTE.map(() => "<b></b>").join("");
   const punkte = $("bootPunkte").children;
@@ -4885,7 +4886,7 @@ async function bootStarten() {
     async () => { melden("Oberfläche geladen"); return true; },
     async () => {
       try { const h = await bootMitTimeout("/api/health"); backendOk = true; chunks = h.chunk_count; melden("Backend verbunden"); return true; }
-      catch (e) { melden("Backend nicht erreichbar - start_jarvis.bat starten", true); return false; }
+      catch (e) { melden("Backend nicht erreichbar - JARVIS STARTEN.bat starten", true); return false; }
     },
     async () => {
       if (!backendOk) { melden("Vault übersprungen", true); return false; }
@@ -4926,7 +4927,7 @@ async function bootStarten() {
   const anrede = S.nutzer || "Sir";
   bootBegruessung = backendOk
     ? `${gruss}, ${anrede}. Alle Systeme bereit.` + (chunks ? ` ${chunks.toLocaleString("de-DE")} Abschnitte im Gedächtnis.` : "") + (kostenText ? ` Diesen Monat ${kostenText}.` : "")
-    : `${gruss}, ${anrede}. Das Backend ist nicht erreichbar. Bitte start_jarvis.bat starten.`;
+    : `${gruss}, ${anrede}. Das Backend ist nicht erreichbar. Bitte JARVIS STARTEN.bat starten.`;
   $("bootSchritt").textContent = backendOk ? "Systeme bereit" : "Eingeschränkt";
   if (S.begruessung === false) { await bootWarte(500); bootSchliessen(); return; }
   // Browser lassen Ton erst nach einem Klick zu - deshalb der Knopf.
@@ -5010,7 +5011,7 @@ function hochzaehlen(el) {
 
 /* ============================================================ Sprach-Blase und Weckwort (23.09.2026)
    Kugel unten rechts auf jeder Seite: Klick = sprechen. Mit "Immer ansprechbar"
-   hört das HUD dauerhaft auf "Jarvis …" (nur solange die Seite offen ist, Chrome
+   hört das HUD dauerhaft auf "Auron …" (nur solange die Seite offen ist, Chrome
    oder Edge). Zustände: hört zu (türkis, pulsiert), denkt (gold), spricht (Wellen).
    Die Antwort erscheint in der Blase, landet zusätzlich im Chat und wird immer
    vorgelesen. Ungetestet am echten Mikrofon - nur im Browser ohne Ton geprüft. */
@@ -5050,7 +5051,7 @@ sprichtAnzeige = function (an) {
   _sprichtAnzeigeAlt(an);
   if (an) { orbZustand("spricht", "Spreche …"); orb.pause = true; wachStoppen(); }
   else if (orb.zustand === "spricht") {
-    orbZustand("", "Fertig. " + (S.wach ? 'Sag "Jarvis …" für die nächste Frage.' : "Klick auf die Kugel für die nächste Frage."));
+    orbZustand("", "Fertig. " + (S.wach ? 'Sag "Auron …" für die nächste Frage.' : "Klick auf die Kugel für die nächste Frage."));
     orb.pause = false; wachStarten(); orbSpaeterSchliessen(12000);
   }
 };
@@ -5061,7 +5062,7 @@ function srNeu() {
   const r = new SR(); r.lang = "de-DE"; r.interimResults = true;
   return r;
 }
-/* Einmal zuhören (Klick auf die Kugel oder nach "Jarvis" ohne Frage) */
+/* Einmal zuhören (Klick auf die Kugel oder nach "Auron" ohne Frage) */
 function orbZuhoeren() {
   if (S.sttModus === "lokal") { lokalZuhoeren((text) => orbFragen(text.replace(WECKWORT, ""))); return; }
   const r = srNeu();
@@ -5103,8 +5104,8 @@ function wachStarten() {
   orb.wach = r;
   r.continuous = true;
   orb.sammelIdx = null; orb.sammelText = "";
-  /* 27.09.2026 abends: Vorher ging nur der Satzteil im selben Erkennungsstück wie "Jarvis" an Claude -
-     machte Sir eine kurze Pause, fehlte der Rest (halbe Frage, "Thema gewechselt"). Jetzt: ab "Jarvis"
+  /* 27.09.2026 abends: Vorher ging nur der Satzteil im selben Erkennungsstück wie "Auron" an Claude -
+     machte Sir eine kurze Pause, fehlte der Rest (halbe Frage, "Thema gewechselt"). Jetzt: ab "Auron"
      alles sammeln, bis Sir ca. 2 s still ist, dann erst fragen. */
   r.onresult = (e) => {
     if (orb.sammelIdx == null) {
@@ -5204,7 +5205,7 @@ $("laengeLang").addEventListener("click", () => { S.laenge = S.laenge === "ausfu
 modellLaengeAnzeigen();
 
 /* ---------- Plan und Vorschläge in der Antwort ---------- */
-/* Kanarienvogel (23.09.2026): Antwort kam ohne "Sir" -> Jarvis befolgt seine
+/* Kanarienvogel (23.09.2026): Antwort kam ohne "Sir" -> Auron befolgt seine
    Regeln womoeglich nicht mehr sicher. Hinweis + Knopf, der den Verlauf leert. */
 function kanarieZeigen(blase, text) {
   if (blase.querySelector(".kanarie")) return;
@@ -5225,7 +5226,7 @@ function planZeigen(blase, schritte) {
 }
 function vorschlagHtml(v) {
   const was = v.art === "anhaengen" ? "an die Notiz anhängen" : "als neue Notiz anlegen";
-  return `<div>Jarvis möchte in <span class="ziel">${esc(v.ziel)}</span> schreiben (${was}):</div>
+  return `<div>Auron möchte in <span class="ziel">${esc(v.ziel)}</span> schreiben (${was}):</div>
     <pre>${esc(v.text.length > 1200 ? v.text.slice(0, 1200) + " …" : v.text)}</pre>
     <div class="row" style="gap:6px"><span class="chip" data-v-ja="${v.id}">Übernehmen</span><span class="chip" data-v-nein="${v.id}">Verwerfen</span>
     <span class="hint" data-v-status="${v.id}"></span></div>`;
@@ -6164,7 +6165,7 @@ async function gerLaden() {
   $("gerHinweis").textContent = d.novnc_da ? "" : "Die Bildschirmansicht (noVNC) fehlt noch: am Haupt-PC 3 Einrichten\\GERAETE_EINRICHTEN.bat, danach NEUSTART.bat.";
   const pc2 = `<div class="ger-karte${GER.detail === "pc2" ? " offen" : ""}" data-ger-detail="pc2" title="Antippen: Livewerte, Steuerung, Bildschirm">
     <div class="ger-name"><span class="dot ${PC2.letzt ? "ok" : ""}"></span>Mini-PC (PC 2, Linux)</div>
-    <div class="ger-zeile">Jarvis-Server · 192.168.68.139</div>
+    <div class="ger-zeile">Auron-Server · 192.168.68.139</div>
     <div class="ger-zeile">Antippen: Livewerte, Steuerung, Bildschirm</div></div>`;
   $("gerListe").innerHTML = d.geraete.map(gerKarte).join("") + pc2;
   $("gerZugriffe").innerHTML = (d.zugriffe || []).map((z) =>
@@ -6366,7 +6367,7 @@ if (S.start && S.start !== "markt") {
 /* ============================================================ Nacht (26.09.2026)
    Nachtaufträge (app/nachtauftraege.py) und Frage des Tages (app/tagesfrage.py). */
 const NA_STATUS = {
-  rueckfrage: "Wartet auf Ihre Antwort", vorschlag: "Vorschläge von Jarvis", offen: "Geplant für die nächste Nacht",
+  rueckfrage: "Wartet auf Ihre Antwort", vorschlag: "Vorschläge von Auron", offen: "Geplant für die nächste Nacht",
   in_arbeit: "Läuft gerade", fertig: "Fertig", fehler: "Fehler", verworfen: "Verworfen",
 };
 const NA_REIHE = ["rueckfrage", "vorschlag", "offen", "in_arbeit", "fertig", "fehler", "verworfen"];
@@ -6423,7 +6424,7 @@ $("naAnlegen").addEventListener("click", async () => {
     const a = await jsonSenden("/api/nachtauftraege", "POST", { text, art: $("naArt").value || null });
     $("naText").value = "";
     $("naMeldung").innerHTML = a.status === "rueckfrage"
-      ? "Jarvis hat Rückfragen zu Nr. " + a.id + " – rechts beantworten."
+      ? "Auron hat Rückfragen zu Nr. " + a.id + " – rechts beantworten."
       : "Angelegt: Nr. " + a.id + " (" + esc(a.art) + ") läuft in der nächsten Nacht.";
     naLaden();
   } catch (e) { $("naMeldung").innerHTML = '<span class="err">' + esc(e.message) + "</span>"; }
@@ -6459,10 +6460,10 @@ document.querySelector('nav button[data-page="nacht"]').addEventListener("click"
 /*UI2-START*/
 /* ============================================================ Oberfläche 2.0 (26.09.2026)
    Entscheidungen von Sir: Seitenleiste links (nach Häufigkeit sortiert, einklappbar),
-   Jarvis-Seite mit Vollbild zuerst (Schwarzes Loch + Galaxie ODER Hologramm-Kopf,
+   Auron-Seite mit Vollbild zuerst (Schwarzes Loch + Galaxie ODER Hologramm-Kopf,
    umschaltbar), Arbeitsmodus mit Status-Kacheln und Inhalten je Tageszeit (Briefing
    immer dabei), Farbe nach Zustand, Mund/Leuchten spricht mit, Vault-Quellen kreisen
-   als Karten. Im Vollbild hört Jarvis dauerhaft zu. Töne: Start, Zuhören, Weltraum.
+   als Karten. Im Vollbild hört Auron dauerhaft zu. Töne: Start, Zuhören, Weltraum.
    Qualität Niedrig/Mittel/Hoch je Gerät (Einstellungen > Darstellung). Name änderbar.
    Das 3D ist reines WebGL ohne fremde Bibliothek - läuft auch ohne Internet. */
 (function oberflaeche2() {
@@ -6577,7 +6578,7 @@ document.querySelector('nav button[data-page="nacht"]').addEventListener("click"
 
   /* ---------------------------------------------------------------- Name überall + Weckwort */
   function nameUeberall() {
-    const n = String(S.assistent || "Jarvis").trim() || "Jarvis";
+    const n = String(S.assistent || "Auron").trim() || "Auron";
     const jb = navEl.querySelector('button[data-page="jarvis"]');
     if (jb) { jb.querySelector("span").textContent = n; jb.title = n; }
     $("jvName").textContent = n.toUpperCase();
@@ -6714,7 +6715,7 @@ document.querySelector('nav button[data-page="nacht"]').addEventListener("click"
   }
 
   /* ---------------------------------------------------------------- WebGL: Universum und Kopf (Fassung 2)
-     Wünsche Sir 26.09. spät: Schwarzes Loch realistischer, farbiger (Jarvis-Farben), mehr Bewegung;
+     Wünsche Sir 26.09. spät: Schwarzes Loch realistischer, farbiger (Auron-Farben), mehr Bewegung;
      Kopf mit echtem Gesicht und als Partikel-Schwarm, der im Leerlauf zerfließt. */
   const QUAL = {
     niedrig: { skala: 0.45, okt: 3, punkte: 5000, teilchen: 1200 },
@@ -7270,7 +7271,7 @@ void main(){ vec2 c = gl_PointCoord - 0.5; float d = length(c); if (d > 0.5) dis
     anzeigen();
   }).observe($("page-jarvis"), { attributes: true, attributeFilter: ["class"] });
   function modus(m) { JV.modus = m; anzeigen(); }
-  // Klassische Ansicht (alte Jarvis-Seite, Wunsch Sir: als Option behalten): ohne Status/Jetzt-Karten
+  // Klassische Ansicht (alte Auron-Seite, Wunsch Sir: als Option behalten): ohne Status/Jetzt-Karten
   function klassischAnwenden() { document.body.classList.toggle("jv-klassisch", S.jvStart === "klassisch"); }
   klassischAnwenden();
   (function vollChip() {
@@ -7371,17 +7372,17 @@ void main(){ vec2 c = gl_PointCoord - 0.5; float d = length(c); if (d > 0.5) dis
   const karteNach = (titel) => karten.find((k) => { const h2 = k.querySelector("h2"); return h2 && h2.textContent.trim().startsWith(titel); });
   const darst = document.createElement("div");
   darst.className = "card";
-  darst.innerHTML = `<h2>Jarvis im Vollbild</h2>
+  darst.innerHTML = `<h2>Auron im Vollbild</h2>
     <div class="set-zeile"><span>Körper<small>Was im Vollbild zu sehen ist</small></span><select id="setKoerper"><option value="universum">Schwarzes Loch + Galaxie</option><option value="kopf">Hologramm-Kopf</option><option value="atom">Atom</option></select></div>
-    <div class="set-zeile"><span>Farbe Schwarzes Loch<small>Gold wie im Film oder Jarvis-Türkis</small></span><select id="setScheibe"><option value="gold">Gold / Weiß</option><option value="jarvis">Jarvis-Farben (Türkis)</option></select></div>
+    <div class="set-zeile"><span>Farbe Schwarzes Loch<small>Gold wie im Film oder Auron-Türkis</small></span><select id="setScheibe"><option value="gold">Gold / Weiß</option><option value="jarvis">Auron-Farben (Türkis)</option></select></div>
     <div class="set-zeile"><span>Kopf-Stil<small>Weich oder wie ein 3D-Scan mit Linien</small></span><select id="setKopfStil"><option value="weich">Weich</option><option value="scan">Scan-Linien</option></select></div>
-    <div class="set-zeile"><span>Jarvis-Seite öffnet mit<small>Vollbild, Arbeitsmodus oder die alte Ansicht</small></span><select id="setJvStart"><option value="voll">Vollbild</option><option value="arbeit">Arbeitsmodus</option><option value="klassisch">Klassisch (alte Seite)</option></select></div>
+    <div class="set-zeile"><span>Auron-Seite öffnet mit<small>Vollbild, Arbeitsmodus oder die alte Ansicht</small></span><select id="setJvStart"><option value="voll">Vollbild</option><option value="arbeit">Arbeitsmodus</option><option value="klassisch">Klassisch (alte Seite)</option></select></div>
     <div class="set-zeile"><span>Qualität auf diesem Gerät<small>Niedrig schont Laptop und Akku</small></span><select id="setQualitaet"><option value="niedrig">Niedrig</option><option value="mittel">Mittel</option><option value="hoch">Hoch</option></select></div>
     <label class="row"><input type="checkbox" id="setTonStart" style="width:auto"> <span>Start-Ton beim Öffnen</span></label>
-    <label class="row"><input type="checkbox" id="setTonZuhoeren" style="width:auto"> <span>Ton, wenn Jarvis anfängt/aufhört zuzuhören</span></label>
+    <label class="row"><input type="checkbox" id="setTonZuhoeren" style="width:auto"> <span>Ton, wenn Auron anfängt/aufhört zuzuhören</span></label>
     <label class="row"><input type="checkbox" id="setTonAmbiente" style="width:auto"> <span>Weltraum-Ambiente im Vollbild (sehr leise)</span></label>
     <label class="row"><input type="checkbox" id="setLeisteZu" style="width:auto"> <span>Seitenleiste eingeklappt (nur Symbole)</span></label>
-    <div class="hint" style="margin-top:8px">Im Vollbild hört Jarvis dauerhaft auf seinen Namen (Chrome/Edge, die Erkennung läuft über den Dienst des Browsers). Leertaste = sofort zuhören, A = Arbeitsmodus, V = zurück ins Vollbild.</div>`;
+    <div class="hint" style="margin-top:8px">Im Vollbild hört Auron dauerhaft auf seinen Namen (Chrome/Edge, die Erkennung läuft über den Dienst des Browsers). Leertaste = sofort zuhören, A = Arbeitsmodus, V = zurück ins Vollbild.</div>`;
   const allgemeinZusatz = document.createElement("div");
   // Ladebildschirm und Effekte gehören zur Darstellung
   ["setBoot", "setEffekte"].forEach((id) => { const l = $(id) && $(id).closest("label"); if (l) darst.appendChild(l); });
@@ -7397,7 +7398,7 @@ void main(){ vec2 c = gl_PointCoord - 0.5; float d = length(c); if (d > 0.5) dis
     ["allgemein", "Allgemein", ["Namen und Start"]],
     ["darstellung", "Darstellung", ["Farben", darst]],
     ["stimme", "Stimme & Sprache", ["Sprache"]],
-    ["jarvis", "Jarvis & Vault", ["Jarvis und Ordner"]],
+    ["jarvis", "Auron & Vault", ["Auron und Ordner"]],
     ["markt", "Markt & Wetter", ["Kurse", "Wetter"]],
     ["kosten", "Kosten & Zugänge", ["Kosten", "API-Schl"]],
   ];
@@ -7501,7 +7502,7 @@ void main(){ vec2 c = gl_PointCoord - 0.5; float d = length(c); if (d > 0.5) dis
 
   /* ---------------------------------------------------------------- 2) Seitenköpfe für die übrigen Seiten */
   const KOEPFE = {
-    vault: ["Gedächtnis", "Was Jarvis aus dem Vault weiß und wie gut er sucht"],
+    vault: ["Gedächtnis", "Was Auron aus dem Vault weiß und wie gut er sucht"],
     labor: ["Labor", "Trading-Sandbox, Paper-Trading und Prüfstand"],
     tiktok: ["TikTok", "Gelernte Videos und Ideen"],
     denkblock: ["Denkblock", "Gedanken sammeln, ordnen, weiterdenken"],
@@ -7629,7 +7630,7 @@ void main(){ vec2 c = gl_PointCoord - 0.5; float d = length(c); if (d > 0.5) dis
         ${wert("Hoch 24 Std", a.hoch ? price(a.hoch) : "–")}${wert("Tief 24 Std", a.tief ? price(a.tief) : "–")}
         ${wert("24 Std", pct(a.chg["24h"]))}${wert("Quelle", a.kind === "krypto" ? "Binance" : a.kind === "metall" ? "gold-api" : "EZB")}
       </div>
-      <div class="row" style="gap:6px; margin-top:12px"><span class="chip" id="mkFragen" title="Bereitet eine Frage an Jarvis vor. Gesendet wird erst mit Enter (normale Fragekosten).">Jarvis fragen</span></div>`;
+      <div class="row" style="gap:6px; margin-top:12px"><span class="chip" id="mkFragen" title="Bereitet eine Frage an Auron vor. Gesendet wird erst mit Enter (normale Fragekosten).">Auron fragen</span></div>`;
     $("mkFragen").addEventListener("click", () => {
       seiteZeigen("jarvis");
       setTimeout(() => {
@@ -7773,7 +7774,7 @@ async function smLaden() {
     const r = await fetch("/api/sprachmemos", { cache: "no-store" });
     d = await r.json();
     if (!r.ok) throw new Error(d.detail || r.status);
-  } catch (e) { liste.textContent = ""; $("smMeldung").textContent = "Liste ging nicht: " + (e.message || e) + " (Jarvis neu gestartet?)"; return; }
+  } catch (e) { liste.textContent = ""; $("smMeldung").textContent = "Liste ging nicht: " + (e.message || e) + " (Auron neu gestartet?)"; return; }
   $("smStand").textContent = d.memos.length + " Memo" + (d.memos.length === 1 ? "" : "s") + " · Abschreiben: " + (d.abschreiben_moeglich ? "lokal möglich" : "nicht eingerichtet");
   liste.textContent = "";
   if (!d.memos.length) { const h = document.createElement("div"); h.className = "hint"; h.textContent = "Noch keine Sprachmemos, Sir."; liste.appendChild(h); return; }

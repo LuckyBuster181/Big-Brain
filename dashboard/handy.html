@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#04080d">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Jarvis</title>
-<!-- Handy-Oberflaeche von Jarvis (24.09.2026, Claude). Aufruf im Heimnetz ueber
+<title>Auron</title>
+<!-- Handy-Oberflaeche von Auron (24.09.2026, Claude). Aufruf im Heimnetz ueber
      1 Starten/HANDY_STARTEN.bat: http://<PC-Adresse>:8000/handy?zugang=CODE
      Nutzt nur: /api/chat/stream, /api/briefing, /api/denkblock, /api/vorschlaege, /api/health -->
 <style>
@@ -83,13 +83,13 @@
 <body>
 <header>
   <span class="punkt" id="punkt"></span>
-  <span class="logo">JARVIS</span>
+  <span class="logo">AURON</span>
   <span class="status" id="status">verbinde ...</span>
   <button class="schalter" id="vorlesen" type="button" aria-pressed="false">Stimme</button>
 </header>
 
 <main id="verlauf">
-  <div class="leer" id="leer"><b>Guten Tag, Sir.</b><br>Tippen Sie auf das Mikrofon und sprechen Sie mit mir.<br>Ich antworte mit meiner Stimme und höre danach wieder zu.<br>„Stopp“ oder „Danke Jarvis“ beendet das Gespräch.</div>
+  <div class="leer" id="leer"><b>Guten Tag, Sir.</b><br>Tippen Sie auf das Mikrofon und sprechen Sie mit mir.<br>Ich antworte mit meiner Stimme und höre danach wieder zu.<br>„Stopp“ oder „Danke Auron“ beendet das Gespräch.</div>
 </main>
 
 <div class="schnell">
@@ -108,7 +108,7 @@
 
 <form id="formular" autocomplete="off">
   <button class="rund" id="mikro" type="button" aria-label="Sprechen">&#127908;</button>
-  <textarea id="eingabe" rows="1" placeholder="Frage an Jarvis ..." enterkeyhint="send"></textarea>
+  <textarea id="eingabe" rows="1" placeholder="Frage an Auron ..." enterkeyhint="send"></textarea>
   <button class="rund senden" id="senden" type="submit" aria-label="Senden">&#10148;</button>
 </form>
 
@@ -123,13 +123,13 @@
 </div></div>
 
 <div class="blatt" id="blattVorschlaege"><div>
-  <h2>Vorschläge von Jarvis</h2>
+  <h2>Vorschläge von Auron</h2>
   <div id="vorschlagListe"><div class="hinweis">lade ...</div></div>
   <div class="knopfreihe"><button class="knopf" type="button" data-zu="blattVorschlaege">Schließen</button></div>
 </div></div>
 
 <div class="blatt" id="blattDatei"><div>
-  <h2>Datei an Jarvis senden</h2>
+  <h2>Datei an Auron senden</h2>
   <label class="datei-wahl">Foto oder Datei wählen (mehrere möglich)
     <input type="file" id="dateiWahl" multiple />
   </label>
@@ -158,7 +158,7 @@
 </div></div>
 
 <div class="blatt" id="blattSlides"><div>
-  <h2>TikTok-Slides an Jarvis</h2>
+  <h2>TikTok-Slides an Auron</h2>
   <div class="hinweis" style="margin-top:0">1. Beitrag wählen oder Link einfügen · 2. Slides in Reihenfolge wählen · 3. Text lesen · 4. In den Vault</div>
   <select class="tt-wahl" id="ttWahl" style="margin-top:8px"><option value="">lade ...</option></select>
   <div class="knopfreihe">
@@ -196,7 +196,7 @@ $("vorlesen").addEventListener("click", () => {
   if (!vorlesen) stummschalten();
 });
 
-/* Sprachausgabe: zuerst die Jarvis-Stimme vom PC (Fish Audio, sonst Piper),
+/* Sprachausgabe: zuerst die Auron-Stimme vom PC (Fish Audio, sonst Piper),
    sonst die Stimme des Handys. Gibt ein Promise zurück, das nach dem Sprechen erfüllt ist. */
 let stimmeQuelle = null;          // "fish" | "piper" | "handy"
 let audioJetzt = null;
@@ -300,7 +300,7 @@ async function fragen(text) {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: text, history: verlauf.slice(-8), laenge: "kurz", top_k: 3 }),
     });
-    if (!r.ok) throw new Error(r.status === 401 ? "Zugangscode fehlt - Link neu öffnen, Sir." : ("Jarvis antwortet nicht (" + r.status + ")."));
+    if (!r.ok) throw new Error(r.status === 401 ? "Zugangscode fehlt - Link neu öffnen, Sir." : ("Auron antwortet nicht (" + r.status + ")."));
     const leser = r.body.getReader(); const dec = new TextDecoder(); let rest = "";
     for (;;) {
       const { value, done } = await leser.read();
@@ -370,8 +370,8 @@ $("eingabe").addEventListener("keydown", (e) => {
 function groesse() { const t = $("eingabe"); t.style.height = "auto"; t.style.height = Math.min(t.scrollHeight, 120) + "px"; }
 $("eingabe").addEventListener("input", groesse);
 
-/* Gespräch: Mikrofon antippen -> Jarvis hört zu -> antwortet mit Stimme ->
-   hört wieder zu. "Stopp", "Danke Jarvis", "Ende" oder erneutes Antippen beendet.
+/* Gespräch: Mikrofon antippen -> Auron hört zu -> antwortet mit Stimme ->
+   hört wieder zu. "Stopp", "Danke Auron", "Ende" oder erneutes Antippen beendet.
    Die Spracherkennung des Browsers braucht eine gesicherte Verbindung. Im Heimnetz
    (http://) geht das über eine einmalige Chrome-Einstellung (Karte unten). */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -423,10 +423,10 @@ function sicherheitsKarte() {
   const k = document.createElement("div"); k.className = "karte"; k.id = "sicherKarte";
   const herkunft = location.origin;
   k.innerHTML = "<b>Einmalig einrichten, Sir:</b> Chrome erlaubt das Mikrofon nur auf gesicherten Seiten. " +
-    "So geben Sie Jarvis im Heimnetz frei:<br>1. Neuen Tab öffnen und diese Adresse eingeben:" +
+    "So geben Sie Auron im Heimnetz frei:<br>1. Neuen Tab öffnen und diese Adresse eingeben:" +
     "<code>chrome://flags/#unsafely-treat-insecure-origin-as-secure</code>" +
     "2. In das Feld diese Adresse eintragen:<code id=\"herkunft\"></code>" +
-    "3. Rechts auf <b>Enabled</b> stellen, unten <b>Relaunch</b> tippen.<br>4. Jarvis wieder öffnen und das Mikrofon erlauben.";
+    "3. Rechts auf <b>Enabled</b> stellen, unten <b>Relaunch</b> tippen.<br>4. Auron wieder öffnen und das Mikrofon erlauben.";
   const knopf = document.createElement("button"); knopf.type = "button"; knopf.textContent = "Adresse kopieren";
   knopf.addEventListener("click", async () => {
     try { await navigator.clipboard.writeText(herkunft); knopf.textContent = "Kopiert"; }
@@ -619,7 +619,7 @@ $("ttSlideWahl").addEventListener("change", async (ev) => {
 });
 $("ttLesen").addEventListener("click", async () => {
   const id = $("ttWahl").value; if (!id) return;
-  $("ttLesen").disabled = true; $("ttStatus").textContent = "Jarvis liest die Slides, ca. 5 Sekunden je Bild ...";
+  $("ttLesen").disabled = true; $("ttStatus").textContent = "Auron liest die Slides, ca. 5 Sekunden je Bild ...";
   try {
     const e = await ttJson("/api/tiktok/" + encodeURIComponent(id) + "/bilder/lesen", { method: "POST" });
     await ttZeigen();

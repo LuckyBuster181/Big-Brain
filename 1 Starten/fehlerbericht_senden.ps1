@@ -32,7 +32,7 @@ if (-not (Test-Path (Join-Path $repo ".git"))) {
 $zweig = (git -C $repo rev-parse --abbrev-ref HEAD).Trim()
 if ($zweig -ne "main") { Ende "STOPP: In $repo ist der Zweig '$zweig' aktiv, nicht main. Claude Bescheid geben." 1 }
 
-Write-Host " [1/3] Fehlerbericht von Jarvis holen ..."
+Write-Host " [1/3] Fehlerbericht von Auron holen ..."
 $bericht = $null
 foreach ($u in $adressen) {
   try {

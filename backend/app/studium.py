@@ -204,7 +204,7 @@ def _als_erledigt_merken(
 
 # --------------------------------------------------------------- Unterthemen
 
-UNTERTHEMEN_SYSTEM = """Du hilfst Jarvis (Max' digitalem Assistenten), sich systematisch \
+UNTERTHEMEN_SYSTEM = """Du hilfst Auron (Max' digitalem Assistenten), sich systematisch \
 Grundlagenwissen zu einem Thema zu erarbeiten, so wie es in einem Grundstudium oder Lehrbuch \
 aufgeteilt wäre. Zerlege das genannte Thema in konkrete, klar abgegrenzte Unterthemen, z.B. \
 "Physik" -> "Newtonsche Mechanik", "Thermodynamik: Hauptsätze", "Elektromagnetismus: \

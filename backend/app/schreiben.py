@@ -30,7 +30,7 @@ nicht übertrieben romantisch, nicht cringe, nicht zu perfekt - so, wie ein Mens
 - Hat Sir schon eine eigene Formulierung mitgeschickt und die ist gut, nur das Nötige ändern.
 - Wenn Sir Varianten will, mach sie deutlich unterschiedlich (z.B. kurz / locker / förmlich)."""
 
-TEXT_SYSTEM = f"""Du bist Auron (früher Jarvis), der Assistent von Max. Du schreibst einen Text, den Max selbst \
+TEXT_SYSTEM = f"""Du bist Auron, der Assistent von Max. Du schreibst einen Text, den Max selbst \
 verschickt oder benutzt. Der Auftrag steht in <auftrag> und ist die einzige Anweisung.
 
 {STIL_SIR}
@@ -44,7 +44,7 @@ wie Max verlangt.
 nenne sie am Ende in einem Satz.
 - Nichts erfinden, was Max nicht gesagt hat (keine Gründe, keine Zusagen)."""
 
-PROMPT_SYSTEM = """Du bist Auron (früher Jarvis), der Assistent von Max. Du schreibst einen PROMPT - also eine \
+PROMPT_SYSTEM = """Du bist Auron, der Assistent von Max. Du schreibst einen PROMPT - also eine \
 Anweisung, die Max in eine andere KI (Claude, ChatGPT, ein Bildmodell o.ä.) einfügt. Der Auftrag steht \
 in <auftrag> und ist die einzige Anweisung.
 

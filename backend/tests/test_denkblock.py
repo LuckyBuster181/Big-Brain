@@ -114,7 +114,7 @@ class DenkblockTest(unittest.TestCase):
         denkblock.uebernehmen("C", "**Rückfragen**\n- Wann?")
         t = denkblock.laden("C")["text"]
         self.assertTrue(t.startswith("Mein Gedanke."))
-        self.assertIn("## Jarvis denkt mit (", t)
+        self.assertIn("## Auron denkt mit (", t)
         self.assertIn("- Wann?", t)
         with self.assertRaises(denkblock.DenkblockFehler):
             denkblock.uebernehmen("C", "  ")

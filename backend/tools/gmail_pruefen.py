@@ -28,7 +28,7 @@ def main() -> int:
         print(f"FEHLER: {fehler}")
         return 1
     weg = "App-Passwort (IMAP)" if gmail.imap_aktiv() else "Google-Zugang (OAuth)"
-    print(f"Anmeldung OK über {weg}. Ungelesen nach Jarvis-Suche: {len(mails)}")
+    print(f"Anmeldung OK über {weg}. Ungelesen nach Auron-Suche: {len(mails)}")
     for m in mails[:3]:
         print(f"  - {m['von'][:40]} | {m['betreff'][:60]}")
     print("Nichts wurde als gelesen markiert.")

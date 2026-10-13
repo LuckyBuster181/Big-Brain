@@ -10,7 +10,7 @@ chcp 65001 >nul
 cd /d "%J%"
 
 echo.
-echo   Jarvis mit Handy-Zugang starten ...
+echo   Auron mit Handy-Zugang starten ...
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0handy_zugang.ps1" -Jarvis "%J%"
 if errorlevel 1 ( echo. & echo   Abgebrochen - Meldung oben an Claude. & pause & exit /b 1 )
 

@@ -10,7 +10,7 @@ import { ReindexButton } from './ReindexButton'
 import { StatusBar } from './StatusBar'
 
 const EXAMPLE_QUESTIONS = [
-  'Was ist der aktuelle Stand des Jarvis-Projekts?',
+  'Was ist der aktuelle Stand des Auron-Projekts?',
   'Fasse zusammen, was ich zu Trading-Bots notiert habe.',
   'Welche offenen Punkte stehen in meinen Notizen?',
 ]
@@ -21,7 +21,7 @@ function EmptyState({ onPick, disabled }: { onPick: (text: string) => void; disa
     <div className="empty">
       <h2>Was willst du wissen?</h2>
       <p>
-        Jarvis durchsucht deinen Obsidian-Vault und antwortet mit Quellenangabe. Wenn nichts
+        Auron durchsucht deinen Obsidian-Vault und antwortet mit Quellenangabe. Wenn nichts
         Passendes im Vault steht, sagt er das - statt sich etwas auszudenken. Rückfragen zur
         letzten Antwort versteht er auch.
       </p>
@@ -67,7 +67,7 @@ export function ChatView() {
             J
           </span>
           <div className="brand-text">
-            <h1>Jarvis</h1>
+            <h1>Auron</h1>
             <p>Dein Big Brain, durchsuchbar</p>
           </div>
         </div>

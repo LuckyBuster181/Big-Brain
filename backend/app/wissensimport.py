@@ -106,7 +106,7 @@ Regeln:
 nicht im Artikel stehen. Was der Artikel offenlässt, lässt du weg.
 - Einfache, klare Sprache (Niveau Abitur). Fachbegriffe kurz erklären - nur so, wie der \
 Artikel sie erklärt, oder mit einer allgemein gültigen Worterklärung.
-- 700 bis 1100 Wörter. Keine Quellenangaben schreiben, die ergänzt Jarvis.
+- 700 bis 1100 Wörter. Keine Quellenangaben schreiben, die ergänzt Auron.
 
 Format (genau so):
 BEREICH: <genau einer aus: {bereiche}>
@@ -559,7 +559,7 @@ def _bereich_index(vault: Path, bereich: str) -> None:
     index = ordner_b / f"00 - {bereich[5:]}.md"
     if not index.exists() and not any(ordner_b.glob("00 - *.md")):
         index.write_text(
-            f"---\ntyp: übersicht\nstatus: aktiv\nquelle: Jarvis (Wissensimport)\n---\n\n# {bereich[5:]}\n\n"
+            f"---\ntyp: übersicht\nstatus: aktiv\nquelle: Auron (Wissensimport)\n---\n\n# {bereich[5:]}\n\n"
             f"Neuer Bereich aus dem Wikipedia-Import. Alle Notizen: [[{UEBERSICHT_NOTIZ[:-3]}|Wissensimport Wikipedia]].\n",
             encoding="utf-8")
 
@@ -579,14 +579,14 @@ def notiz_ablegen(vault: Path, n: dict, text: str, bestanden: bool, heute: str) 
     front = (
         "---\n"
         f"typ: wissen\nstatus: {'geprueft' if bestanden else 'nicht_bestanden'}\n"
-        f"erstellt: {heute}\nquelle: Wikipedia ({n.get('auszeichnung', '')}), zusammengefasst von Jarvis\n"
+        f"erstellt: {heute}\nquelle: Wikipedia ({n.get('auszeichnung', '')}), zusammengefasst von Auron\n"
         f"quelle_url: {n.get('url', '')}\nquelle_version: {n.get('version', '')}\nlizenz: {LIZENZ}\n"
         f"bereich: {bereich}\npruefung: {pruefung}\n"
         f"vertrauen: {'mittel' if bestanden else 'niedrig'}\nniveau: einstieg\n"
         "tags:\n" + "".join(f"  - {t}\n" for t in tags) + "---\n\n"
     )
     fuss = (f"\n\n## Quelle\n- Wikipedia: [{n['titel']}]({n.get('url', '')}) (Version {n.get('version', '?')}, "
-            f"abgerufen {heute}), Lizenz {LIZENZ}.\n- Zusammenfassung von Jarvis, gegen den Artikel geprüft: {pruefung}.\n"
+            f"abgerufen {heute}), Lizenz {LIZENZ}.\n- Zusammenfassung von Auron, gegen den Artikel geprüft: {pruefung}.\n"
             f"- Übersicht: [[{UEBERSICHT_NOTIZ[:-3]}|Wissensimport Wikipedia]]\n")
     if not bestanden:
         fuss += "\n## Prüfbericht (nicht bestanden)\n" + "".join(f"- {f}\n" for f in n.get("fehler") or [])
@@ -601,7 +601,7 @@ def uebersicht_schreiben(vault: Path, stand: dict) -> None:
     stich = [n for n in alle if n.get("opus_urteil_r1")]
     uebersehen = [n for n in stich if n.get("haiku_urteil_r1") == "bestanden" and n.get("opus_urteil_r1") == "nicht_bestanden"]
     zeilen = [
-        "---", "typ: übersicht", "status: aktiv", "quelle: Jarvis (Wissensimport, wird automatisch neu geschrieben)",
+        "---", "typ: übersicht", "status: aktiv", "quelle: Auron (Wissensimport, wird automatisch neu geschrieben)",
         f"aktualisiert: {datetime.date.today().isoformat()}", "---", "",
         "# Wissensimport Wikipedia", "",
         "> [!info] Automatisch erzeugt – Änderungen hier werden beim nächsten Import überschrieben.",

@@ -53,7 +53,7 @@ _QUELLE_RE = re.compile(r"\[(\d{1,2})\]")
 STANDARD_FRAGEN: list[dict[str, Any]] = [
     {"frage": "Wie viel Geld darf ich pro Trade maximal riskieren?", "ziel": ["06 - Risiko und Positionsgröße"]},
     {"frage": "Wie prüfe ich eine Handelsstrategie mit alten Kursdaten?", "ziel": ["08 - Backtesting"]},
-    {"frage": "Welche Tech-Stack-Entscheidungen habe ich für Jarvis getroffen?",
+    {"frage": "Welche Tech-Stack-Entscheidungen habe ich für Auron getroffen?",
      "ziel": ["Big Brain Ziele und Entwicklungsplan", "Jarvis Projekt Anweisung", "Jarvis Entwicklungslog",
               "Jarvis Big Brain Dashboard", "Tages Notizen/2026-09-19"]},
     {"frage": "Was zeigt mir der RSI an?", "ziel": ["04 - Technische Analyse", "M1_RSI_SPIKE_FILTER"]},

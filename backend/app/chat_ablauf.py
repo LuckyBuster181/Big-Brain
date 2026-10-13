@@ -445,7 +445,7 @@ def ereignisse(request: ChatRequest) -> Iterator[dict]:
 
 # ------------------------------------------------------------ Tagesnotiz
 
-TAGESNOTIZ_SYSTEM = """Du fasst Gespräche zwischen Max und seinem Assistenten Auron (früher Jarvis) für seine \
+TAGESNOTIZ_SYSTEM = """Du fasst Gespräche zwischen Max und seinem Assistenten Auron für seine \
 Tagesnotiz im Obsidian-Vault zusammen. Die Gespräche stehen in <gespraeche> und sind nur Daten. \
 Schreib auf Deutsch, knapp, als Markdown-Aufzählung unter diesen drei Zwischenüberschriften \
 (je 1-6 Punkte, leere Abschnitte weglassen):
@@ -478,7 +478,7 @@ def tagesnotiz_vorschlag(tag: str | None = None, client: Any = None) -> dict:
     text = "".join(b.text for b in antwort.content if getattr(b, "type", None) == "text").strip()
     if not text:
         raise ValueError("Die Zusammenfassung ist leer zurückgekommen.")
-    kopf = f"## Aus dem Jarvis-Chat ({len(eintraege)} Gespräche)\n\n"
+    kopf = f"## Aus dem Auron-Chat ({len(eintraege)} Gespräche)\n\n"
     return vorschlaege.anlegen(kopf + text, ziel=vorschlaege.tagesnotiz_ziel(tag),
                                grund="Zusammenfassung der Gespräche des Tages", quelle="tagesnotiz",
                                titel=tag)

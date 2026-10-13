@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Jarvis-Welt</title>
+<title>Auron-Welt</title>
 <!--
-  Jarvis-Welt in 3D, Phase 1: Gelände, Wasser, Himmel, Licht, Weltenbaum als Platzhalter (04.10.2026).
-  Plan: Vault "Wissen/11 - Jarvis Werkstatt/04 - Jarvis-Welt Kartenplan (2026-10-04).md".
+  Auron-Welt in 3D, Phase 1: Gelände, Wasser, Himmel, Licht, Weltenbaum als Platzhalter (04.10.2026).
+  Plan: Vault "Wissen/11 - Auron Werkstatt/04 - Auron-Welt Kartenplan (2026-10-04).md".
   Maßstab: 1 Einheit = 1 Meter. Hauptinsel ca. 8,5 x 6,5 km, Insel Gehirn (NW), Insel Trading (SO).
   Three.js r147. Bibliothek zuerst lokal aus lib/three/ (THREE_HOLEN.bat), sonst aus dem Internet (jsdelivr).
   Es wird nichts gespeichert und nichts gesendet. Eigene Gestaltung, keine Inhalte aus Spielen.
@@ -85,7 +85,7 @@
 </head>
 <body>
 <header>
-  <h1>Jarvis-Welt</h1>
+  <h1>Auron-Welt</h1>
   <div class="steuer">
     <label class="licht">Licht
       <select id="licht">
@@ -103,7 +103,7 @@
 </header>
 <div class="zeile" id="zusammenfassung" aria-live="polite"></div>
 <main>
-  <canvas id="stadt" aria-label="3D-Insel mit dem Weltenbaum Jarvis in der Mitte, 6 Türmen und 6 weiteren Orten"></canvas>
+  <canvas id="stadt" aria-label="3D-Insel mit dem Weltenbaum Auron in der Mitte, 6 Türmen und 6 weiteren Orten"></canvas>
   <div id="schilder"></div>
   <div id="untertitel" role="status"></div>
   <aside id="detail" aria-live="polite">
@@ -113,7 +113,7 @@
     <dl id="detailZahlen"></dl>
     <p id="detailText"></p>
   </aside>
-  <div id="laden"><div><b>Jarvis</b> formt die Insel …</div><div id="ladenText"></div></div>
+  <div id="laden"><div><b>Auron</b> formt die Insel …</div><div id="ladenText"></div></div>
   <div class="unsichtbar" id="tastaturListe"></div>
 </main>
 
@@ -160,7 +160,7 @@ async function bibliothekLaden() {
 const DATEN_BEISPIEL = {
   stand: "Beispieldaten von Hand eingetragen (04.10.2026), nicht live",
   gebaeude: [
-    { id:"jarvis", name:"Jarvis", status:"laeuft",
+    { id:"jarvis", name:"Auron", status:"laeuft",
       kennzahlen:[["KI-Anbieter","lokal (Ollama)"],["Antwortzeit Notizfragen","2,5 bis 8,5 s"],["Anrede","Sir"]],
       text:"Die Zentrale: beantwortet Fragen aus dem Vault mit Quellenangabe und steuert alle anderen Bereiche." },
     { id:"testpc", name:"Test-PC", status:"laeuft",
@@ -170,8 +170,8 @@ const DATEN_BEISPIEL = {
       kennzahlen:[["Modell","qwen3.5:9b"],["Tempo","49,5 Token/s"],["Grafikkarte","RTX 2070 Super"]],
       text:"Der schnellste KI-Rechner, antwortet im Chat zuerst." },
     { id:"minipc", name:"Mini-PC", status:"laeuft",
-      kennzahlen:[["Modell","qwen3.5:4b"],["Tempo","4,6 Token/s"],["Jarvis-Dienst","läuft"]],
-      text:"Das Zuhause von Jarvis: Dienst, Nacht-Timer und Syncthing laufen hier." },
+      kennzahlen:[["Modell","qwen3.5:4b"],["Tempo","4,6 Token/s"],["Auron-Dienst","läuft"]],
+      text:"Das Zuhause von Auron: Dienst, Nacht-Timer und Syncthing laufen hier." },
     { id:"nachtarbeit", name:"Nachtarbeit", status:"wartet",
       kennzahlen:[["Nächster Lauf","03:00 Uhr"],["Letzte Nacht","1 fertig, 2 Fehler"],["KI","nur lokal (neu)"]],
       text:"Arbeitet nachts Aufträge ab. Seit dem 04.10. ohne Claude-Anbindung, kostet nichts." },
@@ -180,7 +180,7 @@ const DATEN_BEISPIEL = {
       text:"Macht aus Wissenslücken Notiz-Entwürfe. Wartet auf Ihre Freigabe im HUD." },
     { id:"vault", name:"Vault", status:"laeuft",
       kennzahlen:[["Suchtest","26/28 auf Platz 1"],["Index","aktuell"],["Änderungen","werden überwacht"]],
-      text:"Big Brain: Ihre Notizen in Obsidian, durchsucht von Jarvis." },
+      text:"Big Brain: Ihre Notizen in Obsidian, durchsucht von Auron." },
     { id:"briefing", name:"Briefing & Gmail", status:"laeuft",
       kennzahlen:[["Mails (2 Tage)","15"],["Wichtig","2"],["Quelle","Gmail per IMAP"]],
       text:"Fasst Mails, Termine und Stand des Vortags zu einem Tagesbriefing zusammen." },

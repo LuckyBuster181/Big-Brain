@@ -8,10 +8,10 @@ set "LOG=%~dp0selftest_log.txt"
 set PYTHONIOENCODING=utf-8
 set HF_HUB_DISABLE_PROGRESS_BARS=1
 set HF_HUB_DISABLE_SYMLINKS_WARNING=1
-echo Jarvis-Selbsttest laeuft - Index-Aufbau dauert ca. 3-10 Minuten (gedrosselt auf 2 CPU-Threads).
+echo Auron-Selbsttest laeuft - Index-Aufbau dauert ca. 3-10 Minuten (gedrosselt auf 2 CPU-Threads).
 echo Fenster bitte offen lassen. Am Ende oeffnet sich das Protokoll im Editor.
 echo.
-echo ==== Jarvis Selbsttest %DATE% %TIME% ==== > "%LOG%"
+echo ==== Auron Selbsttest %DATE% %TIME% ==== > "%LOG%"
 call venv\Scripts\activate.bat
 python -m tests.selftest --log "%LOG%" %*
 echo. >> "%LOG%"
