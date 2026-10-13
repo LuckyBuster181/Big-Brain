@@ -244,6 +244,23 @@ def _kosten() -> list[str]:
     return [f"- Rest im Monatsrahmen: {u.get('rest_usd', '?')} $"]
 
 
+def _alexa() -> list[str]:
+    """12.10.2026 (P19): letzte Alexa-Anfragen, ohne Inhalte - Intent, Ergebnis, Dauer, Gerät."""
+    from . import alexa  # noqa: PLC0415
+
+    liste = alexa.zeilen(25)
+    if not liste:
+        return ["Keine Alexa-Anfragen protokolliert."]
+    zeilen = ["| Zeit | Intent | Ergebnis | Dauer ms | Prüfung ms | Bildschirm | leere Platzhalter | Zeitbudget | Grund |",
+              "|---|---|---|---|---|---|---|---|---|"]
+    for z in liste:
+        zeilen.append(f"| {z.get('zeit', '')} | {z.get('intent', '')} | {z.get('ergebnis', '')} | {z.get('dauer_ms', '')} "
+                      f"| {z.get('pruef_ms', '')} | {'ja' if z.get('bildschirm') else 'nein'} "
+                      f"| {', '.join(z.get('slots_leer') or [])} | {'überschritten' if z.get('dauert') else ''} "
+                      f"| {saeubern(z.get('grund', ''))} |")
+    return zeilen
+
+
 def _funde(tage: int) -> list[str]:
     liste = eintraege(tage)
     if not liste:
@@ -263,4 +280,5 @@ def bericht(tage: int = 7) -> str:
             f"{'an' if _eingerichtet[0] else 'AUS'}",
             f"- KI-Anbieter: {os.getenv('LLM_PROVIDER') or 'claude'}", ""]
     return "\n".join(kopf + _abschnitt("Hintergrund-Läufe (Ampel)", _ampel) + _abschnitt("KI-Rechner", _ki)
-                     + _abschnitt("Kosten", _kosten) + _abschnitt(f"Fehler der letzten {tage} Tage", lambda: _funde(tage)))
+                     + _abschnitt("Kosten", _kosten) + _abschnitt("Alexa (letzte Anfragen)", _alexa)
+                     + _abschnitt(f"Fehler der letzten {tage} Tage", lambda: _funde(tage)))
