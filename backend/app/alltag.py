@@ -439,6 +439,12 @@ def absicht(text: str, offener_vorschlag: str | None = None) -> dict | None:
         return {"art": "antwort", "text": f"Es ist {uhrzeit_text()}, Sir."}
     if _DATUM.match(t):
         return {"art": "antwort", "text": f"Heute ist {datum_text()}, Sir."}
+    # 13.10.2026 (P23): "Kostenstand" - beide Deckel (normal und Code) aus dem Protokoll, ohne KI
+    from . import kosten
+
+    ks = kosten.absicht(t)
+    if ks:
+        return ks
     # 13.10.2026 (P21): "neueste Tagesnotiz" / "Tagesnotiz von gestern" nach Dateiname, ohne KI -
     # VOR allem anderen, sonst landet die Frage in der Ähnlichkeitssuche (app/tagesnotizen.py)
     from . import tagesnotizen

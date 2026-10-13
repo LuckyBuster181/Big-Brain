@@ -1532,6 +1532,8 @@
         <div class="hint" style="margin-bottom:8px">Schätzung aus dem eigenen Token-Protokoll. Der echte Kontostand steht nur in der Anthropic-Konsole.</div>
         <div id="kostenKopf" class="hint">lädt …</div>
         <div class="bar" style="margin-top:8px;"><i id="kostenBar" style="width:0%"></i></div>
+        <div id="kostenCodeKopf" class="hint" style="margin-top:10px"></div>
+        <div class="bar" style="margin-top:8px;"><i id="kostenCodeBar" style="width:0%"></i></div>
         <table style="margin-top:10px"><thead><tr><th>Funktion</th><th class="num">Aufrufe</th><th class="num">$</th></tr></thead>
         <tbody id="kostenFunktionen"></tbody></table>
         <div class="row" style="margin-top:10px">
@@ -3987,9 +3989,19 @@ async function kostenLaden() {
     const bar = $("kostenBar");
     bar.style.width = Math.min(100, k.anteil_prozent) + "%";
     bar.style.background = k.ampel === "rot" ? "var(--down)" : k.ampel === "gelb" ? "var(--warn)" : "";
-    $("kostenFunktionen").innerHTML = k.je_funktion
+    $("kostenFunktionen").innerHTML = k.je_funktion.concat((k.code && k.code.je_funktion) || [])
       .map((f) => `<tr><td>${esc(f.funktion)}</td><td class="num">${f.aufrufe}</td><td class="num">${f.usd.toFixed(3)}</td></tr>`)
       .join("") || '<tr><td colspan="3" class="hint">noch nichts</td></tr>';
+    /* P23: zweiter Topf - Code-Deckel (Modus code-*) */
+    if (k.code) {
+      const c = k.code, farbe = c.ampel === "rot" ? "var(--down)" : c.ampel === "gelb" ? "var(--warn)" : "";
+      $("kostenCodeKopf").innerHTML =
+        `Code-Deckel: <b>${c.ausgegeben_usd.toFixed(2)} $</b> von ${c.rahmen_usd} $ (${c.anteil_prozent} %), Rest ${c.rest_usd.toFixed(2)} $, ` +
+        `Hochrechnung Monatsende ${c.prognose_monatsende_usd.toFixed(2)} $ - ${c.anfragen} Aufrufe.`;
+      const cb = $("kostenCodeBar");
+      cb.style.width = Math.min(100, c.anteil_prozent) + "%";
+      cb.style.background = farbe;
+    }
     $("kostenAufladen").href = k.links.aufladen;
     $("kostenVerbrauch").href = k.links.verbrauch;
   } catch (e) {

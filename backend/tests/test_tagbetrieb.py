@@ -364,7 +364,7 @@ class BriefingImChatTest(Grundlage):
                 mock.patch.object(briefing, "_tagesfrage_zusatz", return_value=""):
             ev = list(chat_ablauf.ereignisse(ChatRequest(message="Briefing")))
         text = "".join(e.get("text", "") for e in ev if e["typ"] == "text")
-        self.assertEqual(text, "Abendbilanz, Sir.")
+        self.assertTrue(text.startswith("Abendbilanz, Sir."))  # abends folgen die Kostendeckel (P23)
         ki = next(e for e in ev if e["typ"] == "ki")
         self.assertEqual((ki["quelle"], ki["rechner"]), ("lokal", "Haupt-PC"))
         self.assertEqual(FalscherClaude.aufrufe, [])
