@@ -35,6 +35,7 @@ from typing import Any
 
 import httpx
 
+from . import anrede as _anrede
 from . import geraeteschutz
 
 # Stufe je Aktion - muss zur Tabelle im Agenten passen (pc_agent_windows/agent_stufen.py)
@@ -57,6 +58,11 @@ BEFEHLE: dict[str, str] = {
     "backup": "Backup",
     "updates_pruefen": "Updates prüfen",
 }
+
+
+def _a(situation: str = "normal") -> str:
+    """Anrede für feste Antworten (siehe app/anrede.py): Fehler und Rückfragen immer "Sir"."""
+    return _anrede.anrede(situation)
 
 
 def stufe(name: str) -> int | None:
@@ -336,12 +342,12 @@ def _bericht_text(name: str) -> str:
     try:
         e = befehl_bericht(name)
     except HauptPcFehler as exc:
-        return f"Das ging nicht, Sir: {exc}"
+        return f"Das ging nicht, {_a('fehler')}: {exc}"
     if not e.get("ok"):
-        return f"{e.get('meldung') or 'Kein Bericht vorhanden'}, Sir."
+        return f"{e.get('meldung') or 'Kein Bericht vorhanden'}, {_a('fehler')}."
     zeilen = [z for z in (e.get("zeilen") or []) if str(z).strip()][-15:]
     stand = "läuft noch" if e.get("laeuft") else ("fertig" if e.get("fertig") else "Stand unklar")
-    kopf = f"{BEFEHLE[name]}: {stand} ({e.get('datei', '')}), Sir. Letzte Zeilen:"
+    kopf = f"{BEFEHLE[name]}: {stand} ({e.get('datei', '')}), {_a()}. Letzte Zeilen:"
     return kopf + "\n\n```\n" + "\n".join(str(z) for z in zeilen) + "\n```"
 
 
@@ -350,26 +356,26 @@ def ausfuehren(a: dict) -> str:
     name = a["aktion"]
     if name == "bericht":
         return _bericht_text(a["ziel"]) if ist_eingerichtet() else \
-            "Die PC-Steuerung ist noch nicht eingerichtet, Sir."
+            f"Die PC-Steuerung ist noch nicht eingerichtet, {_a('fehler')}."
     if name in STUFE_2:
         if not ist_eingerichtet():
-            return f"Das ging nicht, Sir: {NICHT_EINGERICHTET}"
+            return f"Das ging nicht, {_a('fehler')}: {NICHT_EINGERICHTET}"
         _wartend.clear()
         _wartend.update({"aktion": name, "zeit": time.time()})
-        text = f"Soll ich wirklich {SAETZE[name]}, Sir? Sagen Sie \"ja\" (gilt 2 Minuten)."
+        text = f"Soll ich wirklich {SAETZE[name]}, {_a('stufe2')}? Sagen Sie \"ja\" (gilt 2 Minuten)."
         if name in MIT_ABBRUCH:
             text += " Danach bleiben noch 60 Sekunden, in denen \"Herunterfahren abbrechen\" es stoppt."
         return text
     try:
         e = aktion(name, a.get("ziel"))
     except HauptPcFehler as exc:
-        return f"Das ging nicht, Sir: {exc}"
+        return f"Das ging nicht, {_a('fehler')}: {exc}"
     if e.get("ok") and name == "befehl":
         n = BEFEHLE.get(a.get("ziel"), a.get("ziel"))
-        return f"{n} läuft jetzt am Haupt-PC, Sir. Später: \"{BERICHT_FRAGE[a.get('ziel')]}\""
+        return f"{n} läuft jetzt am Haupt-PC, {_a('erfolg')}. Später: \"{BERICHT_FRAGE[a.get('ziel')]}\""
     if e.get("ok"):
-        return f"{e.get('meldung') or 'Erledigt'}, Sir."
-    return f"Das hat der Haupt-PC abgelehnt, Sir: {e.get('meldung') or e.get('fehler') or 'unbekannter Grund'}."
+        return f"{e.get('meldung') or 'Erledigt'}, {_a('erfolg')}."
+    return f"Das hat der Haupt-PC abgelehnt, {_a('fehler')}: {e.get('meldung') or e.get('fehler') or 'unbekannter Grund'}."
 
 
 def bestaetigung(text: str) -> str | None:
@@ -385,13 +391,14 @@ def bestaetigung(text: str) -> str | None:
         try:
             e = aktion(name, bestaetigt=True)
         except HauptPcFehler as exc:
-            return f"Das ging nicht, Sir: {exc}"
+            return f"Das ging nicht, {_a('fehler')}: {exc}"
         if not e.get("ok"):
-            return f"Das hat der Haupt-PC abgelehnt, Sir: {e.get('meldung')}."
+            return f"Das hat der Haupt-PC abgelehnt, {_a('fehler')}: {e.get('meldung')}."
         zusatz = " \"Herunterfahren abbrechen\" stoppt es noch." if name in MIT_ABBRUCH else ""
-        return f"{e.get('meldung') or 'Erledigt'}, Sir.{zusatz}"
+        return f"{e.get('meldung') or 'Erledigt'}, {_a('erfolg')}.{zusatz}"
     if _NEIN.match(text or ""):
         name = _wartend.get("aktion")
         _wartend.clear()
-        return "In Ordnung, Sir, der PC bleibt an." if name in MIT_ABBRUCH else "In Ordnung, Sir, nichts wird ausgeführt."
+        a = _a("normal")
+        return f"In Ordnung, {a}, der PC bleibt an." if name in MIT_ABBRUCH else f"In Ordnung, {a}, nichts wird ausgeführt."
     return None

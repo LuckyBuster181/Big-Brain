@@ -38,7 +38,7 @@ from rag.embedder import get_preset
 from rag.embeddings import get_client, get_collection
 from rag.retriever import RetrievedChunk, search_many
 
-from . import knowledge_gaps
+from . import anrede, claude_fehler, knowledge_gaps
 from .schemas import ChatResponse, HistoryMessage, Source
 
 DEFAULT_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-5")
@@ -85,7 +85,7 @@ _SIR_RE = re.compile(r"\bsir\b", re.I)
 def sir_nachtrag(text: str, lokal: bool = True) -> str:
     """Lokale Modelle vergessen die Anrede trotz Erinnerung manchmal. Dann hängen wir sie an
     (nur bei Ollama; Claude bleibt unverändert). Leer, wenn "Sir" schon vorkommt."""
-    if not lokal or llm_provider.provider_name() != "ollama" or not (text or "").strip() or _SIR_RE.search(text):
+    if not lokal or llm_provider.provider_name() != "ollama" or not (text or "").strip() or anrede.enthaelt_anrede(text):
         return ""
     return "\n\nBitte sehr, Sir."
 
@@ -184,7 +184,8 @@ Witz und ohne Floskeln.
 Wechselt der Ton, wechselst du mit. Den Ton erkennst du an Wortwahl, Satzlänge, \
 Satzzeichen, Großschrift und dem bisherigen Gespräch. Bei Spracheingabe fehlen Satzzeichen oft \
 und einzelne Wörter sind falsch erkannt - deute großzügig.
-Anrede: immer "Sie" und "Sir", nie "du".
+Anrede: immer "Sie", nie "du". Gehobene Sprache wie ein Butler, weiterhin kurz und sachlich. \
+Wie du Max nennst (Sir, der Herr, mein Herr ...), steht im Abschnitt ANREDE am Ende; fehlt er, ist es "Sir".
 Fragen zu dir selbst ("Wie geht's?", "Hast du Spaß?"): bleib in der Rolle, kurz und charmant, \
 z.B. "Alle Systeme laufen, Sir. Und bei Ihnen?". Kein Vortrag darüber, dass du ein \
 Sprachmodell bist, kein Hinweis auf den Vault. Fragt Max ernsthaft, ob du ein Mensch bist \
@@ -246,7 +247,7 @@ es keine Quellennummer.
 oder "veraltet" hat oder Vertrauen "niedrig" - dann einmal kurz am Ende, nicht bei jeder \
 einzelnen Aussage. Vertrauen "mittel" ist der Normalfall im Vault und wird nicht erwähnt.
 6. Antworte auf Deutsch, klar und direkt, ohne unnötige Füllsätze. Sprich Max mit "Sie" \
-und "Sir" an, "Sir" mindestens einmal pro Antwort. Keine Emojis und keine Symbole wie Warnzeichen, auch \
+an und nenne ihn mindestens einmal pro Antwort mit einer Anrede (siehe ANREDE; fehlt der Abschnitt: "Sir"). Keine Emojis und keine Symbole wie Warnzeichen, auch \
 nicht vor Hinweisen.
 7. Frühere Nachrichten im Gespräch helfen dir, Folgefragen zu verstehen (worauf sich \
 "das", "dabei" oder "und was noch?" bezieht). Inhalte deiner früheren Antworten stammen \
@@ -271,7 +272,7 @@ sie ohne Zusammenhang keinen Sinn, antworte mit einer kurzen, lockeren Rückfrag
 Satz.""" + "\n\n" + PERSOENLICHKEIT + "\n\n" + FAEHIGKEITEN
 
 
-def cache_system(prompt: str) -> str | list[dict]:
+def cache_system(prompt: str, mit_anrede: bool = False) -> str | list[dict]:
     """System-Prompt fürs Caching aufbereiten (Kostenhebel 1). Sonnet cached ab
     ca. 1.024 Token - unsere System-Prompts liegen knapp darüber. Der Cache
     hält nur ca. 5 Minuten, hilft also vor allem innerhalb eines Gesprächs,
@@ -279,9 +280,15 @@ def cache_system(prompt: str) -> str | list[dict]:
     (z.B. zum Vergleich im Token-Protokoll) mit PROMPT_CACHE=false in der .env.
     Nach der Umsetzung im Log prüfen: bleibt cache_read_tokens bei 0, ist der
     Prompt zu kurz fürs Caching."""
+    # P20 (13.10.2026): Die wechselnde Anrede (Uhrzeit!) steht in einem eigenen Block ohne Cache,
+    # damit der lange, gleichbleibende Teil weiter aus dem Cache kommt.
+    block = anrede.prompt_block() if mit_anrede else ""
     if os.getenv("PROMPT_CACHE", "true").strip().lower() in ("0", "false", "no", "nein", "aus"):
-        return prompt
-    return [{"type": "text", "text": prompt, "cache_control": {"type": "ephemeral"}}]
+        return prompt + ("\n\n" + block if block else "")
+    teile = [{"type": "text", "text": prompt, "cache_control": {"type": "ephemeral"}}]
+    if block:
+        teile.append({"type": "text", "text": block})
+    return teile
 
 
 def _note_date(hit: RetrievedChunk) -> str | None:
@@ -546,7 +553,7 @@ def ask(
     response = client.messages.create(
         model=model_label,
         max_tokens=max_tokens_fuer(laenge),
-        system=cache_system(SYSTEM_PROMPT),
+        system=cache_system(SYSTEM_PROMPT, mit_anrede=True),
         messages=[*history_messages, {"role": "user", "content": user_message}],
     )
     info = ki_info(client, model_label)
@@ -618,7 +625,7 @@ def smalltalk_stream(message: str, history: list[HistoryMessage] | None = None, 
         with client.messages.stream(
             model=model_label,
             max_tokens=SMALLTALK_MAX_TOKENS,
-            system=cache_system(SYSTEM_PROMPT),
+            system=cache_system(SYSTEM_PROMPT, mit_anrede=True),
             messages=[*history_messages, {"role": "user", "content": frage}],
         ) as stream:
             gesamt = ""
@@ -640,9 +647,9 @@ def smalltalk_stream(message: str, history: list[HistoryMessage] | None = None, 
         yield {"typ": "quellen", "quellen": [], "vault": False}
         yield {"typ": "fertig"}
     except RuntimeError as exc:
-        yield {"typ": "fehler", "text": str(exc)}
+        yield {"typ": "fehler", "text": claude_fehler.oder(exc, str(exc))}
     except Exception as exc:  # noqa: BLE001
-        yield {"typ": "fehler", "text": f"Fehler bei der Anfrage an das Sprachmodell: {exc}"}
+        yield {"typ": "fehler", "text": claude_fehler.oder(exc, f"Fehler bei der Anfrage an das Sprachmodell: {exc}")}
 
 
 def ask_stream(
@@ -693,7 +700,7 @@ def ask_stream(
         with client.messages.stream(
             model=model_label,
             max_tokens=max_tokens_fuer(laenge),
-            system=cache_system(SYSTEM_PROMPT),
+            system=cache_system(SYSTEM_PROMPT, mit_anrede=True),
             messages=[*history_messages, {"role": "user", "content": user_message}],
         ) as stream:
             gesamt = ""
@@ -724,6 +731,6 @@ def ask_stream(
         yield {"typ": "fertig"}
     except RuntimeError as exc:
         # z.B. fehlender ANTHROPIC_API_KEY - Konfigurationsfehler, kein Serverfehler
-        yield {"typ": "fehler", "text": str(exc)}
+        yield {"typ": "fehler", "text": claude_fehler.oder(exc, str(exc))}
     except Exception as exc:  # noqa: BLE001 - Anthropic-API-Fehler, Netzwerk usw. sollen den Stream sauber beenden
-        yield {"typ": "fehler", "text": f"Fehler bei der Anfrage an das Sprachmodell: {exc}"}
+        yield {"typ": "fehler", "text": claude_fehler.oder(exc, f"Fehler bei der Anfrage an das Sprachmodell: {exc}")}

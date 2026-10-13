@@ -40,7 +40,8 @@ class Anweisungen(unittest.TestCase):
     def test_persoenlichkeit_in_beiden_prompts(self):
         for p in (chat_service.SYSTEM_PROMPT, agent_service.SYSTEM_PROMPT_TOOLS):
             self.assertIn("PERSÖNLICHKEIT", p)
-            self.assertIn('"Sie" und "Sir"', p)
+            self.assertIn('"Sie"', p)
+            self.assertIn("ANREDE", p)  # P20: wechselnde Anrede, Standard "Sir"
             self.assertIn("nie \"du\"", p)
 
     def test_kein_herkunfts_vortrag_bei_smalltalk(self):
