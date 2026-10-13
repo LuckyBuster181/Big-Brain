@@ -239,6 +239,20 @@ def _angaben(modus: str, mails: dict | None = None) -> str:
     )
 
 
+def _kosten_zusatz(modus: str) -> str:
+    """P23 (13.10.2026): Abend-Briefing zeigt beide Deckel (normal und Code) mit Rest, Hochrechnung und Ampel.
+    Feste Zeilen aus dem Protokoll, nicht von der KI geschrieben (Zahlen müssen stimmen, kostet 0)."""
+    if modus != "abend":
+        return ""
+    try:
+        from . import kosten
+
+        zeilen = kosten.deckel_zeilen()
+    except Exception:  # noqa: BLE001 - das Briefing darf nie an der Kostenübersicht scheitern
+        return ""
+    return "**Kostendeckel**\n" + "\n".join(f"- {z}" for z in zeilen)
+
+
 def erzeugen(modus: str | None = None, nur_claude: bool = False) -> dict:
     """Briefing erzeugen (ein KI-Aufruf).
     05.10.2026: läuft wie Chat und Alltag über app/ki_aufruf.py - tagsüber die lokale KI (0 €), Claude nur als
@@ -261,7 +275,7 @@ def erzeugen(modus: str | None = None, nur_claude: bool = False) -> dict:
     if not text.strip():
         raise RuntimeError("Das Modell lieferte keinen sichtbaren Briefing-Text"
                            + (" (abgeschnitten)." if e.get("abgeschnitten") else "."))
-    zusatz = "\n\n".join(t for t in (_tagesfrage_zusatz(), _finanzen_zusatz()) if t)
+    zusatz = "\n\n".join(t for t in (_kosten_zusatz(modus), _tagesfrage_zusatz(), _finanzen_zusatz()) if t)
     return {
         "modus": modus,
         "mails": _mails_markieren(mails),

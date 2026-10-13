@@ -165,7 +165,7 @@ def tag_rueckfall() -> str | None:
 
 
 def get_client(get_api_key: Callable[[], str], tag: bool = False, claude_modell: str | None = None,
-               erzwinge_claude: bool = False):
+               erzwinge_claude: bool = False, topf: str = "normal"):
     """Gibt den passenden Client zurück. Standard (LLM_PROVIDER nicht gesetzt
     oder "claude"): echter Anthropic-Client, unverändertes Verhalten.
     LLM_PROVIDER=ollama schaltet auf den lokalen Client um. get_api_key wird
@@ -177,7 +177,7 @@ def get_client(get_api_key: Callable[[], str], tag: bool = False, claude_modell:
     direkt Claude. Nachts (tag=False) bleibt es beim reinen OllamaClient - nie Claude."""
     if provider_name() == "ollama":
         if tag:
-            return TagClient(get_api_key, claude_modell or CLAUDE_STANDARD, nur_claude=erzwinge_claude)
+            return TagClient(get_api_key, claude_modell or CLAUDE_STANDARD, nur_claude=erzwinge_claude, topf=topf)
         return OllamaClient(tag)
     import anthropic  # nur hier importiert: im Ollama-Betrieb nicht nötig, dass es installiert ist
 
@@ -436,8 +436,21 @@ class Ersetzen(str):
         return obj
 
 
-def _rest_reicht() -> bool:
-    """Monatsrahmen für den Claude-Rückfall prüfen. Spät importiert (kein Ringimport), Fehler = erlaubt."""
+# P23 (13.10.2026): Code-Aufgaben haben einen eigenen Deckel; reicht er nicht, kein Rückfall auf Claude
+# (und nie auf den normalen Topf). Die lokale KI wird dadurch nie gesperrt.
+CODE_MIN_REST_USD = 0.20
+
+
+def _rest_reicht(topf: str = "normal") -> bool:
+    """Monatsrahmen für den Claude-Rückfall prüfen. Spät importiert (kein Ringimport), Fehler = erlaubt
+    (beim Code-Topf: Fehler = gesperrt, harte Grenze)."""
+    if topf == "code":
+        try:
+            from app import kosten  # noqa: PLC0415
+
+            return kosten.code_rest() >= CODE_MIN_REST_USD
+        except Exception:  # noqa: BLE001
+            return False
     try:
         from app import kosten  # noqa: PLC0415
 
@@ -453,8 +466,10 @@ class TagClient:
         {"quelle": "lokal"|"claude", "rechner": "Haupt-PC", "modell": "qwen3.5:9b",
          "rueckfall": bool, "grund": "..." (nur beim Rückfall)}"""
 
-    def __init__(self, get_api_key: Callable[[], str], claude_modell: str, nur_claude: bool = False) -> None:
+    def __init__(self, get_api_key: Callable[[], str], claude_modell: str, nur_claude: bool = False,
+                 topf: str = "normal") -> None:
         self._get_api_key = get_api_key
+        self.topf = topf
         self.claude_modell = claude_modell
         self.nur_claude = nur_claude
         self.info: dict[str, Any] = {}
@@ -468,9 +483,13 @@ class TagClient:
 
     def vor_claude(self, grund: str | None) -> None:
         """Vor jedem Claude-Aufruf: Rahmen prüfen, Ziel für Protokoll und Anzeige merken."""
-        if not self.nur_claude and not _rest_reicht():
+        if self.topf == "code" and not _rest_reicht("code"):
+            raise RuntimeError(f"{grund or 'Lokale KI nicht verfügbar'} - und der Code-Deckel für Claude ist "
+                               "fast aufgebraucht. Bitte Haupt-PC oder Test-PC einschalten, Sir.")
+        if self.topf != "code" and not self.nur_claude and not _rest_reicht():
             raise RuntimeError(f"{grund or 'Lokale KI nicht verfügbar'} - und der Monatsrahmen für Claude ist "
                                "fast aufgebraucht. Bitte Haupt-PC oder Test-PC einschalten, Sir.")
+
         letztes_ziel.clear()
         letztes_ziel.update({"name": "Claude", "url": "", "modell": self.claude_modell})
         self.info = {"quelle": "claude", "rechner": "Claude", "modell": self.claude_modell,

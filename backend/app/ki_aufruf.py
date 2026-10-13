@@ -29,6 +29,11 @@ HAIKU = os.getenv("ALLTAG_HAIKU_MODELL", "claude-haiku-4-5-20251001")
 MIN_REST_USD = float(os.getenv("ALLTAG_MIN_REST_USD", "0.30"))
 
 
+# P23 (13.10.2026): Code-Aufgaben (Modus "code-...") haben einen eigenen Deckel (app/kosten.py, Standard 10 $).
+CODE_MIN_REST_USD = llm_provider.CODE_MIN_REST_USD   # darunter: kein Claude-Aufruf (0,20 $)
+CODE_AUFGABE_MAX_USD = float(os.getenv("KOSTEN_CODE_AUFGABE_MAX_USD", "0.50"))  # je Aufgabe, sonst Sir fragen
+
+
 class KiFehler(RuntimeError):
     pass
 
@@ -42,12 +47,52 @@ def _lokal() -> bool:
     return llm_provider.provider_name() == "ollama"
 
 
-def rest_pruefen(mindestens: float = MIN_REST_USD) -> None:
+def rest_pruefen(mindestens: float = MIN_REST_USD, modus: str | None = None) -> None:
     """Wirft KiFehler, wenn der Monatsrahmen fast aufgebraucht ist.
-    Lokal (Ollama) kostet nichts - dann gibt es nichts zu prüfen."""
+    Lokal (Ollama) kostet nichts - dann gibt es nichts zu prüfen.
+    P23: Für code-*-Modi zählt nur der Code-Deckel (nie der normale Rahmen)."""
     if _lokal():
         return
+    if _ist_code(modus):
+        code_rest_pruefen()
+        return
     _rest_pruefen_claude(mindestens)
+
+
+def _ist_code(modus: str | None) -> bool:
+    from . import kosten
+
+    return kosten.ist_code_modus(modus)
+
+
+def code_rest_pruefen() -> None:
+    """Harte Prüfung vor jedem Claude-Aufruf einer Code-Aufgabe: unter 0,20 $ Rest im Code-Deckel gibt es
+    keinen Aufruf und keinen Rückfall auf den normalen Topf. Lässt sich der Stand nicht lesen, gilt: gesperrt."""
+    from . import kosten
+
+    try:
+        rest = kosten.code_rest()
+    except Exception as exc:  # noqa: BLE001 - harte Grenze: im Zweifel nicht ausgeben
+        raise KiFehler(f"Der Code-Deckel ist nicht prüfbar ({exc}) - Code-Aufgaben pausieren.") from exc
+    if rest < CODE_MIN_REST_USD:
+        raise KiFehler(f"Nur noch {rest:.2f} $ im Code-Deckel ({kosten.CODE_RAHMEN_USD:.0f} $ im Monat) - "
+                       "Code-Aufgaben sind bis zum Monatswechsel gesperrt. Der normale Rahmen wird dafür nicht angetastet.")
+
+
+def aufgabe_schaetzen(system: Any, inhalt: Any, verlauf: list[dict] | None, modell: str, max_tokens: int) -> float:
+    """Grobe Kostenschätzung eines Claude-Aufrufs in $ (Eingabe über Zeichen/3,5, Ausgabe = max_tokens)."""
+    text = f"{system}{inhalt}{verlauf or ''}"
+    eingabe = len(text) / 3.5
+    preise = aufgaben_loop.PREISE_JE_MIO_USD
+    art = aufgaben_loop.modell_art(str(modell))
+    return (eingabe * preise[f"input_{art}"] + max_tokens * preise[f"output_{art}"]) / 1_000_000
+
+
+def code_aufgabe_pruefen(geschaetzt_usd: float, bestaetigt: bool = False) -> None:
+    """Je Aufgabe höchstens 0,50 $ (geschätzt). Mehr nur, wenn Sir es ausdrücklich bestätigt hat."""
+    if geschaetzt_usd > CODE_AUFGABE_MAX_USD and not bestaetigt:
+        raise KiFehler(f"Diese Code-Aufgabe würde geschätzt {geschaetzt_usd:.2f} $ kosten "
+                       f"(Grenze je Aufgabe {CODE_AUFGABE_MAX_USD:.2f} $). Bitte Sir fragen.")
 
 
 def _rest_pruefen_claude(mindestens: float = MIN_REST_USD) -> None:
@@ -68,12 +113,13 @@ def _text(antwort: Any) -> str:
 
 def aufrufen(system: str, inhalt: str | list[dict], *, modus: str, modell: str | None = None,
              max_tokens: int = 1200, websuche: int = 0, client: Any = None,
-             verlauf: list[dict] | None = None, nur_claude: bool = False) -> dict:
+             verlauf: list[dict] | None = None, nur_claude: bool = False, groesse_bestaetigt: bool = False) -> dict:
     """Ein Claude-Aufruf. Rückgabe: {"text", "kosten_usd", "suchen", "abgeschnitten", "ki"}.
     inhalt ist die Nutzer-Nachricht (Text) - Daten darin vorher neutralisieren.
     05.10.2026: nur_claude=True (Knopf "Claude fragen") überspringt die lokale KI; "ki" sagt, wer antwortete."""
     modell = modell or SONNET
     lokal = False
+    code = _ist_code(modus)
     if client is None:
         # Bilder (TikTok sehen) und Websuche kann das lokale Textmodell nicht: das bleibt bei Claude.
         hat_bild = isinstance(inhalt, list) and any(
@@ -82,17 +128,22 @@ def aufrufen(system: str, inhalt: str | list[dict], *, modus: str, modell: str |
             # 03.10.2026: Alltagsfunktionen laufen lokal (Test-PC -> Haupt-PC -> Mini-PC), 0 Kosten.
             tag = not modus.startswith(NACHT_MODI)
             # 05.10.2026: springt tagsüber Claude ein, dann mit dem gewünschten Modell (z.B. Haiku, günstig)
-            client = llm_provider.get_client(chat_service.get_api_key, tag=tag, claude_modell=modell) if tag \
+            client = llm_provider.get_client(chat_service.get_api_key, tag=tag, claude_modell=modell,
+                                             topf="code" if code else "normal") if tag \
                 else llm_provider.get_client(chat_service.get_api_key, tag=tag)
             modell = llm_provider.current_model_label(modell, tag=tag)
             lokal = True
         else:
-            if _lokal():  # Websuche/Bilder gehen nur über Claude: Monatsrahmen prüfen
+            # P23: code-* prüft unten den Code-Deckel (vor JEDEM Claude-Aufruf), nie den normalen Rahmen
+            if not code and _lokal():  # Websuche/Bilder gehen nur über Claude: Monatsrahmen prüfen
                 _rest_pruefen_claude()
             try:
                 client = aufgaben_loop._anthropic_client()  # noqa: SLF001
             except Exception as exc:  # noqa: BLE001 - 10.10.2026: z.B. Schlüssel fehlt; vorher brach der Chat stumm ab
                 raise KiFehler(f"Claude ist nicht erreichbar ({exc})") from exc
+    if code and not lokal:
+        code_rest_pruefen()
+        code_aufgabe_pruefen(aufgabe_schaetzen(system, inhalt, verlauf, modell, max_tokens), groesse_bestaetigt)
     nachrichten = [*(verlauf or []), {"role": "user", "content": inhalt}]
     argumente: dict[str, Any] = {"model": modell, "max_tokens": max_tokens,
                                  "system": chat_service.cache_system(system), "messages": nachrichten}
