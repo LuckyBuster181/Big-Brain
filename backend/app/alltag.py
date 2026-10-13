@@ -423,6 +423,7 @@ def absicht(text: str, offener_vorschlag: str | None = None) -> dict | None:
         {"art": "diktat", "text": "..."}                            (-> Vorschlag anlegen)
         {"art": "bestaetigung", "ja": True/False, "vorschlag": id}  (nur mit offenem Vorschlag)
         {"art": "webseite", "url": ...}                              ("speicher die Seite https://...")
+        {"art": "tagesnotiz", "wunsch": "neueste"|"tag"|"ungueltig"}  ("neueste Tagesnotiz", app/tagesnotizen.py)
     """
     t = (text or "").strip()
     if not t or len(t) > 2000:
@@ -438,6 +439,13 @@ def absicht(text: str, offener_vorschlag: str | None = None) -> dict | None:
         return {"art": "antwort", "text": f"Es ist {uhrzeit_text()}, Sir."}
     if _DATUM.match(t):
         return {"art": "antwort", "text": f"Heute ist {datum_text()}, Sir."}
+    # 13.10.2026 (P21): "neueste Tagesnotiz" / "Tagesnotiz von gestern" nach Dateiname, ohne KI -
+    # VOR allem anderen, sonst landet die Frage in der Ähnlichkeitssuche (app/tagesnotizen.py)
+    from . import tagesnotizen
+
+    tn = tagesnotizen.absicht(t)
+    if tn:
+        return tn
     # 27.09.2026: neue Befehle (PC, Mind Maps, Projekte, Schreiben, Recherche, Termine,
     # Umwandeln) VOR Seitenwechsel und Diktat - siehe app/befehle.py
     from . import befehle

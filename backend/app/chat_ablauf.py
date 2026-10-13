@@ -36,7 +36,7 @@ import traceback
 from typing import Any, Iterator
 
 from . import (agent_service, alltag, chat_service, gespraeche, hauptpc, ki_aufruf, marktdaten, nachtauftraege,
-               spotify, tagebuch, tagesfrage, vorschlaege, webseite)
+               spotify, tagebuch, tagesfrage, tagesnotizen, vorschlaege, webseite)
 from .schemas import ChatRequest
 
 TAGESNOTIZ_MODELL = agent_service.TOOL_MODEL
@@ -99,6 +99,9 @@ def _absicht_ausfuehren(a: dict) -> Iterator[dict]:
         except tagebuch.TagebuchFehler as exc:
             text = f"Das konnte ich nicht ins Tagebuch schreiben, Sir: {exc}"
         yield from _direkt(text)
+    elif art == "tagesnotiz":
+        # 13.10.2026 (P21): neueste/bestimmte Tagesnotiz lesen, ohne KI und ohne Ähnlichkeitssuche
+        yield from _direkt(tagesnotizen.antwort(a))
     elif art == "nachtauftrag":
         yield from _direkt(_nachtauftrag(a))
     elif art == "tagesfrage":
@@ -265,6 +268,13 @@ def _inner(request: ChatRequest, modell: str | None, laenge: str | None) -> Iter
     if pc_antwort:
         yield {"typ": "_modus", "modus": "direkt"}
         yield from _direkt(pc_antwort)
+        yield {"typ": "fertig"}
+        return
+    # 13.10.2026 (P21): "ja" auf das Angebot "die jüngste Tagesnotiz zeigen?" (gilt 2 Minuten)
+    tn_antwort = tagesnotizen.bestaetigung(request.message)
+    if tn_antwort:
+        yield {"typ": "_modus", "modus": "direkt"}
+        yield from _direkt(tn_antwort)
         yield {"typ": "fertig"}
         return
     a = alltag.absicht(request.message, request.offener_vorschlag)

@@ -90,6 +90,46 @@
           ]
         },
         {
+          "name": "TagesnotizIntent",
+          "slots": [
+            {
+              "name": "datum",
+              "type": "AMAZON.DATE"
+            }
+          ],
+          "samples": [
+            "die tagesnotiz",
+            "der tagesnotiz",
+            "tagesnotiz",
+            "die neueste tagesnotiz",
+            "der neuesten tagesnotiz",
+            "die neuste tagesnotiz",
+            "der neusten tagesnotiz",
+            "die letzte tagesnotiz",
+            "der letzten tagesnotiz",
+            "die aktuelle tagesnotiz",
+            "der aktuellen tagesnotiz",
+            "die tagesnotiz von {datum}",
+            "die tagesnotiz vom {datum}",
+            "der tagesnotiz von {datum}",
+            "der tagesnotiz vom {datum}",
+            "tagesnotiz von {datum}",
+            "tagesnotiz vom {datum}",
+            "tagesnotiz {datum}",
+            "die tagesnotiz {datum}",
+            "was steht in der tagesnotiz",
+            "was steht in der tagesnotiz von {datum}",
+            "was steht in der tagesnotiz vom {datum}",
+            "was in der tagesnotiz steht",
+            "was in der tagesnotiz von {datum} steht",
+            "was in der tagesnotiz vom {datum} steht",
+            "lies die tagesnotiz vor",
+            "lies die neueste tagesnotiz vor",
+            "lies die tagesnotiz von {datum} vor",
+            "lies die tagesnotiz vom {datum} vor"
+          ]
+        },
+        {
           "name": "NachtauftragIntent",
           "slots": [
             {

@@ -89,16 +89,11 @@ def vault_pfad() -> Path | None:
 
 
 def tagesnotiz(tag: datetime.date) -> str:
-    """Tagesnotiz des angegebenen Tages, gekürzt. Leerer Text, wenn es keine gibt."""
-    wurzel = vault_pfad()
-    if not wurzel:
-        return ""
-    datei = wurzel / TAGESNOTIZ_ORDNER / f"{tag.isoformat()}.md"
-    try:
-        text = datei.read_text(encoding="utf-8")
-    except OSError:
-        return ""
-    return text[:MAX_NOTIZ_ZEICHEN]
+    """Tagesnotiz des angegebenen Tages, gekürzt. Leerer Text, wenn es keine gibt.
+    13.10.2026 (P21): Lesen liegt jetzt in app/tagesnotizen.py (Verhalten unverändert, Frontmatter bleibt)."""
+    from . import tagesnotizen  # erst hier: tagesnotizen importiert dieses Modul
+
+    return tagesnotizen.roh(tag)
 
 
 def verbrauch(tag: datetime.date) -> dict:

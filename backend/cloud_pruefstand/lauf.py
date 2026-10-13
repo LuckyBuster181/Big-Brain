@@ -65,6 +65,8 @@ CHATS = [
     ("Recherchiere: beste Powerbank", "Sir", "braucht Claude: muss freundlich ablehnen, nicht abstürzen"),
     ("Zeig mir den Markt", "Sir", "Seitenwechsel-Befehl"),
     ("Welche Abos habe ich?", "3 Abos", "Finanzen: Abo-Übersicht aus den Beispiel-CSVs"),
+    # 13.10.2026 (P21): nach Dateiname, nicht über die Ähnlichkeitssuche; die Septembernotiz darf nicht kommen
+    ("Leg mir die neue Tagesnotiz vor", "Pruefstand-Tagesnotiz", "neueste Tagesnotiz ohne KI"),
 ]
 
 # Meldungen, die nur die Cloud betreffen (kein Mikrofon, keine Lautsprecher, keine Grafikkarte, kein Netz nach außen)
