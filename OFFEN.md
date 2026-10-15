@@ -12,6 +12,10 @@ Von Sir zurueckgestellt ("machen wir wann anders"). Naechste Sitzung: Sir fragen
    - Seit 10.10.2026 prueft GitHub jede Aenderung automatisch (Tests + Pruefstand).
    - Nachteil: Sir sieht Aenderungen nicht mehr vorher. Erst nach ausdruecklichem Ja von Sir.
 
+3. **Gesten: naechste Schritte** (Stand 15.10.2026, erster Schritt fertig)
+   - Erst am PC testen: Schwellen und Glaettung in werkstatt/gesten/gesten.js (EINSTELLUNG) mit Sirs Webcam.
+   - Spaeter: ganzen Windows-Bildschirm steuern (ueber den PC-Agenten), Scrollen per Geste.
+
 ## Erledigt am 10.10.2026 (zur Einordnung)
 - Sucher und Schreiber (Agenten-Station, Chat-Befehl "Such und schreib: ...").
 - REPO HOLEN.bat (unter Windows erfolgreich gelaufen).

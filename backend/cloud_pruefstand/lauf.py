@@ -13,6 +13,7 @@ fertige Versionen bekommt. Dieses Skript startet das ECHTE Backend in einer abge
    - API: jede GET-Adresse ohne Platzhalter einmal aufrufen. Serverfehler (5xx) = Fehler.
    - Chat: typische Befehle über /api/chat/stream, Antwort muss kommen und "Sir" enthalten.
    - Browser (Chromium über Playwright): Auron, jedes Modul, Agenten-Station, altes HUD, Handy, 3D-Seiten.
+     Gesten (15.10.2026): Logik mit künstlicher Hand, dazu echtes MediaPipe mit der Ersatz-Kamera von Chromium.
      JavaScript-Fehler, fehlgeschlagene Anfragen und Serverfehler werden gesammelt, von jeder Seite ein Bild.
    - Server-Protokoll: Tracebacks des Backends.
 4. Bericht: <ausgabe>/bericht.md (lesbar), bericht.json, bilder/*.png. Rückgabewert 1, wenn es Fehler gab.
@@ -84,6 +85,26 @@ NICHT_EINGERICHTET = [
     ("/api/pc2/", "Mini-PC (PC 2) in der Cloud nicht erreichbar"),
     ("/api/hauptpc/", "Haupt-PC in der Cloud nicht erreichbar"),
     ("/modelle/iss.glb", "3D-Modell fehlt im Repo (vermutlich > 5 MB, REPO HOCHLADEN nimmt es nicht mit); Ersatz-Station greift"),
+]
+
+
+# 15.10.2026 (Gesten): MediaPipe-Dateien wie in werkstatt/GESTEN_HOLEN.bat (gleiche Adressen und Prüfsummen,
+# tests/test_gesten.py vergleicht beide). Nicht im Repo; der Prüfstand lädt sie in den Arbeitsordner, falls sie fehlen.
+MEDIAPIPE_VERSION = "0.10.35"
+_MP = f"https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@{MEDIAPIPE_VERSION}"
+MEDIAPIPE_DATEIEN = [
+    ("vision_bundle.mjs", f"{_MP}/vision_bundle.mjs", "55d7ab624fbb70dcc5adc4ae6d7ea9cfcb569139d3dbfbf2b1deafcb966bc0fe"),
+    ("wasm/vision_wasm_internal.js", f"{_MP}/wasm/vision_wasm_internal.js",
+     "e7fd9858e8e8f221d9b96eddc11f8e077f263e0b7bbd79d3cbe882b134274f8c"),
+    ("wasm/vision_wasm_internal.wasm", f"{_MP}/wasm/vision_wasm_internal.wasm",
+     "6a5c64584c2ab61c763b6e204afbdbc7ce1caf7f5216187322bca8df94f646bc"),
+    ("wasm/vision_wasm_nosimd_internal.js", f"{_MP}/wasm/vision_wasm_nosimd_internal.js",
+     "438d1fe8ff7f4d946025bc211c291543c037d8a3785ed4eee60f1f521b236296"),
+    ("wasm/vision_wasm_nosimd_internal.wasm", f"{_MP}/wasm/vision_wasm_nosimd_internal.wasm",
+     "8a3092d34c79d3f57e6ba8592105e8a90f6b07c27891ffecd14cca428bfd3e31"),
+    ("hand_landmarker.task",
+     "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+     "fbc2a30080c3c557093b5ddfc334698132eb341044ccee322ccf8bcf3607cde1"),
 ]
 
 
@@ -315,12 +336,35 @@ def pruefe_fehlerbericht(basis: str, b: Bericht) -> None:
         b.ok.append("Fehlerbericht: Backend sammelt seine Meldungen")
 
 
+def mediapipe_bereitstellen(werkstatt: Path, b: Bericht) -> bool:
+    """Legt die MediaPipe-Dateien in <arbeit>/werkstatt/lib/mediapipe ab (wie GESTEN_HOLEN.bat), prüft SHA256."""
+    import hashlib
+
+    ziel = werkstatt / "lib" / "mediapipe"
+    for name, adresse, pruefsumme in MEDIAPIPE_DATEIEN:
+        datei = ziel / name
+        if datei.is_file() and hashlib.sha256(datei.read_bytes()).hexdigest() == pruefsumme:
+            continue
+        try:
+            r = requests.get(adresse, timeout=120)
+            r.raise_for_status()
+        except requests.RequestException as exc:
+            b.h("Gesten", f"MediaPipe-Datei {name} nicht ladbar ({str(exc)[:120]}) - echte Handerkennung nicht geprüft")
+            return False
+        if hashlib.sha256(r.content).hexdigest() != pruefsumme:
+            b.f("Gesten", f"MediaPipe-Datei {name}: Prüfsumme falsch (Quelle geändert?)")
+            return False
+        datei.parent.mkdir(parents=True, exist_ok=True)
+        datei.write_bytes(r.content)
+    return True
+
+
 def _chromium() -> str | None:
     kandidaten = sorted(glob.glob("/opt/pw-browsers/chromium-*/chrome-linux/chrome"))
     return kandidaten[-1] if kandidaten else None
 
 
-def pruefe_browser(basis: str, b: Bericht, ausgabe: Path) -> None:
+def pruefe_browser(basis: str, b: Bericht, ausgabe: Path, mit_mediapipe: bool = False) -> None:
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
@@ -329,8 +373,10 @@ def pruefe_browser(basis: str, b: Bericht, ausgabe: Path) -> None:
     bilder = ausgabe / "bilder"
     bilder.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as pw:
+        # 15.10.2026: Ersatz-Kamera von Chromium (Testbild, keine Hand) für die Gesten-Prüfung
         start = {"headless": True, "args": ["--autoplay-policy=no-user-gesture-required", "--use-gl=swiftshader",
-                                            "--enable-unsafe-swiftshader"]}
+                                            "--enable-unsafe-swiftshader", "--use-fake-device-for-media-stream",
+                                            "--use-fake-ui-for-media-stream"]}
         pfad = _chromium()
         if pfad:
             start["executable_path"] = pfad
@@ -344,6 +390,10 @@ def pruefe_browser(basis: str, b: Bericht, ausgabe: Path) -> None:
         _auron_chat_pruefen(browser, basis, b, bilder)
         _finanzen_kuendigen_pruefen(browser, basis, b, bilder)
         _agenten_lichter_pruefen(browser, basis, b, bilder)
+        _gesten_rechnen_pruefen(browser, basis, b, bilder)
+        if mit_mediapipe:
+            _gesten_echt_pruefen(browser, basis, b, bilder)
+            _gesten_fotos_pruefen(browser, basis, b)
         browser.close()
 
 
@@ -460,6 +510,220 @@ def _agenten_lichter_pruefen(browser, basis: str, b: Bericht, bilder: Path) -> N
     kontext.close()
 
 
+# Künstliche Hand (21 Punkte) für die Gesten-Prüfung: Zeigefingerspitze landet genau auf (sx, sy) der Seite.
+_HAND_JS = """
+window.__hand = (pose, sx, sy) => {
+  const s = 16 / 9, r = AuronGesten.EINSTELLUNG.rand;
+  const u = { 0: [0, 0], 1: [-0.08, -0.04], 2: [-0.13, -0.08], 3: [-0.17, -0.12], 4: [-0.23, -0.17],
+    5: [-0.05, -0.18], 6: [-0.06, -0.26], 7: [-0.065, -0.31], 8: [-0.07, -0.36],
+    9: [0, -0.19], 10: [0, -0.28], 11: [0, -0.33], 12: [0, -0.38],
+    13: [0.045, -0.18], 14: [0.05, -0.26], 15: [0.052, -0.3], 16: [0.055, -0.34],
+    17: [0.085, -0.16], 18: [0.095, -0.22], 19: [0.1, -0.26], 20: [0.11, -0.29] };
+  if (pose !== "offen") {   // Mittel-, Ring- und kleiner Finger eingerollt, Daumen angelegt
+    Object.assign(u, { 10: [0, -0.25], 11: [0, -0.2], 12: [0, -0.17], 14: [0.05, -0.23], 15: [0.05, -0.19], 16: [0.05, -0.16],
+      18: [0.09, -0.2], 19: [0.09, -0.17], 20: [0.09, -0.14], 3: [-0.06, -0.12], 4: [-0.03, -0.14] });
+  }
+  if (pose === "pinch") u[4] = [u[8][0] + 0.02, u[8][1] + 0.01];
+  if (pose === "faust") Object.assign(u, { 6: [-0.06, -0.24], 7: [-0.05, -0.2], 8: [-0.045, -0.18], 4: [-0.04, -0.19] });
+  const nx = sx / (innerWidth - 1), ny = sy / (innerHeight - 1);
+  const x8 = 1 - r - nx * (1 - 2 * r), y8 = r + ny * (1 - 2 * r);
+  const p = [];
+  for (let i = 0; i < 21; i++) p.push({ x: x8 + (u[i][0] - u[8][0]) / s, y: y8 + (u[i][1] - u[8][1]), z: 0 });
+  return p;
+};
+window.__zeit = 100000;
+window.__bilder = (pose, sx, sy, n) => {
+  for (let i = 0; i < n; i++) { window.__zeit += 67; AuronGesten.verarbeiten(pose ? window.__hand(pose, sx, sy) : null, window.__zeit, 16 / 9); }
+};
+window.__zeiger = () => {
+  const e = document.getElementById("gestenZeiger"), m = /translate\\((-?[\\d.]+)px, ?(-?[\\d.]+)px/.exec(e.style.transform) || [0, NaN, NaN];
+  return { da: e.classList.contains("da"), ueber: e.classList.contains("ueber"), x: +m[1], y: +m[2] };
+};
+"""
+
+
+def _auron_oeffnen(browser, basis: str, kamera: bool = False):
+    kontext = browser.new_context(viewport={"width": 1440, "height": 900}, locale="de-DE",
+                                  permissions=["camera"] if kamera else [])
+    seite = kontext.new_page()
+    seite.goto(basis + "/auron", wait_until="load", timeout=30000)
+    seite.wait_for_timeout(3000)
+    if seite.locator("#tourUeberspringen").is_visible():
+        seite.locator("#tourUeberspringen").click()
+        seite.wait_for_timeout(1200)
+    return kontext, seite
+
+
+def _gesten_rechnen_pruefen(browser, basis: str, b: Bericht, bilder: Path) -> None:
+    """Gesten-Logik mit künstlicher Hand (ohne Kamera, ohne MediaPipe): Zeigen, Pinch = Klick, offene Hand = Zurück."""
+    kontext, seite = _auron_oeffnen(browser, basis)
+    schritt = "Start"
+    try:
+        if not seite.evaluate("!!window.AuronGesten"):
+            raise AssertionError("window.AuronGesten fehlt (werkstatt/gesten/gesten.js nicht geladen)")
+        seite.evaluate(_HAND_JS)
+        k = seite.locator("#knopfBereiche").bounding_box()
+        x, y = k["x"] + k["width"] / 2, k["y"] + k["height"] / 2
+        schritt = "Zeigen"
+        seite.evaluate(f"__bilder('zeigen', {x}, {y}, 5)")
+        z = seite.evaluate("__zeiger()")
+        if not (z["da"] and z["ueber"] and abs(z["x"] - x) <= 3 and abs(z["y"] - y) <= 3):
+            raise AssertionError(f"Punkt nicht auf dem Knopf: {z}, erwartet {round(x)}/{round(y)}")
+        schritt = "Pinch 1 Bild (darf nicht klicken)"
+        seite.evaluate(f"__bilder('pinch', {x}, {y}, 1); __bilder('zeigen', {x}, {y}, 2)")
+        if seite.evaluate("!document.getElementById('schleier').hidden"):
+            raise AssertionError("ein einzelnes Pinch-Bild hat schon geklickt")
+        schritt = "Pinch = Klick"
+        seite.evaluate(f"__bilder('pinch', {x}, {y}, 3); __bilder('zeigen', {x}, {y}, 3)")
+        if seite.evaluate("document.getElementById('schleier').hidden"):
+            raise AssertionError("Pinch hat 'Alle Bereiche' nicht geöffnet")
+        if "Klick" not in seite.evaluate("AuronGesten.info().geste"):
+            raise AssertionError("letzte Geste ist nicht 'Klick'")
+        seite.screenshot(path=str(bilder / "gesten_klick.png"))
+        schritt = "Offene Hand kurz (darf nicht schließen)"
+        seite.evaluate(f"__bilder('offen', {x}, {y}, 6); __bilder('zeigen', {x}, {y}, 2)")
+        if seite.evaluate("document.getElementById('schleier').hidden"):
+            raise AssertionError("offene Hand für 0,4 s hat schon geschlossen")
+        schritt = "Offene Hand halten = Zurück"
+        seite.evaluate(f"__bilder('offen', {x}, {y}, 17)")
+        if not seite.evaluate("document.getElementById('schleier').hidden"):
+            raise AssertionError("offene Hand (1,1 s) hat 'Alle Bereiche' nicht geschlossen")
+        if "Zurück" not in seite.evaluate("AuronGesten.info().geste"):
+            raise AssertionError("letzte Geste ist nicht 'Zurück'")
+        schritt = "Faust (darf nicht klicken)"
+        seite.evaluate(f"__bilder('zeigen', {x}, {y}, 3); __bilder('faust', {x}, {y}, 4); __bilder('zeigen', {x}, {y}, 3)")
+        if not seite.evaluate("document.getElementById('schleier').hidden"):
+            raise AssertionError("eine Faust hat geklickt")
+        schritt = "Hand weg"
+        seite.evaluate("__bilder(null, 0, 0, 12)")
+        if seite.evaluate("__zeiger().da"):
+            raise AssertionError("Punkt bleibt sichtbar, obwohl keine Hand mehr da ist")
+        b.ok.append("Gesten (künstliche Hand): Zeigen, Pinch = Klick, offene Hand = Zurück, kein Fehlklick (1 Bild, Faust)")
+    except Exception as exc:  # noqa: BLE001
+        b.f("Gesten", f"Logik, Schritt '{schritt}': {str(exc).splitlines()[0][:250]}")
+    kontext.close()
+
+
+# Echte Handfotos aus den MediaPipe-Testdaten (gleicher Server wie das Modell): (Datei, Prüfsumme, Erwartung)
+GESTEN_FOTOS = [
+    ("fist.jpg", "43fa1cabf3f90d574accc9a56986e2ee48638ce59fc65af1846487f73bb2ef24", "faust"),
+    ("pointing_up.jpg", "ecf8ca2611d08fa25948a4fc10710af9120e88243a54da6356bacea17ff3e36e", "zeigen"),
+    ("victory.jpg", "84cb8853e3df614e0cb5c93a25e3e2f38ea5e4f92fd428ee7d867ed3479d5764", "zeigen"),
+    ("right_hands.jpg", "4b5134daa4cb60465535239535f9f74c2842aba3aa5fd30bf04ef5678f93d87f", "offen"),
+]
+_FOTO_JS = """async (fotos) => {
+  const mp = await import("/werkstatt/lib/mediapipe/vision_bundle.mjs");
+  const f = await mp.FilesetResolver.forVisionTasks("/werkstatt/lib/mediapipe/wasm");
+  const h = await mp.HandLandmarker.createFromOptions(f, { baseOptions: { modelAssetPath: "/werkstatt/lib/mediapipe/hand_landmarker.task",
+    delegate: "CPU" }, runningMode: "IMAGE", numHands: 2 });
+  const R = AuronGesten.rechnen, E = AuronGesten.EINSTELLUNG, aus = {};
+  for (const [name, daten] of fotos) {
+    const bild = new Image(); bild.src = daten; await bild.decode();
+    const s = bild.naturalWidth / bild.naturalHeight;
+    aus[name] = h.detect(bild).landmarks.map((p) => { const a = R.einordnen(p, s);
+      return a.offen ? "offen" : a.faust ? "faust" : a.pinch < E.pinchAn ? "pinch" : "zeigen"; });
+  }
+  h.close();
+  return aus;
+}"""
+
+
+def _gesten_fotos_pruefen(browser, basis: str, b: Bericht) -> None:
+    """Echtes Modell an echten Händen: Faust darf nie Klick sein, offene Hände müssen als offen gelten."""
+    import base64
+    import hashlib
+
+    fotos = []
+    for name, pruefsumme, _ in GESTEN_FOTOS:
+        try:
+            r = requests.get(f"https://storage.googleapis.com/mediapipe-assets/{name}", timeout=60)
+            r.raise_for_status()
+        except requests.RequestException as exc:
+            b.h("Gesten", f"Testfoto {name} nicht ladbar ({str(exc)[:100]}) - Fotoprüfung übersprungen")
+            return
+        if hashlib.sha256(r.content).hexdigest() != pruefsumme:
+            b.h("Gesten", f"Testfoto {name} hat sich geändert - Fotoprüfung übersprungen")
+            return
+        fotos.append([name, "data:image/jpeg;base64," + base64.b64encode(r.content).decode()])
+    kontext, seite = _auron_oeffnen(browser, basis)
+    try:
+        erg = seite.evaluate(_FOTO_JS, fotos)
+        falsch = [f"{name}: {erg.get(name)} statt {soll}" for name, _, soll in GESTEN_FOTOS
+                  if not erg.get(name) or any(art != soll for art in erg[name])]
+        if falsch:
+            b.f("Gesten", "Fotos falsch eingeordnet: " + "; ".join(falsch))
+        else:
+            b.ok.append("Gesten (echtes Modell, echte Fotos): Faust kein Klick, Zeigen und Victory kein Klick, offene Hände offen")
+        b.zeile("Gesten", "- Fotos: " + ", ".join(f"{k} = {'/'.join(v)}" for k, v in erg.items()))
+    except Exception as exc:  # noqa: BLE001
+        b.f("Gesten", f"Fotoprüfung: {str(exc).splitlines()[0][:250]}")
+    kontext.close()
+
+
+def _gesten_echt_pruefen(browser, basis: str, b: Bericht, bilder: Path) -> None:
+    """Echtes MediaPipe mit der Ersatz-Kamera von Chromium: lädt, höchstens 15/s, Pause bei unsichtbarer Seite,
+    Sprachbefehl aus, und mit Gesten an geht eine normale Frage NICHT an Claude (/api/kamera/sehen)."""
+    kontext, seite = _auron_oeffnen(browser, basis, kamera=True)
+    anfragen: list[str] = []
+    seite.on("request", lambda r: anfragen.append(r.url))
+    fehler: list[str] = []
+    seite.on("pageerror", lambda e: fehler.append(str(e)))
+    schritt = "Knopf Gesten"
+    try:
+        seite.click("#gestenKnopf")
+        seite.wait_for_function("AuronGesten.info().an || /nicht|fehlen/.test(document.getElementById('hinweis').textContent)",
+                                timeout=90000)
+        if not seite.evaluate("AuronGesten.info().an"):
+            raise AssertionError("startet nicht: " + seite.inner_text("#hinweis"))
+        schritt = "Auswertungen"
+        seite.wait_for_timeout(4000)   # ohne Grafikkarte (Cloud) ca. 0,3 s je Auswertung, am PC mit Grafikkarte viel schneller
+        i = seite.evaluate("AuronGesten.info()")
+        if i["gesamt"] < 3 or i["proSekunde"] > 15:
+            raise AssertionError(f"{i['gesamt']} Auswertungen in 4 s, {i['proSekunde']} pro Sekunde (erwartet mind. 3, höchstens 15/s)")
+        anzeige = seite.inner_text("#gestenAnzeige")
+        if "/s" not in anzeige or not seite.is_visible("#kamera") or seite.inner_text("#kameraStatus") != "Gesten an":
+            raise AssertionError(f"Anzeige fehlt: '{anzeige}', Status '{seite.inner_text('#kameraStatus')}'")
+        b.zeile("Gesten", f"- Ersatz-Kamera: {i['proSekunde']} Auswertungen/s, {i['rechner']}, {i['msJeAuswertung']} ms je Auswertung, "
+                          f"Anzeige: {anzeige.replace(chr(10), ' / ')}")
+        seite.screenshot(path=str(bilder / "gesten_an.png"))
+        schritt = "Pause bei unsichtbarer Seite"
+        seite.evaluate("Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'hidden' });"
+                       " document.dispatchEvent(new Event('visibilitychange'))")
+        seite.wait_for_timeout(1500)
+        i = seite.evaluate("AuronGesten.info()")
+        seite.wait_for_timeout(1500)
+        if not i["pause"] or i["proSekunde"] != 0 or seite.evaluate("AuronGesten.info().gesamt") != i["gesamt"]:
+            raise AssertionError(f"keine Pause: {i}")
+        seite.evaluate("Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'visible' });"
+                       " document.dispatchEvent(new Event('visibilitychange'))")
+        seite.wait_for_function(f"AuronGesten.info().gesamt >= {i['gesamt'] + 2}", timeout=15000)   # läuft weiter
+        schritt = "Frage mit Gesten an (kein Claude-Bild)"
+        seite.fill("#frage", "Was ist 6 mal 7?")
+        seite.press("#frage", "Enter")
+        seite.wait_for_function("document.body.innerText.includes('42')", timeout=30000)
+        if any("/api/kamera/sehen" in a for a in anfragen):
+            raise AssertionError("Frage ging mit Kamerabild an Claude, obwohl nur Gesten an sind")
+        schritt = "Sprachbefehl 'Auron, Gesten aus'"
+        seite.wait_for_timeout(1500)
+        chat_vorher = sum("/api/chat" in a for a in anfragen)
+        seite.fill("#frage", "Auron, Gesten aus")
+        seite.press("#frage", "Enter")
+        seite.wait_for_function("!AuronGesten.info().an && document.getElementById('kamera').hidden", timeout=10000)
+        if sum("/api/chat" in a for a in anfragen) != chat_vorher or "Gesten sind aus" not in seite.inner_text("#verlaufInnen"):
+            raise AssertionError("'Gesten aus' ging an den Chat statt an die Gesten-Weiche")
+        if fehler:
+            raise AssertionError(f"JavaScript-Fehler: {fehler[0][:200]}")
+        b.ok.append("Gesten (echtes MediaPipe, Ersatz-Kamera): lädt, höchstens 15/s, Pause bei unsichtbarer Seite, "
+                    "kein Bild an Claude, 'Gesten aus' per Satz")
+    except Exception as exc:  # noqa: BLE001
+        try:
+            seite.screenshot(path=str(bilder / "gesten_fehler.png"))
+        except Exception:  # noqa: BLE001
+            pass
+        b.f("Gesten", f"MediaPipe, Schritt '{schritt}': {str(exc).splitlines()[0][:250]}")
+    kontext.close()
+
+
 def pruefe_protokoll(log: Path, b: Bericht) -> None:
     text = log.read_text(encoding="utf-8", errors="replace") if log.exists() else ""
     zeilen = text.splitlines()
@@ -524,6 +788,7 @@ def main(argv: list[str] | None = None) -> int:
     server = None
     try:
         pfade = arbeitsordner_bauen(arbeit)
+        mit_mediapipe = not a.ohne_browser and mediapipe_bereitstellen(arbeit / "werkstatt", b)
         server, ollama_url = ersatz_ollama.starten()
         suchmodell = None if a.suchmodell == "aus" else a.suchmodell
         port = _freier_port()
@@ -547,7 +812,7 @@ def main(argv: list[str] | None = None) -> int:
             pruefe_fehlerbericht(basis, b)
             if not a.ohne_browser:
                 print("[Prüfstand] Browser ...", flush=True)
-                pruefe_browser(basis, b, ausgabe)
+                pruefe_browser(basis, b, ausgabe, mit_mediapipe)
             b.zeile("Ersatz-KI", f"- {len(ersatz_ollama.ANFRAGEN)} Anfragen an das Ersatz-Modell (statt Ollama)")
     finally:
         if proc and proc.poll() is None:
