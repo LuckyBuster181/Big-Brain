@@ -312,6 +312,11 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--metall); ou
 .kamera-kopf { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 10px; font-size: 12px; color: var(--leise); }
 .kamera-kopf button { background: transparent; border: 1px solid var(--rand); border-radius: 999px; padding: 3px 12px; color: var(--text); font-size: 12px; }
 .kamera.sieht { border-color: var(--gruen); }
+/* Gesten (15.10.2026): Anzeige im Kamerafenster, Knopf leuchtet, solange Gesten an sind */
+.kamera-gesten { padding: 0 10px 7px; font-size: 11.5px; color: var(--leise); line-height: 1.4; }
+.kamera-gesten b { color: var(--text); font-weight: 600; }
+@media (max-width: 520px) { #gestenKnopf { display: none; } }   /* Handy: Eingabe bleibt breit genug, Sprachbefehl geht weiter */
+.mikro[aria-pressed="true"] { box-shadow: 0 0 0 3px color-mix(in srgb, var(--metall) 55%, transparent), 0 0 18px color-mix(in srgb, var(--glut) 45%, transparent); }
 @media (max-width: 600px) { .kamera { width: 150px; right: 10px; bottom: 120px; } }
 </style>
 </head>
@@ -395,6 +400,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--metall); ou
         <svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
       <button class="mikro" id="kameraKnopf" type="button" aria-label="Auron schaut" title="Auron schaut: Kamera an, Auron beschreibt, was er sieht">
         <svg viewBox="0 0 24 24"><path d="M3 8h3l2-3h8l2 3h3v11H3z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
+      <button class="mikro" id="gestenKnopf" type="button" aria-pressed="false" aria-label="Gesten" title="Gesten: Seite mit der Hand bedienen (Zeigefinger zeigt, Daumen und Zeigefinger zusammen klickt, offene Hand halten = Zurück)">
+        <svg viewBox="0 0 24 24"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V11M11 10V4.5a1.5 1.5 0 0 1 3 0V11M14 10.5V6a1.5 1.5 0 0 1 3 0v7.5a6.5 6.5 0 0 1-12.2 3.1L3.4 14a1.5 1.5 0 0 1 2.4-1.8L8 14.5"/></svg></button>
       <button class="mikro" id="mikro" type="button" aria-label="Sprechen" title="Sprechen">
         <svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
     </form>
@@ -454,7 +461,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--metall); ou
 <!-- Kamera-Modus (10.10.2026): "Auron, schau zu" / "Kamera aus" -->
 <div class="kamera" id="kamera" hidden role="region" aria-label="Kamera">
   <video id="kameraBild" autoplay muted playsinline></video>
-  <div class="kamera-kopf"><span id="kameraStatus">Kamera an</span><button type="button" id="kameraZu" title="Kamera ausschalten">Aus</button></div>
+  <div class="kamera-kopf"><span id="kameraStatus">Kamera an</span><button type="button" id="kameraZu" title="Kamera und Gesten ausschalten">Aus</button></div>
+  <div class="kamera-gesten" id="gestenAnzeige" hidden aria-live="off"></div>
 </div>
 
 <!-- Fehleranzeige (05.10.2026): Mini-PC oder lokale KI nicht erreichbar -->
@@ -464,6 +472,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--metall); ou
   <button type="button" id="warnungPruefen">Erneut prüfen</button>
 </div>
 
+<!-- Gesten (15.10.2026): Handtracking lokal im Browser, MediaPipe aus werkstatt/lib/mediapipe (GESTEN_HOLEN.bat) -->
+<script src="/werkstatt/gesten/gesten.js"></script>
 <script>
 "use strict";
 const NAME = "Auron";
@@ -1040,8 +1050,15 @@ const kamera = { an: false, strom: null, verlauf: [] };
 const KAMERA_AN = /^\s*(?:(?:auron|jarvis)[,\s]+)?(?:bitte\s+)?(?:(?:schau|guck|sieh|kuck)\w*\s+(?:(?:mal|bitte)\s+)?(?:zu|hier(?:hin|her)?|her|hin|mal)\b(?!\s+(?:im|ins|in|nach)\b)|(?:schalt|mach|start|öffn|oeffn)\w*\s+(?:die\s+|deine\s+)?kamera(?:\s+(?:an|auf|ein))?\b|kamera(?:\s*-?\s*modus)?\s+(?:an|auf|ein|starten)\b)[\s,.:;!?-]*/i;
 const KAMERA_AUS = /\bkamera\s*-?\s*(?:aus\w*|zu\b|stopp?\b|beenden)|(?:schau|guck)\w*\s+(?:jetzt\s+)?weg\b|hör\w*\s+auf\s+(?:zu\s+)?(?:schauen|gucken|zuzuschauen)|schau\w*\s+nicht\s+mehr/i;
 function kameraStatusSetzen(t) { $("kameraStatus").textContent = t; }
-async function kameraAn() {
-  if (kamera.an) return;
+/* 15.10.2026 (Gesten): Kamera-Modus und Gesten teilen sich einen Kamera-Strom. Er läuft, solange einer von beiden an ist.
+   Nur Gesten an = kamera.an bleibt false, Sätze gehen also NICHT mit Bild an Claude. */
+function kameraKopfText() { return kamera.an && gesten.an ? "Kamera und Gesten an" : gesten.an ? "Gesten an" : "Kamera an"; }
+function kameraStromAn() {
+  if (kamera.strom) return Promise.resolve();
+  if (!kamera.oeffnet) kamera.oeffnet = kameraStromOeffnen().finally(() => { kamera.oeffnet = null; });   // Kamera und Gesten gleichzeitig: nur ein Strom
+  return kamera.oeffnet;
+}
+async function kameraStromOeffnen() {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error("Dieser Browser erlaubt hier keine Kamera. Auron muss über localhost oder https geöffnet sein.");
   try { kamera.strom = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false }); }
   catch (e) {
@@ -1053,13 +1070,22 @@ async function kameraAn() {
   const v = $("kameraBild"); v.srcObject = kamera.strom;
   try { await v.play(); } catch (e) {}
   for (let i = 0; i < 30 && !v.videoWidth; i++) await warte(100);
-  const spur = kamera.strom.getVideoTracks()[0]; if (spur) spur.onended = () => kameraAus();   // Kabel gezogen
-  kamera.an = true; kamera.verlauf = []; kameraStatusSetzen("Kamera an"); $("kamera").hidden = false;
+  const spur = kamera.strom.getVideoTracks()[0]; if (spur) spur.onended = () => { gestenAus(); kameraAus(); };   // Kabel gezogen
+  $("kamera").hidden = false;
+}
+function kameraStromAus() {
+  if (kamera.an || gesten.an || gesten.laedt) return;   // wird noch gebraucht
+  if (kamera.strom) { kamera.strom.getTracks().forEach((t) => t.stop()); kamera.strom = null; }
+  $("kameraBild").srcObject = null; $("kamera").hidden = true;
+}
+async function kameraAn() {
+  if (kamera.an) return;
+  await kameraStromAn();
+  kamera.an = true; kamera.verlauf = []; kameraStatusSetzen(kameraKopfText());
 }
 function kameraAus() {
-  if (kamera.strom) { kamera.strom.getTracks().forEach((t) => t.stop()); kamera.strom = null; }
-  $("kameraBild").srcObject = null; $("kamera").hidden = true; $("kamera").classList.remove("sieht");
-  kamera.an = false; kamera.verlauf = [];
+  kamera.an = false; kamera.verlauf = []; $("kamera").classList.remove("sieht");
+  kameraStromAus(); kameraStatusSetzen(kameraKopfText());
 }
 function kameraBild() {
   const v = $("kameraBild"); if (!v.videoWidth) return null;
@@ -1097,7 +1123,7 @@ async function kameraWeiche(text, warteAufStimme) {
           body: JSON.stringify({ frage, bild, verlauf: kamera.verlauf }) });
         d = await r.json().catch(() => ({}));
         if (!r.ok) throw new Error(typeof d.detail === "string" ? d.detail : "Das Backend antwortet mit Status " + r.status + ".");
-      } finally { $("kamera").classList.remove("sieht"); if (kamera.an) kameraStatusSetzen("Kamera an"); }
+      } finally { $("kamera").classList.remove("sieht"); if (kamera.an) kameraStatusSetzen(kameraKopfText()); }
       sagen = d.text || "Ich sehe nichts Auffälliges, Sir.";
       kamera.verlauf = kamera.verlauf.concat([{ role: "user", content: frage || "Beschreibe kurz, was du siehst." }, { role: "assistant", content: sagen }]).slice(-6);
       const h = document.createElement("div"); h.className = "herkunft claude";
@@ -1116,15 +1142,97 @@ async function kameraWeiche(text, warteAufStimme) {
   } finally { beschaeftigt = false; $("senden").disabled = false; denkt(false); }
   return true;
 }
-$("kameraZu").addEventListener("click", () => { kameraAus(); hinweis("Die Kamera ist aus."); });
+$("kameraZu").addEventListener("click", () => { const g = gesten.an; gestenAus(); kameraAus(); hinweis(g ? "Kamera und Gesten sind aus." : "Die Kamera ist aus."); });
 /* 11.10.2026 (Sir): Knopf "Auron schaut" - gleicher Weg wie der Sprachbefehl "Auron, schau mal hier". */
 $("kameraKnopf").addEventListener("click", () => { if (kamera.an) senden("Auron, beschreibe, was du siehst"); else senden("Auron, schau mal hier"); });
-window.addEventListener("pagehide", kameraAus);
+window.addEventListener("pagehide", () => { gestenAus(); kameraAus(); });
+
+/* =========================== Gesten (15.10.2026) ===========================
+   Wunsch Sir: Auron-Seite mit der Hand bedienen. Erkennung komplett lokal im Browser (werkstatt/gesten/gesten.js,
+   MediaPipe Hand Landmarker), kein Bild an Claude, keine Kosten. Knopf "Gesten" oder "Auron, Gesten an/aus".
+   Zeigefinger = Punkt, Daumen + Zeigefinger zusammen = Klick, offene Hand ca. 1 s halten = Zurück/Schließen.
+   Steuert nur diese Seite, nicht den Windows-Bildschirm. UNGETESTET AM GERÄT (Webcam von Sir). */
+const gesten = { an: false, laedt: false };
+const GESTEN_BEFEHL = /^\s*(?:(?:auron|jarvis)[,\s]+)?(?:bitte\s+)?(?:(?:schalt|mach)\w*\s+(?:die\s+)?)?g(?:e|ä)sten(?:\s*-?\s*(?:modus|steuerung))?\s+(an|ein|aus|ab|starten|beenden|stopp?)\b[\s,.!?]*$/i;
+function gestenKnopfZeigen() {
+  $("gestenKnopf").setAttribute("aria-pressed", String(gesten.an || gesten.laedt));
+  $("gestenAnzeige").hidden = !(gesten.an || gesten.laedt);
+}
+function gestenAnzeigen(i) {
+  if (!gesten.an && !gesten.laedt) return;
+  const el = $("gestenAnzeige");
+  if (gesten.laedt && !i.an) { el.textContent = "Gesten laden …"; return; }
+  el.innerHTML = i.pause ? "Pause: Seite nicht sichtbar" :
+    "Hand: <b>" + (i.hand ? "erkannt" : "keine") + "</b> · <b>" + i.proSekunde + "</b>/s" + (i.rechner ? " · " + i.rechner : "") +
+    "<br>Geste: <b>" + esc(i.geste) + "</b>";
+}
+// Offene Hand: gleiche Reihenfolge wie Esc, dazu Universum und Tour
+function zurueckOderSchliessen() {
+  if (!$("schleier").hidden || !$("chatsSchleier").hidden) { $("schleier").hidden = true; $("chatsSchleier").hidden = true; return "Fenster geschlossen"; }
+  if (!$("modul").hidden) { modulSchliessen(); return "Bereich geschlossen"; }
+  if (frei.aktiv) { freiZuMachen(); return "Universum geschlossen"; }
+  if (tour.laeuft) { tourEnde(); return "Tour beendet"; }
+  return "";
+}
+async function gestenAn() {
+  if (gesten.an || gesten.laedt) return;
+  if (!window.AuronGesten) throw new Error("Das Gesten-Modul fehlt (werkstatt/gesten/gesten.js). Bitte REPO HOLEN.bat starten, dann Strg+F5.");
+  gesten.laedt = true; gestenKnopfZeigen(); gestenAnzeigen({});
+  try {
+    await kameraStromAn();
+    await AuronGesten.starten($("kameraBild"));
+    if (!gesten.laedt) return;   // während des Ladens ausgeschaltet
+    gesten.an = true;
+  } catch (e) {
+    AuronGesten.stoppen(); throw e;
+  } finally {
+    gesten.laedt = false; gestenKnopfZeigen(); kameraStromAus(); kameraStatusSetzen(kameraKopfText()); gestenAnzeigen(AuronGesten.info());
+  }
+}
+function gestenAus() {
+  if (!gesten.an && !gesten.laedt) return;
+  if (window.AuronGesten) AuronGesten.stoppen();
+  gesten.an = false; gesten.laedt = false;
+  gestenKnopfZeigen(); kameraStromAus(); kameraStatusSetzen(kameraKopfText());
+}
+async function gestenUmschalten(an) {
+  const vorher = gesten.an || gesten.laedt;
+  if (an === undefined) an = !vorher;
+  if (!an) { gestenAus(); return vorher ? "Gesten sind aus, Sir." : "Gesten waren schon aus, Sir."; }
+  if (gesten.an) return "Gesten sind schon an, Sir.";
+  await gestenAn();
+  if (!gesten.an) return "Gesten sind aus, Sir.";
+  return "Gesten sind an, Sir. Zeigefinger zeigt, Daumen und Zeigefinger zusammen klickt, offene Hand kurz halten geht zurück.";
+}
+if (window.AuronGesten) AuronGesten.einrichten({ zurueck: zurueckOderSchliessen, anzeige: gestenAnzeigen,
+  fehler: (t) => { gestenAus(); hinweis(t); } });
+$("gestenKnopf").addEventListener("click", async () => {
+  try { hinweis(await gestenUmschalten()); } catch (e) { gestenAus(); hinweis("Gesten gehen nicht, Sir: " + e.message); }
+});
+/* Sprachbefehl "Auron, Gesten an/aus": ohne KI, 0 Cent. Gibt true zurück, wenn der Satz hier erledigt wurde. */
+async function gestenWeiche(text, warteAufStimme) {
+  const m = GESTEN_BEFEHL.exec(text);
+  if (!m) return false;
+  const an = /^(an|ein|starten)$/i.test(m[1]);
+  if (!warteAufStimme) wachStoppen();
+  verstummen(); hinweis("");
+  nachricht("ich", text);
+  const blase = nachricht("auron", ""); blase.textContent = "";
+  const inhalt = document.createElement("div"); blase.appendChild(inhalt);
+  let sagen;
+  try { sagen = await gestenUmschalten(an); }
+  catch (e) { gestenAus(); blase.classList.add("fehler"); sagen = "Gesten gehen nicht, Sir: " + e.message; }
+  inhalt.innerHTML = formatieren(sagen);
+  flussStart(); flussText(sagen, true);
+  if (warteAufStimme) await flussEnde();
+  return true;
+}
 
 async function senden(text, warteAufStimme, optionen) {
   text = String(text || "").trim();
   const opt = optionen || {};
   if (!text || beschaeftigt) return;
+  if (!opt.nachfrage && GESTEN_BEFEHL.test(text) && await gestenWeiche(text, warteAufStimme)) return;   // Gesten (15.10.2026), vor der Kamera-Weiche
   if (!opt.nachfrage && (kamera.an || KAMERA_AN.test(text) || (KAMERA_AUS.test(text) && text.length <= 30)) && await kameraWeiche(text, warteAufStimme)) return;   // Kamera-Modus (10.10.2026)
   beschaeftigt = true; $("senden").disabled = true; hinweis(""); denkt(true); flussStart();   // Satz für Satz sprechen
   if (!warteAufStimme) wachStoppen();   // getippte Frage: Dauerhören kurz aus, der Wächter startet es danach

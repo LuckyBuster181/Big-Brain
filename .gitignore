@@ -27,3 +27,7 @@ node_modules/
 .idea/
 Thumbs.db
 .DS_Store
+
+# Gesten (15.10.2026): MediaPipe-Dateien und Handmodell holt werkstatt/GESTEN_HOLEN.bat, nicht ins Repo
+/werkstatt/lib/mediapipe/
+/werkstatt/gesten_holen_bericht.txt
