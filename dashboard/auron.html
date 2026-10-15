@@ -1163,7 +1163,9 @@ function gestenAnzeigen(i) {
   const el = $("gestenAnzeige");
   if (gesten.laedt && !i.an) { el.textContent = "Gesten laden …"; return; }
   el.innerHTML = i.pause ? "Pause: Seite nicht sichtbar" :
-    "Hand: <b>" + (i.hand ? "erkannt" : "keine") + "</b> · <b>" + i.proSekunde + "</b>/s" + (i.rechner ? " · " + i.rechner : "") +
+    "Hand: <b>" + (i.hand ? "erkannt" : "keine") + "</b> · <b>" + i.proSekunde + "</b>/s" + (i.rechner ? " · " + i.rechner + " " + i.msJeAuswertung + " ms" : "") +
+    (i.hand && i.abstand != null && isFinite(i.abstand) ? "<br>Pinch: <b>" + i.abstand.toFixed(2).replace(".", ",") + "</b> (Klick unter " + String(i.klickUnter).replace(".", ",") + ")" :
+      i.hand && i.abstand === Infinity ? "<br>Pinch: <b>Faust</b> (kein Klick)" : "") +
     "<br>Geste: <b>" + esc(i.geste) + "</b>";
 }
 // Offene Hand: gleiche Reihenfolge wie Esc, dazu Universum und Tour

@@ -14,7 +14,11 @@ Von Sir zurueckgestellt ("machen wir wann anders"). Naechste Sitzung: Sir fragen
 
 3. **Gesten: naechste Schritte** (Stand 15.10.2026, erster Schritt fertig)
    - Erst am PC testen: Schwellen und Glaettung in werkstatt/gesten/gesten.js (EINSTELLUNG) mit Sirs Webcam.
-   - Spaeter: ganzen Windows-Bildschirm steuern (ueber den PC-Agenten), Scrollen per Geste.
+   - Wunsch Sir 16.10.: ganzen PC steuern, nicht nur Auron. Geht nicht aus dem Browser heraus (Browser darf die
+     Windows-Maus nicht bewegen). Braucht ein eigenes kleines Programm auf dem PC (Kamera + Maus), Start per .bat.
+   - Gesten so, wie ein Mensch es intuitiv macht (Wischen, Greifen, Scrollen); Vorbilder Meta Quest / Apple Vision.
+   - Wunsch Sir 16.10.: ganze Hand wischen (z. B. Fenster/Bereich wechseln). Erst wenn der Klick am PC sicher geht.
+   - Idee Sir: Auron auf der Meta Quest (VR-Brille, WebXR im Quest-Browser). Eigenes Projekt, spaeter.
 
 ## Erledigt am 10.10.2026 (zur Einordnung)
 - Sucher und Schreiber (Agenten-Station, Chat-Befehl "Such und schreib: ...").

@@ -4,7 +4,10 @@
    und kommen einmalig über werkstatt/GESTEN_HOLEN.bat. Kein Bild verlässt den PC, kein Claude, keine Kosten.
 
    Gesten (erster Schritt, nur die Auron-Seite, nicht der Windows-Bildschirm):
-   - Zeigefinger      = Zeiger (sichtbarer Punkt auf der Seite)
+   - Hand bewegen     = Zeiger (sichtbarer Punkt). 16.10.2026 (Sir: "klickt nicht, hängt manchmal", "wie bei Meta Quest"):
+                        Der Punkt folgt jetzt den Fingerknöcheln statt der Zeigefingerspitze. Die Knöchel bewegen sich beim
+                        Pinch kaum, deshalb muss der Punkt nicht mehr anhalten (das war das "Hängen"). Der innere Punkt
+                        schrumpft, je näher Daumen und Zeigefinger kommen (wie bei der Quest).
    - Daumen + Zeigefinger zusammen (Pinch) = Klick an der Stelle des Punktes (auch in Bereichsfenstern)
    - Offene Hand ca. 1 s halten = Zurück/Schließen (Ring um den Punkt zeigt den Fortschritt)
    Leistung: höchstens 15 Auswertungen pro Sekunde, Pause, solange die Seite unsichtbar ist.
@@ -18,11 +21,11 @@
   const DATEIEN = { bibliothek: ORDNER + "/vision_bundle.mjs", wasm: ORDNER + "/wasm", modell: ORDNER + "/hand_landmarker.task" };
   const EINSTELLUNG = {
     maxProSekunde: 15,     // Auswertungen je Sekunde (Obergrenze)
-    rand: 0.15,            // so viel vom Kamerabild je Seite zählt nicht (Hand muss nicht bis an den Bildrand)
-    pinchAn: 0.33,         // Abstand Daumen-Zeigefinger / Handgröße: darunter = zusammen
-    pinchAus: 0.48,        // darüber = wieder offen (Abstand zu pinchAn verhindert Flattern)
-    pinchVorstufe: 0.5,    // darunter bleibt der Punkt stehen, damit der Klick nicht verrutscht
-    faustGrenze: 0.35,     // Zeigefingerspitze näher am Grundgelenk (je Handgröße) = Faust, nie Klick (Faust-Foto: 0,19)
+    rand: 0.2,             // so viel vom Kamerabild je Seite zählt nicht (kleine Handbewegung = ganze Seite)
+    pinchAn: 0.4,          // Abstand Daumen-Zeigefinger / Handgröße: darunter = zusammen (16.10.: vorher 0,33, zu streng)
+    pinchAus: 0.55,        // darüber = wieder offen (Abstand zu pinchAn verhindert Flattern)
+    pinchSkala: 0.9,       // ab hier schrumpft der Punkt sichtbar (Rückmeldung wie bei der Quest)
+    faustGrenze: 0.25,     // Zeigefingerspitze näher am Grundgelenk (je Handgröße) = Faust, nie Klick (Faust-Foto: 0,19)
     pinchBilder: 2,        // so viele Auswertungen in Folge zusammen, dann erst Klick (gegen Fehlklicks)
     klickPause: 400,       // ms zwischen zwei Klicks
     offenHalten: 1000,     // ms offene Hand halten = Zurück
@@ -50,6 +53,10 @@
   // 15.10.2026: Bei einer Faust liegt der Daumen auch auf dem Zeigefinger (Abstand wie beim Pinch). Geprüft an
   // MediaPipe-Testfotos: Faust 0,19, Zeigen 0,86, offene Hand 1,14 (Zeigefingerspitze bis Grundgelenk / Handgröße).
   function faust(p, s) { return abstand(p[8], p[5], s) / handgroesse(p, s) < EINSTELLUNG.faustGrenze; }
+  // Ankerpunkt für den Zeiger: Mitte der vier Fingerknöchel (5, 9, 13, 17), bleibt beim Pinch fast still
+  function knoechel(p) {
+    return { x: (p[5].x + p[9].x + p[13].x + p[17].x) / 4, y: (p[5].y + p[9].y + p[13].y + p[17].y) / 4 };
+  }
   function einordnen(p, s) {
     const f = faust(p, s);
     return { faust: f, pinch: f ? Infinity : pinchVerhaeltnis(p, s), offen: !f && offeneHand(p, s) };
@@ -97,8 +104,9 @@
       "background:conic-gradient(var(--metall,#d0d5de) calc(var(--halten,0)*1turn),transparent 0);will-change:transform}" +
       ".gesten-zeiger::after{content:'';width:16px;height:16px;border-radius:50%;background:var(--glut,#b8333a);" +
       "border:2px solid var(--kugel-licht,#fff);box-shadow:0 0 14px var(--glut,#b8333a)}" +
+      ".gesten-zeiger::after{transform:scale(calc(1 - var(--pinch,0)*.5));transition:transform .08s}" +
       ".gesten-zeiger.da{opacity:.95}.gesten-zeiger.ueber::after{width:22px;height:22px}" +
-      ".gesten-zeiger.zu::after{background:var(--metall,#d0d5de);transform:scale(.75)}" +
+      ".gesten-zeiger.zu::after{background:var(--metall,#d0d5de)}" +
       ".gesten-zeiger.klick::after{box-shadow:0 0 0 10px color-mix(in srgb,var(--metall,#d0d5de) 35%,transparent)}";
     document.head.appendChild(stil);
     zeiger = document.createElement("div");
@@ -106,12 +114,13 @@
     document.body.appendChild(zeiger);
     return zeiger;
   }
-  function zeigerZeichnen(sichtbar, ueber, halten) {
+  function zeigerZeichnen(sichtbar, ueber, halten, pinch) {
     const el = zeigerBauen();
     el.classList.toggle("da", !!sichtbar);
     if (!sichtbar) return;
     el.style.transform = "translate(" + Math.round(z.x) + "px," + Math.round(z.y) + "px)";
     el.style.setProperty("--halten", String(halten || 0));
+    el.style.setProperty("--pinch", (pinch || 0).toFixed(2));
     el.classList.toggle("ueber", !!ueber);
     el.classList.toggle("zu", z.pinch);
   }
@@ -158,7 +167,7 @@
   /* ---------------- Eine Auswertung verarbeiten ---------------- */
   function gesteMerken(t) { z.geste = t; anzeigen(true); }
   function handWeg(jetzt) {
-    z.hand = false; z.pinch = false; z.pinchZaehler = 0; z.offenSeit = null; z.offenErledigt = false;
+    z.hand = false; z.pinch = false; z.abstand = null; z.pinchZaehler = 0; z.offenSeit = null; z.offenErledigt = false;
     if (jetzt - z.zuletztHand > EINSTELLUNG.handWeg) { zeigerZeichnen(false); fx.leeren(); fy.leeren(); z.x = z.y = null; }
   }
   // punkte = 21 Handpunkte oder null (keine Hand); jetzt = Zeit in ms; seiten = Breite/Höhe des Kamerabilds
@@ -167,8 +176,9 @@
     const s = seiten || 16 / 9;
     z.hand = true; z.zuletztHand = jetzt;
     const art = einordnen(punkte, s), v = art.pinch, offen = art.offen;
-    const roh = aufSchirm(punkte[8], window.innerWidth, window.innerHeight);
-    if (z.x == null || !(z.pinch || v < EINSTELLUNG.pinchVorstufe)) { z.x = fx.filtern(roh.x, jetzt); z.y = fy.filtern(roh.y, jetzt); }
+    z.abstand = v;
+    const roh = aufSchirm(knoechel(punkte), window.innerWidth, window.innerHeight);
+    z.x = fx.filtern(roh.x, jetzt); z.y = fy.filtern(roh.y, jetzt);
     // Pinch = Klick (einmal je Zusammenführen)
     if (!z.pinch) {
       if (v < EINSTELLUNG.pinchAn) {
@@ -198,7 +208,8 @@
     } else { z.offenSeit = null; z.offenErledigt = false; }
     let ueber = false;
     try { ueber = !!klickbar(zielAn(z.x, z.y).el); } catch (e) { ueber = false; }
-    zeigerZeichnen(true, ueber, halten);
+    const E = EINSTELLUNG, pinch = z.pinch ? 1 : Math.min(1, Math.max(0, (E.pinchSkala - v) / (E.pinchSkala - E.pinchAn)));
+    zeigerZeichnen(true, ueber, halten, pinch);
     anzeigen(false);
   }
 
@@ -210,7 +221,7 @@
   }
   function info() {
     return { an: z.an, pause: z.pause, hand: z.hand, proSekunde: z.an && !z.pause ? rate() : 0, geste: z.geste,
-      laedt: !!z.laden && !z.landmarker, rechner: z.rechner, msJeAuswertung: Math.round(z.dauer), gesamt: z.anzahl, version: VERSION };
+      laedt: !!z.laden && !z.landmarker, rechner: z.rechner, msJeAuswertung: Math.round(z.dauer), gesamt: z.anzahl, abstand: z.abstand, klickUnter: EINSTELLUNG.pinchAn, version: VERSION };
   }
   function anzeigen(sofort) {
     const t = performance.now();
@@ -306,6 +317,6 @@
   }
   window.AuronGesten = {
     VERSION, EINSTELLUNG, einrichten, starten, stoppen, verarbeiten, info,
-    rechnen: { abstand, pinchVerhaeltnis, fingerGestreckt, daumenGestreckt, offeneHand, faust, einordnen, aufSchirm, EinEuro }
+    rechnen: { abstand, knoechel, pinchVerhaeltnis, fingerGestreckt, daumenGestreckt, offeneHand, faust, einordnen, aufSchirm, EinEuro }
   };
 })();
