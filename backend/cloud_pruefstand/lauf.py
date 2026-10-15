@@ -510,7 +510,7 @@ def _agenten_lichter_pruefen(browser, basis: str, b: Bericht, bilder: Path) -> N
     kontext.close()
 
 
-# Künstliche Hand (21 Punkte) für die Gesten-Prüfung: Zeigefingerspitze landet genau auf (sx, sy) der Seite.
+# Künstliche Hand (21 Punkte) für die Gesten-Prüfung: Mitte der Fingerknöchel landet genau auf (sx, sy) der Seite.
 _HAND_JS = """
 window.__hand = (pose, sx, sy) => {
   const s = 16 / 9, r = AuronGesten.EINSTELLUNG.rand;
@@ -525,10 +525,12 @@ window.__hand = (pose, sx, sy) => {
   }
   if (pose === "pinch") u[4] = [u[8][0] + 0.02, u[8][1] + 0.01];
   if (pose === "faust") Object.assign(u, { 6: [-0.06, -0.24], 7: [-0.05, -0.2], 8: [-0.045, -0.18], 4: [-0.04, -0.19] });
+  // 16.10.2026: Zeiger folgt der Mitte der Fingerknöchel (5, 9, 13, 17) - die landet genau auf (sx, sy)
+  const ax = (u[5][0] + u[9][0] + u[13][0] + u[17][0]) / 4, ay = (u[5][1] + u[9][1] + u[13][1] + u[17][1]) / 4;
   const nx = sx / (innerWidth - 1), ny = sy / (innerHeight - 1);
-  const x8 = 1 - r - nx * (1 - 2 * r), y8 = r + ny * (1 - 2 * r);
+  const xa = 1 - r - nx * (1 - 2 * r), ya = r + ny * (1 - 2 * r);
   const p = [];
-  for (let i = 0; i < 21; i++) p.push({ x: x8 + (u[i][0] - u[8][0]) / s, y: y8 + (u[i][1] - u[8][1]), z: 0 });
+  for (let i = 0; i < 21; i++) p.push({ x: xa + (u[i][0] - ax) / s, y: ya + (u[i][1] - ay), z: 0 });
   return p;
 };
 window.__zeit = 100000;
