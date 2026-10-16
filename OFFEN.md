@@ -28,6 +28,12 @@ Von Sir zurueckgestellt ("machen wir wann anders"). Naechste Sitzung: Sir fragen
      Zugangsdaten und Test in `projekt-aufgaben/UEBERGABE P24b.md`. Unklar: ob de-DE und Entwicklungsmodus das Ereignis zustellen.
    - Offene Fragen an Sir: GPU-Deckel (40 EUR oder 40 $, harte Obergrenze 60 EUR?), Modell (70B oder bei qwen3-coder:30b bleiben).
 
+5. **Piper-Stimme auf dem Mini-PC (P05)** (Stand 16.10.2026, gebaut, am Mini-PC ungetestet)
+   - Sir: REPO HOLEN, JARVIS STARTEN, `PIPER MINI-PC.bat` (1 = Einrichten, 2 = Messen), Berichte an Claude. Ablauf in
+     `projekt-aufgaben/UEBERGABE P05.md`. Frist: Fish Audio kostenlos bis 30.11.2026, ab 01.12. ist Piper automatisch Standard.
+   - Danach entscheiden: Qualitaet high oder medium (nach Hoerprobe und Messung). In `dashboard/auron.html` zeigt die Statuszeile
+     weiter "Fish Audio", auch wenn Piper spricht (auron.html auf Sirs PC neuer, deshalb nicht angefasst).
+
 ## Erledigt am 10.10.2026 (zur Einordnung)
 - Sucher und Schreiber (Agenten-Station, Chat-Befehl "Such und schreib: ...").
 - REPO HOLEN.bat (unter Windows erfolgreich gelaufen).

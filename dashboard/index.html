@@ -1491,11 +1491,13 @@
         </select>
         <div class="hint" id="sttHinweis" style="margin-bottom:10px"></div>
         <label class="hint">Vorlesen über</label>
-        <select id="setTtsQuelle" style="margin:4px 0 10px">
-          <option value="windows">Windows-Stimmen (offline, nichts verlässt den PC)</option>
-          <option value="piper">Piper (offline, gute deutsche Stimme, PIPER_EINRICHTEN.bat nötig)</option>
+        <select id="setTtsQuelle" style="margin:4px 0 4px">
+          <option value="auto">Automatisch (bis 30.11.2026 Fish Audio, ab 01.12.2026 Piper)</option>
           <option value="fish">Fish Audio (natürlicher, Text geht an deren Server)</option>
+          <option value="piper">Piper (läuft auf dem Rechner, nichts verlässt ihn; Mini-PC: PIPER MINI-PC.bat, Windows: PIPER_EINRICHTEN.bat)</option>
+          <option value="windows">Browser (Windows-Stimmen, nichts verlässt den PC)</option>
         </select>
+        <div class="hint" id="stimmeHinweis" style="margin-bottom:10px">Rückfall bei Fehlern: gewählte Stimme, dann Piper, dann Browser.</div>
         <div id="fishBlock" style="display:none">
           <label class="hint">Fish-Stimmen-ID (leer = Standardstimme)</label>
           <input type="text" id="setFishStimme" style="margin:4px 0 6px" />
@@ -2159,7 +2161,7 @@ const STD = {
   mikro: true, autoSend: false, vorlesen: false, stimme: "", tempo: 1,
   chatModus: "",  /* "" = Standard aus den Backend-Einstellungen, sonst "klassisch" oder "werkzeug" */
   agentenModus: false,  /* nur im Werkzeug-Modus wirksam - siehe modusAgenten */
-  ttsQuelle: "windows", fishStimme: "",
+  ttsQuelle: "auto", fishStimme: "",
   boot: true, begruessung: true,  /* Ladebildschirm und gesprochene Begrüßung (23.09.2026) */
   effekte: true,                  /* bewegter Hintergrund und Leuchten (23.09.2026) */
   stil: "zukunft",                /* "zukunft" oder "retro" (80/90er, Wunsch von Sir 23.09.2026) */
@@ -3754,7 +3756,7 @@ function felderFuellen() {
   $("setEffekte").checked = S.effekte !== false;
   $("setBegruessung").checked = S.begruessung !== false;
   $("setTempo").value = S.tempo;
-  $("setTtsQuelle").value = S.ttsQuelle || "windows";
+  $("setTtsQuelle").value = S.ttsQuelle || "auto";
   $("setFishStimme").value = S.fishStimme || "";
   $("setVorlesenKurz").checked = !!S.vorlesenKurz;
   $("setStt").value = S.sttModus || "browser";
@@ -3787,10 +3789,20 @@ FELDER.forEach(([id, key]) => {
   document.body.classList.toggle("ruhig", S.effekte === false);
 }));
 $("setTempo").addEventListener("change", () => { S.tempo = Number($("setTempo").value); einstellungenSpeichernLokal(); });
-$("setTtsQuelle").addEventListener("change", () => {
+/* Die Wahl der Stimme liegt im Backend (stimme_quelle), damit alle Oberflächen (auch Handy, Auron) dieselbe nutzen.
+   Intern heißt "Browser" hier "windows", "Automatisch" ist "auto" (im Backend leer). */
+const STIMME_BACKEND = { auto: "", fish: "fish", piper: "piper", windows: "browser" };
+function stimmeVomBackend(w) { return w === "fish" || w === "piper" ? w : w === "browser" ? "windows" : "auto"; }
+$("setTtsQuelle").addEventListener("change", async () => {
   S.ttsQuelle = $("setTtsQuelle").value;
   einstellungenSpeichernLokal(); fishBlockAnzeigen();
   if (S.ttsQuelle === "fish") fishStatusLaden();
+  try {
+    const r = await fetch("/api/einstellungen", { method: "PUT", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ stimme_quelle: STIMME_BACKEND[S.ttsQuelle] }) });
+    $("stimmeHinweis").textContent = r.ok ? "Gespeichert, gilt sofort. Rückfall bei Fehlern: gewählte Stimme, dann Piper, dann Browser."
+      : "Konnte nicht gespeichert werden (Status " + r.status + ").";
+  } catch (e) { $("stimmeHinweis").textContent = "Backend nicht erreichbar - die Wahl gilt nur in diesem Fenster."; }
 });
 $("fishSpeichern").addEventListener("click", async () => {
   S.fishStimme = $("setFishStimme").value.trim();
@@ -3812,7 +3824,7 @@ async function fishStatusLaden() {
   try {
     const r = await fetch("/api/sprache/status");
     const d = await r.json();
-    $("fishHinweis").textContent = d.verfuegbar
+    $("fishHinweis").textContent = (d.fish_verfuegbar ?? d.verfuegbar)
       ? "Bereit. Modell " + d.modell + ". " + d.hinweis
       : "Kein Schlüssel hinterlegt: FISH_API_KEY in Jarvis\\.env eintragen und JARVIS STARTEN.bat neu starten.";
   } catch (e) {
@@ -3838,6 +3850,7 @@ async function backendEinstellungenLaden() {
     $("setStartEinlesen").checked = (a.einlesen_beim_start || "true") !== "false";
     $("setWatch").checked = (a.vault_ueberwachen || "true") !== "false";
     $("setGaps").checked = (a.wissensluecken_merken || "true") !== "false";
+    S.ttsQuelle = stimmeVomBackend(a.stimme_quelle); $("setTtsQuelle").value = S.ttsQuelle; fishBlockAnzeigen();
     $("setStatus").textContent = d.api_schluessel_gesetzt ? "API-Schlüssel ist gesetzt." : "Achtung: kein API-Schlüssel in der .env.";
   } catch (e) { $("setStatus").textContent = "Backend nicht erreichbar."; }
 }
@@ -3921,27 +3934,29 @@ async function sprich(text) {
   let inhalt = String(text || "").replace(/\[\d+\]/g, "").trim();
   if (!inhalt) return;
   if (S.vorlesenKurz) inhalt = kurzfassung(inhalt);
-  if (S.ttsQuelle === "piper") { piperSprich(inhalt); return; }
-  if (S.ttsQuelle !== "fish") { windowsSprich(inhalt); return; }
+  if (S.ttsQuelle === "windows") { windowsSprich(inhalt); return; }   // ausdrücklich Browser gewählt
+  // sonst entscheidet das Backend (Fish Audio, Piper, Rückfälle) - bei 503 spricht der Browser
+  const anfrageQuelle = S.ttsQuelle === "fish" || S.ttsQuelle === "piper" ? S.ttsQuelle : undefined;
   try {
     if (fishAudio) { fishAudio.pause(); fishAudio = null; }
     if (window.speechSynthesis) speechSynthesis.cancel();
     const r = await fetch("/api/sprache", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: inhalt, tempo: Number(S.tempo) || 1 }),
+      body: JSON.stringify({ text: inhalt, tempo: Number(S.tempo) || 1, quelle: anfrageQuelle }),
     });
     if (!r.ok) {
       const fehler = await r.json().catch(() => ({}));
       throw new Error(fehler.detail || ("Status " + r.status));
     }
+    if (r.headers.get("X-Stimme-Rueckfall") > "0") $("chatHint").textContent = "Die gewählte Stimme ging nicht, es spricht " + (r.headers.get("X-Stimme") === "piper" ? "Piper" : "die Ersatzstimme") + ".";
     const url = URL.createObjectURL(await r.blob());
     fishAudio = new Audio(url);
     fishAudio.onended = () => { URL.revokeObjectURL(url); sprichtAnzeige(false); };
     await fishAudio.play();
     sprichtAnzeige(true);
   } catch (e) {
-    const meldung = "Fish Audio: " + e.message + " - die Windows-Stimme übernimmt.";
+    const meldung = "Stimme: " + e.message + " - die Windows-Stimme übernimmt.";
     // chatHint sitzt auf der Auron-Seite und ist unsichtbar, wenn man z.B.
     // von den Einstellungen aus "Stimme testen" klickt - deshalb zusaetzlich
     // in fishHinweis schreiben, das direkt neben dem Testen-Knopf steht.
@@ -4913,9 +4928,9 @@ async function bootStarten() {
       melden("Vault noch nicht eingelesen", true); return false;
     },
     async () => {
-      if (S.ttsQuelle === "fish" && backendOk) {
-        try { const f = await bootMitTimeout("/api/sprache/status"); melden(f.verfuegbar ? "Stimme: Fish Audio" : "Fish Audio nicht bereit - Windows-Stimme", !f.verfuegbar); return true; }
-        catch (e) { melden("Stimme: Windows (Fish nicht erreichbar)", true); return false; }
+      if (S.ttsQuelle !== "windows" && backendOk) {
+        try { const f = await bootMitTimeout("/api/sprache/status"); melden(f.verfuegbar ? "Stimme: " + (f.name || "Fish Audio") : "Keine Server-Stimme bereit - Windows-Stimme", !f.verfuegbar); return true; }
+        catch (e) { melden("Stimme: Windows (Backend-Stimme nicht erreichbar)", true); return false; }
       }
       melden(window.speechSynthesis ? "Stimme: Windows" : "Keine Sprachausgabe im Browser", !window.speechSynthesis);
       return !!window.speechSynthesis;

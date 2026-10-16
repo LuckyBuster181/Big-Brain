@@ -33,6 +33,9 @@ FELDER: dict[str, str] = {
     "wissensluecken_merken": "WISSENSLUECKEN_LOG",
     "fish_modell": "FISH_MODEL",
     "fish_stimme": "FISH_VOICE_ID",
+    # P05 (16.10.2026): Stimme "fish", "piper", "browser"; leer = automatisch (ab 01.12.2026 Piper)
+    "stimme_quelle": "STIMME_QUELLE",
+    "piper_qualitaet": "PIPER_QUALITAET",
     # Phase 3 (23.09.2026): Spracherkennung "browser" oder "lokal" (Whisper)
     "spracherkennung": "STT_MODUS",
     "whisper_modell": "WHISPER_MODELL",
@@ -86,6 +89,10 @@ def speichern(neu: dict[str, Any]) -> dict[str, Any]:
     stt_modus = neu.get("spracherkennung")
     if stt_modus not in (None, "", "browser", "lokal"):
         raise ValueError("Spracherkennung muss 'browser' oder 'lokal' sein")
+    if neu.get("stimme_quelle") not in (None, "", "fish", "piper", "browser"):
+        raise ValueError("Stimme muss 'fish', 'piper', 'browser' oder leer (automatisch) sein")
+    if neu.get("piper_qualitaet") not in (None, "", "high", "medium"):
+        raise ValueError("Piper-Qualität muss 'high' oder 'medium' sein")
     wm = neu.get("whisper_modell")
     if wm not in (None, "", "tiny", "base", "small", "medium"):
         raise ValueError("Whisper-Modell: tiny, base, small oder medium")
@@ -100,6 +107,10 @@ def speichern(neu: dict[str, Any]) -> dict[str, Any]:
         ziel.parent.mkdir(parents=True, exist_ok=True)
         ziel.write_text(json.dumps(aktuell, ensure_ascii=False, indent=1), encoding="utf-8")
     anwenden()
+    # leere Werte entfernen die Umgebungsvariable wieder (anwenden() überspringt sie): "automatisch" soll sofort gelten
+    for name in ("stimme_quelle", "piper_qualitaet"):
+        if name in neu and neu[name] in (None, ""):
+            os.environ.pop(FELDER[name], None)
     return aktuell
 
 
