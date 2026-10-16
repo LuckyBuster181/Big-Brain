@@ -431,7 +431,7 @@ def uebersicht_schreiben(vault_path: str | None = None) -> str | None:
     vault_path = vault_path or os.getenv("VAULT_PATH")
     if not vault_path or not Path(vault_path).is_dir():
         return None
-    gesehen = [e for e in tiktok.liste() if e.get("gesehen") and e.get("notiz")]
+    gesehen = [e for e in tiktok.liste() if e.get("gesehen") and e.get("notiz") and not e.get("dublette_von")]
     ordner = Path(vault_path) / tiktok.ENTWURF_ORDNER
     ordner.mkdir(parents=True, exist_ok=True)
     datei = ordner / UEBERSICHT_NAME
@@ -470,6 +470,8 @@ def uebersicht_schreiben(vault_path: str | None = None) -> str | None:
 def video_sehen(vid: str, *, aufruf: Callable[..., dict] | None = None, suche: Callable[[str], list] | None = None,
                 holen: Callable[[str, Path], Path] | None = None, vault_path: str | None = None) -> dict:
     eintrag = tiktok._eintrag(vid)  # noqa: SLF001
+    if eintrag.get("dublette_von"):
+        raise SehenFehler("Doppelt - das Original wird ausgewertet, nicht diese Dublette.")
     if eintrag.get("art") == "foto" or "/photo/" in (eintrag.get("url") or ""):
         raise SehenFehler("Foto-Beitrag - läuft über die Slides, nicht über Standbilder.")
     holen = holen or video_holen
@@ -511,9 +513,9 @@ def _stand_speichern() -> None:
 
 
 def kandidaten() -> list[dict]:
-    """Noch nicht gesehene Videos mit Vault-Notiz, neueste zuerst; Foto-Beiträge nicht."""
+    """Noch nicht gesehene Videos mit Vault-Notiz, neueste zuerst; Foto-Beiträge und Dubletten nicht."""
     aus = [e for e in tiktok.liste()
-           if e.get("notiz") and not e.get("gesehen") and e.get("art") != "foto" and "/photo/" not in (e.get("url") or "")]
+           if e.get("notiz") and not e.get("gesehen") and not e.get("dublette_von") and e.get("art") != "foto" and "/photo/" not in (e.get("url") or "")]
     return sorted(aus, key=lambda e: e.get("hinzugefuegt") or "", reverse=True)
 
 

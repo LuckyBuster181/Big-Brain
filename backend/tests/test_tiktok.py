@@ -136,7 +136,8 @@ class Abrufen(Basis):
         git.assert_called_once()
         with mock.patch.object(tiktok, "_git_sichern"):
             zweite = tiktok.in_vault(vid)
-        self.assertNotEqual(zweite["notiz"], e["notiz"])  # nichts überschrieben
+        self.assertEqual(zweite["notiz"], e["notiz"])  # P25: keine zweite Notiz, nichts überschrieben
+        self.assertEqual(len(list((self.vault / tiktok.ENTWURF_ORDNER).glob("*.md"))), 1)
 
     def test_fehler_von_yt_dlp(self):
         vid = self._neu()

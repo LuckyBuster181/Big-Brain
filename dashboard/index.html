@@ -1575,7 +1575,7 @@
         </div>
         <div class="row" id="ttFilter" style="margin-top:10px">
           <span class="chip active" data-f="">Alle</span><span class="chip" data-f="neu">Neu</span>
-          <span class="chip" data-f="geholt">Abgerufen</span><span class="chip" data-f="im_vault">Im Vault</span><span class="chip" data-f="fehler">Fehler</span>
+          <span class="chip" data-f="geholt">Abgerufen</span><span class="chip" data-f="im_vault">Im Vault</span><span class="chip" data-f="fehler">Fehler</span><span class="chip" data-f="dublette">Doppelt</span>
         </div>
         <div class="scroll" style="max-height: 58vh; margin-top:8px">
           <table><thead><tr><th>Video</th><th>Status</th><th class="num">Aktion</th></tr></thead><tbody id="ttBody"></tbody></table>
@@ -4291,7 +4291,11 @@ document.querySelector('nav button[data-page="labor"]').addEventListener("click"
 
 /* ============================================================ TikTok (23.09.2026) */
 let ttDaten = [], ttFilterWert = "", ttAuswahl = null;
-const TT_STATUS = { neu: "neu", laeuft: "läuft …", geholt: "abgerufen", im_vault: "im Vault", fehler: "Fehler" };
+const TT_STATUS = { neu: "neu", laeuft: "läuft …", geholt: "abgerufen", im_vault: "im Vault", fehler: "Fehler", dublette: "doppelt" };
+function ttOriginalTitel(e) {
+  const o = ttDaten.find((x) => x.id === e.dublette_von);
+  return o ? (o.titel || o.sehen_titel || o.id) : (e.dublette_von || "");
+}
 async function ttLaden() {
   try {
     const d = await json("/api/tiktok");
@@ -4308,14 +4312,16 @@ function ttZeigen() {
   $("ttBody").innerHTML = zeilen.map((e) => {
     const titel = e.titel ? esc(e.titel) : '<span class="hint">' + esc(e.url.replace(/^https?:\/\//, "").slice(0, 60)) + "</span>";
     const foto = e.art === "foto" || (e.url || "").includes("/photo/");
-    const aktion = e.status === "geholt" ? `<span class="chip" data-tt-vault="${e.id}">In den Vault</span>`
+    const dublette = e.status === "dublette" || !!e.dublette_von;
+    const aktion = dublette ? '<span class="hint">–</span>'
+      : e.status === "geholt" ? `<span class="chip" data-tt-vault="${e.id}">In den Vault</span>`
       : e.status === "im_vault" ? '<span class="hint">✓</span>'
       : e.status === "laeuft" ? '<span class="hint">…</span>'
       : foto ? `<span class="chip" data-tt="${e.id}">Slides</span>`
       : `<span class="chip" data-tt-abruf="${e.id}">Abrufen</span>`;
     return `<tr data-tt="${e.id}" style="cursor:pointer${e.id === ttAuswahl ? ";background:var(--panel-2)" : ""}">
       <td>${titel}<div class="hint">${esc(e.autor || "")}</div></td>
-      <td>${TT_STATUS[e.status] || e.status}${e.fehler ? '<div class="err">' + esc(e.fehler.slice(0, 80)) + "</div>" : ""}</td>
+      <td>${dublette ? "doppelt – siehe " + esc(ttOriginalTitel(e)) : (TT_STATUS[e.status] || e.status)}${e.fehler ? '<div class="err">' + esc(e.fehler.slice(0, 80)) + "</div>" : ""}</td>
       <td class="num">${aktion}</td></tr>`;
   }).join("") || '<tr><td colspan="3" class="hint">Noch keine Links.</td></tr>';
 }
@@ -4331,9 +4337,10 @@ async function ttDetail(id) {
     const e = await json("/api/tiktok/" + encodeURIComponent(id));
     $("ttDetail").innerHTML = `<div style="font-size:15px; color:var(--text)"><b>${esc(e.titel || "Noch nicht abgerufen")}</b></div>
       <div class="hint">${esc(e.autor || "")}${e.dauer_s ? " · " + e.dauer_s + " s" : ""} · <a href="${esc(e.url)}" target="_blank" rel="noopener" style="color:var(--accent)">auf TikTok öffnen</a></div>
+      ${e.dublette_von ? '<div class="err">Doppelt – siehe ' + esc(ttOriginalTitel(e)) + ". Keine eigene Notiz.</div>" : ""}
       ${e.notiz ? '<div class="hint">Im Vault: ' + esc(e.notiz) + "</div>" : ""}
       ${e.beschreibung ? '<h2 style="margin-top:12px">Beschreibung</h2><div style="white-space:pre-wrap; font-size:13px">' + esc(e.beschreibung) + "</div>" : ""}
-      ${e.ist_foto ? ttSlidesHtml(e) : ""}
+      ${e.ist_foto && !e.dublette_von ? ttSlidesHtml(e) : ""}
       <h2 style="margin-top:12px">${e.ist_foto ? "Gelesener Text" : "Abschrift"}</h2>
       <div class="scroll" style="max-height:40vh; white-space:pre-wrap; font-size:13px">${e.transkript ? esc(e.transkript) : '<span class="hint">' + (e.ist_foto ? "Noch nicht gelesen." : e.status === "geholt" || e.status === "im_vault" ? "Keine Untertitel vorhanden." : "Erst abrufen.") + "</span>"}</div>`;
   } catch (err) { $("ttDetail").innerHTML = '<span class="err">' + esc(err.message) + "</span>"; }
