@@ -28,6 +28,7 @@ from . import (
     einstellungen,
     gesamtkarte,
     gespraeche,
+    gpu_miete,
     kalender,
     kalender_schreiben,
     kamera,
@@ -547,6 +548,48 @@ def nachtarbeit_start() -> dict:
 @router.get("/api/nachtarbeit/status")
 def nachtarbeit_status() -> dict:
     return nachtarbeit.status()
+
+
+# ------------------------------------------------------------------ GPU-Miete (P24, app/gpu_miete.py)
+
+@router.get("/api/gpu-miete/status")
+def gpu_miete_status() -> dict:
+    """GPU-Miete (RunPod): Stand, Deckel in EUR, laufender Pod, Alarm. Nur gelesen, ruft RunPod nicht auf."""
+    return gpu_miete.status()
+
+
+@router.post("/api/gpu-miete/aufraeumen")
+def gpu_miete_aufraeumen() -> dict:
+    """Wächterlauf von Hand: alle Pods des Kontos prüfen und löschen, was nicht da sein darf (ruft RunPod auf)."""
+    return gpu_miete.waechter_lauf()
+
+
+@router.post("/api/gpu-miete/auftrag", status_code=202)
+def gpu_miete_auftrag(werte: dict) -> dict:
+    """Ausdrücklicher Befehl von Sir: einen offenen Code-Auftrag (Art entwicklung) sofort auf einer gemieteten GPU
+    erledigen, auch außerhalb der Nacht. Der Pod wird danach in jedem Fall gelöscht. Läuft im Hintergrund."""
+    import threading
+
+    aid = werte.get("auftrag")
+    try:
+        nachtauftraege.gpu_ausdruecklich_pruefen(aid)
+    except nachtauftraege.NachtauftragFehler as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    if not gpu_miete.ist_aktiv():
+        raise HTTPException(status_code=400, detail="GPU-Miete ist aus (RUNPOD_API_KEY fehlt oder GPU_MIETE_AUS gesetzt).")
+    if gpu_miete.laeuft():
+        raise HTTPException(status_code=409, detail="Es läuft schon eine GPU-Miete.")
+
+    def _lauf() -> None:
+        try:
+            erg = nachtauftraege.gpu_ausdruecklich(aid)
+            for z in erg["protokoll"]:
+                print(f"[GPU-Miete] {z.get('status', z)}", flush=True)
+        except Exception as exc:  # noqa: BLE001
+            print(f"FEHLER GPU-Miete (Befehl von Sir): {gpu_miete._sauber(exc)}", flush=True)  # noqa: SLF001
+
+    threading.Thread(target=_lauf, name="gpu-miete-befehl", daemon=True).start()
+    return {"gestartet": True, "auftrag": aid, "hinweis": "Ergebnis steht danach im Nachtauftrag und im Vault."}
 
 
 @router.get("/api/nachtarbeit/kurz")

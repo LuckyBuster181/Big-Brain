@@ -335,6 +335,14 @@ def _status() -> dict:
     u = kosten.uebersicht()
     teile.append(f"Vom Rahmen sind {_zahl(u['ausgegeben_usd'])} von {_zahl(u['rahmen_usd'], 0)} Dollar verbraucht, "
                  f"{_zahl(u['anteil_prozent'], 0)} Prozent, Sir.")
+    try:   # P24: Alarm der GPU-Miete (Pod nicht als gelöscht bestätigt) wird zuerst gesagt
+        from . import gpu_miete
+
+        hinweis = gpu_miete.sprach_hinweis()
+    except Exception:  # noqa: BLE001
+        hinweis = None
+    if hinweis:
+        teile.insert(0, hinweis)
     return {"sprache": " ".join(teile), "karte": None}
 
 

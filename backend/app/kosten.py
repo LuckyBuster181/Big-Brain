@@ -256,6 +256,7 @@ def uebersicht(heute: datetime.date | None = None, alle: Iterable[dict] | None =
         "je_modell": rund(list(je_modell.values())),
         "je_tag": [{"tag": t, "usd": round(u, 4)} for t, u in sorted(je_tag.items())],
         "code": code,
+        "gpu": _gpu_topf(),
         "gesamt_ausgegeben_usd": round(normal["ausgegeben_usd"] + code["ausgegeben_usd"], 4),
         "links": {"aufladen": LINK_AUFLADEN, "verbrauch": LINK_VERBRAUCH},
         "hinweis": (
@@ -264,6 +265,16 @@ def uebersicht(heute: datetime.date | None = None, alle: Iterable[dict] | None =
             "getrennt und hier nicht sichtbar. Zwei Töpfe: normaler Rahmen und Code-Deckel (Modus code-*)."
         ),
     }
+
+
+def _gpu_topf() -> dict | None:
+    """P24 (16.10.2026): dritter Topf, GPU-Miete in EUR (app/gpu_miete.py). Fehler dürfen die Übersicht nie stören."""
+    try:
+        from . import gpu_miete
+
+        return gpu_miete.kosten_topf()
+    except Exception:  # noqa: BLE001
+        return None
 
 
 def code_rest(heute: datetime.date | None = None) -> float:
@@ -287,9 +298,16 @@ def _topf_zeile(name: str, t: dict) -> str:
 
 
 def deckel_zeilen(u: dict | None = None) -> list[str]:
-    """Zwei Zeilen: normaler Rahmen und Code-Deckel, je mit Rest, Hochrechnung und Ampel."""
+    """Zwei Zeilen: normaler Rahmen und Code-Deckel, je mit Rest, Hochrechnung und Ampel.
+    P24: dritte Zeile für die GPU-Miete (EUR), sobald ein RunPod-Schlüssel gesetzt ist oder GPU-Kosten angefallen sind."""
     u = u or uebersicht()
-    return [_topf_zeile("Normaler Rahmen", u), _topf_zeile("Code-Deckel", u["code"])]
+    zeilen = [_topf_zeile("Normaler Rahmen", u), _topf_zeile("Code-Deckel", u["code"])]
+    g = u.get("gpu")
+    if g and (g.get("aktiv") or g.get("ausgegeben_eur")):
+        from . import gpu_miete
+
+        zeilen.append(gpu_miete.zeile(g))
+    return zeilen
 
 
 def chat_text(u: dict | None = None) -> str:
@@ -297,7 +315,7 @@ def chat_text(u: dict | None = None) -> str:
     u = u or uebersicht()
     zeilen = deckel_zeilen(u)
     heute = _de(u["heute_usd"] + u["code"]["heute_usd"])
-    return (f"Kostenstand {u['monat']}, Sir:\n\n- {zeilen[0]}\n- {zeilen[1]}\n\n"
+    return (f"Kostenstand {u['monat']}, Sir:\n\n" + "\n".join(f"- {z}" for z in zeilen) + "\n\n"
             f"Heute zusammen {heute} $. Das ist eine Schätzung aus dem Protokoll; den echten Stand zeigt die "
             "Anthropic-Konsole. Die eigene KI kostet nichts.")
 

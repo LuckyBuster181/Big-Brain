@@ -1058,29 +1058,21 @@ def bearbeiten(a: dict, rest_usd: float, client: Any = None, heute: datetime.dat
         raise
 
 
-def nacht_abarbeiten(deckel_usd: float, client: Any = None, heute: datetime.date | None = None) -> dict:
-    """Alle offenen Aufträge der Reihe nach, solange Deckel und MAX_AUFTRAEGE_PRO_NACHT
-    es erlauben. Gibt {"ausgegeben_usd", "protokoll": [...]} zurück."""
-    protokoll: list[dict] = []
-    ausgegeben = 0.0
-    offen = liste("offen")
-    if not offen:
-        return {"ausgegeben_usd": 0.0, "protokoll": [{"status": "Keine offenen Nachtaufträge."}]}
-    if client is None:
-        try:
-            client = nacht_ki.client()
-        except nacht_ki.NachtKiFehler as exc:
-            # Kein Rückfall auf Claude: die Aufträge bleiben "offen" und warten auf die nächste Nacht.
-            return {"ausgegeben_usd": 0.0, "protokoll": [
-                {"auftrag": a["id"], "titel": a.get("titel"), "status": f"wartet: {exc}"} for a in offen]}
-    schluss = schluss_fuer()  # 11.10.2026: nach SCHLUSS (09:00, nur Nachtlauf) beginnt kein neuer Auftrag
-    for a in offen[:MAX_AUFTRAEGE_PRO_NACHT]:
+def _abarbeiten(auftraege: list[dict], client: Any, deckel_usd: float, ausgegeben: float, heute: datetime.date | None,
+                schluss: datetime.datetime | None, protokoll: list[dict], gpu: Any = None) -> float:
+    """Die Aufträge der Reihe nach erledigen (Deckel, Schluss 09:00, ggf. verbleibende GPU-Zeit beachten).
+    Hängt Zeilen an `protokoll` an und gibt die neuen Gesamtausgaben (Claude, lokal 0) zurück."""
+    for a in auftraege:
         rest = deckel_usd - ausgegeben
         if rest < MIN_REST_USD:
             protokoll.append({"auftrag": a["id"], "titel": a.get("titel"), "status": "wartet: Deckel dieser Nacht erreicht"})
             continue
         if schluss and _jetzt_dt() >= schluss:
             protokoll.append({"auftrag": a["id"], "titel": a.get("titel"), "status": f"wartet: nach {SCHLUSS} kein neuer Auftrag"})
+            continue
+        if gpu is not None and gpu.restzeit_s() < GPU_MIN_RESTZEIT_S:
+            protokoll.append({"auftrag": a["id"], "titel": a.get("titel"),
+                              "status": "wartet: gemietete GPU-Zeit fast abgelaufen, nächster Lauf"})
             continue
         try:
             fertig = bearbeiten(a, rest, client, heute, schluss)
@@ -1104,10 +1096,106 @@ def nacht_abarbeiten(deckel_usd: float, client: Any = None, heute: datetime.date
             except NachtauftragFehler:
                 pass
             protokoll.append({"auftrag": a["id"], "titel": a.get("titel"), "status": f"Fehler: {exc}"})
-    for a in offen[MAX_AUFTRAEGE_PRO_NACHT:]:
+    return ausgegeben
+
+
+# P24 (16.10.2026): Code-Aufträge ("entwicklung") laufen, wenn erlaubt, auf einer gemieteten GPU (app/gpu_miete.py).
+GPU_MIN_RESTZEIT_S = float(os.getenv("GPU_MIETE_MIN_RESTZEIT_S", "600"))   # darunter beginnt kein neuer Auftrag
+
+
+def code_auf_gpu(code: list[dict], deckel_usd: float, heute: datetime.date | None, schluss: datetime.datetime | None,
+                 protokoll: list[dict], ausdruecklich: bool = False, api: Any = None) -> tuple[float, set[int]]:
+    """Code-Aufträge auf einem gemieteten Pod erledigen. Gibt (ausgegeben_usd, Nummern der behandelten Aufträge) zurück.
+    Ist die Miete nicht erlaubt oder der Start misslingt, passiert nichts (die Aufträge laufen dann wie bisher auf
+    dem normalen Rechner). Der Pod wird in jedem Fall gelöscht (gpu_miete.sitzung); schlägt das fehl, steht eine laute
+    Zeile im Protokoll und der Alarm ist gesetzt."""
+    from . import gpu_miete  # noqa: PLC0415
+
+    if not code or not gpu_miete.schluessel_da():
+        return 0.0, set()
+    behandelt: set[int] = set()
+    ausgegeben = 0.0
+    zeilen: list[dict] = []
+    try:
+        with gpu_miete.sitzung(ausdruecklich=ausdruecklich, api=api) as gpu:
+            client = nacht_ki.client()
+            ausgegeben = _abarbeiten(code, client, deckel_usd, 0.0, heute, schluss, zeilen, gpu)
+            # Alle Code-Aufträge dieses Laufs gelten als behandelt (auch "wartet: GPU-Zeit abgelaufen"): sie gehen in der
+            # nächsten Nacht wieder auf die GPU und nicht jetzt auf einen kleineren Rechner.
+            behandelt = {a["id"] for a in code}
+        protokoll.append({"status": gpu_miete.letzte_zeile()})
+    except gpu_miete.GpuLoeschFehler as exc:
+        behandelt = {a["id"] for a in code if any(z.get("auftrag") == a["id"] for z in zeilen)}
+        protokoll.append({"status": f"ACHTUNG GPU-Miete: {exc} Der Pod läuft evtl. weiter und kostet Geld. "
+                                    "Bitte sofort in der RunPod-Konsole nachsehen, Sir."})
+    except gpu_miete.GpuMieteGesperrt as exc:
+        if not exc.still:
+            protokoll.append({"status": f"GPU-Miete nicht genutzt: {exc}"})
+        return 0.0, set()
+    except gpu_miete.GpuMieteFehler as exc:
+        protokoll.append({"status": f"GPU-Miete fehlgeschlagen ({exc}) - Pod ist gelöscht; Code-Aufträge laufen auf dem "
+                                    "normalen Rechner."})
+        return 0.0, set()
+    except Exception as exc:  # noqa: BLE001 - der Pod ist durch den finally-Block der Sitzung schon gelöscht
+        behandelt = {a["id"] for a in code if any(z.get("auftrag") == a["id"] for z in zeilen)}
+        protokoll.append({"status": f"GPU-Miete: Fehler während der Arbeit ({exc}); Pod ist gelöscht."})
+    protokoll.extend(zeilen)
+    return ausgegeben, behandelt
+
+
+def nacht_abarbeiten(deckel_usd: float, client: Any = None, heute: datetime.date | None = None) -> dict:
+    """Alle offenen Aufträge der Reihe nach, solange Deckel und MAX_AUFTRAEGE_PRO_NACHT
+    es erlauben. Gibt {"ausgegeben_usd", "protokoll": [...]} zurück.
+    P24: Code-Aufträge laufen zuerst auf einer gemieteten GPU (nur mit RUNPOD_API_KEY, im Nachtfenster, unter dem
+    GPU-Deckel); der Pod ist gelöscht, bevor die übrigen Aufträge beginnen."""
+    protokoll: list[dict] = []
+    ausgegeben = 0.0
+    offen = liste("offen")
+    if not offen:
+        return {"ausgegeben_usd": 0.0, "protokoll": [{"status": "Keine offenen Nachtaufträge."}]}
+    schluss = schluss_fuer()  # 11.10.2026: nach SCHLUSS (09:00, nur Nachtlauf) beginnt kein neuer Auftrag
+    heute_liste = offen[:MAX_AUFTRAEGE_PRO_NACHT]
+    spaeter = offen[MAX_AUFTRAEGE_PRO_NACHT:]
+    if client is None:
+        code = [a for a in heute_liste if a.get("art") == "entwicklung"]
+        if code:
+            k, behandelt = code_auf_gpu(code, deckel_usd, heute, schluss, protokoll)
+            ausgegeben += k
+            heute_liste = [a for a in heute_liste if a["id"] not in behandelt]
+        if heute_liste:
+            try:
+                client = nacht_ki.client()
+            except nacht_ki.NachtKiFehler as exc:
+                # Kein Rückfall auf Claude: die Aufträge bleiben "offen" und warten auf die nächste Nacht.
+                return {"ausgegeben_usd": round(ausgegeben, 4), "protokoll": protokoll + [
+                    {"auftrag": a["id"], "titel": a.get("titel"), "status": f"wartet: {exc}"} for a in heute_liste]}
+    if heute_liste:
+        ausgegeben = _abarbeiten(heute_liste, client, deckel_usd, ausgegeben, heute, schluss, protokoll)
+    for a in spaeter:
         protokoll.append({"auftrag": a["id"], "titel": a.get("titel"), "status": "wartet: höchstens "
                           f"{MAX_AUFTRAEGE_PRO_NACHT} Aufträge pro Nacht"})
     return {"ausgegeben_usd": round(ausgegeben, 4), "protokoll": protokoll}
+
+
+def gpu_ausdruecklich_pruefen(aid: int | str) -> dict:
+    """Vorab-Prüfung für den Befehl von Sir ("diesen Code-Auftrag auf die GPU"): offener Auftrag der Art entwicklung."""
+    a = holen(aid)
+    if a.get("status") != "offen":
+        raise NachtauftragFehler(f"Auftrag {a['id']} ist {a.get('status')} - nur offene Aufträge gehen auf die GPU.")
+    if a.get("art") != "entwicklung":
+        raise NachtauftragFehler(f"Auftrag {a['id']} ist keine Code-Aufgabe (Art {a.get('art')}).")
+    return a
+
+
+def gpu_ausdruecklich(aid: int | str, heute: datetime.date | None = None, api: Any = None) -> dict:
+    """Auf ausdrücklichen Befehl von Sir (auch außerhalb der Nacht): einen Code-Auftrag auf einer gemieteten GPU
+    erledigen. Läuft im Aufrufer-Thread (die Route startet dafür einen Hintergrund-Thread)."""
+    a = gpu_ausdruecklich_pruefen(aid)
+    protokoll: list[dict] = []
+    k, behandelt = code_auf_gpu([a], 3.0, heute, None, protokoll, ausdruecklich=True, api=api)
+    if not behandelt and not protokoll:
+        protokoll.append({"status": "GPU-Miete nicht genutzt."})
+    return {"ausgegeben_usd": round(k, 4), "protokoll": protokoll}
 
 
 def bericht_zeilen(ergebnis: dict) -> list[str]:

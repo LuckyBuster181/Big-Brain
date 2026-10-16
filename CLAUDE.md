@@ -11,6 +11,7 @@
 - Kein Shell-Zugriff auf Sirs PC. Befehle fuer den PC nur als .bat, die Sir selbst startet. .bat und .ps1 nur ASCII. JARVIS STARTEN.bat behaelt LF-Zeilenenden.
 - Python geaendert = NEUSTART noetig. Nur HTML oder JS geaendert = Strg+F5.
 - Kosten: Rahmen fuer Claude-Anfragen von Auron selbst ist 20 $ im Monat, dazu ein eigener Code-Deckel von 10 $ fuer selbst ausgeloeste Code-Aufgaben (Modus "code-...", nachts nie Claude). Tag laeuft lokal, Claude nur als Rueckfall. Nachtarbeit nie mit Claude.
+  Dritter Topf (P24): gemietete GPU bei RunPod, eigener Deckel in EUR (Standard 40 EUR im Monat, `GPU_MIETE_DECKEL_EUR`), nur nachts oder auf Befehl von Sir, der Pod wird IMMER gelöscht (`backend/app/gpu_miete.py`, Wächter `backend/gpu_waechter.py`). Anleitung: `projekt-aufgaben/UEBERGABE P24.md`. Tests dürfen RunPod nie echt aufrufen.
 - Kleine Schritte, nichts Ungetestetes stapeln. Ungetestetes klar als ungetestet kennzeichnen. Nichts erfinden.
 - Jede Commit-Nachricht auf Deutsch: was geaendert, ob getestet, was Sir am PC tun muss. Aenderungen direkt ins Repo pushen. Sir holt sie selbst auf den PC.
 - Gesamtkarte: massgeblich ist data\gesamtkarte.json auf Sirs PC (nicht im Repo, per Syncthing abgeglichen). backend\app\gesamtkarte.json ist nur der Startwert fuer den ersten Start; Aenderungen dort erreichen Sir nicht mehr. Karte aendert Claude im Projekt direkt in data.

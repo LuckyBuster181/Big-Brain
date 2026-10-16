@@ -80,6 +80,14 @@ async def lifespan(_app: FastAPI):
     except Exception as exc:  # noqa: BLE001
         print(f"WARNUNG: Wissensimport nicht fortgesetzt: {exc}", flush=True)
 
+    # 16.10.2026 (P24): einmal beim Start prüfen, ob bei RunPod ein Pod hängt (nur mit RUNPOD_API_KEY)
+    try:
+        from app import gpu_miete
+
+        gpu_miete.start_pruefung()
+    except Exception as exc:  # noqa: BLE001
+        print(f"WARNUNG: GPU-Start-Prüfung nicht gestartet: {exc}", flush=True)
+
     watcher = None
     try:
         watcher = vault_watcher.from_env()

@@ -55,13 +55,22 @@ ERWEITERUNG 05.10.2026 (Claude Cowork, Entscheidung Sir): Tagbetrieb lokal, Clau
   Jeder Rückfall ist sichtbar: TagClient.info sagt, wer geantwortet hat und warum
   (chat_service schickt das als Ereignis "ki" an Auron, Auron zeigt es unter der Antwort).
 - Nachts (tag=False) gibt es NIE einen Rückfall auf Claude (Entscheidung Sir 04.10.2026, app/nacht_ki.py).
+
+ERWEITERUNG 16.10.2026 (P24, app/gpu_miete.py): ziel_exklusiv() setzt für die Dauer eines with-Blocks (nur im
+aufrufenden Thread, nur nachts/tag=False) EIN einziges Ziel: den gemieteten RunPod-Pod. Kein Rückfall auf andere
+Rechner (die Aufgabe ist für das große Modell geschrieben). Das Ziel kann eine eigene Lese-Zeitgrenze, num_ctx und
+"stream" haben: Der RunPod-Proxy bricht Anfragen ab, die in 100 s nicht zu antworten anfangen, deshalb wird die
+Antwort dort intern gestreamt und zu einer normalen Nachricht zusammengesetzt. Die Zeitgrenze für lange Läufe
+bleibt sonst über OLLAMA_NACHT_TIMEOUT (Sekunden, Standard 1200) einstellbar.
 """
 
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import re
+import threading
 import time
 from pathlib import Path
 from typing import Any, Callable, Iterator
@@ -114,11 +123,41 @@ def _hauptpc_ollama_url() -> str | None:
     return f"http://{host}:11434" if host else None
 
 
+_exklusiv = threading.local()
+
+
+@contextlib.contextmanager
+def ziel_exklusiv(name: str, url: str, modell: str, lese_zeit: int | None = None, stream: bool = False,
+                  num_ctx: int | None = None):
+    """Nachts (tag=False) NUR dieses Ziel fragen, solange der Block läuft - gilt nur im aufrufenden Thread.
+    P24: der gemietete GPU-Pod. Fällt er aus, bricht die Aufgabe ab statt auf einem anderen Rechner weiterzulaufen."""
+    ziel: dict[str, str] = {"name": name, "url": url.rstrip("/"), "modell": modell}
+    if lese_zeit:
+        ziel["lese_zeit"] = str(int(lese_zeit))
+    if stream:
+        ziel["stream"] = "1"
+    if num_ctx:
+        ziel["num_ctx"] = str(int(num_ctx))
+    vorher = getattr(_exklusiv, "ziel", None)
+    _exklusiv.ziel = ziel
+    try:
+        yield ziel
+    finally:
+        _exklusiv.ziel = vorher
+
+
+def _exklusives_ziel() -> dict[str, str] | None:
+    return getattr(_exklusiv, "ziel", None)
+
+
 def ziele(tag: bool = False) -> list[dict[str, str]]:
     """Rechner in der Reihenfolge, in der gefragt wird. Jeder Eintrag: name, url, modell.
     tag=True (Sir sitzt gerade davor: Chat, Sprechen, Alltagsfunktionen): falls in der Datei
     "reihenfolge_tag" steht, gilt diese (z.B. Haupt-PC zuerst, weil schneller). Nachtarbeit
     und alles andere nutzt "reihenfolge"."""
+    exklusiv = None if tag else _exklusives_ziel()
+    if exklusiv:
+        return [exklusiv]
     if not (os.getenv("OLLAMA_URL") or os.getenv("OLLAMA_MODEL")):
         try:
             daten = json.loads(_ki_lokal_pfad().read_text(encoding="utf-8"))
@@ -274,11 +313,14 @@ def _anfrage(payload: dict[str, Any], stream: bool, tag: bool = False) -> reques
         payload = {**payload, "options": {**(payload.get("options") or {}), "num_ctx": OLLAMA_NACHT_NUM_CTX}}
     for z in alle:
         daten = {**payload, "model": z["modell"], "think": False, "keep_alive": OLLAMA_KEEP_ALIVE}
+        if z.get("num_ctx") and not tag:   # P24: der Pod hat mehr Speicher als die Heim-Rechner
+            daten["options"] = {**(daten.get("options") or {}), "num_ctx": int(z["num_ctx"])}
+        z_lese = int(z["lese_zeit"]) if z.get("lese_zeit") else lese_zeit
         _agent("ki_start", z.get("name", "lokal"), z.get("modell", ""), tag)
         try:
             for versuch in (daten, {k: v for k, v in daten.items() if k != "think"}):
                 resp = requests.post(f"{z['url']}/api/chat", json=versuch,
-                                     timeout=(OLLAMA_CONNECT_TIMEOUT, lese_zeit), stream=stream)
+                                     timeout=(OLLAMA_CONNECT_TIMEOUT, z_lese), stream=stream)
                 try:
                     resp.raise_for_status()
                 except requests.exceptions.HTTPError as exc:
@@ -292,7 +334,7 @@ def _anfrage(payload: dict[str, Any], stream: bool, tag: bool = False) -> reques
                 return resp
         except requests.exceptions.ReadTimeout as exc:
             if not tag:
-                raise _wrap_request_error(exc, alle, lese_zeit) from exc
+                raise _wrap_request_error(exc, alle, z_lese) from exc
             letzter = exc  # tagsüber: kein erstes Wort in lese_zeit Sekunden -> nächster Rechner
             _agent("ki_fehler", z.get("name", "lokal"), "hängt")
             continue
@@ -308,6 +350,9 @@ class _OllamaMessages:
         self._tag = tag
 
     def create(self, *, model: str, max_tokens: int, system: Any, messages: list[dict]) -> _Message:
+        ziel = None if self._tag else _exklusives_ziel()
+        if ziel and ziel.get("stream"):
+            return self._gestreamt(max_tokens, system, messages)
         payload = {
             "messages": _ollama_messages(system, messages),
             "stream": False,
@@ -326,6 +371,15 @@ class _OllamaMessages:
         msg = _Message(text, usage)
         if data.get("done_reason") == "length":  # Grenze num_predict erreicht = abgeschnitten
             msg.stop_reason = "max_tokens"
+        return msg
+
+    def _gestreamt(self, max_tokens: int, system: Any, messages: list[dict]) -> _Message:
+        """Wie create(), aber über den Stream (P24: RunPod-Proxy). Gleiches Ergebnis wie ohne Stream."""
+        with _OllamaStream(system, messages, max_tokens, self._tag) as s:
+            for _ in s.text_stream:
+                pass
+            msg = s.get_final_message()
+        msg.content = [_TextBlock(_bereinigen(msg.content[0].text))]
         return msg
 
     def stream(self, *, model: str, max_tokens: int, system: Any, messages: list[dict]) -> "_OllamaStream":

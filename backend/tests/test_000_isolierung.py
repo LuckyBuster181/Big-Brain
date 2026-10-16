@@ -73,6 +73,8 @@ UMLEITUNGEN = {
     "FEHLER_LOG_PATH": _TMP / "fehler_log.jsonl",
     # 11.10.2026: Finanzen (Umsätze, Eingang)
     "FINANZEN_PATH": _TMP / "finanzen",
+    # 16.10.2026: GPU-Miete (P24, Journal und Alarm)
+    "GPU_MIETE_PATH": _TMP / "gpu_miete",
 }
 for _name, _pfad in UMLEITUNGEN.items():
     os.environ[_name] = str(_pfad)
@@ -81,6 +83,10 @@ for _name, _pfad in UMLEITUNGEN.items():
 # keine Frage des Tages unter dem Briefing - beides würde echte Aufrufe auslösen.
 os.environ["NACHTARBEIT_FREI"] = ""
 os.environ["BRIEFING_TAGESFRAGE"] = "0"
+os.environ["BRIEFING_FINANZEN"] = "0"
+# 16.10.2026 (P24): nie ein echter RunPod-Schlüssel in Tests - die GPU-Miete bleibt aus, außer ein Test setzt sie selbst.
+os.environ.pop("RUNPOD_API_KEY", None)
+os.environ.pop("RUNPOD_API_URL", None)
 os.environ["BRIEFING_FINANZEN"] = "0"   # 11.10.2026: Abo-Übersicht nur in den eigenen Tests (test_finanzen)
 
 

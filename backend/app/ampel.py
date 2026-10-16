@@ -116,6 +116,23 @@ def _nachtarbeit() -> dict:
     return _lauf("Nachtarbeit", st, "prüft Studium-Entwürfe", "jarvis")
 
 
+def _gpu_miete() -> dict:
+    """P24: rot, solange ein gemieteter Pod nicht als gelöscht bestätigt ist (kostet sonst Geld)."""
+    from . import gpu_miete
+    if not gpu_miete.schluessel_da():
+        return _eintrag("GPU-Miete", "grau", "aus (kein RUNPOD_API_KEY)", "settings")
+    alarm = gpu_miete.alarm_lesen()
+    if alarm:
+        return _eintrag("GPU-Miete", "rot", f"ALARM: {str(alarm.get('text', ''))[:140]}", "settings")
+    t = gpu_miete.kosten_topf()
+    if gpu_miete.laeuft() or t["laufend"]:
+        return _eintrag("GPU-Miete", "gruen", "gemieteter Pod läuft (wird nach der Aufgabe gelöscht)", "settings")
+    stand = f"{t['ausgegeben_eur']:.2f} von {t['rahmen_eur']:.0f} EUR im Monat".replace(".", ",")
+    if t["rest_eur"] <= 0:
+        return _eintrag("GPU-Miete", "gelb", f"Deckel erreicht ({stand}), gesperrt bis Monatswechsel", "settings")
+    return _eintrag("GPU-Miete", "grau", f"ruht, {stand}", "settings")
+
+
 TEILE: list[tuple[str, Callable[[], dict]]] = [
     ("Vault einlesen", _reindex),
     ("Aufgaben-Loop", _aufgaben_loop),
@@ -126,6 +143,7 @@ TEILE: list[tuple[str, Callable[[], dict]]] = [
     ("Vorschläge", _vorschlaege),
     ("TikTok", _tiktok),
     ("Kosten", _kosten),
+    ("GPU-Miete", _gpu_miete),
 ]
 
 

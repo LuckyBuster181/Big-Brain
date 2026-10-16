@@ -20,6 +20,11 @@ Von Sir zurueckgestellt ("machen wir wann anders"). Naechste Sitzung: Sir fragen
    - Wunsch Sir 16.10.: ganze Hand wischen (z. B. Fenster/Bereich wechseln). Erst wenn der Klick am PC sicher geht.
    - Idee Sir: Auron auf der Meta Quest (VR-Brille, WebXR im Quest-Browser). Eigenes Projekt, spaeter.
 
+4. **GPU-Miete (P24): erster echter Lauf** (Stand 16.10.2026, Code gebaut, nie gegen echtes RunPod gelaufen)
+   - Sir: RunPod-Konto, Network Volume, Schluessel in die .env, Waechter auf dem Mini-PC einrichten, kleiner Testlauf mit offener
+     RunPod-Konsole. Ablauf in `projekt-aufgaben/UEBERGABE P24.md`.
+   - Danach pruefen: Feldnamen der RunPod-Antworten, Vorladen des Modells im Pod, Image auf feste Version setzen.
+
 ## Erledigt am 10.10.2026 (zur Einordnung)
 - Sucher und Schreiber (Agenten-Station, Chat-Befehl "Such und schreib: ...").
 - REPO HOLEN.bat (unter Windows erfolgreich gelaufen).

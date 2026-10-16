@@ -109,6 +109,14 @@ def kurz(heute: datetime.date | None = None) -> dict[str, Any]:
         punkte.append(f"Die Nachtarbeit wurde übersprungen: {_kurz(str(grund))}")
     elif letzte.get("fehler"):
         punkte.append(f"Die Nachtarbeit meldet einen Fehler: {_kurz(str(letzte['fehler']))}")
+    try:   # P24: Alarm der GPU-Miete steht ganz oben
+        from . import gpu_miete
+
+        alarm = gpu_miete.alarm_lesen()
+    except Exception:  # noqa: BLE001
+        alarm = None
+    if alarm:
+        punkte.insert(0, f"ACHTUNG GPU-Miete: {_kurz(str(alarm.get('text', '')), 140)} Bitte in der RunPod-Konsole nachsehen.")
     for a in auftraege:
         satz = f"Auftrag Nr. {a['nr']} „{_kurz(a['titel'], 70)}“: {STATUS_TEXT.get(a['status'], a['status'])}"
         if a["urteil"]:

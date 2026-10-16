@@ -46,6 +46,7 @@ _MARKER = re.compile(r"Traceback \(most recent call last\)|\bWARNUNG\b|\bFEHLER\
 
 _GEHEIM = [
     (re.compile(r"sk-ant-[A-Za-z0-9_\-]+"), "sk-ant-***"),
+    (re.compile(r"\brp[a-z]?_[A-Za-z0-9]{8,}"), "rpa_***"),   # RunPod-Schlüssel (P24)
     (re.compile(r"(?i)(bearer\s+)[A-Za-z0-9._~+/=\-]+"), r"\1***"),
     (re.compile(r"(?i)((?:api[_-]?key|token|secret|passwor[dt]|passwd|client_secret)\s*[=:]\s*)[^\s,;&\"']+"), r"\1***"),
     (re.compile(r"(?i)([?&](?:token|key|access_token|refresh_token|code|sig|signature)=)[^&\s\"']+"), r"\1***"),
@@ -261,6 +262,13 @@ def _alexa() -> list[str]:
     return zeilen
 
 
+def _gpu() -> list[str]:
+    """P24: GPU-Miete (RunPod): Stand, laufende Pods, Alarm, letzte Mieten. Nie der Schlüssel."""
+    from . import gpu_miete  # noqa: PLC0415
+
+    return [saeubern(z) for z in gpu_miete.bericht_zeilen()]
+
+
 def _funde(tage: int) -> list[str]:
     liste = eintraege(tage)
     if not liste:
@@ -280,5 +288,5 @@ def bericht(tage: int = 7) -> str:
             f"{'an' if _eingerichtet[0] else 'AUS'}",
             f"- KI-Anbieter: {os.getenv('LLM_PROVIDER') or 'claude'}", ""]
     return "\n".join(kopf + _abschnitt("Hintergrund-Läufe (Ampel)", _ampel) + _abschnitt("KI-Rechner", _ki)
-                     + _abschnitt("Kosten", _kosten) + _abschnitt("Alexa (letzte Anfragen)", _alexa)
+                     + _abschnitt("Kosten", _kosten) + _abschnitt("GPU-Miete (RunPod)", _gpu) + _abschnitt("Alexa (letzte Anfragen)", _alexa)
                      + _abschnitt(f"Fehler der letzten {tage} Tage", lambda: _funde(tage)))

@@ -669,11 +669,14 @@ const STATIONEN = [
   { id: "kosten", station: "Kosten", titel: "Kosten", text: "Was Claude heute gekostet hat. Meine eigene KI kostet nichts.",
     pruefen: async () => { const k = await holeJson("/api/kosten"); if (!k) return null;
       const c = k.code || { heute_usd: 0, ausgegeben_usd: 0, rahmen_usd: 0, rest_usd: 0 };
-      if (!(k.heute_usd > 0 || c.heute_usd > 0)) return null;
+      const g = k.gpu && (k.gpu.aktiv || k.gpu.ausgegeben_eur > 0) ? k.gpu : null;   // P24: gemietete GPU, in Euro
+      if (!(k.heute_usd > 0 || c.heute_usd > 0 || (g && g.ausgegeben_eur > 0))) return null;
       return { jetzt: "heute " + geld(k.heute_usd + c.heute_usd) + " $, Monat " + geld(k.ausgegeben_usd) + " von " + k.rahmen_usd + " $"
-          + " · Code " + geld(c.ausgegeben_usd) + " von " + c.rahmen_usd + " $",
+          + " · Code " + geld(c.ausgegeben_usd) + " von " + c.rahmen_usd + " $"
+          + (g ? " · GPU-Miete " + geld(g.ausgegeben_eur) + " von " + g.rahmen_eur + " €" : ""),
         sagen: "Heute hat Claude " + geld(k.heute_usd + c.heute_usd) + " Dollar gekostet. Normaler Rahmen: " + geld(k.ausgegeben_usd)
-          + " von " + k.rahmen_usd + " Dollar. Code-Deckel: " + geld(c.ausgegeben_usd) + " von " + c.rahmen_usd + " Dollar." }; } }
+          + " von " + k.rahmen_usd + " Dollar. Code-Deckel: " + geld(c.ausgegeben_usd) + " von " + c.rahmen_usd + " Dollar."
+          + (g ? " GPU-Miete: " + geld(g.ausgegeben_eur) + " von " + g.rahmen_eur + " Euro." : "") }; } }
 ];
 function tourSatz(s) { return s.titel + ". " + s.text + (s.sagen ? " " + s.sagen : ""); }
 
