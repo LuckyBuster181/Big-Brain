@@ -31,8 +31,11 @@ Von Sir zurueckgestellt ("machen wir wann anders"). Naechste Sitzung: Sir fragen
 5. **Piper-Stimme auf dem Mini-PC (P05)** (Stand 16.10.2026, gebaut, am Mini-PC ungetestet)
    - Sir: REPO HOLEN, JARVIS STARTEN, `PIPER MINI-PC.bat` (1 = Einrichten, 2 = Messen), Berichte an Claude. Ablauf in
      `projekt-aufgaben/UEBERGABE P05.md`. Frist: Fish Audio kostenlos bis 30.11.2026, ab 01.12. ist Piper automatisch Standard.
-   - Danach entscheiden: Qualitaet high oder medium (nach Hoerprobe und Messung). In `dashboard/auron.html` zeigt die Statuszeile
-     weiter "Fish Audio", auch wenn Piper spricht (auron.html auf Sirs PC neuer, deshalb nicht angefasst).
+   - Danach entscheiden: Qualitaet high oder medium (nach Hoerprobe und Messung).
+
+6. **Whisper auf dem Mini-PC (P04)** (Stand 16.10.2026, gebaut, am Mini-PC ungetestet)
+   - Sir: `WHISPER MINI-PC.bat` (1 = einrichten, 3 = messen, 4 = lokal einschalten), `data\whisper_mini_bericht.txt` an Claude.
+     Ablauf in `projekt-aufgaben/UEBERGABE P04.md`. Danach entscheiden: base oder small, lokal oder Browser.
 
 ## Erledigt am 10.10.2026 (zur Einordnung)
 - Sucher und Schreiber (Agenten-Station, Chat-Befehl "Such und schreib: ...").
