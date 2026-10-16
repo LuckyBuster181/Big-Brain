@@ -89,12 +89,32 @@ case "$AKTION" in
 einrichten)
     echo
     echo "1/3 Python-Paket piper-tts in die venv installieren ..."
-    "$PY" -m pip install --upgrade piper-tts 2>&1 | tail -4
-    if ! "$PY" -c "import piper" 2>/dev/null; then
-        echo "FEHLER: piper-tts laesst sich nicht importieren. Meldung oben an Claude geben."
+    # Die venv des Mini-PCs hat evtl. kein pip (Befund 16.10.2026: "No module named pip"). Dann uv, sonst ensurepip.
+    UV="$(command -v uv 2>/dev/null || true)"
+    for kandidat in "$HOME/.local/bin/uv" "$HOME/.cargo/bin/uv" "/usr/local/bin/uv"; do
+        if [ -z "$UV" ] && [ -x "$kandidat" ]; then UV="$kandidat"; fi
+    done
+    if "$PY" -m pip --version >/dev/null 2>&1; then
+        echo "  Weg: pip"
+        "$PY" -m pip install --upgrade piper-tts 2>&1 | tail -4
+    elif [ -n "$UV" ]; then
+        echo "  Weg: uv ($UV), die venv hat kein pip"
+        "$UV" pip install --python "$PY" --upgrade piper-tts 2>&1 | tail -6
+    elif "$PY" -m ensurepip --upgrade >/dev/null 2>&1; then
+        echo "  Weg: ensurepip, danach pip"
+        "$PY" -m pip install --upgrade piper-tts 2>&1 | tail -4
+    else
+        echo "FEHLER: die venv hat weder pip noch ensurepip, und uv wurde nicht gefunden."
+        echo "        Meldung an Claude geben."
         exit 4
     fi
-    echo "  piper-tts: $("$PY" -m pip show piper-tts 2>/dev/null | grep -i '^Version')"
+    if ! "$PY" -c "import piper" 2>/dev/null; then
+        echo "FEHLER: piper-tts laesst sich nicht importieren. Meldung oben an Claude geben."
+        "$PY" -c "import piper" 2>&1 | tail -3
+        exit 4
+    fi
+    echo "  piper-tts: $("$PY" -c "import importlib.metadata as m; print(m.version('piper-tts'))" 2>&1)"
+    echo "  onnxruntime: $("$PY" -c "import importlib.metadata as m; print(m.version('onnxruntime'))" 2>&1)"
 
     echo
     echo "2/3 Stimmen bereitstellen ($STIMMEN) ..."
