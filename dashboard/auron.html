@@ -1301,10 +1301,67 @@ $("vorschlaege").addEventListener("click", (e) => {
   if (b.hasAttribute("data-nur-einsetzen")) { $("frage").value = b.dataset.text; $("frage").focus(); } else senden(b.dataset.text);
 });
 
-/* Sprechen: Spracherkennung des Browsers (Chrome/Edge). */
+/* Sprechen: Spracherkennung des Browsers (Chrome/Edge) - oder, wenn im Backend "Spracherkennung: lokal" eingestellt
+   und faster-whisper eingerichtet ist, Whisper auf dem Mini-PC (P04, 16.10.2026; das Audio verlässt das Heimnetz nicht).
+   Das Weckwort ("Immer ansprechbar") bleibt immer beim Browser. */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let erkennung = null;
+const sttLokal = { an: false, laeuft: false, stoppen: () => {} };
+async function sttPruefen() {
+  try { const st = await holeJson("/api/sprache/erkennen/status", 4000); sttLokal.an = st.modus === "lokal" && !!st.installiert; }
+  catch (e) { /* Backend nicht erreichbar: Browser bleibt */ }
+}
+sttPruefen(); setInterval(sttPruefen, 120000);
+/* Nimmt auf, bis 1,2 s Stille nach dem Sprechen (höchstens 15 s, ohne Sprechen nach 6 s Schluss),
+   schickt die Aufnahme an /api/sprache/erkennen und fragt mit dem Text. Wie lokalZuhoeren im alten HUD. */
+async function lokalHoeren() {
+  if (!navigator.mediaDevices || !window.MediaRecorder) { sttLokal.an = false; hinweis("Dieser Browser kann nicht aufnehmen, ich nehme die Browser-Erkennung."); return; }
+  let strom;
+  try { strom = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+  catch (e) { hinweis("Das Mikrofon ist im Browser gesperrt."); return; }
+  verstummen(); wachStoppen(); wach.pause = true;
+  const typ = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : "";
+  const rec = new MediaRecorder(strom, typ ? { mimeType: typ } : undefined), teile = [];
+  rec.ondataavailable = (e) => { if (e.data.size) teile.push(e.data); };
+  const ctx = new (window.AudioContext || window.webkitAudioContext)(), analyse = ctx.createAnalyser();
+  analyse.fftSize = 1024; ctx.createMediaStreamSource(strom).connect(analyse);
+  const puffer = new Float32Array(analyse.fftSize), start = Date.now();
+  let gesprochen = false, stilleSeit = null;
+  const takt = setInterval(() => {
+    analyse.getFloatTimeDomainData(puffer);
+    const rms = Math.sqrt(puffer.reduce((a, x) => a + x * x, 0) / puffer.length);
+    if (rms > 0.02) { gesprochen = true; stilleSeit = null; }
+    else if (gesprochen) { stilleSeit = stilleSeit || Date.now(); if (Date.now() - stilleSeit > 1200) sttLokal.stoppen(); }
+    if (Date.now() - start > 15000 || (!gesprochen && Date.now() - start > 6000)) sttLokal.stoppen();
+  }, 100);
+  sttLokal.laeuft = true; sttLokal.stoppen = () => { if (rec.state !== "inactive") rec.stop(); };
+  $("mikro").classList.add("hoert"); hinweis("Ich höre zu (lokal), Sir …");
+  rec.onstop = async () => {
+    clearInterval(takt); sttLokal.laeuft = false; $("mikro").classList.remove("hoert");
+    strom.getTracks().forEach((t) => t.stop()); ctx.close();
+    const weiter = () => { wach.pause = false; wachStarten(); };
+    if (!gesprochen) { hinweis("Nichts gehört, Sir."); weiter(); return; }
+    hinweis("Erkenne Sprache (lokal) …");
+    try {
+      const blob = new Blob(teile, { type: rec.mimeType || "audio/webm" });
+      const r = await fetch("/api/sprache/erkennen", { method: "POST", headers: { "Content-Type": blob.type }, body: blob });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.detail || ("Status " + r.status));
+      weiter();
+      if (!(d.text || "").trim()) { hinweis("Nichts verstanden, Sir."); return; }
+      hinweis(""); if (!stimmeAn) { stimmeAn = true; stimmeZeigen(); }
+      senden(d.text);
+    } catch (e) {
+      sttLokal.an = false;   // bis zur nächsten Prüfung (2 Min.) wieder der Browser
+      hinweis("Whisper: " + e.message + " - beim nächsten Mal hört der Browser zu.");
+      weiter();
+    }
+  };
+  rec.start(250);
+}
 $("mikro").addEventListener("click", () => {
+  if (sttLokal.laeuft) { sttLokal.stoppen(); return; }
+  if (sttLokal.an && !erkennung) { lokalHoeren(); return; }
   if (!SR) { hinweis("Dieser Browser kann keine Sprache erkennen. Chrome oder Edge nutzen."); return; }
   if (erkennung) { erkennung.stop(); return; }
   verstummen(); wachStoppen();
@@ -1709,7 +1766,7 @@ async function ladeStart(mitTour) {
         setze("stimme", "laeuft", "prüfe …");
         try {
           const st = await holeJson("/api/sprache/status", 5000);
-          setze("stimme", st.verfuegbar ? "ok" : "warn", (st.verfuegbar ? "Fish Audio" : "Browser-Stimme") + (stimmeAn ? "" : " (aus)"));
+          setze("stimme", st.verfuegbar ? "ok" : "warn", (st.verfuegbar ? (st.name || "Fish Audio") : "Browser-Stimme") + (stimmeAn ? "" : " (aus)"));   // P05: Fish Audio oder Piper
         } catch (e) { setze("stimme", "warn", "Browser-Stimme"); }
       })(),
       (async () => {
