@@ -1,4 +1,6 @@
-# Jarvis
+# Auron
+
+Früher „Jarvis“ (Name seit 04.10.2026 Auron, P20 am 16.10.2026: Reste umgestellt). Der Projektordner heißt weiter `Jarvis`, der Dienst auf dem Mini-PC weiter `jarvis`.
 
 Digitaler Assistent auf Basis des Obsidian-Vaults „Big Brain“. Beantwortet Fragen nur aus den eigenen Notizen, mit Quellenangabe, und sagt offen, wenn etwas nicht im Vault steht.
 
@@ -6,29 +8,29 @@ Plan und Hintergrund stehen im Vault: `Wissen/03 - KI und Technik/03 - Big Brain
 
 ## Wo liegt was (sortiert am 24.09.2026)
 
-Die Übersicht mit allen Dateien steht auch im Vault: `Wissen/11 - Jarvis Werkstatt/00 - Jarvis Ordner Übersicht.md`.
+Die Übersicht mit allen Dateien steht auch im Vault: `Wissen/11 - Jarvis Werkstatt/00 - Jarvis Ordner Übersicht.md` (nach `NAMEN AUF AURON UMSTELLEN.bat` steht dort Auron statt Jarvis).
 
 | Ordner | Inhalt |
 |---|---|
-| `1 Starten` | `start_jarvis.bat` (starten), `NEUSTART.bat` (nach Code-Änderungen), `NACHTARBEIT.bat` (nächtlicher Lauf), `CHROME_OEFFNEN.bat` (Hilfsdatei) |
+| `1 Starten` | `AURON STARTEN.bat` (starten und nach Code-Änderungen; `JARVIS STARTEN.bat` leitet nur weiter), `REPO HOLEN.bat`, `NACHTARBEIT HEUTE.bat`, `FEHLERBERICHT SENDEN.bat`, `PIPER MINI-PC.bat`, `WHISPER MINI-PC.bat`, `NAMEN AUF AURON UMSTELLEN.bat`, `CHROME_OEFFNEN.bat` (Hilfsdatei) |
 | `2 Testen und Pruefen` | `TESTS_AUSFUEHREN.bat`, `PRUEFEN_WERKZEUG.bat`, `PRUEFEN_KALENDER.bat`, `TIKTOK_TEST.bat` |
 | `3 Einrichten` | einmalige Installationen: Piper, Whisper, TikTok, Sucher-Modell, Git im Vault |
 | `4 Zugaenge setzen` | Schlüssel in die `.env` eintragen: Spotify, Google-Kalender |
-| `5 Mini-PC und PC 2` | Jarvis auf dem Mini-PC, Linux-PC koppeln |
+| `5 Mini-PC und PC 2` | Auron auf dem Mini-PC, Linux-PC koppeln |
 | `6 Trading` | MetaTrader: Bots installieren, Kurse exportieren |
 | `7 Ideen und Material` | Briefing-Skill, Übergabe an ChatGPT, alte Tagesnotiz |
 | `8 Alt - nicht mehr benutzen` | überholte Einmal-Skripte (nur zum Nachsehen, nicht starten) |
 | `backend`, `dashboard`, `data`, `mql5`, `linux`, `pc2_agent`, `Ideen` | Programm und Daten – nicht verschieben, der Code verweist darauf |
 
-**Gesamtkarte (seit 11.10.2026):** Die Karte im HUD liegt in `data\gesamtkarte.json` (wird per Syncthing abgeglichen, nicht im Repo). `REPO HOLEN.bat` überschreibt sie deshalb nicht mehr. `backend\app\gesamtkarte.json` ist nur der Startwert: Fehlt die Datei in `data`, kopiert Jarvis ihn einmal dorthin. Sirs Antworten stehen wie bisher in `data\gesamtkarte_antworten.json`.
+**Gesamtkarte (seit 11.10.2026):** Die Karte im HUD liegt in `data\gesamtkarte.json` (wird per Syncthing abgeglichen, nicht im Repo). `REPO HOLEN.bat` überschreibt sie deshalb nicht mehr. `backend\app\gesamtkarte.json` ist nur der Startwert: Fehlt die Datei in `data`, kopiert Auron ihn einmal dorthin. Sirs Antworten stehen wie bisher in `data\gesamtkarte_antworten.json`.
 
 Alle `.bat`-Dateien in den Ordnern 1–6 finden den Jarvis-Ordner selbst (eine Ebene darüber).
 
 ## Starten
 
-`1 Starten\start_jarvis.bat` doppelklicken. Öffnet zwei Fenster (Backend auf Port 8000, Dashboard auf Port 5173) und danach den Browser. Beenden: beide Fenster schließen.
+`1 Starten\AURON STARTEN.bat` doppelklicken. Auron läuft auf dem Mini-PC; die Datei bringt den neuesten Code hin, startet den Dienst neu, baut den Tunnel und öffnet Auron unter http://127.0.0.1:8001/auron (altes HUD unter /).
 
-Die Oberfläche läuft auf http://localhost:5173. Fragen, zu denen nichts im Vault stand, zeigt http://localhost:5173/api/wissensluecken (neueste zuerst).
+Früher (vor dem Umzug auf den Mini-PC) lief die Oberfläche auf http://localhost:5173. Fragen, zu denen nichts im Vault stand, zeigt http://localhost:5173/api/wissensluecken (neueste zuerst).
 
 Beim Start liest das Backend geänderte Notizen automatisch ein. Solange es läuft, erkennt es Änderungen im Vault und liest sie nach einer Minute Ruhe nach. Der Knopf „Vault einlesen“ im Dashboard macht dasselbe sofort (Shift+Klick: Index komplett neu). Das Dashboard fragt alle 15 Sekunden nach (nur bei sichtbarem Tab) und zeigt so auch Läufe des Watchers ohne Neuladen an.
 
@@ -96,7 +98,7 @@ data/                  Chroma-Index, usage_log.jsonl (Token), wissensluecken.jso
 
 ## Notizen von der Suche ausnehmen
 
-`jarvis: ignorieren` im Frontmatter einer Notiz nimmt sie aus dem Index – z. B. für Platzhalter ohne Inhalt oder Berichte. Wirkt beim nächsten Einlesen (automatisch nach einer Minute, wenn das Backend läuft).
+`auron: ignorieren` (alt: `jarvis: ignorieren`, gilt weiter) im Frontmatter einer Notiz nimmt sie aus dem Index – z. B. für Platzhalter ohne Inhalt oder Berichte. Wirkt beim nächsten Einlesen (automatisch nach einer Minute, wenn das Backend läuft).
 
 ## Sicherheit
 

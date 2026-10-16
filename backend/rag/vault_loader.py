@@ -41,9 +41,16 @@ DEFAULT_SKIP_DIRS = {
     "90 - Importarchiv",
 }
 
-# Notizen mit "jarvis: ignorieren" im Frontmatter werden nicht indexiert (z.B.
-# Platzhalter ohne Inhalt, Berichte, Listen). Gleiche Wirkung: aus, nein, false.
+# Notizen mit "auron: ignorieren" (P20; alter Name "jarvis: ignorieren" gilt weiter) im Frontmatter
+# werden nicht indexiert (z.B. Platzhalter ohne Inhalt, Berichte, Listen). Gleiche Wirkung: aus, nein, false.
 IGNORE_VALUES = {"ignorieren", "aus", "nein", "false", "off"}
+IGNORE_KEYS = ("auron", "jarvis")
+
+
+def is_ignored(frontmatter: dict | None) -> bool:
+    """True, wenn die Notiz per "auron: ignorieren" oder "jarvis: ignorieren" aus der Suche genommen ist."""
+    fm = frontmatter or {}
+    return any(str(fm.get(k, "")).strip().lower() in IGNORE_VALUES for k in IGNORE_KEYS)
 
 # Chunks über dieser Zeichenzahl werden zusätzlich an Absätzen aufgeteilt
 MAX_CHUNK_CHARS = 1500
@@ -202,7 +209,7 @@ def load_note(path: Path, vault_root: Path, file_hash: str | None = None) -> lis
         file_hash = compute_file_hash(path)
 
     frontmatter, body = _split_frontmatter(raw)
-    if str(frontmatter.get("jarvis", "")).strip().lower() in IGNORE_VALUES:
+    if is_ignored(frontmatter):
         return []  # bewusst von der Suche ausgenommen
     rel_path = relative_path(path, vault_root)
     filename = path.stem

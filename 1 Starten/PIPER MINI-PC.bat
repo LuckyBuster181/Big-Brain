@@ -6,7 +6,7 @@ rem  in die venv, Stimmen thorsten high und medium bereitstellen, Probesatz erze
 rem    1 = Einrichten    2 = Messen (Fish Audio / Piper high / Piper medium)    3 = Stand zeigen
 rem  Ergebnis: data\piper_mini_bericht.txt (bitte an Claude geben), Hoerproben data\piper_probe_*.wav,
 rem  Messung data\stimme_messung.txt.
-rem  Vorher: REPO HOLEN.bat und JARVIS STARTEN.bat (bringt den neuen Code auf den Mini-PC).
+rem  Vorher: REPO HOLEN.bat und AURON STARTEN.bat (bringt den neuen Code auf den Mini-PC).
 rem  Aendert nichts am Dienst jarvis und nichts an der .env.
 rem ======================================================================
 setlocal EnableExtensions
@@ -39,7 +39,7 @@ if errorlevel 1 (
 )
 ssh %SSHO% %ZIEL% "mkdir -p ~/jarvis-umzug" >nul 2>&1
 if errorlevel 1 (
-  echo  FEHLER: SSH zum Mini-PC geht nicht. JARVIS STARTEN.bat einmal laufen lassen.
+  echo  FEHLER: SSH zum Mini-PC geht nicht. AURON STARTEN.bat einmal laufen lassen.
   >> "%BERICHT%" echo FEHLER: SSH zum Mini-PC geht nicht.
   goto ende
 )

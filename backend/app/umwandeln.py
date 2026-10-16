@@ -93,7 +93,7 @@ def _pdf_seiten_als_bilder(quelle: Path, ziel: str) -> list[str]:
     except ImportError:
         pass
     if not shutil.which("pdftoppm"):
-        raise UmwandelFehler("Zum Umwandeln von PDFs fehlt das Paket PyMuPDF. Einmal \"JARVIS STARTEN.bat\" "
+        raise UmwandelFehler("Zum Umwandeln von PDFs fehlt das Paket PyMuPDF. Einmal \"AURON STARTEN.bat\" "
                              "starten - die Datei installiert es auf dem Mini-PC nach.")
     with tempfile.TemporaryDirectory() as tmp:
         subprocess.run(["pdftoppm", "-r", str(DPI), "-png", "-l", str(MAX_SEITEN), str(quelle), f"{tmp}/s"],
@@ -113,7 +113,7 @@ def _pdf_text(quelle: Path) -> str:
             text = "\n\n".join(f"--- Seite {i} ---\n{s.get_text()}" for i, s in enumerate(doc, 1))
     except ImportError:
         if not shutil.which("pdftotext"):
-            raise UmwandelFehler("Zum Lesen von PDFs fehlt PyMuPDF (einmal \"JARVIS STARTEN.bat\" starten).") from None
+            raise UmwandelFehler("Zum Lesen von PDFs fehlt PyMuPDF (einmal \"AURON STARTEN.bat\" starten).") from None
         r = subprocess.run(["pdftotext", "-layout", str(quelle), "-"], capture_output=True, timeout=120, check=True)
         text = r.stdout.decode("utf-8", errors="replace")
     if not text.strip() or not re.search(r"\w{3}", text):

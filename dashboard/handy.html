@@ -375,7 +375,7 @@ $("eingabe").addEventListener("input", groesse);
    Die Spracherkennung des Browsers braucht eine gesicherte Verbindung. Im Heimnetz
    (http://) geht das über eine einmalige Chrome-Einstellung (Karte unten). */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-const STOPP = /^(stopp?|stop|ende|danke,? jarvis|tschüss,? jarvis|das wars|das war's|gespräch beenden)[.!]?$/i;
+const STOPP = /^(stopp?|stop|ende|danke,? (?:auron|jarvis)|tschüss,? (?:auron|jarvis)|das wars|das war's|gespräch beenden)[.!]?$/i;
 let gespraech = false, erkennung = null, stilleFehler = 0;
 
 function gespraechEnde() {

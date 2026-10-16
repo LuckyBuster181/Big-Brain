@@ -8,7 +8,7 @@ rem    3 = Messen: Dauer fuer 5 und 10 Sekunden Sprache (base und small)
 rem    4 = Spracherkennung auf lokal stellen      5 = zurueck auf Browser      6 = Stand zeigen
 rem  Einrichten installiert faster-whisper in die venv, laedt das Modell und startet den Dienst jarvis neu.
 rem  Logdatei (an Claude geben): data\whisper_mini_bericht.txt. Messung auch in data\whisper_messung.txt.
-rem  Vorher: REPO HOLEN.bat und JARVIS STARTEN.bat. Fuer die Messung vorher PIPER MINI-PC.bat (macht die Sprachproben).
+rem  Vorher: REPO HOLEN.bat und AURON STARTEN.bat. Fuer die Messung vorher PIPER MINI-PC.bat (macht die Sprachproben).
 rem  Aendert nichts an der .env. Kosten 0 EUR.
 rem ======================================================================
 setlocal EnableExtensions
@@ -48,7 +48,7 @@ if errorlevel 1 (
 )
 ssh %SSHO% %ZIEL% "mkdir -p ~/jarvis-umzug" >nul 2>&1
 if errorlevel 1 (
-  echo  FEHLER: SSH zum Mini-PC geht nicht. JARVIS STARTEN.bat einmal laufen lassen.
+  echo  FEHLER: SSH zum Mini-PC geht nicht. AURON STARTEN.bat einmal laufen lassen.
   >> "%BERICHT%" echo FEHLER: SSH zum Mini-PC geht nicht.
   goto ende
 )

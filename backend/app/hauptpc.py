@@ -36,7 +36,9 @@ from typing import Any
 import httpx
 
 from . import anrede as _anrede
-from . import geraeteschutz
+from . import geraeteschutz, namen
+
+_NAME = namen.ANREDE  # P20: zentrale Namensliste ("auron", "jarvis")
 
 # Stufe je Aktion - muss zur Tabelle im Agenten passen (pc_agent_windows/agent_stufen.py)
 STUFEN: dict[str, int] = {
@@ -116,13 +118,13 @@ WEBSEITEN: dict[str, tuple[str, tuple[str, ...]]] = {
     "wikipedia": ("https://de.wikipedia.org", ("wikipedia",)),
 }
 _YT_SUCHE = re.compile(
-    r"^\s*(?:(?:jarvis|auron)[,\s]+)?(?:bitte\s+)?(?:such\w*|spiel\w*|zeig\w*(?:\s+mir)?|öffne|oeffne|mach)\s+(?:mir\s+)?(?:auf|in|bei)\s+"
+    r"^\s*(?:" + _NAME + r"[,\s]+)?(?:bitte\s+)?(?:such\w*|spiel\w*|zeig\w*(?:\s+mir)?|öffne|oeffne|mach)\s+(?:mir\s+)?(?:auf|in|bei)\s+"
     r"(?:youtube|you\s*tube)\s+(?:nach\s+|das\s+video\s+|den\s+song\s+)?(?P<q>.+?)(?:\s+(?:an|ab|auf))?\s*[.!?]?\s*$|"
-    r"^\s*(?:(?:jarvis|auron)[,\s]+)?(?:bitte\s+)?(?:such\w*|spiel\w*)\s+(?P<q2>.+?)\s+(?:auf|in|bei)\s+(?:youtube|you\s*tube)"
+    r"^\s*(?:" + _NAME + r"[,\s]+)?(?:bitte\s+)?(?:such\w*|spiel\w*)\s+(?P<q2>.+?)\s+(?:auf|in|bei)\s+(?:youtube|you\s*tube)"
     r"(?:\s+(?:an|ab))?\s*[.!?]?\s*$", re.I)
 
 _PC = r"(?:(?:den|meinen|dem|am|auf\s+dem|beim)\s+)?(?:pc|computer|rechner|haupt-?pc)"
-_VOR = r"^\s*(?:(?:jarvis|auron)[,\s]+)?(?:bitte\s+)?"
+_VOR = r"^\s*(?:" + _NAME + r"[,\s]+)?(?:bitte\s+)?"
 _OEFFNEN = re.compile(_VOR + r"(?:öffne|oeffne|starte|start|mach)\s+(?:mir\s+)?(?:(?:den|die|das)\s+)?(?P<ziel>.{2,60}?)"
                       r"(?:\s+(?:am|auf\s+dem|auf\s+meinem)\s+(?:pc|computer|rechner|haupt-?pc))?(?:\s+auf)?\s*(?:bitte)?[.!]?\s*$",
                       re.I)
@@ -181,7 +183,7 @@ class HauptPcFehler(Exception):
 
 
 NICHT_EINGERICHTET = ("Die PC-Steuerung ist noch nicht eingerichtet: am Haupt-PC einmal "
-                      "\"3 Einrichten\\PC_STEUERUNG_EINRICHTEN.bat\" starten, danach \"JARVIS STARTEN.bat\".")
+                      "\"3 Einrichten\\PC_STEUERUNG_EINRICHTEN.bat\" starten, danach \"AURON STARTEN.bat\".")
 
 
 def konfig() -> dict[str, str]:

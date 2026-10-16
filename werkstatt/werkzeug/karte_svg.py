@@ -165,7 +165,7 @@ for i in range(7):
     o.append(f'<path d="M{CX},{CY} Q{CX+30*math.cos(a+.4):.1f},{CY+30*math.sin(a+.4):.1f} {CX+52*math.cos(a):.1f},{CY+52*math.sin(a):.1f}" stroke="#6b4a24" stroke-width="4" fill="none" stroke-linecap="round"/>')
 o.append(f'<circle cx="{CX}" cy="{CY}" r="12" fill="#5a3d1c" stroke="#fff3c0" stroke-width="2"/>')
 o.append(f'<text x="{CX}" y="{CY+4}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff3c0">J</text>')
-o.append(f'<text x="{CX}" y="{CY-88}" text-anchor="middle" class="t ort" style="font-size:18px">Weltenbaum · Jarvis</text>')
+o.append(f'<text x="{CX}" y="{CY-88}" text-anchor="middle" class="t ort" style="font-size:18px">Weltenbaum · Auron</text>')
 
 # Türme
 for w, name, st, form in TUERME:
@@ -188,12 +188,12 @@ schild(g_c[0], g_c[1], "Vault", "Insel Gehirn", STATUS["laeuft"])
 schild(tr_c[0], tr_c[1], "Trading", "Fernklippe (aus)", STATUS["aus"], 4)
 
 # Titel, Legende, Kompass, Maßstab
-o.append('<text x="40" y="58" class="t" style="font-size:30px;font-weight:800">Jarvis-Welt · Kartenplan</text>')
+o.append('<text x="40" y="58" class="t" style="font-size:30px;font-weight:800">Auron-Welt · Kartenplan</text>')
 o.append('<text x="40" y="82" class="t g" style="font-size:14px">Entwurf 04.10.2026 · eigene Gestaltung · Draufsicht, nicht maßstabsgenau</text>')
 lx, ly = 1180, 210
 o.append(f'<rect x="{lx-18}" y="{ly-30}" width="318" height="340" rx="12" fill="#0b1d28" opacity=".78"/>')
 o.append(f'<text x="{lx}" y="{ly}" class="t k" style="font-size:15px">Legende</text>')
-eintraege = [("circ", "#f3c74f", "Weltenbaum = Jarvis (Mitte)"), ("rauten", "#3fbf6a", "6 Türme: Geräte &amp; Systeme"),
+eintraege = [("circ", "#f3c74f", "Weltenbaum = Auron (Mitte)"), ("rauten", "#3fbf6a", "6 Türme: Geräte &amp; Systeme"),
              ("circ2", "#3fbf6a", "Regionen und Inseln"), ("farbe", "#3fbf6a", "läuft"), ("farbe", "#e2b33c", "wartet"),
              ("farbe", "#8a8f98", "aus"), ("linie", "#e8dcb0", "Straße / Ringstraße"), ("strich", "#ffffff", "Bootslinie"),
              ("strich", "#c9a7ff", "Lichtstrom: Nachtarbeit schreibt Notizen"), ("klippe", "#3b3a33", "Steilküste (Ecken und Kanten)"),

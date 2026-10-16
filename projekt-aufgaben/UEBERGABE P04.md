@@ -22,7 +22,7 @@ geht das Audio an Google oder Microsoft, mit Whisper bleibt es im Heimnetz. Das 
 - `1 Starten/WHISPER MINI-PC.bat` + `whisper_mini_einrichten.sh` (per ssh):
   1 = einrichten mit base, 2 = einrichten mit small, 3 = messen (base und small), 4 = Spracherkennung lokal,
   5 = zurück auf Browser, 6 = Stand. Einrichten installiert `faster-whisper` und `av<19` in die venv und lädt das Modell.
-  Dann startet es den Dienst „jarvis“ neu (über `jarvis_mini.sh neustart`, das JARVIS STARTEN.bat auf den Mini-PC legt) und stellt
+  Dann startet es den Dienst „jarvis“ neu (über `jarvis_mini.sh neustart`, das AURON STARTEN.bat auf den Mini-PC legt) und stellt
   das Modell im Backend ein.
   Logdatei: `data\whisper_mini_bericht.txt` (wird fortgeschrieben, nicht überschrieben).
 - `backend/whisper_messung.py`: Dauer der Erkennung für 5 und 10 Sekunden Sprache, je 3 Läufe, dazu der grob gezählte Anteil
@@ -34,7 +34,7 @@ geht das Audio an Google oder Microsoft, mit Whisper bleibt es im Heimnetz. Das 
 
 ## Was Sir tun muss
 
-1. `REPO HOLEN.bat`, danach `JARVIS STARTEN.bat` (neuer Code auf den Mini-PC), im Browser Strg+F5.
+1. `REPO HOLEN.bat`, danach `AURON STARTEN.bat` (neuer Code auf den Mini-PC), im Browser Strg+F5.
 2. `1 Starten\WHISPER MINI-PC.bat`, Taste **1** (base). Dauert einige Minuten, das Modell hat ca. 150 MB.
 3. Gleiches .bat, Taste **3** (Messen). Vorher muss Piper eingerichtet sein (`PIPER MINI-PC.bat` Taste 1).
 4. Gleiches .bat, Taste **4** (lokal einschalten). Dann in Auron auf den Mikrofon-Knopf: Der Hinweis zeigt „Ich höre zu (lokal), Sir …“.
@@ -56,7 +56,7 @@ Wiederholungen mehrfach nach. Das liegt am Inhalt, nicht an der Aufnahme aus dem
 ## Grenzen
 
 - Der Dienst wird über `~/jarvis-umzug/jarvis_mini.sh neustart` neu gestartet. Fehlt die Datei oder fehlt das Recht, steht im
-  Bericht „Bitte JARVIS STARTEN.bat starten“.
+  Bericht „Bitte AURON STARTEN.bat starten“.
 - Das Modell lädt beim ersten Mal von HuggingFace, der Mini-PC braucht dafür Internet. Läuft der Dienst unter einem anderen
   Benutzer als `max1`, lädt er das Modell beim ersten Satz noch einmal (eigener Cache). Abhilfe: `WHISPER_MODELLORDNER` in der .env.
 - faster-whisper steht nicht in `backend/requirements.txt` (wie Piper), es kommt nur über das .bat in die venv des Mini-PCs.

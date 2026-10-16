@@ -3,7 +3,7 @@
 # der Router (DHCP) dem Haupt-PC jederzeit eine ANDERE IP geben - dann steht in der .env noch die alte
 # HAUPTPC_URL und der Mini-PC erreicht die PC-Steuerung nicht mehr ("Der Haupt-PC antwortet nicht").
 # Dieses Skript traegt bei JEDEM Start die aktuelle IP ein, egal ob reserviert oder nicht.
-# Wird von JARVIS STARTEN.bat aufgerufen, macht nichts, wenn die PC-Steuerung nicht eingerichtet ist.
+# Wird von AURON STARTEN.bat aufgerufen, macht nichts, wenn die PC-Steuerung nicht eingerichtet ist.
 param([Parameter(Mandatory = $true)][string]$J)
 $ErrorActionPreference = 'Stop'
 $envDatei = Join-Path $J '.env'

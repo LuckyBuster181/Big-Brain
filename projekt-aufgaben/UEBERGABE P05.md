@@ -24,12 +24,12 @@ geprüft (Sprechen, Einmal-Laden, Einrichtungsskript, Messskript). Am Mini-PC se
 
 ## Was Sir tun muss
 
-1. `REPO HOLEN.bat`, danach `JARVIS STARTEN.bat` (bringt den neuen Code auf den Mini-PC, startet neu). Strg+F5 im Browser.
+1. `REPO HOLEN.bat`, danach `AURON STARTEN.bat` (bringt den neuen Code auf den Mini-PC, startet neu). Strg+F5 im Browser.
 2. `1 Starten\PIPER MINI-PC.bat`, Taste **1** (Einrichten). Es installiert `piper-tts` in die venv des Mini-PCs, lädt die Stimmen
    `de_DE-thorsten-high` und `-medium` nach `tools/piper` (falls dort nicht schon vorhanden, ca. 190 MB), erzeugt einen Probesatz
    und schreibt `data\piper_mini_bericht.txt`. Hörproben: `data\piper_probe_high.wav` und `piper_probe_medium.wav`.
    Das Skript findet den Projektordner und die venv über den Dienst „jarvis“; findet es sie nicht, steht es im Bericht.
-3. `JARVIS STARTEN.bat` noch einmal (das Backend lädt die Stimme dann beim Start vor).
+3. `AURON STARTEN.bat` noch einmal (das Backend lädt die Stimme dann beim Start vor).
 4. `1 Starten\PIPER MINI-PC.bat`, Taste **2** (Messen, einige Minuten). Ergebnis: `data\stimme_messung.txt`:
    Zeit bis der Ton fertig ist (Satz mit 80 Zeichen, je 5 Läufe) für Fish Audio, Piper high, Piper medium, dazu 20 Sätze
    hintereinander auf Fehler. Fish Audio wird nur gemessen, wenn `FISH_API_KEY` gesetzt ist (25 kurze Sätze, kostenlos).

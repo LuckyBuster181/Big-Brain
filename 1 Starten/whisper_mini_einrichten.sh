@@ -7,7 +7,7 @@
 #     bash whisper_mini_einrichten.sh lokal | browser           Spracherkennung umstellen (Einstellung im Backend)
 #     bash whisper_mini_einrichten.sh status
 #
-# Projektordner und venv findet es selbst (Dienst "jarvis", sonst bekannte Ordner); anders: JARVIS_DIR=/pfad.
+# Projektordner und venv findet es selbst (Dienst "jarvis", sonst bekannte Ordner); anders: AURON_DIR=/pfad (alt: JARVIS_DIR).
 # Aendert nichts an der .env. Kosten: 0 EUR (Download Modell base ca. 150 MB, small ca. 480 MB).
 # Ungetestet auf dem Mini-PC (in der Cloud mit echtem faster-whisper und Piper-Sprachproben geprueft).
 
@@ -15,12 +15,13 @@ set -u
 
 AKTION="${1:-einrichten}"
 shift || true
-PORT="${JARVIS_PORT:-8000}"
+PORT="${AURON_PORT:-${JARVIS_PORT:-8000}}"
 export WHISPER_THREADS="${WHISPER_THREADS:-2}"
 
 suche_ordner() {
     local kandidat
-    if [ -n "${JARVIS_DIR:-}" ] && [ -d "$JARVIS_DIR/backend" ]; then echo "$JARVIS_DIR"; return; fi
+    local vorgabe="${AURON_DIR:-${JARVIS_DIR:-}}"   # P20: AURON_DIR vor JARVIS_DIR
+    if [ -n "$vorgabe" ] && [ -d "$vorgabe/backend" ]; then echo "$vorgabe"; return; fi
     for modus in "" "--user"; do
         kandidat="$(systemctl $modus show jarvis -p WorkingDirectory --value 2>/dev/null || true)"
         kandidat="${kandidat%/backend}"
@@ -87,23 +88,23 @@ neu_starten() {
     if [ -f "$HOME/jarvis-umzug/jarvis_mini.sh" ]; then
         bash "$HOME/jarvis-umzug/jarvis_mini.sh" neustart; local rc=$?
         if [ "$rc" -eq 0 ]; then echo "  Dienst jarvis neu gestartet."; return 0; fi
-        echo "  Neustart ueber jarvis_mini.sh ging nicht (Code $rc). Bitte JARVIS STARTEN.bat starten."; return 1
+        echo "  Neustart ueber jarvis_mini.sh ging nicht (Code $rc). Bitte AURON STARTEN.bat starten."; return 1
     fi
     if systemctl --user restart jarvis 2>/dev/null || sudo -n systemctl restart jarvis 2>/dev/null; then
         echo "  Dienst jarvis neu gestartet."; return 0
     fi
-    echo "  Dienst konnte nicht neu gestartet werden (kein Recht). Bitte JARVIS STARTEN.bat starten."; return 1
+    echo "  Dienst konnte nicht neu gestartet werden (kein Recht). Bitte AURON STARTEN.bat starten."; return 1
 }
 
 echo "===== Whisper auf dem Mini-PC: $AKTION $*, $(date '+%d.%m.%Y %H:%M:%S') ====="
 ORDNER="$(suche_ordner)"
-if [ -z "$ORDNER" ]; then echo "FEHLER: Projektordner nicht gefunden. JARVIS_DIR=/pfad angeben oder an Claude melden."; exit 2; fi
+if [ -z "$ORDNER" ]; then echo "FEHLER: Projektordner nicht gefunden. AURON_DIR=/pfad angeben oder an Claude melden."; exit 2; fi
 PY="$(suche_python "$ORDNER")"
 if [ -z "$PY" ]; then echo "FEHLER: keine venv gefunden."; exit 2; fi
 echo "Projektordner: $ORDNER"
 echo "Python:        $PY ($("$PY" --version 2>&1))"
 if ! grep -q "def vorladen" "$ORDNER/backend/app/stt.py" 2>/dev/null; then
-    echo "FEHLER: Auf dem Mini-PC liegt noch der alte Code (stt.py ohne vorladen). Erst REPO HOLEN.bat und JARVIS STARTEN.bat."
+    echo "FEHLER: Auf dem Mini-PC liegt noch der alte Code (stt.py ohne vorladen). Erst REPO HOLEN.bat und AURON STARTEN.bat."
     exit 3
 fi
 cd "$ORDNER/backend" || exit 2

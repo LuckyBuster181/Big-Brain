@@ -1,7 +1,7 @@
 @echo off
 rem AURON_APP_EINRICHTEN.bat (04.10.2026, Claude): legt das Symbol "Auron" auf dem Desktop und im Startmenue an.
-rem Einmal starten. Danach genuegt ein Doppelklick auf das Symbol "Auron" (kein JARVIS STARTEN mehr noetig,
-rem solange Jarvis auf dem Mini-PC laeuft; sonst fragt das Symbol, ob JARVIS STARTEN.bat laufen soll).
+rem Einmal starten. Danach genuegt ein Doppelklick auf das Symbol "Auron" (kein AURON STARTEN mehr noetig,
+rem solange Auron auf dem Mini-PC laeuft; sonst fragt das Symbol, ob AURON STARTEN.bat laufen soll).
 setlocal
 chcp 65001 >nul
 title Auron einrichten

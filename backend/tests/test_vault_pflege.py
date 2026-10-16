@@ -67,7 +67,7 @@ class VaultPflegeTest(unittest.TestCase):
 
     def test_bericht_wird_erzeugt(self):
         text = vault_pflege.render(self.result, "2026-09-20")
-        self.assertIn("jarvis: ignorieren", text)
+        self.assertIn("auron: ignorieren", text)   # P20: neuer Name, alter gilt weiter
         self.assertIn("`Gehirn/Trading/` → `Wissen/Trading/`", text)
         self.assertIn("Links ins Leere", text)
 

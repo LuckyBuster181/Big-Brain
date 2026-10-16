@@ -5,7 +5,7 @@ rem  Wissen aus Wikipedia in den Vault holen (app/wissensimport.py):
 rem  Sonnet fasst ausgezeichnete Artikel zusammen, Haiku prueft jede Notiz
 rem  gegen den Artikel, Opus jede 10. Notiz. Deckel 10 $ fuer alles.
 rem  Laeuft auf dem Mini-PC im Hintergrund weiter (auch wenn dieses Fenster zu ist).
-rem  Vorher einmal 1 Starten\JARVIS STARTEN.bat (bringt den neuen Code hin).
+rem  Vorher einmal 1 Starten\AURON STARTEN.bat (bringt den neuen Code hin).
 rem ======================================================================
 setlocal EnableExtensions
 for %%I in ("%~dp0..") do set "J=%%~fI"

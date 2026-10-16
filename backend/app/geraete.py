@@ -44,7 +44,7 @@ from urllib.parse import quote
 
 import anyio
 
-from . import geraeteschutz
+from . import geraeteschutz, namen
 
 JARVIS = Path(__file__).resolve().parents[2]
 NOVNC_ORDNER = JARVIS / "dashboard" / "novnc"
@@ -84,12 +84,11 @@ def _wert(name: str) -> str:
 def zugangscodes() -> dict[str, str]:
     """{geraet_schluessel: code} aus allen JARVIS_ZUGANG_<NAME>-Einträgen der .env."""
     codes = {}
-    for name, wert in os.environ.items():
-        if name.startswith("JARVIS_ZUGANG_"):
-            schluessel = name[len("JARVIS_ZUGANG_"):].strip().lower()
-            code = str(wert or "").strip().strip('"').strip("'")
-            if schluessel and len(code) >= 8:
-                codes[schluessel] = code
+    for rest, wert in namen.env_gruppe("ZUGANG_").items():   # P20: AURON_ZUGANG_<NAME> vor JARVIS_ZUGANG_<NAME>
+        schluessel = rest.strip().lower()
+        code = str(wert or "").strip().strip('"').strip("'")
+        if schluessel and len(code) >= 8:
+            codes[schluessel] = code
     return codes
 
 
@@ -271,7 +270,7 @@ def zugriffe(anzahl: int = 40) -> list[dict]:
 # ------------------------------------------------------------------ Status
 
 def vnc_passwort(schluessel: str) -> str:
-    return _wert(f"JARVIS_VNC_{schluessel.upper()}")[:8]
+    return (namen.env(f"VNC_{schluessel.upper()}") or "").strip().strip('"').strip("'")[:8]   # P20: AURON_ vor JARVIS_
 
 
 def port_offen(ip: str | None, port: int = VNC_PORT, timeout: float = PRUEF_TIMEOUT_S) -> bool:
@@ -402,7 +401,7 @@ def _anzeige_ueber_agent(wahl: str) -> dict:
         return {"ok": True, "anzeige": wahl}
     meldung = str(e.get("meldung") or e.get("fehler") or "unbekannter Grund")
     if meldung.startswith("Unbekannte Aktion"):
-        meldung = "Der PC-Agent am Haupt-PC ist noch die alte Version - JARVIS STARTEN.bat am Haupt-PC starten."
+        meldung = "Der PC-Agent am Haupt-PC ist noch die alte Version - AURON STARTEN.bat am Haupt-PC starten."
     return {"ok": False, "anzeige": wahl, "fehler": meldung}
 
 

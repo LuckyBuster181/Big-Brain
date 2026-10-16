@@ -172,7 +172,7 @@ def bild_zeiten(dauer: float) -> list[float]:
 def standbilder(video: Path, ziel: Path, dauer: float | None = None, ffmpeg: str | None = None) -> list[Path]:
     ffmpeg = ffmpeg or ffmpeg_befehl()
     if not ffmpeg:
-        raise SehenFehler("ffmpeg nicht gefunden (auf dem Mini-PC: JARVIS STARTEN.bat installiert imageio-ffmpeg).")
+        raise SehenFehler("ffmpeg nicht gefunden (auf dem Mini-PC: AURON STARTEN.bat installiert imageio-ffmpeg).")
     ziel.mkdir(parents=True, exist_ok=True)
     if not dauer:
         dauer = video_dauer(ffmpeg, video)
@@ -546,7 +546,7 @@ def start(anzahl: int, deckel_usd: float | None = None, pause_s: float | None = 
         if not tiktok.yt_dlp_befehl():
             raise SehenFehler("yt-dlp nicht gefunden.")
         if not ffmpeg_befehl():
-            raise SehenFehler("ffmpeg nicht gefunden - einmal JARVIS STARTEN.bat ausführen (installiert imageio-ffmpeg).")
+            raise SehenFehler("ffmpeg nicht gefunden - einmal AURON STARTEN.bat ausführen (installiert imageio-ffmpeg).")
         video_funktion = video_sehen
     with _lock:
         if _stand.get("laeuft"):

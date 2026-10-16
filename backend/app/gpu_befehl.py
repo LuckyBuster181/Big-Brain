@@ -15,9 +15,13 @@ import re
 import time
 from typing import Any
 
+from . import namen
+
+_NAME = namen.ANREDE  # P20: zentrale Namensliste ("auron", "jarvis")
+
 BESTAETIGUNG_S = 120
 
-_V = r"^\s*(?:(?:jarvis|auron)[,\s]+)?(?:bitte\s+)?"
+_V = r"^\s*(?:" + _NAME + r"[,\s]+)?(?:bitte\s+)?"
 _GPU = r"(?:gpu|g-?p-?u|gpu-?miete|gemieteten?\s+gpu)"
 
 _STATUS = re.compile(

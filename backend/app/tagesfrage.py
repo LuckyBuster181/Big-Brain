@@ -21,10 +21,16 @@ import time
 from pathlib import Path
 from typing import Any
 
-from . import aufgaben_loop, chat_service
+from . import aufgaben_loop, chat_service, namen
 
 MODELL = os.getenv("TAGESFRAGE_MODELL", "claude-haiku-4-5-20251001")
-VAULT_NOTIZ = "01 - Persönliches/06 - Jarvis fragt.md"
+VAULT_NOTIZ = "01 - Persönliches/06 - Jarvis fragt.md"   # P20: nach der Umbenennung gilt "06 - Auron fragt.md"
+
+
+def notiz_rel() -> str:
+    """Die Notiz, die gerade gilt (Auron-Fassung, sobald es sie im Vault gibt)."""
+    v = _vault()
+    return namen.vault_datei(v, VAULT_NOTIZ) if v else VAULT_NOTIZ
 UEBER_MICH = "00 - Über mich.md"
 DEFAULT_PFAD = Path(__file__).resolve().parents[2] / "data" / "tagesfragen.json"
 _lock = threading.RLock()
@@ -138,7 +144,7 @@ def text_fuer_briefing(client: Any = None) -> str:
     if e.get("antwort"):
         return ""
     return (f"**Frage des Tages:** {e['frage']}\n"
-            f"(Antwort einfach im Chat mit \"Antwort: ...\" - ich trage sie in \"{VAULT_NOTIZ}\" ein, Sir.)")
+            f"(Antwort einfach im Chat mit \"Antwort: ...\" - ich trage sie in \"{notiz_rel()}\" ein, Sir.)")
 
 
 def beantworten(antwort: str, datum: str | None = None) -> dict:
@@ -164,7 +170,8 @@ def _in_vault(e: dict) -> str | None:
     v = _vault()
     if not v:
         return None
-    ziel = v / VAULT_NOTIZ
+    rel = namen.vault_datei(v, VAULT_NOTIZ)
+    ziel = v / rel
     ziel.parent.mkdir(parents=True, exist_ok=True)
     if not ziel.exists():
         ziel.write_text(
@@ -175,4 +182,4 @@ def _in_vault(e: dict) -> str | None:
     antwort = re.sub(r"\n+", " ", e["antwort"]).strip()
     with ziel.open("a", encoding="utf-8") as fh:
         fh.write(f"\n## {datum}\n**Frage:** {e['frage']}\n**Antwort:** {antwort}\n")
-    return VAULT_NOTIZ
+    return rel

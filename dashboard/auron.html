@@ -1583,7 +1583,7 @@ function warnungAktualisieren() {
   if (!zustand.backend) {
     warnungZeigen("rot", "Keine Verbindung zum Mini-PC, Sir.",
       "Auron läuft auf dem Mini-PC und antwortet gerade nicht. Ursachen: Mini-PC aus, Netzwerkkabel, oder die Verbindung (Tunnel) ist zu. " +
-      "Abhilfe: Auron über das Desktop-Symbol neu starten, sonst JARVIS STARTEN.bat.");
+      "Abhilfe: Auron über das Desktop-Symbol neu starten, sonst AURON STARTEN.bat.");
     return;
   }
   // 16.10.2026 (P24b): Fehler im ganzen System (Ampel rot: Vault, Aufgaben-Loop, Kosten, GPU-Miete ...) haben Vorrang
@@ -1598,7 +1598,7 @@ function warnungAktualisieren() {
   }
   const k = zustand.ki;
   if (zustand.kiAlt) {
-    warnungZeigen("info", "Neustart nötig, Sir.", "Das Backend auf dem Mini-PC ist noch die alte Version. Bitte JARVIS STARTEN.bat starten, " +
+    warnungZeigen("info", "Neustart nötig, Sir.", "Das Backend auf dem Mini-PC ist noch die alte Version. Bitte AURON STARTEN.bat starten, " +
       "damit lokale KI mit Claude-Rückfall und diese Fehleranzeige vollständig laufen.");
     return;
   }

@@ -25,7 +25,11 @@ from __future__ import annotations
 
 import re
 
-_V = r"^\s*(?:(?:jarvis|auron)[,\s]+)?(?:bitte\s+)?(?:(?:kannst|könntest|koenntest)\s+du\s+(?:mir\s+)?)?"
+from . import namen
+
+_NAME = namen.ANREDE  # P20: zentrale Namensliste ("auron", "jarvis")
+
+_V = r"^\s*(?:" + _NAME + r"[,\s]+)?(?:bitte\s+)?(?:(?:kannst|könntest|koenntest)\s+du\s+(?:mir\s+)?)?"
 _MM = r"(?:mind\s*-?\s*maps?|mindmaps?)"
 
 # --------------------------------------------------------------- Schreiben
@@ -113,7 +117,7 @@ _TAGESPLAN = re.compile(
 # --------------------------------------------------------------- Briefing (05.10.2026)
 # Vorher landete "Briefing" im Chat in der Vault-Suche, und die KI erfand ein Briefing aus alten Notizen.
 _BRIEFING = re.compile(
-    _V + r"(?:(?:mein|das|ein|dein)\s+)?(?:tages-?|morgen-?|abend-?)?briefing(?:\s+(?:bitte|jarvis|auron|für\s+heute|fuer\s+heute))?|"
+    _V + r"(?:(?:mein|das|ein|dein)\s+)?(?:tages-?|morgen-?|abend-?)?briefing(?:\s+(?:bitte|" + _NAME + r"|für\s+heute|fuer\s+heute))?|"
     + _V + r"(?:gib|mach)\w*\s+(?:mir\s+)?(?:das|ein|mein)\s+(?:tages-?)?briefing|" + _V + r"brief\s+mich", re.I)
 _BRIEFING_GANZ = re.compile(r"\s*[.!?]*\s*$")
 
