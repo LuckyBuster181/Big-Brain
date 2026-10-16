@@ -55,6 +55,7 @@ _LINK_RE = re.compile(
 )
 _VIDEO_ID_RE = re.compile(r"/video/(\d{8,25})")
 _lock = threading.Lock()
+_vault_lock = threading.Lock()  # verhindert zwei gleichzeitige Notizen zum selben Video
 _python_cache: list[str] | None = None
 
 
@@ -152,13 +153,43 @@ def liste() -> list[dict]:
         return _laden()
 
 
+def _bekannte_nummern(eintraege: list[dict]) -> set[str]:
+    """Alle Kennungen UND alle echten Video-Nummern der Liste (P25, 16.10.2026).
+    Ein Kurzlink hat zuerst nur eine Ersatz-Kennung ("k..."); die echte Nummer
+    steht erst nach dem Abruf in video_id. Ohne diese Menge käme dasselbe Video
+    über den vollen Link ein zweites Mal in die Liste."""
+    nummern: set[str] = set()
+    for e in eintraege:
+        nummern.add(e["id"])
+        if e.get("video_id"):
+            nummern.add(str(e["video_id"]))
+    return nummern
+
+
+def _original_zu(eintraege: list[dict], eigene_id: str, video_id: str) -> dict | None:
+    """Anderer Eintrag mit derselben Video-Nummer (video_id oder id). Bevorzugt
+    einen, der selbst keine Dublette ist; unter mehreren der älteste."""
+    treffer = [e for e in eintraege
+               if e["id"] != eigene_id and (str(e.get("video_id") or "") == video_id or e["id"] == video_id)]
+    if not treffer:
+        return None
+    treffer.sort(key=lambda e: (bool(e.get("dublette_von")), e.get("hinzugefuegt") or ""))
+    return treffer[0]
+
+
+def _original_info(eintraege: list[dict], dublette: dict) -> dict:
+    orig = next((e for e in eintraege if e["id"] == dublette.get("dublette_von")), None) or {}
+    return {"original_id": dublette.get("dublette_von"), "original_titel": orig.get("titel") or "",
+            "original_notiz": orig.get("notiz") or ""}
+
+
 def hinzufuegen(text: str, quelle: str = "HUD") -> dict:
     urls = links_finden(text)
     if not urls:
         raise TikTokFehler("Kein TikTok-Link erkannt (erwartet z.B. https://www.tiktok.com/@name/video/123...).")
     with _lock:
         eintraege = _laden()
-        bekannt = {e["id"] for e in eintraege}
+        bekannt = _bekannte_nummern(eintraege)
         neu = 0
         for url in urls:
             vid = link_id(url)
@@ -289,6 +320,8 @@ def _untertitel_wahl(dateien: list[Path]) -> Path | None:
 def abrufen(vid: str) -> dict:
     """Holt Metadaten und Untertitel EINES Videos (kein Videodownload)."""
     eintrag = _eintrag(vid)
+    if eintrag.get("dublette_von"):  # schon als doppelt erkannt: kein neuer Abruf
+        return {**eintrag, **_original_info(_laden(), eintrag)}
     befehl = yt_dlp_befehl()
     if not befehl:
         raise TikTokFehler("yt-dlp nicht gefunden - einmal TIKTOK_EINRICHTEN.bat ausführen, dann NEUSTART.bat.")
@@ -323,6 +356,15 @@ def abrufen(vid: str) -> dict:
         info = json.loads(infos[0].read_text(encoding="utf-8")) if infos else {}
     except (json.JSONDecodeError, OSError):
         info = {}
+    echte_nummer = str(info.get("id") or vid)
+    with _lock:
+        alle = _laden()
+        orig = _original_zu(alle, vid, echte_nummer)
+    if orig:
+        # P25: dasselbe Video steckt schon in einem anderen Eintrag -> nur markieren, nichts weiter
+        neu = _aendern(vid, status="dublette", dublette_von=orig["id"], fehler=None, video_id=echte_nummer)
+        return {**neu, "original_id": orig["id"], "original_titel": orig.get("titel") or "",
+                "original_notiz": orig.get("notiz") or ""}
     untertitel = _untertitel_wahl([p for p in ziel.iterdir() if p.suffix.lower() in (".vtt", ".srt")])
     transkript = vtt_zu_text(untertitel.read_text(encoding="utf-8", errors="replace")) if untertitel else ""
     (ziel / "transkript.txt").write_text(transkript, encoding="utf-8")
@@ -331,7 +373,7 @@ def abrufen(vid: str) -> dict:
         status="geholt",
         fehler=None,
         geholt=_jetzt(),
-        video_id=str(info.get("id") or vid),
+        video_id=echte_nummer,
         titel=(info.get("title") or info.get("fulltitle") or "")[:200],
         autor=info.get("uploader") or info.get("creator") or info.get("channel") or "",
         beschreibung=(info.get("description") or "")[:4000],
@@ -542,10 +584,11 @@ def _slides(vid: str) -> list[dict]:
 
 def reparieren() -> dict:
     """Aufräumen der Linkliste: zusammengeklebte Links trennen, hängende Abrufe
-    ("läuft" ohne Ende) zurück auf "neu". Nichts wird gelöscht."""
+    ("läuft" ohne Ende) zurück auf "neu", Dubletten (gleiche Video-Nummer)
+    markieren. Nichts wird gelöscht."""
     with _lock:
         eintraege = _laden()
-        bekannt = {e["id"] for e in eintraege}
+        bekannt = _bekannte_nummern(eintraege)
         getrennt, zurueck = 0, 0
         for e in list(eintraege):
             url = e.get("url", "")
@@ -570,8 +613,31 @@ def reparieren() -> dict:
             elif e.get("status") == "laeuft":
                 e["status"], e["fehler"] = "neu", "Abruf hing - zurückgesetzt, bitte noch einmal abrufen."
                 zurueck += 1
+        markiert = _dubletten_markieren(eintraege)
         _speichern(eintraege)
-    return {"getrennt": getrennt, "zurueckgesetzt": zurueck, "gesamt": len(eintraege)}
+    return {"getrennt": getrennt, "zurueckgesetzt": zurueck, "gesamt": len(eintraege),
+            "dubletten": len(markiert), "dubletten_notizen": [e["notiz"] for e in markiert if e.get("notiz")]}
+
+
+def _dubletten_markieren(eintraege: list[dict]) -> list[dict]:
+    """P25: Einträge mit gleicher Video-Nummer (id oder video_id) finden. Der
+    älteste (hinzugefuegt) bleibt, die übrigen bekommen status "dublette" und
+    dublette_von. Notizen im Vault bleiben unberührt, nichts wird gelöscht.
+    Verändert die Einträge in der Liste und gibt die neu markierten zurück."""
+    besitzer: dict[str, str] = {}
+    markiert: list[dict] = []
+    for e in sorted(eintraege, key=lambda x: x.get("hinzugefuegt") or ""):
+        if e.get("dublette_von"):
+            continue
+        nummern = {e["id"], *([str(e["video_id"])] if e.get("video_id") else [])}
+        original = next((besitzer[n] for n in sorted(nummern) if n in besitzer), None)
+        if original and original != e["id"]:
+            e.update({"status": "dublette", "dublette_von": original, "fehler": None})
+            markiert.append(e)
+        else:
+            for n in nummern:
+                besitzer[n] = e["id"]
+    return markiert
 
 
 def details(vid: str) -> dict:
@@ -593,13 +659,30 @@ def _dateiname(titel: str) -> str:
 
 
 def in_vault(vid: str, vault_path: str | None = None) -> dict:
-    """Legt eine Entwurfs-Notiz mit Beschreibung und Abschrift im Vault an."""
+    """Legt eine Entwurfs-Notiz mit Beschreibung und Abschrift im Vault an.
+    Gibt es zu dem Eintrag schon eine Notiz, wird KEINE zweite angelegt (P25):
+    die Notiz kann einen Bild-Block von tiktok_sehen enthalten. Dubletten
+    bekommen nie eine Notiz."""
+    with _vault_lock:
+        return _in_vault(vid, vault_path)
+
+
+def _in_vault(vid: str, vault_path: str | None) -> dict:
     e = details(vid)
+    if e.get("dublette_von"):
+        orig = _original_info(_laden(), e)
+        wo = f" (Notiz: {orig['original_notiz']})" if orig["original_notiz"] else ""
+        raise TikTokFehler(
+            f"Doppelt: dieses Video gibt es schon als \"{orig['original_titel'] or orig['original_id']}\"{wo}. "
+            "Keine zweite Notiz."
+        )
     if e.get("status") not in ("geholt", "im_vault"):
         raise TikTokFehler("Erst abrufen, dann in den Vault übernehmen.")
     vault_path = vault_path or os.getenv("VAULT_PATH")
     if not vault_path or not Path(vault_path).is_dir():
         raise TikTokFehler("VAULT_PATH ist nicht gesetzt oder nicht vorhanden (.env prüfen).")
+    if e.get("notiz") and (Path(vault_path) / e["notiz"]).is_file():
+        return _eintrag(vid)  # Notiz gibt es schon: nichts anlegen, nichts ändern
     titel = e.get("titel") or (e.get("beschreibung") or "")[:60] or f"TikTok {vid}"
     ziel_ordner = Path(vault_path) / ENTWURF_ORDNER
     ziel_ordner.mkdir(parents=True, exist_ok=True)
