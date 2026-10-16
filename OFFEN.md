@@ -24,6 +24,9 @@ Von Sir zurueckgestellt ("machen wir wann anders"). Naechste Sitzung: Sir fragen
    - Sir: RunPod-Konto, Network Volume, Schluessel in die .env, Waechter auf dem Mini-PC einrichten, kleiner Testlauf mit offener
      RunPod-Konsole. Ablauf in `projekt-aufgaben/UEBERGABE P24.md`.
    - Danach pruefen: Feldnamen der RunPod-Antworten, Vorladen des Modells im Pod, Image auf feste Version setzen.
+   - P24b: Alexa-Alarm (Benachrichtigung statt Erinnerung, Amazon erlaubt keine neue Erinnerung von aussen) ungetestet; Skill-Manifest,
+     Zugangsdaten und Test in `projekt-aufgaben/UEBERGABE P24b.md`. Unklar: ob de-DE und Entwicklungsmodus das Ereignis zustellen.
+   - Offene Fragen an Sir: GPU-Deckel (40 EUR oder 40 $, harte Obergrenze 60 EUR?), Modell (70B oder bei qwen3-coder:30b bleiben).
 
 ## Erledigt am 10.10.2026 (zur Einordnung)
 - Sucher und Schreiber (Agenten-Station, Chat-Befehl "Such und schreib: ...").

@@ -88,6 +88,14 @@ async def lifespan(_app: FastAPI):
     except Exception as exc:  # noqa: BLE001
         print(f"WARNUNG: GPU-Start-Prüfung nicht gestartet: {exc}", flush=True)
 
+    # 16.10.2026 (P24b): Alarme - rote Bereiche der Ampel melden (Alexa-Benachrichtigung, sofern eingerichtet)
+    try:
+        from app import alarm
+
+        alarm.start_hintergrund()
+    except Exception as exc:  # noqa: BLE001
+        print(f"WARNUNG: Alarm-Prüfung nicht gestartet: {exc}", flush=True)
+
     watcher = None
     try:
         watcher = vault_watcher.from_env()
@@ -104,6 +112,12 @@ async def lifespan(_app: FastAPI):
 
     yield
 
+    try:
+        from app import alarm
+
+        alarm.stoppen()
+    except Exception:  # noqa: BLE001
+        pass
     if watcher:
         watcher.stop()
 

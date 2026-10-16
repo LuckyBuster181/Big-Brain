@@ -15,6 +15,8 @@ Fähigkeiten (Intents, Modell in backend/alexa/interaktionsmodell_de.json):
   NachtauftragIntent  nachtauftraege.anlegen()       0 €, erst nach "Ja"
   AktionIntent        nur ALEXA_AKTIONEN (Whitelist) 0 €, erst nach "Ja"
   LetzteAntwortIntent liest data/alexa_letzte_antwort.json
+  GpuAuftragIntent    nachtauftraege.gpu_ausdruecklich_starten()  P24b: Code-Auftrag auf gemietete GPU, kostet Geld,
+                      erst nach "Ja" am Echo; "gpu_aufraeumen" ist eine Aktion der Whitelist
 Bewusst NICHT per Sprache: Trades, Käufe, Mails, Löschen (Fehlauslösung zu leicht).
 
 Zeitbudget: Alexa wartet nur wenige Sekunden. Dauert etwas länger als ZEITBUDGET_S, sagt
@@ -51,6 +53,12 @@ ALEXA_AKTIONEN: dict[str, dict[str, Any]] = {
         "name": "Vault neu einlesen",
         "aktiv": True,
         "antwort": "Der Vault wird neu eingelesen, Sir.",
+    },
+    # P24b (16.10.2026): Wächter sofort - löscht Pods im RunPod-Konto, die nicht da sein dürfen
+    "gpu_aufraeumen": {
+        "name": "GPU aufräumen",
+        "aktiv": True,
+        "antwort": "Ich räume die gemieteten GPUs auf, Sir.",
     },
     # INHALT_PRUEFEN_HINTERGRUND.bat liegt auf dem Haupt-PC, Auron läuft auf dem Mini-PC. Erst wenn
     # der PC-Agent dafür eine feste Aktion hat (Stufe 2, pc_agent_windows ins Repo), hier aktivieren.
@@ -317,6 +325,16 @@ def _merken(text: str) -> dict:
     return {"sprache": "Gemerkt, Sir.", "karte": f"Gemerkt in {v['ziel']}:\n{text}"}
 
 
+def _rote_punkte() -> list[str]:
+    """P24b: alles, was in der Ampel (app/ampel.py) rot ist - "Name: Text", höchstens 4. Fehler = leere Liste."""
+    try:
+        from . import ampel
+
+        return [f"{j['name']}: {j['text']}" for j in ampel.uebersicht()["jobs"] if j.get("farbe") == "rot"][:4]
+    except Exception:  # noqa: BLE001 - die Ansage darf an der Ampel nie scheitern
+        return []
+
+
 def _status() -> dict:
     from . import kosten, nachtarbeit
 
@@ -335,15 +353,21 @@ def _status() -> dict:
     u = kosten.uebersicht()
     teile.append(f"Vom Rahmen sind {_zahl(u['ausgegeben_usd'])} von {_zahl(u['rahmen_usd'], 0)} Dollar verbraucht, "
                  f"{_zahl(u['anteil_prozent'], 0)} Prozent, Sir.")
-    try:   # P24: Alarm der GPU-Miete (Pod nicht als gelöscht bestätigt) wird zuerst gesagt
+    rote = _rote_punkte()
+    try:   # P24: ein gerade laufender Pod wird genannt (ein Alarm steht schon unter den roten Punkten)
         from . import gpu_miete
 
-        hinweis = gpu_miete.sprach_hinweis()
+        hinweis = None if gpu_miete.alarm_lesen() else gpu_miete.sprach_hinweis()
     except Exception:  # noqa: BLE001
         hinweis = None
     if hinweis:
-        teile.insert(0, hinweis)
-    return {"sprache": " ".join(teile), "karte": None}
+        teile.append(hinweis)
+    if rote:   # P24b: Fehler im ganzen System zuerst
+        teile.insert(0, "Achtung Sir, es gibt " + ("einen Fehler: " if len(rote) == 1 else f"{len(rote)} Fehler: ")
+                     + " ".join(r.rstrip(".") + "." for r in rote))
+    else:
+        teile.append("Sonst läuft alles.")
+    return {"sprache": " ".join(teile), "karte": "\n".join(f"- {r}" for r in rote) or None}
 
 
 def _zeitraum(wert: str, heute: datetime.date) -> tuple[datetime.date, datetime.date, str]:
@@ -446,6 +470,19 @@ def _nachtauftrag(text: str) -> dict:
     return {"sprache": f"Auftrag {a['id']} für die Nacht notiert, Sir.", "karte": f"Nachtauftrag {a['id']}: {text}"}
 
 
+def _gpu_auftrag(nummer: int) -> dict:
+    """P24b: Code-Auftrag auf eine gemietete GPU - nur nach dem "Ja" am Echo (kostet Geld)."""
+    from . import nachtauftraege
+
+    try:
+        nachtauftraege.gpu_ausdruecklich_starten(nummer)
+    except nachtauftraege.NachtauftragFehler as exc:
+        return {"sprache": f"Das geht nicht, Sir: {str(exc).rstrip('.')}.", "karte": None}
+    return {"sprache": f"Auftrag {nummer} läuft jetzt auf einer gemieteten GPU, Sir. Der Pod wird danach gelöscht. "
+                       "Fragen Sie später nach dem Status.",
+            "karte": f"Code-Auftrag {nummer} läuft auf einer gemieteten GPU (RunPod). Der Pod wird danach gelöscht."}
+
+
 def _aktion_nachtarbeit() -> bool:
     from . import nachtarbeit
 
@@ -461,9 +498,22 @@ def _aktion_vault_einlesen() -> bool:
 
 
 # Feste Zuordnung Whitelist-Schlüssel -> Funktion. Kein getattr/eval mit Text aus der Anfrage.
+def _aktion_gpu_aufraeumen() -> bool:
+    from . import gpu_miete
+
+    if not gpu_miete.schluessel_da():
+        raise RuntimeError("Die GPU-Miete ist aus, es gibt keinen Schlüssel")
+    if gpu_miete.laeuft():
+        return False   # es läuft gerade eine Miete: nicht dazwischenfunken
+    # im Hintergrund: der Wächter kann bei Fehlern mehrere Sekunden wiederholen, Alexa wartet nicht
+    threading.Thread(target=gpu_miete.waechter_lauf, name="alexa-gpu-aufraeumen", daemon=True).start()
+    return True
+
+
 _AUSFUEHRUNG: dict[str, Callable[[], bool]] = {
     "nachtarbeit_starten": _aktion_nachtarbeit,
     "vault_einlesen": _aktion_vault_einlesen,
+    "gpu_aufraeumen": _aktion_gpu_aufraeumen,
 }
 
 
@@ -507,6 +557,12 @@ def verarbeiten(anfrage: dict, pruef_ms: int = 0) -> dict:
     name = str(_intent(anfrage).get("name") or typ)
     claude = False
     try:
+        try:   # P24b: die Alexa-Kennung von Sir für Alarm-Benachrichtigungen lernen (nur die Kennung, geprüfte Anfrage)
+            from . import alexa_alarm
+
+            alexa_alarm.nutzer_merken(str((((anfrage.get("context") or {}).get("System") or {}).get("user") or {}).get("userId") or ""))
+        except Exception:  # noqa: BLE001
+            pass
         if typ == "LaunchRequest":
             ergebnis = antwort("Auron hört, Sir.", ende=False, nachfrage="Was kann ich tun, Sir?")
         elif typ == "SessionEndedRequest":
@@ -547,13 +603,13 @@ def _intent_verarbeiten(anfrage: dict, name: str) -> tuple[dict, bool]:
 
     if name == "StatusIntent":
         e = _status()
-        return _sprechen(e["sprache"]), False
+        return _sprechen(e["sprache"], e.get("karte")), False
 
     if name == "TermineIntent":
         e = _mit_zeitbudget(name, lambda: _termine(_slot(anfrage, "tag")))
         return antwort(e["sprache"], e.get("karte")), False
 
-    if name in ("MerkenIntent", "NachtauftragIntent", "AktionIntent"):
+    if name in ("MerkenIntent", "NachtauftragIntent", "AktionIntent", "GpuAuftragIntent"):
         return _mit_bestaetigung(anfrage, name), False
 
     if name == "LetzteAntwortIntent":
@@ -587,5 +643,11 @@ def _mit_bestaetigung(anfrage: dict, name: str) -> dict:
         if not text:
             return _weitergeben()
         e = _nachtauftrag(text)
+        return antwort(e["sprache"], e.get("karte"))
+    if name == "GpuAuftragIntent":
+        nummer = re.sub(r"\D", "", _slot(anfrage, "nummer"))
+        if not nummer:
+            return _weitergeben()
+        e = _gpu_auftrag(int(nummer))
         return antwort(e["sprache"], e.get("karte"))
     return antwort(aktion_ausfuehren(_slot_id(anfrage, "aktion")))

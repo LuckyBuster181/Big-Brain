@@ -1512,7 +1512,7 @@ $("chatsNeu").addEventListener("click", () => { $("chatsSchleier").hidden = true
    Sofort sichtbar oben, über allem: (1) Mini-PC/Backend antwortet nicht, (2) lokale KI aus - mit Angabe, ob Claude
    einspringt (kostet) oder gar nichts geht, (3) Backend noch alt (Neustart nötig). Verschwindet von selbst, wenn
    alles wieder läuft. Prüft /api/health alle 15 s und /api/ki/status (kostet nichts) jede Minute. */
-const zustand = { backend: true, backendFehler: 0, ki: null, kiAlt: false };
+const zustand = { backend: true, backendFehler: 0, ki: null, kiAlt: false, ampelRot: [] };
 function warnungZeigen(art, titel, text, punkte) {
   const w = $("warnung");
   w.className = "warnung" + (art === "info" ? " info" : art === "gelb" ? " gelb" : "");
@@ -1527,6 +1527,16 @@ function warnungAktualisieren() {
     warnungZeigen("rot", "Keine Verbindung zum Mini-PC, Sir.",
       "Auron läuft auf dem Mini-PC und antwortet gerade nicht. Ursachen: Mini-PC aus, Netzwerkkabel, oder die Verbindung (Tunnel) ist zu. " +
       "Abhilfe: Auron über das Desktop-Symbol neu starten, sonst JARVIS STARTEN.bat.");
+    return;
+  }
+  // 16.10.2026 (P24b): Fehler im ganzen System (Ampel rot: Vault, Aufgaben-Loop, Kosten, GPU-Miete ...) haben Vorrang
+  const rot = zustand.ampelRot || [];
+  if (rot.length) {
+    const punkte = rot.map((j) => j.name + ": " + j.text);
+    const ki = zustand.ki;
+    if (ki && ki.anbieter === "ollama" && !ki.lokal_bereit) punkte.push("Lokale KI: nicht erreichbar");
+    warnungZeigen("rot", rot.length === 1 ? "Achtung, Sir: " + rot[0].name + " meldet einen Fehler." : "Achtung, Sir: " + rot.length + " Bereiche melden einen Fehler.",
+      "Bitte nachsehen. Einzelheiten sagt auch Alexa: \"Computer, frag Agent Auron nach dem Status\".", punkte);
     return;
   }
   const k = zustand.ki;
@@ -1571,6 +1581,14 @@ async function backendPruefen(sofort) {
   statusZeile(); warnungAktualisieren();
   return zustand.backend;
 }
+async function ampelPruefen() {
+  if (!zustand.backend) return;
+  try {
+    const a = await holeJson("/api/ampel", 8000);
+    zustand.ampelRot = (a.jobs || []).filter((j) => j.farbe === "rot");
+  } catch (e) { return; }   // alter Stand ohne Schnittstelle: still auslassen
+  warnungAktualisieren();
+}
 async function kiPruefen(neu) {
   if (!zustand.backend) return;
   try {
@@ -1582,7 +1600,7 @@ async function kiPruefen(neu) {
 }
 $("warnungPruefen").addEventListener("click", async () => {
   $("warnungPruefen").disabled = true; $("warnungPruefen").textContent = "Prüfe …";
-  try { if (await backendPruefen(true)) await kiPruefen(true); }
+  try { if (await backendPruefen(true)) { await kiPruefen(true); await ampelPruefen(); } }
   finally { $("warnungPruefen").disabled = false; $("warnungPruefen").textContent = "Erneut prüfen"; }
 });
 
@@ -1796,6 +1814,8 @@ $("begruessungTitel").textContent = gruss() + ", Sir. Was darf ich für Sie tun?
 farbeSetzen(speicher.lesen("farbe", "silber"));
 setInterval(backendPruefen, 15000);
 setInterval(() => kiPruefen(), 60000);
+setInterval(ampelPruefen, 60000);   // P24b: rote Bereiche als Banner
+setTimeout(ampelPruefen, 4000);
 // 04.10.2026 (Sir): die Tour kommt bei JEDEM Start von Auron. Nur mit ?tour=aus entfällt sie.
 // 05.10.2026: vorher der Ladebildschirm; die Tour lädt das Universum schon dahinter und beginnt, wenn er fertig ist.
 const mitTour = new URLSearchParams(location.search).get("tour") !== "aus";

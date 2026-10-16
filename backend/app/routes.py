@@ -568,28 +568,28 @@ def gpu_miete_aufraeumen() -> dict:
 def gpu_miete_auftrag(werte: dict) -> dict:
     """Ausdrücklicher Befehl von Sir: einen offenen Code-Auftrag (Art entwicklung) sofort auf einer gemieteten GPU
     erledigen, auch außerhalb der Nacht. Der Pod wird danach in jedem Fall gelöscht. Läuft im Hintergrund."""
-    import threading
-
-    aid = werte.get("auftrag")
     try:
-        nachtauftraege.gpu_ausdruecklich_pruefen(aid)
+        erg = nachtauftraege.gpu_ausdruecklich_starten(werte.get("auftrag"))
     except nachtauftraege.NachtauftragFehler as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
-    if not gpu_miete.ist_aktiv():
-        raise HTTPException(status_code=400, detail="GPU-Miete ist aus (RUNPOD_API_KEY fehlt oder GPU_MIETE_AUS gesetzt).")
-    if gpu_miete.laeuft():
-        raise HTTPException(status_code=409, detail="Es läuft schon eine GPU-Miete.")
+    return {**erg, "hinweis": "Ergebnis steht danach im Nachtauftrag und im Vault."}
 
-    def _lauf() -> None:
-        try:
-            erg = nachtauftraege.gpu_ausdruecklich(aid)
-            for z in erg["protokoll"]:
-                print(f"[GPU-Miete] {z.get('status', z)}", flush=True)
-        except Exception as exc:  # noqa: BLE001
-            print(f"FEHLER GPU-Miete (Befehl von Sir): {gpu_miete._sauber(exc)}", flush=True)  # noqa: SLF001
 
-    threading.Thread(target=_lauf, name="gpu-miete-befehl", daemon=True).start()
-    return {"gestartet": True, "auftrag": aid, "hinweis": "Ergebnis steht danach im Nachtauftrag und im Vault."}
+@router.get("/api/alarm/status")
+def alarm_status() -> dict:
+    """Alarme (P24b, app/alarm.py): welche Wege sind eingerichtet, was wurde gemeldet. Ruft nichts bei Amazon auf."""
+    from . import alarm
+
+    return alarm.status()
+
+
+@router.post("/api/alarm/test")
+def alarm_test() -> dict:
+    """Schickt eine Test-Benachrichtigung an Sirs Echo (app/alexa_alarm.py). Zum Prüfen der Einrichtung."""
+    from . import alexa_alarm
+
+    ok, text = alexa_alarm.senden(["Test"])
+    return {"gesendet": ok, "text": text}
 
 
 @router.get("/api/nachtarbeit/kurz")

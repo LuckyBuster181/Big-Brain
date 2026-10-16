@@ -35,7 +35,7 @@ import time
 import traceback
 from typing import Any, Iterator
 
-from . import (agent_service, alltag, anrede, chat_service, claude_fehler, gespraeche, hauptpc, ki_aufruf, marktdaten, nachtauftraege,
+from . import (agent_service, alltag, anrede, chat_service, claude_fehler, gespraeche, gpu_befehl, hauptpc, ki_aufruf, marktdaten, nachtauftraege,
                spotify, tagebuch, tagesfrage, tagesnotizen, vorschlaege, webseite)
 from .schemas import ChatRequest
 
@@ -102,6 +102,9 @@ def _absicht_ausfuehren(a: dict) -> Iterator[dict]:
     elif art == "tagesnotiz":
         # 13.10.2026 (P21): neueste/bestimmte Tagesnotiz lesen, ohne KI und ohne Ähnlichkeitssuche
         yield from _direkt(tagesnotizen.antwort(a))
+    elif art == "gpu":
+        # 16.10.2026 (P24b): GPU-Miete per Chat (Status, aufräumen, Code-Auftrag mit Nachfrage)
+        yield from _direkt(gpu_befehl.ausfuehren(a))
     elif art == "nachtauftrag":
         yield from _direkt(_nachtauftrag(a))
     elif art == "tagesfrage":
@@ -268,6 +271,13 @@ def _inner(request: ChatRequest, modell: str | None, laenge: str | None) -> Iter
     if pc_antwort:
         yield {"typ": "_modus", "modus": "direkt"}
         yield from _direkt(pc_antwort)
+        yield {"typ": "fertig"}
+        return
+    # 16.10.2026 (P24b): "ja" auf die Rückfrage "Auftrag auf eine gemietete GPU?" (gilt 2 Minuten)
+    gpu_antwort = gpu_befehl.bestaetigung(request.message)
+    if gpu_antwort:
+        yield {"typ": "_modus", "modus": "direkt"}
+        yield from _direkt(gpu_antwort)
         yield {"typ": "fertig"}
         return
     # 13.10.2026 (P21): "ja" auf das Angebot "die jüngste Tagesnotiz zeigen?" (gilt 2 Minuten)

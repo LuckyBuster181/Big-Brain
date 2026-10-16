@@ -390,6 +390,7 @@ def pruefe_browser(basis: str, b: Bericht, ausgabe: Path, mit_mediapipe: bool = 
         _auron_chat_pruefen(browser, basis, b, bilder)
         _finanzen_kuendigen_pruefen(browser, basis, b, bilder)
         _agenten_lichter_pruefen(browser, basis, b, bilder)
+        _ampel_banner_pruefen(browser, basis, b, bilder)
         _gesten_rechnen_pruefen(browser, basis, b, bilder)
         if mit_mediapipe:
             _gesten_echt_pruefen(browser, basis, b, bilder)
@@ -508,6 +509,37 @@ def _agenten_lichter_pruefen(browser, basis: str, b: Bericht, bilder: Path) -> N
     except Exception as exc:  # noqa: BLE001
         b.f("Browser", f"Agenten-Lichter: {str(exc).splitlines()[0][:200]}")
     kontext.close()
+
+
+def _ampel_banner_pruefen(browser, basis: str, b: Bericht, bilder: Path) -> None:
+    """P24b: Ist ein Bereich der Ampel rot (hier: /api/ampel im Browser ersetzt), zeigt Auron oben das rote Banner mit dem
+    Bereich; ist alles in Ordnung, bleibt es weg."""
+    rot = {"gesamt": "rot", "jobs": [{"name": "GPU-Miete", "farbe": "rot", "text": "ALARM: Pod nicht gelöscht", "seite": "settings"},
+                                     {"name": "Studium", "farbe": "grau", "text": "ruht", "seite": "jarvis"}]}
+    gut = {"gesamt": "grau", "jobs": [{"name": "Studium", "farbe": "grau", "text": "ruht", "seite": "jarvis"}]}
+    for name, daten, soll in (("rot", rot, True), ("gut", gut, False)):
+        kontext = browser.new_context(viewport={"width": 1440, "height": 900}, locale="de-DE")
+        seite = kontext.new_page()
+        try:
+            seite.route("**/api/ampel*", (lambda d: lambda r: r.fulfill(json=d))(daten))
+            seite.goto(basis + "/auron", wait_until="load", timeout=30000)
+            seite.wait_for_timeout(1500)
+            if seite.locator("#tourUeberspringen").is_visible():
+                seite.locator("#tourUeberspringen").click()
+            seite.wait_for_timeout(6500)   # erste Ampel-Abfrage nach 4 s
+            sichtbar = seite.locator("#warnung").is_visible()
+            titel = seite.locator("#warnungTitel").inner_text() if sichtbar else ""
+            liste = seite.locator("#warnungListe").inner_text() if sichtbar else ""
+            seite.screenshot(path=str(bilder / f"auron_banner_{name}.png"), timeout=60000)
+            if soll and not (sichtbar and "GPU-Miete" in titel and "Pod nicht gelöscht" in liste):
+                b.f("Banner", f"Ampel rot, aber kein rotes Banner mit dem Bereich (sichtbar={sichtbar}, Titel={titel!r})")
+            elif not soll and sichtbar and "Achtung" in titel:
+                b.f("Banner", f"Ampel in Ordnung, aber Banner sichtbar ({titel!r})")
+            else:
+                b.ok.append(f"Auron-Banner: Ampel {name} -> Banner {'sichtbar' if soll else 'weg'}")
+        except Exception as exc:  # noqa: BLE001
+            b.f("Browser", f"Ampel-Banner ({name}): {str(exc).splitlines()[0][:200]}")
+        kontext.close()
 
 
 # Künstliche Hand (21 Punkte) für die Gesten-Prüfung: Mitte der Fingerknöchel landet genau auf (sx, sy) der Seite.

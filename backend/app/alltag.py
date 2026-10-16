@@ -445,6 +445,12 @@ def absicht(text: str, offener_vorschlag: str | None = None) -> dict | None:
     ks = kosten.absicht(t)
     if ks:
         return ks
+    # 16.10.2026 (P24b): "GPU Status", "GPU aufräumen", "Code-Auftrag 7 auf die GPU" (mit Nachfrage), ohne KI
+    from . import gpu_befehl
+
+    gb = gpu_befehl.absicht(t)
+    if gb:
+        return gb
     # 13.10.2026 (P21): "neueste Tagesnotiz" / "Tagesnotiz von gestern" nach Dateiname, ohne KI -
     # VOR allem anderen, sonst landet die Frage in der Ähnlichkeitssuche (app/tagesnotizen.py)
     from . import tagesnotizen

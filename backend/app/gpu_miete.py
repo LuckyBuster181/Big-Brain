@@ -323,6 +323,12 @@ def alarm_setzen(text: str, pods: list[str] | None = None) -> None:
     meldung = f"FEHLER GPU-Miete: {text} - Bitte in der RunPod-Konsole nachsehen und den Pod von Hand löschen, Sir."
     fehlerbericht.merken("gpu_miete", meldung, "gpu_miete")
     print(meldung, flush=True)
+    try:   # P24b: sofort über die eingerichteten Alarm-Wege melden (Alexa), nicht erst beim nächsten Prüflauf
+        from . import alarm  # noqa: PLC0415
+
+        alarm.pruefen_gpu()
+    except Exception:  # noqa: BLE001
+        pass
 
 
 def alarm_loeschen() -> None:

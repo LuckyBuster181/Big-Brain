@@ -75,6 +75,9 @@ UMLEITUNGEN = {
     "FINANZEN_PATH": _TMP / "finanzen",
     # 16.10.2026: GPU-Miete (P24, Journal und Alarm)
     "GPU_MIETE_PATH": _TMP / "gpu_miete",
+    # 16.10.2026: Alarme (P24b)
+    "ALARM_PATH": _TMP / "alarm_zustand.json",
+    "ALEXA_NUTZER_PATH": _TMP / "alexa_nutzer.json",
 }
 for _name, _pfad in UMLEITUNGEN.items():
     os.environ[_name] = str(_pfad)
@@ -87,6 +90,9 @@ os.environ["BRIEFING_FINANZEN"] = "0"
 # 16.10.2026 (P24): nie ein echter RunPod-Schlüssel in Tests - die GPU-Miete bleibt aus, außer ein Test setzt sie selbst.
 os.environ.pop("RUNPOD_API_KEY", None)
 os.environ.pop("RUNPOD_API_URL", None)
+for _n in ("ALEXA_ALARM_CLIENT_ID", "ALEXA_ALARM_CLIENT_SECRET", "ALEXA_ALARM_EVENT_URL", "ALEXA_ALARM_TOKEN_URL"):
+    os.environ.pop(_n, None)
+os.environ["ALARM_AUS"] = "1"   # kein Hintergrund-Prüflauf in Tests/Prüfstand
 os.environ["BRIEFING_FINANZEN"] = "0"   # 11.10.2026: Abo-Übersicht nur in den eigenen Tests (test_finanzen)
 
 

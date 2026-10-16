@@ -69,7 +69,13 @@
             "läuft die nachtarbeit",
             "was hat die nacht gebracht",
             "wie viel ist vom rahmen verbraucht",
-            "wie stehen die kosten"
+            "wie stehen die kosten",
+            "was läuft nicht",
+            "gibt es probleme",
+            "gibt es fehler",
+            "ist alles in ordnung",
+            "wie steht die gpu",
+            "läuft ein pod"
           ]
         },
         {
@@ -159,6 +165,22 @@
           ]
         },
         {
+          "name": "GpuAuftragIntent",
+          "slots": [
+            {
+              "name": "nummer",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "code auftrag {nummer} auf die gpu",
+            "starte auftrag {nummer} auf der gpu",
+            "auftrag {nummer} auf der gpu",
+            "gpu auftrag {nummer}",
+            "lass auftrag {nummer} auf der gpu laufen"
+          ]
+        },
+        {
           "name": "LetzteAntwortIntent",
           "slots": [],
           "samples": [
@@ -223,6 +245,18 @@
                   "die inhaltsprüfung"
                 ]
               }
+            },
+            {
+              "id": "gpu_aufraeumen",
+              "name": {
+                "value": "gpu aufräumen",
+                "synonyms": [
+                  "die gpu aufräumen",
+                  "pods aufräumen",
+                  "gemietete gpus aufräumen",
+                  "gpu pods löschen"
+                ]
+              }
             }
           ]
         }
@@ -284,6 +318,24 @@
               }
             }
           ]
+        },
+        {
+          "name": "GpuAuftragIntent",
+          "confirmationRequired": true,
+          "prompts": {
+            "confirmation": "Confirm.Intent.GpuAuftrag"
+          },
+          "slots": [
+            {
+              "name": "nummer",
+              "type": "AMAZON.NUMBER",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.GpuAuftrag.nummer"
+              }
+            }
+          ]
         }
       ]
     },
@@ -339,6 +391,24 @@
           {
             "type": "PlainText",
             "value": "Welche Aktion, Sir?"
+          }
+        ]
+      },
+      {
+        "id": "Confirm.Intent.GpuAuftrag",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Für Auftrag {nummer} jetzt eine GPU bei RunPod mieten? Das kostet Geld. Richtig?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.GpuAuftrag.nummer",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Welche Nummer hat der Code-Auftrag, Sir?"
           }
         ]
       }

@@ -346,7 +346,8 @@ class FehlerfaelleLoeschenImmer(GpuTest):
         self.assertEqual(ampel.uebersicht()["gesamt"], "rot")
         self.assertIn("FEHLER GPU-Miete", self.fehlerbericht_texte())
         self.assertIn("nicht als gelöscht bestätigt", gpu_miete.sprach_hinweis())
-        self.assertIn("nicht als gelöscht bestätigt", alexa._status()["sprache"])  # noqa: SLF001
+        self.assertIn("Achtung Sir", alexa._status()["sprache"])  # noqa: SLF001 - Alarm steht unter den roten Punkten
+        self.assertIn("GPU-Miete", alexa._status()["sprache"])  # noqa: SLF001
         self.assertTrue(any("GPU-Miete" in p for p in nachtbericht.kurz()["punkte"]))
         self.assertIn("ALARM", "\n".join(gpu_miete.bericht_zeilen()))
         # Pod steht noch im Journal (Kosten laufen weiter in der Anzeige), neue Miete gesperrt

@@ -2,6 +2,7 @@
 #   -Aktion status      Stand zeigen (Deckel, laufender Pod, Alarm). Ruft RunPod NICHT auf.
 #   -Aktion aufraeumen  Waechter jetzt: alle Pods im RunPod-Konto pruefen und loeschen, was nicht da sein darf.
 #   -Aktion auftrag -Nr 7   offenen Code-Auftrag Nr. 7 SOFORT auf einer gemieteten GPU erledigen (kostet Geld).
+#   -Aktion alarmtest   Test-Benachrichtigung an das Echo schicken (P24b, Alexa-Alarm). Zeigt auch, was noch zur Einrichtung fehlt.
 param([string]$Aktion = "status", [int]$Nr = 0)
 $ErrorActionPreference = "Stop"
 $ip = "192.168.68.139"
@@ -43,5 +44,14 @@ elseif ($Aktion -eq "auftrag") {
   $r = Invoke-RestMethod -Method Post -Uri "$basis/api/gpu-miete/auftrag" -ContentType "application/json" -Body $json
   Write-Output ("GESTARTET: Auftrag " + $r.auftrag + ". " + $r.hinweis)
   Write-Output "Bitte jetzt die RunPod-Konsole offen halten: der Pod erscheint, arbeitet und verschwindet wieder."
+}
+elseif ($Aktion -eq "alarmtest") {
+  $s = Invoke-RestMethod -Uri "$basis/api/alarm/status"
+  Write-Output ("ALEXA_ALARM_EINGERICHTET=" + $s.alexa_eingerichtet)
+  if ($s.alexa_fehlt) { Write-Output ("FEHLT NOCH: " + $s.alexa_fehlt) }
+  $r = Invoke-RestMethod -Method Post -Uri "$basis/api/alarm/test" -TimeoutSec 60
+  Write-Output ("GESENDET=" + $r.gesendet)
+  Write-Output $r.text
+  if ($r.gesendet) { Write-Output "Am Echo sollte jetzt der gelbe Ring leuchten. Fragen Sie: Alexa, Benachrichtigungen." }
 }
 else { throw "Unbekannte Aktion: $Aktion" }

@@ -1187,6 +1187,33 @@ def gpu_ausdruecklich_pruefen(aid: int | str) -> dict:
     return a
 
 
+def gpu_ausdruecklich_starten(aid: int | str) -> dict:
+    """Befehl von Sir (Chat, Alexa, .bat, Route): prüft alles Wichtige sofort und startet die Miete im Hintergrund.
+    Wirft NachtauftragFehler mit einem Grund in einfachen Worten, sonst {"gestartet": True, "auftrag": nr}."""
+    from . import gpu_miete  # noqa: PLC0415
+
+    a = gpu_ausdruecklich_pruefen(aid)
+    if not gpu_miete.ist_aktiv():
+        raise NachtauftragFehler("Die GPU-Miete ist aus (RUNPOD_API_KEY fehlt oder GPU_MIETE_AUS ist gesetzt).")
+    if gpu_miete.laeuft():
+        raise NachtauftragFehler("Es läuft schon eine GPU-Miete.")
+    try:
+        gpu_miete.pruefen_start(ausdruecklich=True)
+    except gpu_miete.GpuMieteGesperrt as exc:
+        raise NachtauftragFehler(str(exc)) from exc
+
+    def _lauf() -> None:
+        try:
+            erg = gpu_ausdruecklich(a["id"])
+            for z in erg["protokoll"]:
+                print(f"[GPU-Miete] {z.get('status', z)}", flush=True)
+        except Exception as exc:  # noqa: BLE001
+            print(f"FEHLER GPU-Miete (Befehl von Sir): {gpu_miete._sauber(exc)}", flush=True)  # noqa: SLF001
+
+    threading.Thread(target=_lauf, name="gpu-miete-befehl", daemon=True).start()
+    return {"gestartet": True, "auftrag": a["id"]}
+
+
 def gpu_ausdruecklich(aid: int | str, heute: datetime.date | None = None, api: Any = None) -> dict:
     """Auf ausdrücklichen Befehl von Sir (auch außerhalb der Nacht): einen Code-Auftrag auf einer gemieteten GPU
     erledigen. Läuft im Aufrufer-Thread (die Route startet dafür einen Hintergrund-Thread)."""

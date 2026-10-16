@@ -32,6 +32,12 @@ def main() -> int:
         print("GPU-Wächter: kein RUNPOD_API_KEY, nichts zu tun.")
         return 0
     erg = gpu_miete.waechter_lauf()
+    try:   # P24b: steht ein Alarm, meldet der Wächter ihn selbst (auch wenn das Backend aus ist)
+        from app import alarm
+
+        alarm.pruefen_gpu()
+    except Exception as exc:  # noqa: BLE001
+        print(f"GPU-Wächter: Alarm-Meldung fehlgeschlagen: {type(exc).__name__}")
     print(f"GPU-Wächter: {erg['geprueft']} Pod(s) geprüft, {len(erg['geloescht'])} gelöscht"
           + (f", Fehler: {'; '.join(erg['fehler'])}" if erg["fehler"] else "."))
     for g in erg["geloescht"]:
