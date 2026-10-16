@@ -38,8 +38,10 @@ from rag.embedder import get_preset
 from rag.embeddings import get_client, get_collection
 from rag.retriever import RetrievedChunk, search_many
 
-from . import anrede, claude_fehler, knowledge_gaps
+from . import anrede, claude_fehler, knowledge_gaps, namen
 from .schemas import ChatResponse, HistoryMessage, Source
+
+_NAME = namen.ANREDE  # P20: zentrale Namensliste ("auron", "jarvis")
 
 DEFAULT_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-5")
 
@@ -589,7 +591,7 @@ _SMALLTALK_MUSTER = [
     r"(?:ja\s+ich\s+wei(?:ß|ss)|ok(?:ay)?\s+(?:cool|gut|danke|super)|alles\s+gut|passt\s+schon|schon\s+gut|egal)",
 ]
 _SMALLTALK_RE = re.compile(
-    r"^\s*(?:(?:jarvis|auron)\s*,?\s*)?(?:" + "|".join(_SMALLTALK_MUSTER) + r")" + _ANREDE + r"[\s.!?,]*$", re.I
+    r"^\s*(?:" + _NAME + r"\s*,?\s*)?(?:" + "|".join(_SMALLTALK_MUSTER) + r")" + _ANREDE + r"[\s.!?,]*$", re.I
 )
 _WITZ_RE = re.compile(
     r"\b(?:erz(?:ä|ae)hl|sag|mach|kennst\s+du|hast\s+du)\b.{0,20}\b(?:witz|witze|flachwitz|was\s+lustiges|joke)\b", re.I

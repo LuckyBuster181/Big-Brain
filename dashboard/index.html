@@ -11,6 +11,7 @@
 (function () {
   var q = new URLSearchParams(location.search), m = q.get("modul"), f = q.get("farbe");
   if (!m || !/^[a-z0-9]+$/.test(m)) return;
+  if (m === "auron") m = "jarvis";   /* P20: ?modul=auron gilt wie ?modul=jarvis (Seiten-Kennung bleibt) */
   window.MODUL = m;
   document.documentElement.classList.add("modul");
   document.documentElement.setAttribute("data-auron", /^(silber|graphit|gold)$/.test(f || "") ? f : "silber");
@@ -1514,7 +1515,7 @@
 
       <div class="card">
         <h2>Auron und Ordner</h2>
-        <div class="hint" style="margin-bottom:10px">Diese Werte liegen beim Backend. Änderungen wirken nach einem Neustart von JARVIS STARTEN.bat.</div>
+        <div class="hint" style="margin-bottom:10px">Diese Werte liegen beim Backend. Änderungen wirken nach einem Neustart von AURON STARTEN.bat.</div>
         <label class="hint">Vault-Ordner</label>
         <input type="text" id="setVault" style="margin:4px 0 10px" />
         <label class="hint">Antwortmodus</label>
@@ -2835,7 +2836,7 @@ async function jarvisStatus() {
   } catch (e) {
     $("statusDot").className = "dot bad";
     $("statusText").textContent = "Backend nicht erreichbar";
-    $("jobState").innerHTML = '<span class="err">Backend nicht erreichbar. JARVIS STARTEN.bat starten.</span>';
+    $("jobState").innerHTML = '<span class="err">Backend nicht erreichbar. AURON STARTEN.bat starten.</span>';
     setCore("bad", "offline");
   }
 }
@@ -3140,7 +3141,7 @@ async function briefingHolen() {
     if (S.vorlesen) sprich(d.text || "");
   } catch (e) {
     msgTextSetzen(blase, "Briefing nicht möglich: " + e.message);
-    $("chatHint").textContent = "Läuft das Backend? JARVIS STARTEN.bat";
+    $("chatHint").textContent = "Läuft das Backend? AURON STARTEN.bat";
   } finally {
     $("briefingBtn").classList.remove("active");
   }
@@ -3273,7 +3274,7 @@ async function ask(opt) {
     return antwort;
   } catch (e) {
     msgTextSetzen(blase, antwort || ("Fehler: " + e.message));
-    $("chatHint").textContent = "Läuft das Backend? JARVIS STARTEN.bat";
+    $("chatHint").textContent = "Läuft das Backend? AURON STARTEN.bat";
     if (opt.sprechen) sprich("Entschuldigung, Sir. Das Backend antwortet gerade nicht.");
     return antwort || "Fehler: " + e.message;
   } finally { $("chatSend").disabled = false; }
@@ -3826,9 +3827,9 @@ async function fishStatusLaden() {
     const d = await r.json();
     $("fishHinweis").textContent = (d.fish_verfuegbar ?? d.verfuegbar)
       ? "Bereit. Modell " + d.modell + ". " + d.hinweis
-      : "Kein Schlüssel hinterlegt: FISH_API_KEY in Jarvis\\.env eintragen und JARVIS STARTEN.bat neu starten.";
+      : "Kein Schlüssel hinterlegt: FISH_API_KEY in Jarvis\\.env eintragen und AURON STARTEN.bat neu starten.";
   } catch (e) {
-    $("fishHinweis").textContent = "Backend nicht erreichbar - läuft JARVIS STARTEN.bat?";
+    $("fishHinweis").textContent = "Backend nicht erreichbar - läuft AURON STARTEN.bat?";
   }
 }
 
@@ -3870,7 +3871,7 @@ $("setSpeichern").addEventListener("click", async () => {
     const d = await r.json();
     if (r.ok) { modusStandard = $("setModus").value; S.chatModus = ""; einstellungenSpeichernLokal(); modusAnzeigen(); }
     $("setStatus").textContent = r.ok
-      ? "Gespeichert. Der Ordner wirkt nach einem Neustart von JARVIS STARTEN.bat."
+      ? "Gespeichert. Der Ordner wirkt nach einem Neustart von AURON STARTEN.bat."
       : "Fehler: " + (d.detail || r.status);
   } catch (e) { $("setStatus").textContent = "Fehler: " + e.message; }
 });
@@ -4920,7 +4921,7 @@ async function bootStarten() {
     async () => { melden("Oberfläche geladen"); return true; },
     async () => {
       try { const h = await bootMitTimeout("/api/health"); backendOk = true; chunks = h.chunk_count; melden("Backend verbunden"); return true; }
-      catch (e) { melden("Backend nicht erreichbar - JARVIS STARTEN.bat starten", true); return false; }
+      catch (e) { melden("Backend nicht erreichbar - AURON STARTEN.bat starten", true); return false; }
     },
     async () => {
       if (!backendOk) { melden("Vault übersprungen", true); return false; }
@@ -4961,7 +4962,7 @@ async function bootStarten() {
   const anrede = S.nutzer || "Sir";
   bootBegruessung = backendOk
     ? `${gruss}, ${anrede}. Alle Systeme bereit.` + (chunks ? ` ${chunks.toLocaleString("de-DE")} Abschnitte im Gedächtnis.` : "") + (kostenText ? ` Diesen Monat ${kostenText}.` : "")
-    : `${gruss}, ${anrede}. Das Backend ist nicht erreichbar. Bitte JARVIS STARTEN.bat starten.`;
+    : `${gruss}, ${anrede}. Das Backend ist nicht erreichbar. Bitte AURON STARTEN.bat starten.`;
   $("bootSchritt").textContent = backendOk ? "Systeme bereit" : "Eingeschränkt";
   if (S.begruessung === false) { await bootWarte(500); bootSchliessen(); return; }
   // Browser lassen Ton erst nach einem Klick zu - deshalb der Knopf.
@@ -6284,7 +6285,7 @@ async function gerHauptpcZeigen() {
   catch (e) { st = { fehler: e.message || String(e) }; }
   if (GER.detail !== "hauptpc") return;
   let werte = "";
-  if (st.eingerichtet === false) werte = '<div class="hint">PC-Steuerung noch nicht eingerichtet: am Haupt-PC 3 Einrichten\\PC_STEUERUNG_EINRICHTEN.bat, danach JARVIS STARTEN.bat.</div>';
+  if (st.eingerichtet === false) werte = '<div class="hint">PC-Steuerung noch nicht eingerichtet: am Haupt-PC 3 Einrichten\\PC_STEUERUNG_EINRICHTEN.bat, danach AURON STARTEN.bat.</div>';
   else if (st.fehler) werte = `<div class="err">Haupt-PC antwortet nicht: ${esc(st.fehler)}</div><div class="hint">Aus, im Standby oder der PC-Agent läuft nicht (startet beim Anmelden automatisch).</div>`;
   else werte = `<div class="jv-kacheln">
       ${gerWert("Status", '<span class="up">online</span>')}
@@ -6440,7 +6441,7 @@ async function naLaden() {
     $("naListe").innerHTML = NA_REIHE.filter((s) => gruppen[s] && (s !== "verworfen" || gruppen[s].length)).map((s) =>
       `<h3 style="margin:10px 0 6px">${NA_STATUS[s]} (${gruppen[s].length})</h3>` + gruppen[s].slice(0, s === "verworfen" ? 5 : 50).map(naKarte).join("")).join("")
       || '<div class="hint">Noch keine Aufträge. Links einen anlegen oder im Chat: "Heute Nacht: recherchiere …"</div>';
-  } catch (e) { $("naLauf").innerHTML = '<span class="err">Nachtaufträge nicht erreichbar (JARVIS STARTEN.bat nötig?).</span>'; }
+  } catch (e) { $("naLauf").innerHTML = '<span class="err">Nachtaufträge nicht erreichbar (AURON STARTEN.bat nötig?).</span>'; }
 }
 async function tfLaden() {
   try {
@@ -7345,7 +7346,7 @@ void main(){ vec2 c = gl_PointCoord - 0.5; float d = length(c); if (d > 0.5) dis
     const [health, kosten, nacht, vor] = await Promise.all([ok("/api/health"), ok("/api/kosten"), ok("/api/nachtauftraege"), ok("/api/vorschlaege")]);
     const setz = (id, text, klasse) => { $(id).textContent = text; if (klasse !== undefined) $(id).parentNode.className = "jv-kachel " + klasse; };
     if (health) { setz("kMini", "online", "gut"); $("kMiniText").textContent = (health.chunk_count || 0).toLocaleString("de-DE") + " Abschnitte"; }
-    else { setz("kMini", "nicht erreichbar", "schlecht"); $("kMiniText").textContent = "JARVIS STARTEN.bat"; }
+    else { setz("kMini", "nicht erreichbar", "schlecht"); $("kMiniText").textContent = "AURON STARTEN.bat"; }
     if (kosten) {
       setz("kHeute", euro(kosten.heute_usd), kosten.heute_usd > 0.33 ? "warn" : "gut");
       $("kMonat").textContent = "Monat " + euro(kosten.ausgegeben_usd) + " von " + euro(kosten.rahmen_usd);
@@ -7923,7 +7924,7 @@ document.querySelector('nav button[data-page="denkblock"]').addEventListener("cl
   window.addEventListener("message", (e) => {
     if (e.origin !== location.origin || !e.data || e.data.auron !== "modul") return;
     if (/^(silber|graphit|gold)$/.test(e.data.farbe || "")) document.documentElement.setAttribute("data-auron", e.data.farbe);
-    if (/^[a-z0-9]+$/.test(e.data.seite || "")) { window.MODUL = e.data.seite; zeigen(e.data.seite); }
+    if (/^[a-z0-9]+$/.test(e.data.seite || "")) { const seite = e.data.seite === "auron" ? "jarvis" : e.data.seite; window.MODUL = seite; zeigen(seite); }
   });
 })();
 </script>

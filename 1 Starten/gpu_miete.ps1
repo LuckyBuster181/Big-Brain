@@ -19,7 +19,7 @@ if (-not (Antwortet)) {
   Start-Process -FilePath "ssh" -ArgumentList $arg -WindowStyle Hidden
   for ($i = 0; $i -lt 25; $i++) { Start-Sleep -Seconds 1; if (Antwortet) { break } }
 }
-if (-not (Antwortet)) { throw "Auron antwortet nicht (Port 8001). Bitte zuerst JARVIS STARTEN.bat." }
+if (-not (Antwortet)) { throw "Auron antwortet nicht (Port 8001). Bitte zuerst AURON STARTEN.bat." }
 
 if ($Aktion -eq "status") {
   $s = Invoke-RestMethod -Uri "$basis/api/gpu-miete/status"

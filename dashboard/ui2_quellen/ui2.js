@@ -852,7 +852,7 @@ void main(){ vec2 c = gl_PointCoord - 0.5; float d = length(c); if (d > 0.5) dis
     const [health, kosten, nacht, vor] = await Promise.all([ok("/api/health"), ok("/api/kosten"), ok("/api/nachtauftraege"), ok("/api/vorschlaege")]);
     const setz = (id, text, klasse) => { $(id).textContent = text; if (klasse !== undefined) $(id).parentNode.className = "jv-kachel " + klasse; };
     if (health) { setz("kMini", "online", "gut"); $("kMiniText").textContent = (health.chunk_count || 0).toLocaleString("de-DE") + " Abschnitte"; }
-    else { setz("kMini", "nicht erreichbar", "schlecht"); $("kMiniText").textContent = "JARVIS STARTEN.bat"; }
+    else { setz("kMini", "nicht erreichbar", "schlecht"); $("kMiniText").textContent = "AURON STARTEN.bat"; }
     if (kosten) {
       setz("kHeute", euro(kosten.heute_usd), kosten.heute_usd > 0.33 ? "warn" : "gut");
       $("kMonat").textContent = "Monat " + euro(kosten.ausgegeben_usd) + " von " + euro(kosten.rahmen_usd);

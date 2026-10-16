@@ -25,6 +25,8 @@ import os
 import shutil
 from pathlib import Path
 
+from . import namen
+
 # Name -> (Beschreibung, geheim?, Neustart nötig?)
 BEKANNTE: dict[str, tuple[str, bool, bool]] = {
     "ANTHROPIC_API_KEY": ("Claude (Anthropic) - Pflicht für alle Antworten", True, False),
@@ -46,7 +48,7 @@ class SchluesselFehler(ValueError):
 
 
 def env_pfad() -> Path:
-    return Path(os.getenv("JARVIS_ENV_PATH") or Path(__file__).resolve().parents[2] / ".env")
+    return Path(namen.env("ENV_PATH") or Path(__file__).resolve().parents[2] / ".env")   # P20: AURON_ENV_PATH vor JARVIS_ENV_PATH
 
 
 def _sicherung_pfad() -> Path:

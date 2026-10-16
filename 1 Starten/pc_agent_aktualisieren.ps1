@@ -3,7 +3,7 @@
 # Aendert Claude seinen Code, laeuft bis zum naechsten Anmelden noch die alte Version weiter.
 # Dieses Skript vergleicht die Version in der Datei mit der laufenden Version und startet den
 # Agent nur dann neu, wenn sie sich unterscheiden (oder wenn er gar nicht laeuft).
-# Wird von JARVIS STARTEN.bat aufgerufen. Macht nichts, wenn die PC-Steuerung nicht eingerichtet ist.
+# Wird von AURON STARTEN.bat aufgerufen. Macht nichts, wenn die PC-Steuerung nicht eingerichtet ist.
 param([Parameter(Mandatory = $true)][string]$J)
 $ErrorActionPreference = 'Stop'
 try {

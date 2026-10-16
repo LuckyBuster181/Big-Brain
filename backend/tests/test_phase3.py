@@ -51,7 +51,7 @@ class Whisper(unittest.TestCase):
 
     def test_stand_ohne_installation(self):
         with mock.patch.object(stt, "installiert", return_value=False):
-            self.assertIn("WHISPER_EINRICHTEN", stt.stand()["hinweis"])
+            self.assertRegex(stt.stand()["hinweis"], "WHISPER_EINRICHTEN|WHISPER MINI-PC")
         with mock.patch.dict(os.environ, {"STT_MODUS": "quatsch"}):
             self.assertEqual(stt.modus(), "browser")
 

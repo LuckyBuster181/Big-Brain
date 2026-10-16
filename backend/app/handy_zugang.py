@@ -23,7 +23,8 @@ und Zugriffe landen mit Zeit in data/zugriffe.jsonl.
 from __future__ import annotations
 
 import hmac
-import os
+
+from . import namen
 
 COOKIE = "jarvis_zugang"
 # 12.10.2026 (P19): Alexa-Skill "frag Auron". Amazon hat weder Tailnet noch Zugangscode; der
@@ -79,7 +80,7 @@ ERLAUBT: tuple[tuple[str, str], ...] = (
 
 
 def token() -> str:
-    return (os.getenv("JARVIS_HANDY_TOKEN") or "").strip()
+    return (namen.env("HANDY_TOKEN") or "").strip()   # P20: AURON_HANDY_TOKEN, sonst JARVIS_HANDY_TOKEN
 
 
 def ist_lokal(host: str | None) -> bool:

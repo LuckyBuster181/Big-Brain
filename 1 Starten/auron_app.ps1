@@ -1,6 +1,6 @@
 # auron_app.ps1 (04.10.2026, Claude) - startet Auron als eigenes Fenster (Desktop-Symbol "Auron").
 # Ablauf: 1. laeuft der Tunnel zum Mini-PC (127.0.0.1:8001)? Wenn nicht: Tunnel verdeckt starten.
-#         2. Antwortet Auron? Wenn nicht: Meldung, auf Wunsch JARVIS STARTEN.bat starten.
+#         2. Antwortet Auron? Wenn nicht: Meldung, auf Wunsch AURON STARTEN.bat starten.
 #         3. Auron im App-Fenster (ohne Adressleiste) oeffnen: Chrome, sonst Edge.
 # Nur ASCII, damit Windows PowerShell die Datei sicher liest.
 # 05.10.2026: Chrome/Edge mit eigenem Profil und Autoplay erlaubt (Stimme beim Start ohne Klick).
@@ -38,9 +38,9 @@ if (-not (Antwortet)) {
     Meldung "Der Mini-PC ($ip) antwortet nicht. Ist er an? Danach Auron noch einmal starten." ([System.Windows.Forms.MessageBoxButtons]::OK) | Out-Null
     exit 1
   }
-  $antwort = Meldung "Auron antwortet nicht. Soll JARVIS STARTEN.bat jetzt gestartet werden?" ([System.Windows.Forms.MessageBoxButtons]::YesNo)
+  $antwort = Meldung "Auron antwortet nicht. Soll AURON STARTEN.bat jetzt gestartet werden?" ([System.Windows.Forms.MessageBoxButtons]::YesNo)
   if ($antwort -eq [System.Windows.Forms.DialogResult]::Yes) {
-    Start-Process -FilePath (Join-Path $ordner "JARVIS STARTEN.bat")
+    Start-Process -FilePath (Join-Path $ordner "AURON STARTEN.bat")
   }
   exit 1
 }

@@ -31,7 +31,9 @@ from pathlib import Path
 from typing import Any
 
 DEFAULT_DATEI = Path(__file__).resolve().parents[2] / "data" / "vorschlaege.json"
-STANDARD_ZIEL = "Wissen/00 - Eingang/Gemerkt von Jarvis.md"
+STANDARD_ZIEL = "Wissen/00 - Eingang/Gemerkt von Auron.md"
+ALTES_ZIEL = "Wissen/00 - Eingang/Gemerkt von Jarvis.md"   # bis 16.10.2026 (P20); bleibt als Archiv liegen
+UEBERGANG_HINWEIS = "> Hinweis (P20): Neue Einträge stehen ab jetzt in [[Gemerkt von Auron]]. Diese Datei bleibt als Archiv."
 TAGESNOTIZ_ORDNER = "Wissen/02 - Grundlagen/Tages Notizen"
 MAX_TEXT = 30_000
 MAX_EINTRAEGE = 300
@@ -99,6 +101,44 @@ def ziel_pruefen(ziel: str) -> str:
     return "/".join(teile)
 
 
+def gemerkt_uebergang(basis: Path | None = None) -> str | None:
+    """P20: "Gemerkt von Jarvis.md" -> "Gemerkt von Auron.md". Gibt es nur die alte Datei, bekommt die
+    neue deren Inhalt; die alte bleibt liegen und bekommt oben einen Hinweis (einmal). Nichts wird gelöscht.
+    Rückgabe: was getan wurde (für Protokoll und Tests) oder None."""
+    basis = basis or vault_pfad()
+    alt, neu = basis / ALTES_ZIEL, basis / STANDARD_ZIEL
+    if not alt.is_file():
+        return None
+    getan = None
+    if not neu.exists():
+        neu.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(alt, neu)
+        getan = "kopiert"
+    text = alt.read_text(encoding="utf-8", errors="replace")
+    if UEBERGANG_HINWEIS not in text:
+        m = re.match(r"^---\s*\n.*?\n---\s*\n", text, re.S)
+        kopf, rest = (text[:m.end()], text[m.end():]) if m else ("", text)
+        alt.write_text(kopf + ("\n" if kopf else "") + UEBERGANG_HINWEIS + "\n\n" + rest.lstrip("\n"), encoding="utf-8")
+        getan = (getan + "+hinweis") if getan else "hinweis"
+    return getan
+
+
+def _ziel_aufloesen(rel: str) -> str:
+    """Altes Gemerkt-Ziel -> neues (mit Übergang); Vault-Namen mit "Jarvis" -> Auron-Fassung, wenn es sie gibt."""
+    from . import namen
+
+    if rel == ALTES_ZIEL:
+        rel = STANDARD_ZIEL
+    try:
+        basis = vault_pfad()
+    except VorschlagFehler:
+        return rel
+    if rel == STANDARD_ZIEL:
+        gemerkt_uebergang(basis)
+        return rel
+    return namen.vault_datei(basis, rel)
+
+
 def _absolut(rel: str) -> Path:
     basis = vault_pfad().resolve()
     pfad = (basis / rel).resolve()
@@ -115,7 +155,7 @@ def anlegen(text: str, ziel: str | None = None, grund: str = "", quelle: str = "
         raise VorschlagFehler("Leerer Vorschlag.")
     if len(text) > MAX_TEXT:
         raise VorschlagFehler(f"Text zu lang ({len(text)} Zeichen, höchstens {MAX_TEXT}).")
-    rel = ziel_pruefen(ziel or STANDARD_ZIEL)
+    rel = _ziel_aufloesen(ziel_pruefen(ziel or STANDARD_ZIEL))
     try:
         existiert = _absolut(rel).is_file()
     except VorschlagFehler:
@@ -197,7 +237,8 @@ def uebernehmen(vid: str) -> dict:
     with _lock:
         alle = _laden()
         v = _finden(alle, vid)
-        rel = ziel_pruefen(v["ziel"])
+        rel = _ziel_aufloesen(ziel_pruefen(v["ziel"]))
+        v["ziel"] = rel
         pfad = _absolut(rel)
         if pfad.is_file():
             alt = pfad.read_text(encoding="utf-8", errors="replace")

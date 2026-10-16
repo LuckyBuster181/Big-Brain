@@ -36,7 +36,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from urllib.parse import unquote
 
-from rag.vault_loader import HEADING_RE, IGNORE_VALUES, _read_text, _split_frontmatter, load_note
+from rag.vault_loader import HEADING_RE, _read_text, _split_frontmatter, is_ignored, load_note
 
 REPORT_NAME = "Vault-Pflegebericht.md"
 REPORT_DIR = "Wissen/06 - Quellen und Pflege"
@@ -438,10 +438,10 @@ def analyse(vault: Path, report_rel: str, not_checked: set[str] | None = None) -
 # ---------------------------------------------------------------------------
 
 def search_ignored(result: dict) -> set[str]:
-    """Notizen, die per `jarvis: ignorieren` (o. ä.) nicht in den Suchindex kommen."""
+    """Notizen, die per `auron: ignorieren` (oder alt `jarvis: ignorieren`, o. ä.) nicht in den Suchindex kommen."""
     return {
         n.rel for n in result["notes"]
-        if str((n.frontmatter or {}).get("jarvis", "")).strip().lower() in IGNORE_VALUES
+        if is_ignored(n.frontmatter)
     }
 
 
@@ -478,7 +478,7 @@ def render(result: dict, today: str, skipped_note: str | None = None) -> str:
     w(f"erstellt: {today}")
     w("quelle: automatische Prüfung (Jarvis/backend/tools/vault_pflege.py)")
     w("vertrauen: hoch")
-    w("jarvis: ignorieren")
+    w("auron: ignorieren")
     w("tags:")
     w("  - vault-pflege")
     w("  - qualitaet")
@@ -526,12 +526,12 @@ def render(result: dict, today: str, skipped_note: str | None = None) -> str:
             open_rels = [r for r in group if r not in ignored]
             if not open_rels:
                 todo.append(f"**{len(group)} Platzhalter mit fast demselben Text** ({names}) sind schon mit "
-                            "`jarvis: ignorieren` von der Suche ausgenommen. Offen: mit echtem Inhalt füllen "
+                            "`auron: ignorieren` von der Suche ausgenommen. Offen: mit echtem Inhalt füllen "
                             "(dann die Zeile wieder löschen) oder die Notizen löschen.")
                 continue
             text = (f"**{len(group)} Notizen bestehen aus fast demselben Text** ({names}). Das sind Platzhalter "
                     "aus einem Import ohne echten Fachinhalt. Entweder mit Inhalt füllen oder bis dahin mit "
-                    "`jarvis: ignorieren` im Frontmatter von der Suche ausnehmen.")
+                    "`auron: ignorieren` im Frontmatter von der Suche ausnehmen (alt `jarvis: ignorieren` gilt weiter).")
             if len(open_rels) < len(group):
                 text += " Noch nicht ausgenommen: " + ", ".join(Path(r).stem for r in open_rels) + "."
             else:

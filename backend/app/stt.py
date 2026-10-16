@@ -7,15 +7,23 @@ Das HUD nimmt die Frage auf (bis ca. 15 Sekunden) und schickt sie an
 /api/sprache/erkennen; faster-whisper macht daraus Text.
 
 Einschalten (Wunsch von Sir, 23.09.2026: "ja, als Option"):
-1. WHISPER_EINRICHTEN.bat starten (installiert faster-whisper ins venv und
-   lädt das Modell, einmalig ca. 250-500 MB).
-2. Im HUD unter Einstellungen > Sprache "Spracherkennung: lokal (Whisper)".
+1. Windows: WHISPER_EINRICHTEN.bat. Mini-PC (Ubuntu, P04 16.10.2026):
+   1 Starten\\WHISPER MINI-PC.bat (installiert faster-whisper per ssh in die
+   venv, lädt das Modell, startet den Dienst neu, schreibt eine Logdatei).
+2. Im HUD unter Einstellungen > Sprache "Spracherkennung: lokal (Whisper)"
+   oder im .bat "lokal einschalten". Auron (auron.html) nimmt dann für den
+   Mikrofon-Knopf Whisper; das Weckwort bleibt beim Browser.
 Standard bleibt der Browser.
 
+Linux (P04): läuft unverändert - Aufnahme in einen Temp-Ordner, Threads über
+WHISPER_THREADS, das Modell lädt faster-whisper beim ersten Mal von
+HuggingFace in den Cache des Benutzers (~/.cache/huggingface) oder nach
+WHISPER_MODELLORDNER. Standardmodell seit P04 "base" (der Mini-PC, i5 der
+4. Generation, ist langsam); "small" ist wählbar (WHISPER_MODELL).
+
 PC-Last: gedrosselt auf WHISPER_THREADS (Standard 2) und nie zwei Erkennungen
-gleichzeitig (Sperre). Modell "small" (Standard) versteht Deutsch gut und
-braucht für 10 Sekunden Sprache auf dem Ryzen 7 5700X3D grob 2-5 Sekunden
-(Schätzung, ungetestet). "base" ist schneller, versteht aber schlechter.
+gleichzeitig (Sperre). "small" versteht Deutsch besser, "base" ist etwa
+doppelt so schnell. Messung: backend/whisper_messung.py (über das .bat).
 
 Das Weckwort ("Immer ansprechbar") bleibt beim Browser - dauerhaftes Mithören
 mit Whisper wäre für den PC zu viel Last.
@@ -48,8 +56,20 @@ def modus() -> str:
     return m if m in ("browser", "lokal") else "browser"
 
 
+STANDARD_MODELL = "base"  # P04 (16.10.2026): vorher "small"; der Mini-PC ist für "small" zu langsam
+
+
 def modell_name() -> str:
-    return (os.getenv("WHISPER_MODELL") or "small").strip() or "small"
+    return (os.getenv("WHISPER_MODELL") or STANDARD_MODELL).strip() or STANDARD_MODELL
+
+
+def modell_ordner() -> str | None:
+    """Eigener Ordner für die Modelle (sonst der HuggingFace-Cache des Benutzers)."""
+    return (os.getenv("WHISPER_MODELLORDNER") or "").strip() or None
+
+
+def einrichtung() -> str:
+    return "WHISPER_EINRICHTEN.bat" if os.name == "nt" else "1 Starten\\WHISPER MINI-PC.bat"
 
 
 def threads() -> int:
@@ -71,9 +91,9 @@ def stand() -> dict:
     ok = installiert()
     return {
         "modus": modus(), "installiert": ok, "modell": modell_name(), "threads": threads(),
-        "geladen": _modell is not None,
+        "geladen": _modell is not None, "bereit": ok and modus() == "lokal",
         "hinweis": ("Lokale Erkennung bereit - das Audio verlässt den PC nicht." if ok else
-                    "faster-whisper ist nicht installiert - WHISPER_EINRICHTEN.bat starten. "
+                    f"faster-whisper ist nicht installiert - {einrichtung()} starten. "
                     "Bis dahin erkennt der Browser die Sprache."),
     }
 
@@ -87,11 +107,19 @@ def _laden(lader: Any = None):
             try:
                 from faster_whisper import WhisperModel
             except Exception as exc:  # noqa: BLE001
-                raise SttFehler("faster-whisper ist nicht installiert (WHISPER_EINRICHTEN.bat).") from exc
+                raise SttFehler(f"faster-whisper ist nicht installiert ({einrichtung()}).") from exc
             lader = WhisperModel
-        _modell = lader(modell_name(), device="cpu", compute_type="int8", cpu_threads=threads())
+        extra = {"download_root": modell_ordner()} if modell_ordner() else {}
+        _modell = lader(modell_name(), device="cpu", compute_type="int8", cpu_threads=threads(), **extra)
         _modell_name = modell_name()
         return _modell
+
+
+def vorladen(lader: Any = None) -> float:
+    """Modell laden (beim ersten Mal auch herunterladen). Gibt die Sekunden zurück."""
+    start = time.time()
+    _laden(lader)
+    return round(time.time() - start, 2)
 
 
 def erkennen(audio: bytes, typ: str = "audio/webm", lader: Any = None) -> dict:
@@ -109,8 +137,13 @@ def erkennen(audio: bytes, typ: str = "audio/webm", lader: Any = None) -> dict:
         with tempfile.TemporaryDirectory() as tmp:
             pfad = Path(tmp) / f"aufnahme{endung}"
             pfad.write_bytes(audio)
-            segmente, info = modell.transcribe(str(pfad), language="de", beam_size=1, vad_filter=True)
-            text = " ".join(s.text.strip() for s in segmente).strip()
+            try:
+                segmente, info = modell.transcribe(str(pfad), language="de", beam_size=1, vad_filter=True)
+                text = " ".join(s.text.strip() for s in segmente).strip()
+            except TypeError as exc:
+                if "metadata_errors" in str(exc):   # Befund 16.10.2026: faster-whisper 1.2.1 läuft nicht mit av 19
+                    raise SttFehler(f"Das Paket av ist zu neu für faster-whisper (braucht av<19) - {einrichtung()} erneut starten.") from exc
+                raise
         return {"text": text, "dauer_s": round(time.time() - start, 2), "modell": modell_name(),
                 "audio_s": round(getattr(info, "duration", 0) or 0, 1)}
     finally:

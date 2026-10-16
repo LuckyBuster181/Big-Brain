@@ -26,6 +26,10 @@ import operator
 import re
 from dateutil import tz
 
+from . import namen
+
+_NAME = namen.ANREDE  # P20: zentrale Namensliste ("auron", "jarvis")
+
 # dateutil statt zoneinfo: unter Windows fehlt zoneinfo die Zeitzonen-Datenbank
 # (Paket tzdata), dateutil bringt sie mit - wie app/kalender.py.
 ZEITZONE = tz.gettz("Europe/Berlin") or tz.tzlocal()
@@ -177,20 +181,20 @@ SEITEN = {
     "finanzen": ("finanzen", "finanzbereich", "konten", "kontoauszüge", "kontoauszuege", "kosten und abos"),
 }
 _NAV = re.compile(
-    r"^\s*(?:(?:jarvis|auron)[,\s]+)?(?:bitte\s+)?(?:zeig(?:e)?|öffne|oeffne|geh(?:e)?|wechsel(?:e)?|wechsle|spring(?:e)?|mach)"
+    r"^\s*(?:" + _NAME + r"[,\s]+)?(?:bitte\s+)?(?:zeig(?:e)?|öffne|oeffne|geh(?:e)?|wechsel(?:e)?|wechsle|spring(?:e)?|mach)"
     r"\s+(?:mir\s+)?(?:zu[mr]?\s+|auf\s+|in\s+|nach\s+)?(?:(?:den|die|das|dem|der)\s+)?"
     r"(?P<ziel>[a-zäöüß0-9\- ]{2,20}?)\s*(?:seite|an|auf)?\s*(?:bitte)?[.!]?\s*$",  # 26.09.: Ziffern und Bindestrich (PC 2, Mini-PC)
     re.I,
 )
-_STUMM = re.compile(r"^\s*(?:(?:jarvis|auron)[,\s]+)?(?:stopp|stop|halt|sei still|ruhe|psst|pst|hör auf|hoer auf)\s*[.!]?\s*$", re.I)
-_UHRZEIT = re.compile(r"^\s*(?:(?:jarvis|auron)[,\s]+)?(?:wie\s*spät\s*ist\s*es|wie\s*viel\s*uhr\s*(?:ist\s*es|haben\s*wir)|uhrzeit)\s*\??\s*$", re.I)
+_STUMM = re.compile(r"^\s*(?:" + _NAME + r"[,\s]+)?(?:stopp|stop|halt|sei still|ruhe|psst|pst|hör auf|hoer auf)\s*[.!]?\s*$", re.I)
+_UHRZEIT = re.compile(r"^\s*(?:" + _NAME + r"[,\s]+)?(?:wie\s*spät\s*ist\s*es|wie\s*viel\s*uhr\s*(?:ist\s*es|haben\s*wir)|uhrzeit)\s*\??\s*$", re.I)
 _DATUM = re.compile(
-    r"^\s*(?:(?:jarvis|auron)[,\s]+)?(?:welcher\s*tag\s*ist\s*heute|welches\s*datum\s*(?:ist\s*heute|haben\s*wir)?|"
+    r"^\s*(?:" + _NAME + r"[,\s]+)?(?:welcher\s*tag\s*ist\s*heute|welches\s*datum\s*(?:ist\s*heute|haben\s*wir)?|"
     r"der\s*wievielte\s*ist\s*heute|was\s*ist\s*heute\s*für\s*ein\s*tag|datum|welche\s*kalenderwoche(?:\s*ist)?(?:\s*heute)?|welche\s*kw)\s*\??\s*$",
     re.I,
 )
 _DIKTAT = re.compile(
-    r"^\s*(?:(?:jarvis|auron)[,\s]+)?(?:bitte\s+)?(?:merk\s*dir|merke\s*dir|notier(?:e)?|schreib\s*(?:dir\s*)?auf|"
+    r"^\s*(?:" + _NAME + r"[,\s]+)?(?:bitte\s+)?(?:merk\s*dir|merke\s*dir|notier(?:e)?|schreib\s*(?:dir\s*)?auf|"
     r"halte\s*fest|halt\s*fest|speicher(?:e)?\s*(?:dir\s*)?|vermerke)\s*[:,]?\s*(?:dass\s+)?(?P<text>.+)$",
     re.I | re.S,
 )
@@ -267,7 +271,7 @@ _ZAHL = r"(\d{1,3}(?:[.\s]\d{3})+(?:,\d+)?|\d+(?:[.,]\d+)?)"
 _SYMBOL_TICKER = r"[a-z]{6}|dax|sp500|nasdaq100|dow|aapl|msft|nvda|tsla|sap"
 _TB_RICHTUNG = r"(?P<richtung>long|short|kauf|gekauft|verkauf|verkauft|buy|sell)"
 _TB_EINTRAG = re.compile(
-    r"^\s*(?:(?:jarvis|auron)[,\s]+)?(?:(?:neuer\s+)?trade|tagebuch|eintrag(?:en)?)?\s*:?\s*"
+    r"^\s*(?:" + _NAME + r"[,\s]+)?(?:(?:neuer\s+)?trade|tagebuch|eintrag(?:en)?)?\s*:?\s*"
     r"(?P<symbol>[a-zäöüß&/\s\d]{2,20}?)\s+" + _TB_RICHTUNG + r"\s+(?:bei|@|zu|auf)?\s*(?P<einstieg>" + _ZAHL[1:-1] + r")"
     r"(?P<rest>.*)$", re.I | re.S)
 _TB_STOPP = re.compile(r"\b(?:stopp?|sl|stop[\s-]*loss)\s*(?:bei|@|auf|:)?\s*" + _ZAHL, re.I)
@@ -275,11 +279,11 @@ _TB_ZIEL = re.compile(r"\b(?:ziel|tp|take[\s-]*profit)\s*(?:bei|@|auf|:)?\s*" + 
 _TB_RISIKO = re.compile(r"\brisiko\s*(?:von|:)?\s*" + _ZAHL + r"\s*(?:€|euro|eur)", re.I)
 _TB_GRUND = re.compile(r"\b(?:grund|weil|wegen)\s*:?\s*(?P<grund>.+)$", re.I | re.S)
 _TB_ZU = re.compile(
-    r"^\s*(?:(?:jarvis|auron)[,\s]+)?(?:trade\s+(?P<id>\d+)\s+|(?P<symbol>[a-zäöüß&/]{2,15})(?:\s+trade)?\s+|trade\s+)?"
+    r"^\s*(?:" + _NAME + r"[,\s]+)?(?:trade\s+(?P<id>\d+)\s+|(?P<symbol>[a-zäöüß&/]{2,15})(?:\s+trade)?\s+|trade\s+)?"
     r"(?:geschlossen|raus|ausgestiegen|beendet|zugemacht|glattgestellt)\s*(?:bei|@|zu|auf)?\s*(?P<preis>" + _ZAHL[1:-1] + r")"
     r"(?:\s*(?:mit|,)?\s*(?P<eur>[+-]?\d+(?:[.,]\d+)?)\s*(?:€|euro|eur))?\s*[.!]?\s*$", re.I)
 _TB_ZU_ART = re.compile(
-    r"^\s*(?:(?:jarvis|auron)[,\s]+)?(?:(?:bei\s+)?(?:trade\s+(?P<id>\d+)|(?P<symbol>[a-zäöüß&/]{2,15}))\s*[:,]?\s*)?"
+    r"^\s*(?:" + _NAME + r"[,\s]+)?(?:(?:bei\s+)?(?:trade\s+(?P<id>\d+)|(?P<symbol>[a-zäöüß&/]{2,15}))\s*[:,]?\s*)?"
     r"(?P<art>stopp?|sl|stop[\s-]*loss|ziel|tp|take[\s-]*profit)\s+(?:wurde\s+|ist\s+)?"
     r"(?:erreicht|getroffen|ausgel(?:ö|oe)st|gerissen|gegriffen)\s*[.!]?\s*$", re.I)
 _TB_AUSWERTUNG = re.compile(
@@ -369,21 +373,21 @@ def ziel_seite(wort: str) -> str | None:
 _NA_VERB = (r"recherchier|such|plan|bau|entwickl|schreib|finde|überleg|ueberleg|vergleich|erstell|arbeite|"
             r"prüf|pruef|analysier|sammel|mach|denk|schmied|programmier|lies|lese")
 _NA_ANLEGEN = re.compile(
-    r"^\s*(?:(?:jarvis|auron)[,\s]+)?(?:bitte\s+)?(?:(?:heute|diese)\s+nacht|über\s+nacht|ueber\s+nacht|nachtauftrag|"
+    r"^\s*(?:" + _NAME + r"[,\s]+)?(?:bitte\s+)?(?:(?:heute|diese)\s+nacht|über\s+nacht|ueber\s+nacht|nachtauftrag|"
     r"f(?:ü|ue)r\s+(?:heute\s+|die\s+)?nacht)\b\s*(?P<trenner>[:,\-–]?)\s*(?P<text>.{5,})$", re.I | re.S)
 _NA_LISTE = re.compile(
-    r"^\s*(?:(?:jarvis|auron)[,\s]+)?(?:was\s+(?:steht|machst\s+du|macht\s+(?:jarvis|auron)|l(?:ä|ae)uft|ist\s+geplant)\s+"
+    r"^\s*(?:" + _NAME + r"[,\s]+)?(?:was\s+(?:steht|machst\s+du|macht\s+" + _NAME + r"|l(?:ä|ae)uft|ist\s+geplant)\s+"
     r"(?:(?:f(?:ü|ue)r\s+)?(?:heute|diese)\s+)?nacht\b.*|(?:zeig\w*\s+(?:mir\s+)?(?:die\s+)?)?nachtauftr(?:ä|ae)ge\s*\??)\s*$", re.I)
 _NA_ANTWORT = re.compile(
-    r"^\s*(?:(?:jarvis|auron)[,\s]+)?(?:antwort\s+(?:zu|f(?:ü|ue)r|auf)\s+(?:den\s+)?)?auftrag\s*(?:nr\.?\s*)?(?P<nr>\d+)\s*[:\-–]\s*(?P<text>.+)$",
+    r"^\s*(?:" + _NAME + r"[,\s]+)?(?:antwort\s+(?:zu|f(?:ü|ue)r|auf)\s+(?:den\s+)?)?auftrag\s*(?:nr\.?\s*)?(?P<nr>\d+)\s*[:\-–]\s*(?P<text>.+)$",
     re.I | re.S)
 _NA_AKTION = re.compile(
-    r"^\s*(?:(?:jarvis|auron)[,\s]+)?(?:auftrag|vorschlag)\s*(?:nr\.?\s*)?(?P<nr>\d+)\s+"
+    r"^\s*(?:" + _NAME + r"[,\s]+)?(?:auftrag|vorschlag)\s*(?:nr\.?\s*)?(?P<nr>\d+)\s+"
     r"(?P<aktion>freigeben|starten|annehmen|verwerfen|l(?:ö|oe)schen|streichen)\b[\s.!]*$", re.I)
 _TF_ANTWORT = re.compile(
-    r"^\s*(?:(?:jarvis|auron)[,\s]+)?(?:antwort(?:\s+auf\s+(?:die\s+)?(?:tages)?frage)?|tagesfrage)\s*:\s*(?P<text>.+)$", re.I | re.S)
+    r"^\s*(?:" + _NAME + r"[,\s]+)?(?:antwort(?:\s+auf\s+(?:die\s+)?(?:tages)?frage)?|tagesfrage)\s*:\s*(?P<text>.+)$", re.I | re.S)
 _TF_ZEIGEN = re.compile(
-    r"^\s*(?:(?:jarvis|auron)[,\s]+)?(?:was\s+ist\s+(?:die\s+|deine\s+)?)?(?:frage\s+des\s+tages|tagesfrage)\s*\??\s*$", re.I)
+    r"^\s*(?:" + _NAME + r"[,\s]+)?(?:was\s+ist\s+(?:die\s+|deine\s+)?)?(?:frage\s+des\s+tages|tagesfrage)\s*\??\s*$", re.I)
 
 
 def nachtauftrag_absicht(text: str) -> dict | None:

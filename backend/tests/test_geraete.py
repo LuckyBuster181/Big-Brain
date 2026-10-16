@@ -261,7 +261,7 @@ class Monitore(Grundlage):
                 mock.patch.object(hauptpc, "aktion", return_value={"ok": False, "meldung": "Unbekannte Aktion: anzeige"}):
             r = geraete.anzeige_anwenden("alle")
         self.assertFalse(r["ok"])
-        self.assertIn("JARVIS STARTEN", r["fehler"])
+        self.assertIn("AURON STARTEN", r["fehler"])
 
     def test_haupt_pc_aus_klare_meldung(self):
         from app import hauptpc

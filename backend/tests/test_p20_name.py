@@ -29,7 +29,9 @@ def _sichtbar(text: str) -> list[str]:
 class KeinJarvisSichtbar(unittest.TestCase):
     def test_python_texte(self):
         funde = []
-        dateien = [*WURZEL.glob("backend/app/*.py"), WURZEL / "backend/main.py", *WURZEL.glob("backend/tools/*.py"),
+        # tools/namen_auron.py (P20 Teil C) muss den alten Namen nennen: es benennt genau diese Dateien um.
+        dateien = [*WURZEL.glob("backend/app/*.py"), WURZEL / "backend/main.py",
+                   *[d for d in WURZEL.glob("backend/tools/*.py") if d.name != "namen_auron.py"],
                    *WURZEL.glob("backend/llm/*.py")]
         for datei in dateien:
             baum = ast.parse(datei.read_text(encoding="utf-8"))

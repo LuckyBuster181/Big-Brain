@@ -7,7 +7,7 @@
 #     bash piper_mini_einrichten.sh status       nur anzeigen, was da ist
 #
 # Es findet den Projektordner und die venv selbst: Dienst "jarvis" (systemd), sonst bekannte Ordner.
-# Anderer Ordner: JARVIS_DIR=/pfad bash piper_mini_einrichten.sh einrichten
+# Anderer Ordner: AURON_DIR=/pfad (alt: JARVIS_DIR) bash piper_mini_einrichten.sh einrichten
 # Aendert nichts am Dienst und nichts an der .env. Kosten: 0 EUR (Download der Stimmen ca. 190 MB).
 # Ungetestet auf dem Mini-PC (in der Cloud ist nur der Python-Teil mit einer echten Stimme geprueft).
 
@@ -18,13 +18,14 @@ HF="https://huggingface.co/rhasspy/piper-voices/resolve/main/de/de_DE/thorsten"
 
 suche_ordner() {
     local kandidat
-    if [ -n "${JARVIS_DIR:-}" ] && [ -d "$JARVIS_DIR/backend" ]; then echo "$JARVIS_DIR"; return; fi
+    local vorgabe="${AURON_DIR:-${JARVIS_DIR:-}}"   # P20: AURON_DIR vor JARVIS_DIR
+    if [ -n "$vorgabe" ] && [ -d "$vorgabe/backend" ]; then echo "$vorgabe"; return; fi
     for modus in "" "--user"; do
         kandidat="$(systemctl $modus show jarvis -p WorkingDirectory --value 2>/dev/null || true)"
         kandidat="${kandidat%/backend}"
         if [ -n "$kandidat" ] && [ -d "$kandidat/backend" ]; then echo "$kandidat"; return; fi
     done
-    for kandidat in "$HOME/Jarvis" "$HOME/jarvis" "$HOME/Brain" "$HOME/big-brain" "$HOME/Documents/KI/Jarvis"; do
+    for kandidat in "$HOME/KI/Jarvis" "$HOME/Jarvis" "$HOME/jarvis" "$HOME/Brain" "$HOME/big-brain" "$HOME/Documents/KI/Jarvis"; do
         if [ -d "$kandidat/backend" ]; then echo "$kandidat"; return; fi
     done
 }
@@ -45,7 +46,7 @@ echo "===== Piper auf dem Mini-PC: $AKTION, $(date '+%d.%m.%Y %H:%M:%S') ====="
 ORDNER="$(suche_ordner)"
 if [ -z "$ORDNER" ]; then
     echo "FEHLER: Projektordner nicht gefunden (gesucht: Dienst jarvis, ~/Jarvis, ~/jarvis, ~/Brain, ~/big-brain)."
-    echo "        Dann mit JARVIS_DIR=/pfad/zum/Projekt starten oder den Ordner an Claude melden."
+    echo "        Dann mit AURON_DIR=/pfad/zum/Projekt starten oder den Ordner an Claude melden."
     exit 2
 fi
 PY="$(suche_python "$ORDNER")"
@@ -58,7 +59,7 @@ echo "Python:        $PY ($("$PY" --version 2>&1))"
 
 if [ ! -f "$ORDNER/backend/app/piper_tts.py" ] || ! grep -q "def paket_da" "$ORDNER/backend/app/piper_tts.py"; then
     echo "FEHLER: Auf dem Mini-PC liegt noch der alte Code (piper_tts.py ohne Linux-Weg)."
-    echo "        Erst REPO HOLEN.bat, dann JARVIS STARTEN.bat (bringt den neuen Code hin), dann dies noch einmal."
+    echo "        Erst REPO HOLEN.bat, dann AURON STARTEN.bat (bringt den neuen Code hin), dann dies noch einmal."
     exit 3
 fi
 
@@ -154,12 +155,12 @@ for q in piper_tts.QUALITAETEN:
 PYEOF
     echo
     echo "Fertig. Hoerproben: data/piper_probe_high.wav und piper_probe_medium.wav (kommen auch auf den PC)."
-    echo "Danach JARVIS STARTEN.bat, damit das Backend die Stimme vorlaedt. Dann in den Einstellungen 'Vorlesen ueber' waehlen."
+    echo "Danach AURON STARTEN.bat, damit das Backend die Stimme vorlaedt. Dann in den Einstellungen 'Vorlesen ueber' waehlen."
     exit $FEHLT
     ;;
 messen)
     cd "$ORDNER/backend" || exit 2
-    if [ ! -f stimme_messung.py ]; then echo "FEHLER: backend/stimme_messung.py fehlt - erst REPO HOLEN und JARVIS STARTEN."; exit 3; fi
+    if [ ! -f stimme_messung.py ]; then echo "FEHLER: backend/stimme_messung.py fehlt - erst REPO HOLEN und AURON STARTEN."; exit 3; fi
     echo "Messung laeuft (Fish Audio, Piper high, Piper medium: je 5 Laeufe und 20 Saetze), dauert einige Minuten ..."
     PIPER_THREADS="${PIPER_THREADS:-2}" "$PY" stimme_messung.py --ausgabe "$DATEN/stimme_messung.txt"
     ;;

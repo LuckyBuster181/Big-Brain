@@ -21,7 +21,7 @@ import time
 from pathlib import Path
 from typing import Any
 
-from . import chat_service
+from . import chat_service, namen
 
 ORDNER = "Wissen/10 - Denkblock"
 FUSSZEILE = "\n\n---\nDenkblock · [[Wissen/10 - Denkblock/00 - Denkblock|Alle Denk-Notizen]] · [[Wissen/00 - Übersicht|Gesamtübersicht]]\n"
@@ -168,8 +168,17 @@ def _uebersicht_schreiben() -> None:
     for e in liste():
         zeilen.append(f"| [[{ORDNER}/{e['name']}\\|{e['name']}]] | {e['geaendert'][:16].replace('T', ' ')} |")
     zeilen += ["", "## Verbindungen", "- [[Wissen/00 - Übersicht|Gesamtübersicht]]",
-               "- [[Wissen/03 - KI und Technik/12 - Jarvis Gesamtidee Plan und Fragen an Sir|Gesamtidee, Plan und Fragen an Sir]]", ""]
+               f"- [[{_gesamtidee()}|Gesamtidee, Plan und Fragen an Sir]]", ""]
     (_ordner() / f"{UEBERSICHT}.md").write_text("\n".join(zeilen), encoding="utf-8")
+
+
+def _gesamtidee() -> str:
+    """Link-Ziel der Gesamtidee; nach NAMEN AUF AURON UMSTELLEN.bat die Auron-Fassung (P20)."""
+    rel = "Wissen/03 - KI und Technik/12 - Jarvis Gesamtidee Plan und Fragen an Sir.md"
+    vault = (os.getenv("VAULT_PATH") or "").strip()
+    if vault and Path(vault).is_dir():
+        rel = namen.vault_datei(vault, rel)
+    return rel[:-3]
 
 
 def speichern(name: str, text: str) -> dict:
