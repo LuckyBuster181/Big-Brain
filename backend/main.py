@@ -96,6 +96,15 @@ async def lifespan(_app: FastAPI):
     except Exception as exc:  # noqa: BLE001
         print(f"WARNUNG: Alarm-Prüfung nicht gestartet: {exc}", flush=True)
 
+    # 16.10.2026 (P05): Piper-Stimme schon beim Start laden (Linux), damit der erste Satz nicht Sekunden braucht
+    try:
+        from app import piper_tts, stimme
+
+        if not os.getenv("AURON_TESTMODUS") and "piper" in stimme.kette():
+            piper_tts.vorwaermen_starten()
+    except Exception as exc:  # noqa: BLE001
+        print(f"WARNUNG: Piper nicht vorgewärmt: {exc}", flush=True)
+
     watcher = None
     try:
         watcher = vault_watcher.from_env()

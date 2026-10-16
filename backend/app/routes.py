@@ -50,6 +50,7 @@ from . import (
     sonos,
     sprache,
     spotify,
+    stimme,
     stt,
     studium,
     system_info,
@@ -969,23 +970,33 @@ def trading_backtest(request: BacktestRequest) -> dict:
 
 @router.get("/api/sprache/status")
 def sprache_status() -> dict:
-    """Ob die Sprachausgabe über Fish Audio bereitsteht (ohne den Schlüssel zu zeigen)."""
-    return sprache.stand()
+    """Stand der Sprachausgabe (ohne Schlüssel). "verfuegbar" = eine Server-Stimme (Fish Audio
+    oder Piper) kann sprechen; "fish_verfuegbar" nur Fish. Details der Wahl: stimme.stand()."""
+    daten = sprache.stand()
+    wahl = stimme.stand()
+    daten["fish_verfuegbar"] = daten["verfuegbar"]
+    daten["verfuegbar"] = wahl["quelle"] != "browser"
+    daten.update({"quelle": wahl["quelle"], "name": wahl["name"], "gewaehlt": wahl["gewaehlt"],
+                  "automatisch": wahl["automatisch"], "kette": wahl["kette"], "piper": wahl["piper"]})
+    return daten
 
 
 @router.post("/api/sprache")
 def sprache_erzeugen(request: SpracheRequest) -> Response:
-    """Text vorlesen lassen und die fertige MP3 zurückgeben.
+    """Text vorlesen lassen und die fertige Sprachdatei zurückgeben (MP3 von Fish Audio oder WAV von Piper).
 
-    Achtung: Der Text verlässt dabei den PC (siehe app/sprache.py)."""
+    Welche Stimme: Einstellung "Stimme" (app/stimme.py). Rückfall gewählte Stimme -> Piper -> Browser;
+    bei "Browser" antwortet der Server mit 503, und die Oberfläche spricht selbst.
+    Achtung: Bei Fish Audio verlässt der Text den PC (siehe app/sprache.py)."""
     try:
-        daten = sprache.sprich(request.text, tempo=request.tempo)
-    except sprache.SpracheFehler as exc:
-        raise HTTPException(status_code=502, detail=str(exc)) from exc
+        ergebnis = stimme.sprich(request.text, tempo=request.tempo, bevorzugt=request.quelle)
+    except stimme.StimmeBrowser as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
     return Response(
-        content=daten,
-        media_type="audio/mpeg",
-        headers={"Cache-Control": "no-store", "Content-Length": str(len(daten))},
+        content=ergebnis.daten,
+        media_type=ergebnis.medientyp,
+        headers={"Cache-Control": "no-store", "Content-Length": str(len(ergebnis.daten)),
+                 "X-Stimme": ergebnis.quelle, "X-Stimme-Rueckfall": str(len(ergebnis.rueckfaelle))},
     )
 
 

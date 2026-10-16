@@ -62,6 +62,7 @@ class Piper(unittest.TestCase):
             exe, stimme = Path(tmp) / "piper.exe", Path(tmp) / "de.onnx"
             exe.write_bytes(b"")
             stimme.write_bytes(b"")
+            Path(str(stimme) + ".json").write_text("{}", encoding="utf-8")   # P05: ohne .onnx.json nicht bereit
             aufrufe = []
 
             def ausfuehren(befehl, input, capture_output, timeout, **kw):
@@ -69,7 +70,8 @@ class Piper(unittest.TestCase):
                 Path(befehl[befehl.index("--output_file") + 1]).write_bytes(b"RIFFWAV")
                 return SimpleNamespace(returncode=0, stderr=b"")
 
-            with mock.patch.dict(os.environ, {"PIPER_PFAD": str(exe), "PIPER_STIMME": str(stimme)}):
+            with mock.patch.dict(os.environ, {"PIPER_PFAD": str(exe), "PIPER_STIMME": str(stimme)}), \
+                    mock.patch.object(piper_tts, "_windows", return_value=True):   # dieser Test prüft den Windows-Weg
                 self.assertTrue(piper_tts.verfuegbar())
                 wav = piper_tts.sprechen("Guten Abend, Sir.", tempo=1.25, ausfuehren=ausfuehren)
         self.assertEqual(wav, b"RIFFWAV")
@@ -77,7 +79,8 @@ class Piper(unittest.TestCase):
         self.assertIn("0.80", aufrufe[0][0])  # length_scale = 1 / tempo
 
     def test_nicht_eingerichtet(self):
-        with mock.patch.dict(os.environ, {"PIPER_PFAD": "/gibt/es/nicht", "PIPER_STIMME": "/nein.onnx"}):
+        with mock.patch.dict(os.environ, {"PIPER_PFAD": "/gibt/es/nicht", "PIPER_STIMME": "/nein.onnx"}), \
+                mock.patch.object(piper_tts, "_windows", return_value=True):
             self.assertFalse(piper_tts.verfuegbar())
             with self.assertRaises(piper_tts.PiperFehler):
                 piper_tts.sprechen("Hallo")

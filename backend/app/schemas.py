@@ -127,6 +127,7 @@ class SpracheRequest(BaseModel):
 
     text: str
     tempo: float = 1.0
+    quelle: str | None = None  # P05: "fish", "piper" oder "browser" nur für diese Anfrage
 
 
 class SpotifyBefehl(BaseModel):
